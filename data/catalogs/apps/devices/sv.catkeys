@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	542483980
+1	swedish	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
@@ -8,6 +8,7 @@ Generate system information	DevicesView		Generera systeminformation
 Class info	DevicePCI		Klass information
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
+ACPI thermal zone	DeviceACPI		ACPI-termisk zon
 Communications	DeviceSCSI		Kommunikations
 Mass storage controller	Device		Lagringskontroller
 Connection	DevicesView		Anslutning
@@ -21,7 +22,9 @@ Unknown device	DevicesView		Okänd enhet
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 Name	PropertyList		Namn
 Manufacturer	DeviceSCSI		Tillverkare
+Graphics peripheral	DeviceSCSI		Grafikperiferienhet
 Device name	Device		Enhetsnamn
+unknown	DeviceACPI		okänd
 Satellite communications controller	Device		Styrenhet för satellitkommunikation
 Device class	DeviceSCSI		Enhetsklass
 Device	Device		Enhet
@@ -29,6 +32,7 @@ Input device controller	Device		Indataenhetskontroller
 PCI bus	DevicesView		PCI-buss
 Changer	DeviceSCSI		Växlare
 Serial bus controller	Device		Seriell kontroller
+unknown	DevicesView		okänd
 Refresh devices	DevicesView		Uppdatera enheter
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
@@ -38,7 +42,10 @@ Wireless controller	Device		Trådlös kontroller
 Generic system peripheral	Device		Allmänt systemtillbehör
 Value	PropertyList		Värde
 Devices	DevicesView		Enheter
+none	DevicesView		ingen
 Device name	DeviceACPI		Enhetsnamn
+unknown	DevicePCI		okänd
+Optical drive	DeviceSCSI		Optisk enhet
 Display controller	Device		Skärmkontroller
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
@@ -48,20 +55,27 @@ Report compatibility	DevicesView		Rapportera kompatibilitet
 Computer	Device		Dator
 PCI bus	Device		PCI-buss
 Enclosure	DeviceSCSI		Hölje
+Tape drive	DeviceSCSI		Bandstation
 Order by:	DevicesView		Sortera efter:
 Intelligent controller	Device		Intelligent styrenhet
+ACPI processor namespace '%2'	DeviceACPI		ACPI-processornamnområde ”%2”
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avsluta
 ISA bus	Device		ISA-buss
 ISA bus	DevicesView		ISA-buss
 Basic information	PropertyList		Grundläggande information
 Processor	DeviceSCSI		Processor
+Card reader	DeviceSCSI		Kortläsare
 Bridge	Device		Brygga
+ACPI button '%1'	DeviceACPI		ACPI-knapp ”%1”
 Attributes	PropertyList		Attribut
+Disk drive	DeviceSCSI		Disk-enhet
 Worm	DeviceSCSI		Mask
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Tillverkare
 Bridge	DeviceSCSI		Brygga
+ACPI system indicator	DeviceACPI		ACPI-systemindikator
+ACPI system bus	DeviceACPI		ACPI-systembuss
 Signal processing controller	Device		Signalbehandlingskontroller
 Device name	DeviceSCSI		Enhetsnamn
 Docking station	Device		Dockningsstation

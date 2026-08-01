@@ -1,5 +1,6 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3945138144
+1	friulian	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
+User ratings loading…	PackageInfoView		Cjariament valutazions dai utents…
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
@@ -44,13 +45,16 @@ Cancel	UserLoginWindow		Anule
 Rating not possible	MainWindow		Valutazion dineade
 Package update error	MainWindow		Erôr di inzornament dal pachet
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Fâs clic achì
+No screenshot available.	PackageInfoView		Nissune videade disponibile.
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Daûr a recuperâ lis valutazions dai utents pal pachet
 Reboot required	PackageManager		Tornâ a inviâ necessari
 All packages	PackageListView		Ducj i pachets
+Checking server information	ServerRuntimeInformationVerifierProcess		Daûr a controlâ lis informazions dal servidôr
 Send	RatePackageWindow		Invie
 Creating package list…	FeaturedPackagesView		Daûr a creâ la liste dai pachets…
 Start package daemon	App		Invie demoni dai pachets
+Changelog loading…	PackageInfoView		Daûr a cjariâ il regjistri des modifichis…
 There are problems in the supplied data:	UserLoginWindow		Si à problemis tai dâts furnîts:
 Desktop and non-desktop packages	MainWindow		Pachets pal scritori e no pal scritori
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utent '%Nickname%' nol à acetât nissune cundizion di utilizazion.
@@ -80,6 +84,7 @@ Continue	App		Continue
 A password is required.	UserLoginWindow		E je necessarie une peraule d'ordin.
 Language	RatePackageWindow		Lenghe
 Open %DeskbarLink%	PackageAction		Vierç %DeskbarLink%
+Login disabled	MainWindow		Acès disativât
 Status	PackageListView		Stât
 Network transport error	ServerHelper		Erôr di traspuart de rêt
 Cancel	PackageResult		Anule
@@ -138,6 +143,8 @@ Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 No, quit	App		No, jes
 Show	MainWindow		Mostre
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Disparitât di ore
+No contents available.	PackageInfoView		Nissun contignût disponibil.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al somee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi files in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma al è pussibil che cualchi funzionalitât e vegni disabilitade.
 Settings…	MainWindow		Impostazions…
 <Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets esternis>
@@ -150,6 +157,7 @@ Installed packages	MainWindow		Pachets instalâts
 User rating	RatePackageWindow		Valutazion utents
 Date	PackageListView		Date
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La password e scugne vê almancul %MinPasswordLength% caratars. %MinPasswordUppercaseChar% caratars a scugnin jessi maiuscui e %MinPasswordDigitsChar% caratars a scugnin jessi numars.
+Screenshot loading…	PackageInfoView		Cjariament videade…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Al è vignût fûr un erôr tal discjamâ lis cundizions di utilizazion. Controle il regjistri pai detais e torne prove.\nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Daûr a vierzi \"%DeskbarLink%\"
@@ -216,6 +224,7 @@ The nickname is required.	UserLoginWindow		Il sorenon al è necessari.
 Apply changes	PackageResult		Apliche modifichis
 Server error	ServerHelper		Erôr dal servidôr
 Rate package	RatePackageWindow		Valute pachet
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		Il servidôr e chest computer a àn une diference tal orari corint di cirche %DiscrepancySeconds% seconts. Chest al pues causâ problemis cu la comunicazion di HaikuDepot cul servidôr. Verifiche lis impostazions de ore dal to computer e justile se al covente.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Viodude di regjistrazion di \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Daûr a inviâ dâts anonim sul ûs
 Log in	UserLoginWindow		Jentre

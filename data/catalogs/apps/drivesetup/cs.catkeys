@@ -1,7 +1,9 @@
-1	czech	x-vnd.Haiku-DriveSetup	2345310783
+1	czech	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
+Register disk image…	MainWindow		Zaregistrovat obraz disku…
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
+Disk image has been added.	MainWindow		Obraz disku byl přidán.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Určitě si přejete zapsat změny zpět na disk?\n\nVšechna data na vybraném oddílu budou nenávratně ztracena!
 Device	PartitionList		Zařízení
 Could not change the parameters of the selected partition.	MainWindow		Nelze změnit parametry vybraného oddílu.
@@ -9,6 +11,7 @@ Initialize	MainWindow		Inicializovat
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na oddíle \"%s\" budou nenávratně ztracena!
 PGP encrypted	Encryption utils		Zašifrováno PGP
 Delete partition	MainWindow		Odstranit oddíl
+Write	MainWindow		Zápis
 Removable	PartitionList		Vyměnitelný
 Block size	PartitionList		Velikost bloku
 The panel experienced a problem!	MainWindow		Na panelu došlo k problému!
@@ -19,27 +22,35 @@ Unmount	MainWindow		Odpojit
 Failed to format the partition %s!\n	MainWindow		Chyba při formátování oddílu %s!\n
 Partition size	CreateParametersPanel		Velikost oddílu
 Validation of the given parameters failed.	MainWindow		Ověření uvedených parametrů selhalo.
+Cannot init target partition.	MainWindow		Nelze rozjet cílový oddíl.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete formátovat oddíl \"%s\"? Budete požádáni znovu, než budou na disk zapsány změny.
 DriveSetup	System name		Nastavení disků
+Error:	MainWindow	in any error alert	Chyba:
 Mounted at	PartitionList		Připojeno na
 Disk system %s not found!	MainWindow		Diskový systém %s nenalezen!
 Create…	MainWindow		Vytvořit…
+Failed to register file disk device: %s	MainWindow		Selhalo přihlašování zařízení souborového disku: %s
 Write changes	MainWindow		Zapsat změny
 Validation of the given creation parameters failed.	MainWindow		Ověření zadaných vytvářecích parametrů selhalo.
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicializace oddílu %s selhala. (Na disk nebylo nic zapsáno.)
 Eject	MainWindow		Vysunout
+There is not enough free space on target device.	MainWindow		Na cílovém disku není dost místa.
 Read only	PartitionList		Pouze pro čtení
 Surface test (not implemented)	MainWindow		Test povrchu (neimplementováno)
+Creating disk image	MainWindow		Vytvářím obraz disku
 The panel could not return successfully.	MainWindow		Panel se nedokázal úspěšně ukončit.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nepodařilo se změnit parametry oddílu. Na disk nebyly zapsány žádné změny.
 Partition %ld	DiskView		Oddíl %ld
 There's no space on the partition where a child partition could be created.	MainWindow		V oddílu, kde by mohl být vytvořen vnořený oddíl, již žádné místo.
+%s does not refer to a file disk device.	MainWindow		%s neodkazuje na zařízení souborového disku.
 No disk devices have been recognized.	DiskView		Žádná disková zařízení nebyla nalezena.
 Attributes	PartitionList		Atributy
+'%s' is not a regular file.	MainWindow		'%s' není běžný soubor.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Odstranění oddílu selhalo. Žádné změny nebyly na disk zapsány.
 Change parameters…	MainWindow		Změnit parametry…
 Format	InitializeParametersPanel		Formátovat
 Could not unmount partition	MainWindow		Nepodařilo se odpojit svazek
+Target partition is read only.	MainWindow		Cílový oddíl je jen pro čtení.
 Create	CreateParametersPanel		Vytvořit
 File system	PartitionList		Systém souborů
 Unknown (%s)	PartitionList		Neznámý (%s)
@@ -56,28 +67,40 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 MIMEs	PartitionList		MIME
 Shared	PartitionList		Sdílený
 BitLocker encrypted	Encryption utils		Zašifrováno BitLockerem
+Cannot init target volume.	MainWindow		Nelze nahodit cílový oddíl.
 You need to select a partition entry from the list.	MainWindow		Musíte si vybrat oddíl ze seznamu.
 Offset: %s	Support		Ofset: %s
 SafeBoot encrypted	Encryption utils		Zašifrováno pomocí SafeBootu
 Volume name	PartitionList		Název svazku
+Disk image	MainWindow		Obraz disku
+Save image…	MainWindow		Uložit obraz…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Určitě nyní chcete zapsat změny zpět na disk?\n\nVšechna data na oddílu budou nenávratně ztracena!
 Change	ChangeParametersPanel		Změnit
 Partition name:	ChangeParametersPanel		Název oddílu:
 LUKS encrypted	Encryption utils		Zašifrováno pomocí LUKS
 Empty space	PartitionList		Prázdné místo
 Cancel	AbstractParametersPanel		Zrušit
+%appname%: Save disk image	MainWindow		%appname%: Uložit obraz disku
 Format	MainWindow		Formátovat
 OK	MainWindow		OK
+Cannot init target file.	MainWindow		Nelze nahodit cílový soubor.
+Disk image successfully created.	MainWindow		Obraz disku úspěšně stvořen.
+Unregister disk image	MainWindow		Odregistrovat obraz disku
+The target partition is smaller than the image file.	MainWindow		Cílový oddíl je menší než obraz.
 Empty space	DiskView		Prázdné místo
 Could not delete the selected partition.	MainWindow		Nelze odstranit vybraný oddíl.
+Failed to get information about '%s'.	MainWindow		Chyba šťourání informací o '%s'.
 Open with DiskProbe	MainWindow		Otevřít diskovou sondou
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Opravdu chcete inicializovat vybraný disk? Všechna data budou ztracena. Budete požádáni znovu, než budou na disk zapsány změny.\n
 There was an error preparing the disk for modifications.	MainWindow		Při přípravě disku na úpravy došlo k chybě.
 The disk has been successfully initialized.\n	MainWindow		Disk byl v pořádku inicializován.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Má být vynuceno odpojení?\n\nPoznámka: Pokud aplikace momentálně zapisuje do svazku, odpojení může vést ke ztrátě dat.\n
+Disk image has been removed.	MainWindow		Obraz disku byl odebrán.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		Se zadaným ID nenalezeno žádné zařízení souborového disku, zkouší soubor '%s'.
 Cancel	MainWindow		Zrušit
 Free space	PartitionList		Dostupné místo
 Queries	PartitionList		Dotazy
+Register	MainWindow		Registrace
 Force unmount	MainWindow		Vynutit odpojení
 Change parameters	MainWindow		Změnit parametry
 Partition	MainWindow		Oddíl
@@ -88,15 +111,21 @@ The partition cannot be unmounted.	MainWindow		Oddíl se nepodařilo odpojit.
 Delete	MainWindow		Odstranit
 Partition type:	ChangeParametersPanel		Typ oddílu:
 Parameters	PartitionList		Parametry
+Disk image successfully written to the target.	MainWindow		Obraz disku úspěšně zapsán do cíle.
 Could not acquire partitioning information.	MainWindow		Nepodařilo se získat informace o diskových oblastech.
 Cannot delete the selected partition.	MainWindow		Nelze odstranit vybraný oddíl.
 Continue	MainWindow		Pokračovat
 Could not mount partition %s.	MainWindow		Nemohu připojit oddíl %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete formátovat oddíl? Budete požádáni znovu, než budou na disk zapsány změny.
+%appname% error	MainWindow		Chyba %appname%
 The selected disk is read-only.	MainWindow		Vybraný disk je pouze pro čtení.
+Failed to unregister file disk device %s.	MainWindow		Chyba odregistrování zařízení souborového disku %s.
 The partition %s is already unmounted.	MainWindow		Oddíl %s je již odpojen.
+Target volume is read only.	MainWindow		Cílový oddíl je jen pro čtení.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Opravdu chcete změnit parametry vybraného oddílu?\n\nOddíl už nemusí být rozpoznán jinými operačními systémy!
+Cannot init source volume.	MainWindow		Nelze nahodit zdrojový oddíl.
 Boot	PartitionList		Zaváděcí
+%appname%: Select disk image	MainWindow		%appname%: Zvolit obraz disku
 OK	AbstractParametersPanel		OK
 Virtual	PartitionList		Virtuální
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Jste si jisti, že chcete zapsat změny zpět na disk?\n\nPokud změnu provedete, všechna data na disku \"%s\" budou nenávratně ztracena!
@@ -105,7 +134,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Vyberte oddíl ze seznamu níže.
 Active	PartitionList		Aktivní
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Určitě chcete odstranit vybraný oddíl?\n\nVšechna data na oddílu budou nenávratně ztracena!
+Failed to unregister file disk device.	MainWindow		Chyba odregistrace zařízení souborového disku.
+Writing image to disk	MainWindow		Zápis obrazu na disk
 The partition %s has been successfully formatted.\n	MainWindow		Oddíl %s byl v pořádku naformátován.\n
+%appname%: Register disk image	MainWindow		%appname%: Registrace obrazu disku
+Write image…	MainWindow		Zapsat obraz…
 The partition %s is already mounted.	MainWindow		Oddíl %s je již připojen.
 Size	PartitionList		Velikost
 Creation of the partition has failed.	MainWindow		Vytvoření oddílu selhalo.

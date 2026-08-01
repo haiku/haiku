@@ -1,15 +1,20 @@
-1	catalan; valencian	x-vnd.Haiku-BluetoothPrefs	420387731
+1	catalan; valencian	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Cancel·la
 Laptop	Settings view		Portàtil
 Only from trusted devices	Settings view		Només els dispositius de confiança
 15 secs	Settings view		15 s
 Quit	main		Surt
+Scan finished	Inquiry panel		Escaneig acabat
 Manufacturer: 	Device View		Fabricant : 
+Scan	Inquiry panel		Escaneig
+%secs% remaining	Inquiry panel		%secs% restants
 Desktop	Settings view		Escriptori
 Server	Window		Servidor
 Identify host as:	Settings view		Identifica l'amfitrió com a:
 Local devices found on system:	Settings view		Dispositius locals trobats al sistema:
 Service classes: 	Device View		Classes de serveis : 
 Remote devices	Window		Dispositius remots
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Sembla que aquest ordinador no té compatibilitat amb Bluetooth.
 Settings	Window		Paràmetres
 Stop bluetooth services…	Window		Atura els serveis de Bluetooth…
 61 secs	Settings view		61 s
@@ -17,12 +22,14 @@ Add…	Remote devices		Afegeix…
 Revert	Window		Reverteix
 Refresh local devices…	Window		Actualitza els dispositius locals...
 Disconnect	Remote devices		Desconnecta
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Assegureu-vos que les funcionalitats del Bluetooth del dispositiu remot estiguin activades abans d'iniciar l'escaneig.
 Defaults	Window		Valors predeterminats
 From all devices	Settings view		Tots els dispositius
 Start bluetooth services…	Window		Inicia el servei del Bluetooth
 Cancel	Inquiry panel		Cancel·la
 Launch now	main		Llança ara
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Es recupera el nom de «%1»
 Remove	Remote devices		Suprimeix
 Pick device…	Settings view		Trieu un dispositiu...
 Always ask	Settings view		Pregunta-ho sempre.
@@ -31,13 +38,16 @@ Help	Window		Ajuda
 Pair…	Remote devices		Connecta-hi...
 Incoming connections policy:	Settings view		Política de connexions d'entrada:
 Retrieving names…	Inquiry panel		S'obtenen els noms...
+Canceling scan…	Inquiry panel		Es cancel·la l'escaneig…
 Show name	Extended local device view		Mostra el nom
 Add device to list	Inquiry panel		Afegeix el dispositiu a la llista
+Scanning progress:	Inquiry panel		Progrés de l'escaneig:
 The Bluetooth services are not currently running on this system.	main		Els serveis de Bluetooth ara no s'executen en aquest sistema.
 Discoverable	Extended local device view		Visible
 Authenticate	Extended local device view		Autenticació
 Smart phone	Settings view		Telèfon intel·ligent
 Default inquiry time:	Settings view		Temps de consulta per defecte:
+Friendly name:	Settings view		Nom descriptiu:
 Server	Settings view		Servidor
 Handheld	Settings view		Dispositiu de butxaca
  packets: 	Device View		 paquets: 

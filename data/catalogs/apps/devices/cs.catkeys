@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Devices	1374585159
+1	czech	x-vnd.Haiku-Devices	2994036512
 ACPI bus	DevicesView		Sběrnice ACPI
 Encryption controller	Device		Řadič šifrování
 Devices	System name		Zařízení
@@ -8,18 +8,23 @@ Generate system information	DevicesView		Generovat systémové informace
 Class info	DevicePCI		Informace o třídě
 USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
+ACPI thermal zone	DeviceACPI		ACPI teplotky
 Communications	DeviceSCSI		Komunikace
 Mass storage controller	Device		Řadič velkokapacitního úložiště
 Connection	DevicesView		Připojení
 Printer	DeviceSCSI		Tiskárna
+Driver used	DevicesView		Použitý ovladač
 Manufacturer	Device		Výrobce
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Kontroler paměti
+Device paths	DevicesView		Cesty zařízení
 Unknown device	DevicesView		Neznámé zařízení
 ACPI node '%1'	DeviceACPI		Uzel ACPI '%1'
 Name	PropertyList		Název
 Manufacturer	DeviceSCSI		Výrobce
+Graphics peripheral	DeviceSCSI		Grafická periferie
 Device name	Device		Název zařízení
+unknown	DeviceACPI		neznámo
 Satellite communications controller	Device		Řadič satelitní komunikace
 Device class	DeviceSCSI		Třída zařízení
 Device	Device		Zařízení
@@ -27,6 +32,7 @@ Input device controller	Device		Kontroler vstupních zařízení
 PCI bus	DevicesView		Sběrnice PCI
 Changer	DeviceSCSI		Měnič
 Serial bus controller	Device		Řadič sériové sběrnice
+unknown	DevicesView		neznámo
 Refresh devices	DevicesView		Obnovit zařízení
 Category	DevicesView		Kategorie
 RBC	DeviceSCSI		RBC
@@ -36,8 +42,12 @@ Wireless controller	Device		Řadič bezdrátových sítí
 Generic system peripheral	Device		Periferie generického systému
 Value	PropertyList		Hodnota
 Devices	DevicesView		Zařízení
+none	DevicesView		žádná
 Device name	DeviceACPI		Název zařízení
+unknown	DevicePCI		neznámo
+Optical drive	DeviceSCSI		Optická jednotka
 Display controller	Device		Kontroler obrazovky
+Bus	DevicesView		Sběrnice
 ACPI <unknown>	DeviceACPI		ACPI <neznámé>
 Device name	DevicePCI		Název zařízení
 Other	DeviceSCSI		Ostatní
@@ -45,18 +55,27 @@ Report compatibility	DevicesView		Nahlásit kompatibilitu
 Computer	Device		Počítač
 PCI bus	Device		Sběrnice PCI
 Enclosure	DeviceSCSI		Skříňka
+Tape drive	DeviceSCSI		Kazetová jednotka
 Order by:	DevicesView		Seřadit podle:
 Intelligent controller	Device		Inteligentní řadič
+ACPI processor namespace '%2'	DeviceACPI		ACPI jmenný prostor procesoru '%2'
 Multimedia controller	Device		Kontroler multimédií
 Quit	DevicesView		Ukončit
 ISA bus	Device		Sběrnice ISA
 ISA bus	DevicesView		Sběrnice ISA
+Basic information	PropertyList		Základní informace
 Processor	DeviceSCSI		Procesor
+Card reader	DeviceSCSI		Čtečka karet
 Bridge	Device		Most
+ACPI button '%1'	DeviceACPI		ACPI tlačítko '%1'
+Attributes	PropertyList		Atributy
+Disk drive	DeviceSCSI		Disková jednotka
 Worm	DeviceSCSI		Jednou zapisovatelný
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Výrobce
 Bridge	DeviceSCSI		Most
+ACPI system indicator	DeviceACPI		ACPI kontrolka systému
+ACPI system bus	DeviceACPI		ACPI systémová sběrnice
 Signal processing controller	Device		Řadič zpracování signálu
 Device name	DeviceSCSI		Název zařízení
 Docking station	Device		Dokovací stanice

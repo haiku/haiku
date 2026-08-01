@@ -1,12 +1,12 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Avslutt
+Show window tab	Workspaces		Vis vindu fane
+Live in the Deskbar	Workspaces		Live i Deskbar
+Switch on mouse wheel	Workspaces		Bytt med musehjulet
 Invalid argument: %s\n	Workspaces		Ugyldig argument: %s\n
 Change workspace count…	Workspaces		Endre antall arbeidsområder…
 Always on top	Workspaces		Alltid øverst
 Show window border	Workspaces		Vis vinduskant
-Show window tab	Workspaces		Vis vindu fane
 Auto-raise	Workspaces		Bring til forgrunnen automatisk
 Remove replicant	Workspaces		Fjern replikant
-Live in the Deskbar	Workspaces		Live i Deskbar
-Switch on mouse wheel	Workspaces		Bytt med musehjulet
 Workspaces	System name		Arbeidsområder

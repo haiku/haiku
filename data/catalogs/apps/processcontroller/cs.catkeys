@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ProcessController	2724038695
+1	czech	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Chyba při ukládání souboru
 Display priority	ProcessController		Priorita zobrazování
 That's no Fun!	ProcessController		Todle není sranda!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Priorita nízká
 Urgent display priority	ProcessController		Priorita urgentní zobrazování
 Memory usage	ProcessController		Využití paměti
 Ok!	ProcessController		OK!
+%appname% is already installed in Deskbar.	ProcessController		%appname% je již na Panelu.
 Normal priority	ProcessController		Priorita normální
 Restart Deskbar	ProcessController		Restartovat Deskbar
 Usage: %s [-deskbar]\n	ProcessController		Využití: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Ukončit aplikaci
 Info	ProcessController		Info
 Kill this thread!	ProcessController		Zabít toto vlákno!
 This team is already gone…	ProcessController		Tento tým je již pryč…
+About %appname%…	ProcessController		O %appname%…
 Gone teams…	ProcessController		Zrušené týmy…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		%appname% lze spustit v okně nebo instalovat na Panel.
 Quit an application	ProcessController		Ukončit aplikaci
 Cancel	ProcessController		Zrušit
 Install in Deskbar	ProcessController		Nainstalovat do Deskbaru

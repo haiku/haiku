@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	681075858
+1	swedish	x-vnd.Haiku-HaikuDepot	4230673291
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -143,6 +143,7 @@ Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
 No, quit	App		Nej, avsluta
 Show	MainWindow		Visa
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Avvikelse i tidsstämpel
 No contents available.	PackageInfoView		Inget innehåll tillgängligt.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Denna applikation skriver och läser några arbetsfiler på din dator för att fungera. Det verkar som om det finns problem med att skriva en testfil på [%TestFilePath%]. Kontrollera att det inte finns några problem med din hårdisk eller behörigheter som kan förhindra programmet från att skriva filer till katalogplatsen. Du kan välja att bara notera detta problem och fortsätta, men vissa funktioner kan vara inaktiverade.
 Settings…	MainWindow		Inställningar...
@@ -223,6 +224,7 @@ The nickname is required.	UserLoginWindow		Ett användarnamn krävs.
 Apply changes	PackageResult		Applicera förändringar
 Server error	ServerHelper		Serverfel
 Rate package	RatePackageWindow		Betygsatt paket
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		Det råder en skillnad på cirka %DiscrepancySeconds% sekunder mellan serverns och den här datorns aktuella tidsangivelse. Detta kan orsaka problem för HaikuDepot vid kommunikation med servern. Kontrollera datorns klockinställningar och korrigera tiden vid behov.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Inspelningsvy av \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Skickar anonym användningsinformation
 Log in	UserLoginWindow		Logga in

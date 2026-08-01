@@ -1,15 +1,20 @@
-1	friulian	x-vnd.Haiku-BluetoothPrefs	305903693
+1	friulian	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Anule
 Laptop	Settings view		Portatil
 Only from trusted devices	Settings view		Dome di dispositîfs fidâts
 15 secs	Settings view		15 seconts
 Quit	main		Jes
+Scan finished	Inquiry panel		Scansion finide
 Manufacturer: 	Device View		Fabricant: 
+Scan	Inquiry panel		Scansione
+%secs% remaining	Inquiry panel		A restin %secs%
 Desktop	Settings view		Scritori
 Server	Window		Servidôr
 Identify host as:	Settings view		Identifiche host come:
 Local devices found on system:	Settings view		Dispositîfs locâi cjatâts sul sisteme:
 Service classes: 	Device View		Classis di servizi: 
 Remote devices	Window		Dispositîfs lontans
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Al somee che chest computer nol vedi il supuart pal Bluetooth.
 Settings	Window		Impostazions
 Stop bluetooth services…	Window		Ferme i servizis bluetooth…
 61 secs	Settings view		61 seconts
@@ -17,11 +22,14 @@ Add…	Remote devices		Zonte…
 Revert	Window		Ripristine
 Refresh local devices…	Window		Inzornament dispositîfs locâi…
 Disconnect	Remote devices		Disconeti
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Verifiche che lis capacitâts Bluetooth dal dispositîf lontan a sedin ativadis prime di scomençâ la scansion.
 Defaults	Window		Predefinîts
 From all devices	Settings view		Di ducj i dispositîfs
 Start bluetooth services…	Window		Invie servizis bluetooth…
+Cancel	Inquiry panel		Anule
 Launch now	main		Inviâ cumò
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Daûr a recuperâ il non di '%1'
 Remove	Remote devices		Gjave
 Pick device…	Settings view		Sielç dispositîf…
 Always ask	Settings view		Domande simpri
@@ -30,13 +38,16 @@ Help	Window		Jutori
 Pair…	Remote devices		Associe…
 Incoming connections policy:	Settings view		Politiche pes conessions in jentrade:
 Retrieving names…	Inquiry panel		Daûr a recuperâ i nons…
+Canceling scan…	Inquiry panel		Daûr a anulâ la scansion…
 Show name	Extended local device view		Mostre non
 Add device to list	Inquiry panel		Zonte dispositîf ae liste
+Scanning progress:	Inquiry panel		Avanzament de scansion:
 The Bluetooth services are not currently running on this system.	main		I servizis Bluetooth pal moment no son in esecuzion su chest sisteme.
 Discoverable	Extended local device view		Visibil
 Authenticate	Extended local device view		Autenticazion
 Smart phone	Settings view		Smartphone
 Default inquiry time:	Settings view		Timp di interogazion predefinît:
+Friendly name:	Settings view		Non familiâr:
 Server	Settings view		Servidôr
 Handheld	Settings view		Palmâr
  packets: 	Device View		 pachets: 

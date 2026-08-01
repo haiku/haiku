@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-StyledEdit	2777022576
+1	friulian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Statistichis sul document
 Cut	Menus		Taie
 Center	Menus		Centre
@@ -39,6 +39,7 @@ Strikeout	Menus		Tressât
 Replace in all windows	FindandReplaceWindow		Sostituìs in ducj i barcons
 Error saving \"%filename%\":\n%error%	SaveAlert		Erôr tal salvâ \"%filename%\":\n%error%
 Save changes to the document \"%title%\"?	QuitAlert		Salvâ lis modifichis al document \"%title%\"?
+Style	Menus		Stîl
 Save	SaveAlert		Salve
 \"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" al à modifichis che no son stadis salvadis.\nRipristinâlu ae ultime version salvade?
 Default	Open_and_SaveAsPanel		Predefinît

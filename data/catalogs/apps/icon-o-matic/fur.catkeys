@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-icon_o_matic	2319229532
+1	friulian	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Nissun
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nete il segn
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -161,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Cence non
 Max LOD	Icon-O-Matic-PropertyNames		LOD massim
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvâ lis modifichis ae icone prime di sierâ?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No si è rivâts a vierzi il file '%s' come document SVG.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<proprietât no cognossude>
 Save as…	Icon-O-Matic-Menu-File		Salve come…
 Swatches	Icon-O-Matic-Menus		Campions
 <modify path>	Icon-O-Matic-PathCmd		<modifiche percors>

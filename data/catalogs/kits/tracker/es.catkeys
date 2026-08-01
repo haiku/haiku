@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2992119353
+1	spanish; castilian	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		No puede re
 (unknown)	InfoWindow		(desconocido)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# fechas>}}
 Trailing \\.	libtracker		Arrastrando \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		En %func \nfind_directory() tuvo un error. \nMotivo: %error
 Handles any file	OpenWithWindow		Manejar cualquier archivo
 save text	FilePanelPriv		Guardar texto
 Raw data	AttributesView		Datos en bruto
@@ -144,7 +143,6 @@ Disks	Model		Discos
 Create a Query template	FindPanel		Crear una plantilla de consulta
 Size	FindPanel		Tamaño
 New submenu	ContainerWindow	Folder name of New-template submenu	Nuevo submenú
-OK	Email Query Columns		OK
 Location	QueryPoseView		Localización
 Edit query	ContainerWindow		Editar consulta
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		Medios de parámetro Web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		No es posible guardar elementos en la raíz del sistema.
 Restore	ContainerWindow		Restaurar
 Location	ContainerWindow		Localización
-Skip	FSUtils		Saltar
 Warning space color	SettingsView		Advertencia sobre el espacio de color
+Skip	FSUtils		Saltar
 Text list	AttributesView		Listado de texto
 Used space color	SettingsView		Color de espacio usado
 Cancel	FSUtils		Cancelar
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No se
 Create %s clipping	PoseView		Cree %s recorte
 Error moving \"%name\"	FSUtils		Error moviendo \"%name\"
 To: %dir	StatusWindow		A: %dir
-Cancel	Tracker		Cancelar
 Paste layout	ContainerWindow		Pegar distribución
+Cancel	Tracker		Cancelar
 yes	AttributesView		sí
 Make active printer	ContainerWindow		Convertir en la impresora activa
 Copy to	ContainerWindow		Copiar a 

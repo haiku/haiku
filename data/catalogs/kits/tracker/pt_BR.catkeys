@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2500553665
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	3389721135
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -38,7 +38,6 @@ Would you like to find a suitable application to open the file?	FSUtils		Gostari
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Você não pode substituir uma pasta ou um atalho por um arquivo.
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datas>}}
 Trailing \\.	libtracker		Seguindo \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Em %func \nfind_directory() falhou. \nRazão: %error
 Handles any file	OpenWithWindow		Lida com qualquer arquivo
 save text	FilePanelPriv		salvar texto
 Raw data	AttributesView		Dados Raw
@@ -132,7 +131,6 @@ Cut	ContainerWindow		Recortar
 Disks	Model		Discos
 Create a Query template	FindPanel		Criar um modelo de consulta
 Size	FindPanel		Tamanho
-OK	Email Query Columns		OK
 Location	QueryPoseView		Local
 Edit query	ContainerWindow		Editar consulta
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -181,8 +179,8 @@ Media parameter web	AttributesView		Parâmetro Web de mídia
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz do seu sistema.
 Restore	ContainerWindow		Recuperar
 Location	ContainerWindow		Local
-Skip	FSUtils		Ignorar
 Warning space color	SettingsView		Cor de aviso de pouco espaço
+Skip	FSUtils		Ignorar
 Text list	AttributesView		Lista de texto
 Used space color	SettingsView		Espaco de cor utilizado
 Cancel	FSUtils		Cancelar
@@ -299,8 +297,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não 
 Create %s clipping	PoseView		Criar %s recorte
 Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
 To: %dir	StatusWindow		Para: %dir
-Cancel	Tracker		Cancelar
 Paste layout	ContainerWindow		Colar layout
+Cancel	Tracker		Cancelar
 yes	AttributesView		sim
 Make active printer	ContainerWindow		Marcar como impressora ativa
 Copy to	ContainerWindow		Copiar para

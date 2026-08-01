@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.support	3450110595
+1	friulian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
 Recording	MediaString		Regjistrazion
@@ -46,6 +46,7 @@ Right	MediaString		Diestre
 System mixer	MediaString		Mixer di sisteme
 Physical output	MediaString		Jessude fisiche
 Top-Back-center	MediaString		In alt daûr tal mieç
+(unknown video orientation)	MediaString		(orientament video no cognossût)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Dal alt in bas, di çampe a drete
 (unknown run mode)	MediaString		(modalitât di esecuzion no cognossude)

@@ -1,10 +1,9 @@
-1	english (united kingdom)	x-vnd.Haiku-libtracker	850392540
+1	english (united kingdom)	x-vnd.Haiku-libtracker	176556192
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moving \"%name\" to the Rubbish Bin. (%error)
 Error emptying Trash	FSUtils		Error emptying the Rubbish Bin
 OK	OpenWithWindow		Alright
 Trash	Model		Rubbish
 Move to Trash	ContainerWindow		Move to the Rubbish Bin
-OK	Email Query Columns		Alright
 Sorry, you can't create links in the Trash.	PoseView		Sorry, you can't create links in the Rubbish Bin.
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Could not open \"%document\" because the application \"%app\" is in the Rubbish Bin. 
 Warning space color	SettingsView		Warning space colour

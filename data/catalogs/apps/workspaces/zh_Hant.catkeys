@@ -1,12 +1,12 @@
 1	english	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		退出
+Show window tab	Workspaces		顯示視窗標籤
+Live in the Deskbar	Workspaces		在Deskbar中實時顯示
+Switch on mouse wheel	Workspaces		打開滑鼠滾輪
 Invalid argument: %s\n	Workspaces		無效參數: %s\n
 Change workspace count…	Workspaces		更改工作區數…
 Always on top	Workspaces		始終位於頂部
 Show window border	Workspaces		顯示視窗邊框
-Show window tab	Workspaces		顯示視窗標籤
 Auto-raise	Workspaces		自動加註
 Remove replicant	Workspaces		移除副本
-Live in the Deskbar	Workspaces		在Deskbar中實時顯示
-Switch on mouse wheel	Workspaces		打開滑鼠滾輪
 Workspaces	System name		工作區

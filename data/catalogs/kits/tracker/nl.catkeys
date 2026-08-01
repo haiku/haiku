@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	49831366
+1	dutch; flemish	x-vnd.Haiku-libtracker	938998836
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -39,7 +39,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		U kunt geen
 (unknown)	InfoWindow		(onbekend)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datums>}}
 Trailing \\.	libtracker		\\ aan het einde.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in \n%func is mislukt. \nReden: %error
 Handles any file	OpenWithWindow		Behandelt elk bestand
 save text	FilePanelPriv		sla tekst op
 Raw data	AttributesView		Ruwe data
@@ -134,7 +133,6 @@ Cut	ContainerWindow		Knippen
 Disks	Model		Schijven
 Create a Query template	FindPanel		Maak een Zoekopdracht-sjabloon
 Size	FindPanel		Grootte
-OK	Email Query Columns		OK
 Location	QueryPoseView		Locatie
 Edit query	ContainerWindow		Zoekopdracht aanpassen
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -184,8 +182,8 @@ Media parameter web	AttributesView		Mediaparameterweb
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sorry, u kunt geen zaken opslaan in de root van uw systeem.
 Restore	ContainerWindow		Herstellen
 Location	ContainerWindow		Locatie
-Skip	FSUtils		Overslaan
 Warning space color	SettingsView		Waarschuwende ruimte-kleur
+Skip	FSUtils		Overslaan
 Text list	AttributesView		Tekstlijst
 Used space color	SettingsView		Kleur voor gebruikte ruimte
 Cancel	FSUtils		Annuleren
@@ -302,8 +300,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%do
 Create %s clipping	PoseView		Maak %s clipping
 Error moving \"%name\"	FSUtils		Fout bij het verplaatsen van \"%name\"
 To: %dir	StatusWindow		Naar: %dir
-Cancel	Tracker		Annuleren
 Paste layout	ContainerWindow		Lay-out plakken
+Cancel	Tracker		Annuleren
 yes	AttributesView		ja
 Make active printer	ContainerWindow		Actieve printer maken
 Copy to	ContainerWindow		Kopiëren naar

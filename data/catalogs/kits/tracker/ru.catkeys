@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1792277746
+1	russian	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Невоз�
 (unknown)	InfoWindow		(неизвестно)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# даты>}}
 Trailing \\.	libtracker		Конечный \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Не удалось выполнить %func в find_directory(). \nПричина: %error
 Handles any file	OpenWithWindow		Поддерживает любые файлы
 save text	FilePanelPriv		сохранить текст
 Raw data	AttributesView		RAW-данные
@@ -145,7 +144,6 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Создать шаблон запроса
 Size	FindPanel		Размер
 New submenu	ContainerWindow	Folder name of New-template submenu	Новое подменю
-OK	Email Query Columns		ОК
 Location	QueryPoseView		Путь
 Edit query	ContainerWindow		Изменить запрос
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# байт)} few{(# байта)} other{(# байтов)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Медиа параметры веб
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Restore	ContainerWindow		Восстановить
 Location	ContainerWindow		Путь
-Skip	FSUtils		Пропустить
 Warning space color	SettingsView		Цвет предупреждения о нехватке места
+Skip	FSUtils		Пропустить
 Text list	AttributesView		Текстовый список
 Used space color	SettingsView		Цвет использованного места
 Cancel	FSUtils		Отменить
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не�
 Create %s clipping	PoseView		Сохранить как %s
 Error moving \"%name\"	FSUtils		Ошибка при перемещении \«%name\»
 To: %dir	StatusWindow		В: %dir
-Cancel	Tracker		Отменить
 Paste layout	ContainerWindow		Вставить вид папки
+Cancel	Tracker		Отменить
 yes	AttributesView		да
 Make active printer	ContainerWindow		Сделать принтер основным
 Copy to	ContainerWindow		Копировать в

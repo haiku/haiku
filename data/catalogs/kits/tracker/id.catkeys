@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	936319284
+1	indonesian	x-vnd.Haiku-libtracker	1825486754
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Anda tidak 
 (unknown)	InfoWindow		(tidak dikenal)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		Membuntuti \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Di %func \nfind_directory() gagal. \nSebabnya: %error
 Handles any file	OpenWithWindow		Tangani setiap file
 save text	FilePanelPriv		simpan teks
 Raw data	AttributesView		Data mentah
@@ -143,7 +142,6 @@ Cut	ContainerWindow		Potong
 Disks	Model		Diska
 Create a Query template	FindPanel		Membuat template pencarian
 Size	FindPanel		Ukuran
-OK	Email Query Columns		OKE
 Location	QueryPoseView		Lokasi
 Edit query	ContainerWindow		Sunting kueri
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -194,8 +192,8 @@ Media parameter web	AttributesView		Parameter media web
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Maaf, anda tidak dapat menyimpan sesuatu pada root sistem anda.
 Restore	ContainerWindow		Memulihkan
 Location	ContainerWindow		Lokasi
-Skip	FSUtils		Lewati
 Warning space color	SettingsView		Warna ruang peringatan
+Skip	FSUtils		Lewati
 Text list	AttributesView		Daftar teks
 Used space color	SettingsView		Warna ruang yang digunakan
 Cancel	FSUtils		Batal
@@ -317,8 +315,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Tidak
 Create %s clipping	PoseView		Buat kliping %s
 Error moving \"%name\"	FSUtils		Ada galat saat memindahkan \"%name\"
 To: %dir	StatusWindow		Ke: %dir
-Cancel	Tracker		Batal
 Paste layout	ContainerWindow		Temple layout
+Cancel	Tracker		Batal
 yes	AttributesView		ya
 Make active printer	ContainerWindow		Membuat printer aktif
 Copy to	ContainerWindow		Salin ke

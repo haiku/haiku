@@ -19,7 +19,7 @@ Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakete werden
 to	SoftwareUpdaterWindow	List item text	auf
 Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Hier klicken, um %appname% zu starten. Für einige Aktualisierungen muss eine Problemlösung gewählt werden.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Versuche die Aktualisierungen abzubrechen …
-Automatically clean up old install states	SoftwareUpdaterWindow		Alte Installationsdaten automatisch entfernen.
+Automatically clean up old install states	SoftwareUpdaterWindow		Alte Installationsdaten automatisch entfernen
 Contacting software repositories to check for package updates.	CheckManager		Um nach Aktualisierungen zu suchen, wird eine Verbindung mit den Paketquellen hergestellt.
 Available updates found	CheckManager		Aktualisierungen gefunden
 from repository	SoftwareUpdaterWindow	List item text	von Paketquelle

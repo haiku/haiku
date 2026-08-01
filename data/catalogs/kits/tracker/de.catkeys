@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1792277746
+1	german	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Ordner oder
 (unknown)	InfoWindow		(unbekannt)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# Daten>}}
 Trailing \\.	libtracker		\\ am Ende.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
 Handles any file	OpenWithWindow		Geeignet für jede Datei
 save text	FilePanelPriv		Text speichern
 Raw data	AttributesView		Rohdaten
@@ -145,7 +144,6 @@ Disks	Model		Datenträger
 Create a Query template	FindPanel		Query als Vorlage erstellen
 Size	FindPanel		Größe
 New submenu	ContainerWindow	Folder name of New-template submenu	Neues Untermenü
-OK	Email Query Columns		OK
 Location	QueryPoseView		Ort
 Edit query	ContainerWindow		Query bearbeiten
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# Byte)} other{(# Bytes)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Media-Parameternetz
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Im Root-Verzeichnis des Systems kann nichts gespeichert werden.
 Restore	ContainerWindow		Wiederherstellen
 Location	ContainerWindow		Ort
-Skip	FSUtils		Überspringen
 Warning space color	SettingsView		Farbe für geringen Speicher
+Skip	FSUtils		Überspringen
 Text list	AttributesView		Text-Liste
 Used space color	SettingsView		Farbe für benutzten Speicher
 Cancel	FSUtils		Abbrechen
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%do
 Create %s clipping	PoseView		Erzeuge %s Ausschnitt
 Error moving \"%name\"	FSUtils		Fehler beim Verschieben von \"%name\"
 To: %dir	StatusWindow		Nach: %dir
-Cancel	Tracker		Abbrechen
 Paste layout	ContainerWindow		Anordnung einfügen
+Cancel	Tracker		Abbrechen
 yes	AttributesView		ja
 Make active printer	ContainerWindow		Zum aktiven Drucker machen
 Copy to	ContainerWindow		Kopieren nach

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2992119353
+1	english	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能�
 (unknown)	InfoWindow		（未知）
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
 Trailing \\.	libtracker		跟隨中 \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		At %func \nfind_directory() failed. \nReason: %error
 Handles any file	OpenWithWindow		處理任何檔案
 save text	FilePanelPriv		存储文字
 Raw data	AttributesView		原始數據
@@ -144,7 +143,6 @@ Disks	Model		磁碟
 Create a Query template	FindPanel		建立查詢模板
 Size	FindPanel		大小
 New submenu	ContainerWindow	Folder name of New-template submenu	新子選單
-OK	Email Query Columns		確認
 Location	QueryPoseView		位置
 Edit query	ContainerWindow		編輯查詢
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		媒體參數網
 Sorry, you can't save things at the root of your system.	FilePanelPriv		抱歉，您無法將內容存储在系統根目錄中。
 Restore	ContainerWindow		恢復
 Location	ContainerWindow		位置
-Skip	FSUtils		跳過
 Warning space color	SettingsView		警告空間顔色
+Skip	FSUtils		跳過
 Text list	AttributesView		文字列表
 Used space color	SettingsView		使用的空間色彩
 Cancel	FSUtils		取消
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		無�
 Create %s clipping	PoseView		建立 %s 剪輯
 Error moving \"%name\"	FSUtils		移動 \"%name\" 時發生錯誤
 To: %dir	StatusWindow		至：%dir
-Cancel	Tracker		取消
 Paste layout	ContainerWindow		貼上版面
+Cancel	Tracker		取消
 yes	AttributesView		是的
 Make active printer	ContainerWindow		設定活躍印表機
 Copy to	ContainerWindow		複製到

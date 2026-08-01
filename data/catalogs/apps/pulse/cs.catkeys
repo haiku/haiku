@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Pulse	3032132277
+1	czech	x-vnd.Haiku-Pulse	3118820593
 Normal mode	DeskbarPulseView		Běžný režim
 Info	CPUButton		Info
 Quit	DeskbarPulseView		Ukončit
@@ -14,6 +14,7 @@ Mini mode	PrefsWindow		Mini režim
 CPU progress bar	NormalPulseView		Panel využití CPU
 Fade colors	ConfigView		Barvy stínu
 Deskbar mode	NormalPulseView		Deskbar režim
+About %appname%…	PulseView		O %appname%…
 Pulse settings	PulseApp		Nastavení Pulsu
 Remove replicant	CPUButton		Odebrat replikanta
 You can't disable the last active CPU.	PulseView		Nelze zakázat poslední aktivní CPU.
@@ -26,6 +27,7 @@ Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstraňování z lišty sel
 OK	PulseApp		OK
 Deskbar mode	PrefsWindow		Deskbar režim
 Mini mode	DeskbarPulseView		Mini režim
+About %appname%…	CPUButton		O %appname%…
 You can't disable the last active CPU.	CPUButton		Nelze zakázat poslední aktivní CPU.
 OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar

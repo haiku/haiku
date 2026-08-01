@@ -1,12 +1,12 @@
 1	finnish	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Poistu
+Show window tab	Workspaces		Näytä ikkunavälilehti
+Live in the Deskbar	Workspaces		Liveseuranta Työpöytäpalkissa
+Switch on mouse wheel	Workspaces		Vaihda hiiren rullalla
 Invalid argument: %s\n	Workspaces		Virheellinen argumentti: %s\n
 Change workspace count…	Workspaces		Vaihda työtilalukumäärää...
 Always on top	Workspaces		Aina päällimmäisenä
 Show window border	Workspaces		Näytä ikkunaraja
-Show window tab	Workspaces		Näytä ikkunavälilehti
 Auto-raise	Workspaces		Nosta automaattisesti
 Remove replicant	Workspaces		Poista kopio
-Live in the Deskbar	Workspaces		Liveseuranta Työpöytäpalkissa
-Switch on mouse wheel	Workspaces		Vaihda hiiren rullalla
 Workspaces	System name		Työtilat

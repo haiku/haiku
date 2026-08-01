@@ -1,12 +1,12 @@
 1	slovak	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Ukončiť
+Show window tab	Workspaces		Zobraziť záložku okna
+Live in the Deskbar	Workspaces		Prebývať v Paneli
+Switch on mouse wheel	Workspaces		Zapnúť koliesko myši
 Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
 Change workspace count…	Workspaces		Zmeniť počet pracovných plôch…
 Always on top	Workspaces		Vždy na vrchu
 Show window border	Workspaces		Zobraziť okraj okna
-Show window tab	Workspaces		Zobraziť záložku okna
 Auto-raise	Workspaces		Automaticky aktivovať
 Remove replicant	Workspaces		Odstrániť replikanta
-Live in the Deskbar	Workspaces		Prebývať v Paneli
-Switch on mouse wheel	Workspaces		Zapnúť koliesko myši
 Workspaces	System name		Pracovné plochy

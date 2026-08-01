@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	2752321853
+1	croatian	x-vnd.Haiku-libtracker	2078485505
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Open with…	ContainerWindow		Otvori pomoću...
@@ -96,7 +96,6 @@ Error deleting items	FSUtils		Greška pri brisanju stavki
 Cut	ContainerWindow		Izreži
 Disks	Model		Diskovi
 Size	FindPanel		Veličina
-OK	Email Query Columns		U redu
 Location	QueryPoseView		Lokacija
 Previously mounted disks	AutoMounterSettings		Prethodno montirani diskovi
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Ne možete zamjeniti datoteku mapom ili simboličkom poveznicom.
@@ -128,8 +127,8 @@ Copy more	ContainerWindow		Kopiraj više
 by name	FindPanel		po imenu
 Restore	ContainerWindow		Vratiti
 Location	ContainerWindow		Lokacija
-Skip	FSUtils		Preskoči
 Warning space color	SettingsView		Boja upozoravajućeg prostora
+Skip	FSUtils		Preskoči
 Used space color	SettingsView		Boja korišrenog prostora
 Cancel	FSUtils		Odustani
 Original name	ContainerWindow		Izvorno ime
@@ -211,8 +210,8 @@ Creating links: 	StatusWindow		Stvaranje poveznica:
 Create %s clipping	PoseView		Napravi %s isječak
 Error moving \"%name\"	FSUtils		Greška pri premještanju \"%name\"
 To: %dir	StatusWindow		U: %dir
-Cancel	Tracker		Odustani
 Paste layout	ContainerWindow		Zalijepi raspored
+Cancel	Tracker		Odustani
 yes	AttributesView		da
 Copy to	ContainerWindow		Kopiraj u
 Name	SelectionWindow		Ime

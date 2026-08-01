@@ -1,12 +1,12 @@
 1	danish	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Afslut
+Show window tab	Workspaces		Vis vinduesfaneblad
+Live in the Deskbar	Workspaces		Lev i Deskbar
+Switch on mouse wheel	Workspaces		Skift med musehjul
 Invalid argument: %s\n	Workspaces		Ugyldigt argument: %s\n
 Change workspace count…	Workspaces		Vælg antal arbejdspladser…
 Always on top	Workspaces		Altid øverst
 Show window border	Workspaces		Vis vindueskant
-Show window tab	Workspaces		Vis vinduesfaneblad
 Auto-raise	Workspaces		Hæv automatisk
 Remove replicant	Workspaces		Fjern replikant
-Live in the Deskbar	Workspaces		Lev i Deskbar
-Switch on mouse wheel	Workspaces		Skift med musehjul
 Workspaces	System name		Arbejdsområder

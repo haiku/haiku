@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Input	993392905
+1	czech	x-vnd.Haiku-Input	3371770123
 Defaults	InputMouse		Výchozí hodnoty
 Scrolling	TouchpadPrefView		Rolování
 Long	KeyboardView		Dlouhá
@@ -6,9 +6,13 @@ Cancel	TouchpadPrefView		Zrušit
 Slow	TouchpadPrefView		Pomalý
 Device List	InputWindow		Seznam zařízení
 Double-click speed	SettingsView		Rychlost poklepání
+On tap-drag only	TouchpadPrefView		Pouze při klepnutí a tažení
+Edge motion:	TouchpadPrefView		Pohyb okraje:
 5-Button	SettingsView		5-tlačítková
 Typing test area	KeyboardView		Oblast pro zkoušení psaní
 Fast	KeyboardView		Rychlá
+Always	TouchpadPrefView		Vždy
+Software button areas	TouchpadPrefView		Oblasti virtuálních tlačítek
 Please confirm	TouchpadPrefView		Prosím potvrďte
 Trackpad speed	TouchpadPrefView		Rychlost trackpadu
 Mouse speed	SettingsView		Rychlost myši
@@ -23,14 +27,17 @@ Revert	InputMouse		Vrátit
 Slow	KeyboardView		Pomalá
 2-Button	SettingsView		2-tlačítková
 Click to focus and raise	SettingsView		Aktivovat a vyzdvihnout klepnutím
+Natural scrolling	TouchpadPrefView		Přirozené posouvání
 Vertical	TouchpadPrefView		Svislý
 Low	TouchpadPrefView		Málo
 Focus follows mouse	SettingsView		Aktivace najetím myši nad okno
 Focus mode:	SettingsView		Režim aktivace:
 Double-click test area	SettingsView		Oblast zkoušení poklepání
 Revert	TouchpadPrefView		Vrátit
+When dragging	TouchpadPrefView		Při přetažení
 4-Button	SettingsView		4-tlačítková
 Tapping sensitivity	TouchpadPrefView		Citlivost klepnutí
+Disabled	TouchpadPrefView		Zakázáno
 Revert	InputKeyboard		Vrátit
 Mouse type:	SettingsView		Typ myši:
 Off	TouchpadPrefView		Vypnuto
@@ -47,6 +54,7 @@ Mouse acceleration	SettingsView		Zrychlení myši
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Nová rolovací oblast je velmi velká a může zamezit běžnému používání myši. Opravdu ji chcete změnit?
 High	TouchpadPrefView		Velký
 Defaults	TouchpadPrefView		Výchozí hodnoty
+Finger click	TouchpadPrefView		Kliknutí dotykem
 1-Button	SettingsView		1-tlačítková
 Defaults	InputKeyboard		Výchozí hodnoty
 Key repeat rate	KeyboardView		Rychlost opakování kláves

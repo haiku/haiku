@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2992119353
+1	finnish	x-vnd.Haiku-libtracker	3881286823
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Et voi korv
 (unknown)	InfoWindow		(tuntematon)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# päivää>}}
 Trailing \\.	libtracker		Jäljessä oleva \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
 Handles any file	OpenWithWindow		Käsittelee kaikkia tiedostoja
 save text	FilePanelPriv		tallenna teksti
 Raw data	AttributesView		Raakadata
@@ -144,7 +143,6 @@ Disks	Model		Levyt
 Create a Query template	FindPanel		Luo kyselymallinne
 Size	FindPanel		Koko
 New submenu	ContainerWindow	Folder name of New-template submenu	Uusi alivalikko
-OK	Email Query Columns		Valmis
 Location	QueryPoseView		Sijainti
 Edit query	ContainerWindow		Muokkaa kyselyä
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# tavu)} other{(# tavua)}}
@@ -196,8 +194,8 @@ Media parameter web	AttributesView		Mediaparametriwebbi
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi tallentaa asioita järjestelmäsi root-kansioon.
 Restore	ContainerWindow		Palauta
 Location	ContainerWindow		Sijainti
-Skip	FSUtils		Ohita
 Warning space color	SettingsView		Varoitustilaväri
+Skip	FSUtils		Ohita
 Text list	AttributesView		Tekstiluettelo
 Used space color	SettingsView		Käytetyn tilan väri
 Cancel	FSUtils		Peru
@@ -320,8 +318,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiak
 Create %s clipping	PoseView		Luo %s-leikkaus
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 To: %dir	StatusWindow		Vastaanottaja: %dir
-Cancel	Tracker		Peru
 Paste layout	ContainerWindow		Liitä sijoittelu
+Cancel	Tracker		Peru
 yes	AttributesView		kyllä
 Make active printer	ContainerWindow		Aseta aktiivinen tulostin
 Copy to	ContainerWindow		Kopioi kohteeseen

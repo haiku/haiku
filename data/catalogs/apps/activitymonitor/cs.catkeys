@@ -1,5 +1,6 @@
-1	czech	x-vnd.Haiku-ActivityMonitor	2467534740
+1	czech	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Týmy
+Temp	DataSource		Horko
 Block cache memory	DataSource		Bloková vyrovnávací paměť
 Media nodes	DataSource		Mediální uzly
 Network send	DataSource		Odesláno sítí
@@ -9,8 +10,10 @@ ActivityMonitor	System name		Monitor aktivit
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval obnovení:
 Settings…	ActivityWindow		Nastavení…
+Unknown thermal sensor	SystemInfoHandler		Neznámý teploměr
 Block cache	DataSource		Bloková vyrovnávací paměť
 Memory	DataSource		Paměť
+No thermal sensor	SystemInfoHandler		Žádný teploměr
 CPU speed	DataSource		Rychlost CPU
 CPU usage	DataSource		Využití CPU
 Raw clipboard	DataSource		Schránka bez formátu
@@ -23,6 +26,7 @@ Page faults	DataSource		Chyby stránkování
 Add graph	ActivityWindow		Přidat graf
 Swap	DataSource		Odkládací soubor
 %s faults/s	DataSource		%s chyb/s
+Temperature	DataSource		Teplota
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms

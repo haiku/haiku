@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	2402977561
+1	czech	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 Copy	Console Window		Kopírovat
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Nová karta
 Increase size	WebPositive Window		Zvětšit velikost
 Today	WebPositive Window		Dnes
 Open location	WebPositive Window		Otevřít umístění
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Ještě se stahuje, opravdu ukončit %appname%?
 New browser window	Download Window		Nové okno prohlížeče
 Open	Download Window		Otevřít
 New window	WebPositive Window		Nové okno
@@ -108,6 +109,7 @@ Apply	Settings Window		Použít
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Při pokusu o zobrazení adresáře záložek došlo k chybě.\n\nChyba: %error
 Revert	Settings Window		Vrátit zpět
 Copy	WebPositive Window		Kopírovat
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		Váš procesor je asi archivní kousek, nepodporuje instrukce SSE2 a bez nich %appname% nepojede. Doporučujeme raději instalaci NetSurfu.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Poslední řádek se opakoval.}other{Poslední řádek se opakoval # krát.}}
 Default standard font size:	Settings Window		Výchozí velikost standardního písma:
 Custom	Settings Window		Vlastní
@@ -151,6 +153,7 @@ Proxy server address:	Settings Window		Adresa proxy serveru:
 Search page:	Settings Window		Stránka hledání:
 Settings	WebPositive Window		Nastavení
 Show in Tracker	BookmarkBar		Zobrazit v Trackeru
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% přijato, %rate%/s)
 Clear	URL Bar		Vyčistit
 Loading %url	WebPositive Window		Načítání %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Příliš žluťoučký kůň úpěl ďábelské ódy.

@@ -1,12 +1,12 @@
 1	russian	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Выход
+Show window tab	Workspaces		Показывать заголовок окна
+Live in the Deskbar	Workspaces		Жить в Deskbar
+Switch on mouse wheel	Workspaces		Переключать колесом мыши
 Invalid argument: %s\n	Workspaces		Ошибочный аргумент: %s\n
 Change workspace count…	Workspaces		Изменить количество столов…
 Always on top	Workspaces		Всегда сверху
 Show window border	Workspaces		Показывать рамку окна
-Show window tab	Workspaces		Показывать заголовок окна
 Auto-raise	Workspaces		Всплывать при наведении
 Remove replicant	Workspaces		Удалить репликант
-Live in the Deskbar	Workspaces		Жить в Deskbar
-Switch on mouse wheel	Workspaces		Переключать колесом мыши
 Workspaces	System name		Рабочие столы

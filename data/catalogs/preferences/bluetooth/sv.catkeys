@@ -1,15 +1,20 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	305903693
+1	swedish	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Avbryt
 Laptop	Settings view		Bärbar dator
 Only from trusted devices	Settings view		Endast från betrodda källor
 15 secs	Settings view		15 s
 Quit	main		Avsluta
+Scan finished	Inquiry panel		Skanningen slutförd
 Manufacturer: 	Device View		Tillverkare:
+Scan	Inquiry panel		Avsöka
+%secs% remaining	Inquiry panel		%secs% återstår
 Desktop	Settings view		Skrivbord
 Server	Window		Server
 Identify host as:	Settings view		Identifiera värd som:
 Local devices found on system:	Settings view		Lokala enheter funna på systemet:
 Service classes: 	Device View		Tjänsteklasser:
 Remote devices	Window		Fjärrenheter
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Den här datorn verkar inte ha stöd för Bluetooth.
 Settings	Window		Inställningar
 Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
 61 secs	Settings view		61 s
@@ -17,11 +22,14 @@ Add…	Remote devices		Lägg till…
 Revert	Window		Återgå
 Refresh local devices…	Window		Uppdatera lokala enheter…
 Disconnect	Remote devices		Koppla från
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Se till att Bluetooth-funktionen på fjärrenheten är aktiverad innan sökningen påbörjas.
 Defaults	Window		Förval
 From all devices	Settings view		För alla enheter
 Start bluetooth services…	Window		Starta Bluetooth-tjänster…
+Cancel	Inquiry panel		Avbryt
 Launch now	main		Starta nu
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Hämtar namn för ”%1”
 Remove	Remote devices		Ta bort
 Pick device…	Settings view		Välj enhet…
 Always ask	Settings view		Fråga alltid
@@ -30,13 +38,16 @@ Help	Window		Hjälp
 Pair…	Remote devices		Para…
 Incoming connections policy:	Settings view		Policy för inkommande förbindelser:
 Retrieving names…	Inquiry panel		Hämtar namn…
+Canceling scan…	Inquiry panel		Avbryter skanning…
 Show name	Extended local device view		Visa namn
 Add device to list	Inquiry panel		Lägg till enhet i listan
+Scanning progress:	Inquiry panel		Skanningsförlopp:
 The Bluetooth services are not currently running on this system.	main		Bluetoothtjänsten körs för närvarande inte på detta system.
 Discoverable	Extended local device view		Synlig
 Authenticate	Extended local device view		Autentisera
 Smart phone	Settings view		Telefon
 Default inquiry time:	Settings view		Förvald frågotid:
+Friendly name:	Settings view		Visningsnamn:
 Server	Settings view		Server
 Handheld	Settings view		Handhållen
  packets: 	Device View		Paketer:

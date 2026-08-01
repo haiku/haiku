@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Вийти
+Show window tab	Workspaces		Показати заголовок вікна
+Live in the Deskbar	Workspaces		Залишити в Deskbar
+Switch on mouse wheel	Workspaces		Перемикати колесом миші
 Invalid argument: %s\n	Workspaces		Помилковий аргумент: %s\n
 Change workspace count…	Workspaces		Змінити кількість робочих областей…
 Always on top	Workspaces		Завжди поверх усіх
 Show window border	Workspaces		Показувати рамку вікна
-Show window tab	Workspaces		Показати заголовок вікна
 Auto-raise	Workspaces		Випливати автоматично
 Remove replicant	Workspaces		Вилучити реплікант
-Live in the Deskbar	Workspaces		Залишити в Deskbar
-Switch on mouse wheel	Workspaces		Перемикати колесом миші
 Workspaces	System name		Workspaces

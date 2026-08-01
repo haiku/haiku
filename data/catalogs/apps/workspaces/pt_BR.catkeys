@@ -1,12 +1,12 @@
 1	portuguese (brazil)	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Sair
+Show window tab	Workspaces		Exibir aba da janela
+Live in the Deskbar	Workspaces		Ao vivo no Deskbar
+Switch on mouse wheel	Workspaces		Mudar no botão de rolagem do mouse
 Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Change workspace count…	Workspaces		Alterar o número de áreas de trabalho…
 Always on top	Workspaces		Sempre no topo
 Show window border	Workspaces		Mostrar a borda da janela
-Show window tab	Workspaces		Exibir aba da janela
 Auto-raise	Workspaces		Auto-levantar
 Remove replicant	Workspaces		Remover replicante
-Live in the Deskbar	Workspaces		Ao vivo no Deskbar
-Switch on mouse wheel	Workspaces		Mudar no botão de rolagem do mouse
 Workspaces	System name		Áreas de Trabalho

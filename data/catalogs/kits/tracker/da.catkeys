@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2793012022
+1	danish	x-vnd.Haiku-libtracker	3682179492
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -39,7 +39,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan ikke
 (unknown)	InfoWindow		(ukendt)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoer>}}
 Trailing \\.	libtracker		Efterstillede \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ved %func \nfind_directory() mislykkede. \nÅrsag: %error
 Handles any file	OpenWithWindow		Håndterer enhver fil
 save text	FilePanelPriv		gem tekst
 Raw data	AttributesView		Rå data
@@ -135,7 +134,6 @@ Cut	ContainerWindow		Klip
 Disks	Model		Diske
 Create a Query template	FindPanel		Opret en forespørgselsskabelon
 Size	FindPanel		Størrelse
-OK	Email Query Columns		O.k.
 Location	QueryPoseView		Placering
 Edit query	ContainerWindow		Redigér forespørgsel
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# byte)}}
@@ -185,8 +183,8 @@ Media parameter web	AttributesView		Medieparameterweb
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Beklager, du kan ikke lagre noget i roden af dit system.
 Restore	ContainerWindow		Gendan
 Location	ContainerWindow		Placering
-Skip	FSUtils		Spring over
 Warning space color	SettingsView		Farve for advarselsmellemrum
+Skip	FSUtils		Spring over
 Text list	AttributesView		Tekstliste
 Used space color	SettingsView		Farve for brugt plads
 Cancel	FSUtils		Afbryd
@@ -304,8 +302,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne
 Create %s clipping	PoseView		Lav %s klipning
 Error moving \"%name\"	FSUtils		Fejl ved flytning af \"%name\"
 To: %dir	StatusWindow		Til: %dir
-Cancel	Tracker		Afbryd
 Paste layout	ContainerWindow		Indsæt layout
+Cancel	Tracker		Afbryd
 yes	AttributesView		ja
 Make active printer	ContainerWindow		Gør til aktiv printer
 Copy to	ContainerWindow		Kopiér til

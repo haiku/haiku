@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3466149242
+1	turkish	x-vnd.Haiku-libtracker	60349416
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -43,7 +43,6 @@ You cannot replace a folder or a symbolic link with a file.	FSUtils		Bir klasör
 (unknown)	InfoWindow		(bilinmiyor)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# tarih>}}
 Trailing \\.	libtracker		İzleyen \\.
-At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func işlevinde \nfind_directory() başarısız oldu. \nSebep: %error
 Handles any file	OpenWithWindow		Her tür dosyayı işler
 save text	FilePanelPriv		metni kaydet
 Raw data	AttributesView		Ham veri
@@ -145,7 +144,6 @@ Disks	Model		Diskler
 Create a Query template	FindPanel		Bir sorgu şablonu oluştur
 Size	FindPanel		Boyut
 New submenu	ContainerWindow	Folder name of New-template submenu	Yeni alt menü
-OK	Email Query Columns		Tamam
 Location	QueryPoseView		Konum
 Edit query	ContainerWindow		Sorguyu düzenle
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, other{(# bayt)}}
@@ -198,8 +196,8 @@ Media parameter web	AttributesView		Ortam parametre ağı
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Üzgünüm, sistem kök dizinine dosya kaydedilemez.
 Restore	ContainerWindow		Geri yükle
 Location	ContainerWindow		Konum
-Skip	FSUtils		Atla
 Warning space color	SettingsView		Uyarı alanı rengi
+Skip	FSUtils		Atla
 Text list	AttributesView		Metin listesi
 Used space color	SettingsView		Kullanılan alan rengi
 Cancel	FSUtils		Vazgeç
@@ -325,8 +323,8 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%d
 Create %s clipping	PoseView		%s kırpma oluştur
 Error moving \"%name\"	FSUtils		“%name” taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
-Cancel	Tracker		Vazgeç
 Paste layout	ContainerWindow		Yerleşimi yapıştır
+Cancel	Tracker		Vazgeç
 yes	AttributesView		evet
 Make active printer	ContainerWindow		Etkin yazıcı kıl
 Copy to	ContainerWindow		Kopyala

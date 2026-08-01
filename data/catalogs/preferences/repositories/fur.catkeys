@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Repositories	1003035766
+1	friulian	x-vnd.Haiku-Repositories	2642736029
 This is not a valid URL.	AddRepoWindow	Add URL error message	Chest nol è un URL valit.
 Repository URL:	AddRepoWindow	Text box label	URL dal dipuesit:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Al è vignût fûr un erôr tal inzornâ la cache dal dipuesit %name%
@@ -21,6 +21,7 @@ Status	RepositoriesView	Column title	Stât
 Name	RepositoriesView	Column title	Non
 Add	AddRepoWindow	Button label	Zonte
 Enable all	RepositoriesView	Button label	Abilite dut
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% nol è rivât a recuperâ i nons dai dipuesit abilitâts corints.
 Aborted	TaskLooper	Aborted task status message	Anulât
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Abilite

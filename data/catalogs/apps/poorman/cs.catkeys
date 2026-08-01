@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-PoorMan	2667626017
+1	czech	x-vnd.Haiku-PoorMan	3080340918
 Select web folder	PoorMan		Vybrat webovou složku
 Console logging	PoorMan		Záznam konzole
 Create Log File	PoorMan		Vytvořit soubor protokolu
@@ -9,6 +9,7 @@ Shutting down.	PoorMan		Ukončuji.
 Web folder:	PoorMan		Webová složka:
 Log To Console	PoorMan		Logovat do Konzole
 File Name	PoorMan		Jméno souboru
+Error folder	PoorMan		Chybová složka
 Starting up... 	PoorMan		Spouštím... 
 Select	PoorMan		Vybrat
 Logging view	PoorMan		Zobrazení logování
@@ -18,11 +19,13 @@ Cancel	PoorMan		Zrušit
 Directory: 	PoorMan		Adresář: 
 Hits: %lu	PoorMan		Přístupy: %lu
 Hits: 0	PoorMan		Přístupy: 0
+%appname% settings	PoorMan		%appname% nastavení
 Shutting down.\n	PoorMan		Ukončuji.\n
 Select all	PoorMan		Vybrat vše
 Send file listing if there's no start page	PoorMan		Odeslat výpis souborů pokud není úvodní stránka
 Max. simultaneous connections:	PoorMan		Max. současných připojení:
 Done	PoorMan		Hotovo
+Please choose the folder to publish on the web.\n\nYou can have %appname% create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Zvolte složku k publikování na síti.\n\n%appname% může vytvořit výchozí \"public_html\" v domovské složce,\nnebo si lze vybrat vlastní složku.
 Site	PoorMan		Síť
 Cannot start the server	PoorMan		Nemohu spustit server
 Create log file	PoorMan		Vytvořit soubor logu
@@ -31,10 +34,12 @@ Clear hit counter	PoorMan		Vymazat počitadlo přístupů
 Status: Stopped	PoorMan		Status: Zastaveno
 File	PoorMan		Soubor
 Settings…	PoorMan		Nastavení…
+Create %appname% log	PoorMan		Vytvořit záznam %appname%
 Log To File	PoorMan		Logovat do souboru
 Connections	PoorMan		Spojení
 Controls	PoorMan		Ovládací prvky
 Log to console	PoorMan		Záznam do konzole
+Error server	PoorMan		Chyba serveru
 Advanced	PoorMan		Pokročilé
 Copy	PoorMan		Kopírovat
 Logging	PoorMan		Logování

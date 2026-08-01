@@ -1,12 +1,12 @@
 1	czech	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Ukončit
+Show window tab	Workspaces		Zobrazit záložku okna
+Live in the Deskbar	Workspaces		Přebývat v panelu
+Switch on mouse wheel	Workspaces		Zapnout kolečko myši
 Invalid argument: %s\n	Workspaces		Neplatný argument: %s\n
 Change workspace count…	Workspaces		Změnit počet ploch…
 Always on top	Workspaces		Vždy navrchu
 Show window border	Workspaces		Zobrazit okraj okna
-Show window tab	Workspaces		Zobrazit záložku okna
 Auto-raise	Workspaces		Automaticky vyzvednout
 Remove replicant	Workspaces		Odebrat replikanta
-Live in the Deskbar	Workspaces		Přebývat v panelu
-Switch on mouse wheel	Workspaces		Zapnout kolečko myši
 Workspaces	System name		Pracovní plochy

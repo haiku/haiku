@@ -1,12 +1,12 @@
 1	italian	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Esci
+Show window tab	Workspaces		Mostra l'etichetta della finestra
+Live in the Deskbar	Workspaces		Visualizza nel Deskbar
+Switch on mouse wheel	Workspaces		Cambia con la rotellina del mouse
 Invalid argument: %s\n	Workspaces		Argomento non valido: %s\n
 Change workspace count…	Workspaces		Modifica quantità di spazi di lavoro…
 Always on top	Workspaces		Sempre in primo piano
 Show window border	Workspaces		Mostra i bordi della finestra
-Show window tab	Workspaces		Mostra l'etichetta della finestra
 Auto-raise	Workspaces		Automaticamente in primo piano
 Remove replicant	Workspaces		Rimuovi replicante
-Live in the Deskbar	Workspaces		Visualizza nel Deskbar
-Switch on mouse wheel	Workspaces		Cambia con la rotellina del mouse
 Workspaces	System name		Spazi di Lavoro

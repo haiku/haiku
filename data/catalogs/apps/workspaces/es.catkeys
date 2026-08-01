@@ -1,12 +1,12 @@
 1	spanish; castilian	x-vnd.Be-WORK	1255000335
 Quit	Workspaces		Salir
+Show window tab	Workspaces		Mostrar pestaña de ventana
+Live in the Deskbar	Workspaces		Vivo en escritorio
+Switch on mouse wheel	Workspaces		Cambiar con rueda de scroll del mouse
 Invalid argument: %s\n	Workspaces		Argumento inválido: %s\n
 Change workspace count…	Workspaces		Cambio de área de trabajo 
 Always on top	Workspaces		Siempre en la parte superior
 Show window border	Workspaces		Mostrar el borde de la ventana
-Show window tab	Workspaces		Mostrar pestaña de ventana
 Auto-raise	Workspaces		Autoaumento
 Remove replicant	Workspaces		Remover replicante
-Live in the Deskbar	Workspaces		Vivo en escritorio
-Switch on mouse wheel	Workspaces		Cambiar con rueda de scroll del mouse
 Workspaces	System name		Áreas de trabajo
