@@ -245,11 +245,7 @@ BQueryPoseView::AddPosesCompleted()
 EntryListBase*
 BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 {
-	BEntry entry(ref);
-	if (entry.InitCheck() != B_OK)
-		return NULL;
-
-	Model sourceModel(&entry, true);
+	Model sourceModel(ref, false, true);
 	if (sourceModel.InitCheck() != B_OK)
 		return NULL;
 
