@@ -85,8 +85,7 @@ typedef struct scsi_mode_sense_6_parameter_s {
 	uint8	medium_type;
 	uint8	device_specific;
 	uint8	block_descriptor_length;
-	uint8	densitiy;
-	uint8	num_blocks[3];
+	uint8	num_blocks[4];
 	uint8	reserved;
 	uint8	block_length[3];
 } _PACKED scsi_mode_sense_6_parameter;
@@ -119,7 +118,8 @@ typedef enum {
 #define SCSI_ASC_MEDIUM_NOT_PRESENT			0x3a
 
 // mode sense page code/parameter
-#define SCSI_MODE_PAGE_DEVICE_CONFIGURATION	0x10
+#define SCSI_MODE_PAGE_DEVICE_CONFIGURATION	0x3f
 #define SCSI_DEVICE_SPECIFIC_WRITE_PROTECT	0x80
+#define SCSI_MODE_SENSE_DISABLE_BLOCK_DESCRIPTORS 0x08
 
 #endif // _USB_DISK_SCSI_H_
