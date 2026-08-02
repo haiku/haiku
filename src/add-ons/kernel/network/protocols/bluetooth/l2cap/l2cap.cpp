@@ -300,8 +300,10 @@ l2cap_error_received(net_error error, net_error_data* errorData, net_buffer* dat
 
 	if (error == B_NET_ERROR_UNREACH_HOST) {
 		struct HciConnection* connection = connection_for(data);
-		if (connection == NULL)
+		if (connection == NULL) {
+			ERROR("Couldn't find the connection to complete l2cap disconnection\n");
 			return ENOTCONN;
+		}
 
 		// Disconnect all connections with this HciConnection.
 		gL2capEndpointManager.Disconnected(connection);

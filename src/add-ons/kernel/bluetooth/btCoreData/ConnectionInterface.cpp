@@ -40,22 +40,6 @@ HciConnection::HciConnection(hci_id hid)
 
 HciConnection::~HciConnection()
 {
-	if (L2cap == NULL)
-	if (get_module(NET_BLUETOOTH_L2CAP_NAME, (module_info**)&L2cap) != B_OK) {
-		ERROR("%s: cannot get module \"%s\"\n", __func__,
-			NET_BLUETOOTH_L2CAP_NAME);
-	} // TODO: someone put it
-
-	// Inform the L2CAP module this connection is about to be gone.
-	if (L2cap != NULL) {
-		net_buffer* error = gBufferModule->create(128);
-		error->interface_address = &interface_address;
-		if (L2cap->error_received(B_NET_ERROR_UNREACH_HOST, NULL, error) != B_OK) {
-			error->interface_address = NULL;
-			gBufferModule->free(error);
-		}
-	}
-
 	mutex_destroy(&fLock);
 }
 
@@ -104,29 +88,23 @@ bail:
 status_t
 RemoveConnection(const bdaddr_t& destination, hci_id hid)
 {
-	MutexLocker locker(&sConnectionListLock);
-	HciConnection*	conn;
+	HciConnection*	conn = ConnectionByDestination(destination, hid);
 
-	DoublyLinkedList<HciConnection>::Iterator iterator
-		= sConnectionList.GetIterator();
+	if (conn == NULL)
+		return B_ERROR;
 
-	while (iterator.HasNext()) {
+	// if the device is still part of the list, remove it
+	if (conn->GetDoublyLinkedListLink()->next != NULL
+		|| conn->GetDoublyLinkedListLink()->previous != NULL
+		|| conn == sConnectionList.Head()) {
+		DisconnectL2capEndpoints(conn);
 
-		conn = iterator.Next();
-		if (conn->Hid == hid
-			&& bdaddrUtils::Compare(conn->destination, destination)) {
+		MutexLocker locker(&sConnectionListLock);
+		sConnectionList.Remove(conn);
+		locker.Unlock();
 
-			// if the device is still part of the list, remove it
-			if (conn->GetDoublyLinkedListLink()->next != NULL
-				|| conn->GetDoublyLinkedListLink()->previous != NULL
-				|| conn == sConnectionList.Head()) {
-				sConnectionList.Remove(conn);
-
-				locker.Unlock();
-				delete conn;
-				return B_OK;
-			}
-		}
+		delete conn;
+		return B_OK;
 	}
 	return B_ERROR;
 }
@@ -135,29 +113,55 @@ RemoveConnection(const bdaddr_t& destination, hci_id hid)
 status_t
 RemoveConnection(uint16 handle, hci_id hid)
 {
-	MutexLocker locker(&sConnectionListLock);
-	HciConnection*	conn;
+	HciConnection*	conn = ConnectionByHandle(handle, hid);
 
-	DoublyLinkedList<HciConnection>::Iterator iterator
-		= sConnectionList.GetIterator();
-	while (iterator.HasNext()) {
+	if (conn == NULL)
+		return B_ERROR;
 
-		conn = iterator.Next();
-		if (conn->Hid == hid && conn->handle == handle) {
+	// if the device is still part of the list, remove it
+	if (conn->GetDoublyLinkedListLink()->next != NULL
+		|| conn->GetDoublyLinkedListLink()->previous != NULL
+		|| conn == sConnectionList.Head()) {
+		DisconnectL2capEndpoints(conn);
 
-			// if the device is still part of the list, remove it
-			if (conn->GetDoublyLinkedListLink()->next != NULL
-				|| conn->GetDoublyLinkedListLink()->previous != NULL
-				|| conn == sConnectionList.Head()) {
-				sConnectionList.Remove(conn);
+		MutexLocker locker(&sConnectionListLock);
+		sConnectionList.Remove(conn);
+		locker.Unlock();
 
-				locker.Unlock();
-				delete conn;
-				return B_OK;
-			}
-		}
+		delete conn;
+		return B_OK;
 	}
+
 	return B_ERROR;
+}
+
+
+status_t
+DisconnectL2capEndpoints(HciConnection* conn)
+{
+	status_t status = B_OK;
+	if (L2cap == NULL)
+		status = get_module(NET_BLUETOOTH_L2CAP_NAME, (module_info**)&L2cap);
+	if (status != B_OK) {
+		ERROR("%s: cannot get module \"%s\"\n", __func__,
+			NET_BLUETOOTH_L2CAP_NAME);
+		return status;
+	} // TODO: someone put it
+
+	// Inform the L2CAP module this connection is about to be gone.
+	net_buffer* error = gBufferModule->create(128);
+	sockaddr_l2cap source = {};
+	source.l2cap_bdaddr = conn->destination;
+	error->source = (struct sockaddr*)&source;
+	error->interface_address = &conn->interface_address;
+	status = L2cap->error_received(B_NET_ERROR_UNREACH_HOST, NULL, error);
+	if (status != B_OK) {
+		error->interface_address = NULL;
+		gBufferModule->free(error);
+		return status;
+	}
+
+	return status;
 }
 
 
