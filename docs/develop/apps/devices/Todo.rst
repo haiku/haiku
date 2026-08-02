@@ -6,7 +6,6 @@ TODO
 * Bottom scrollbar strangeness
 * Reduce executable size?
 * Find a place for unknown devices (or decypher the names better)
-* Reselect currently selected on sort-by change - unique device id (device_node_cookie?)
 * Check for keyboard navigation
 * Icons per device type
 * Index attributes by enum, not string

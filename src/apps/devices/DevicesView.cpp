@@ -436,6 +436,8 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			CAT_NONE, B_TRANSLATE("Unknown device"));
 	}
 
+	newDevice->SetNodeCookie(*node);
+
 	struct device_attr_info driverAttrInfo;
 	driverAttrInfo.node_cookie = *node;
 	driverAttrInfo.cookie = 0;
@@ -564,6 +566,34 @@ DevicesView::_ToggleDriverState(bool disable)
 
 
 void
+DevicesView::_SetOrderBy(OrderByType orderBy)
+{
+	device_node_cookie selectedCookie = 0;
+	int32 selected = fDevicesOutline->CurrentSelection(0);
+	if (selected >= 0) {
+		Device* device = (Device*)fDevicesOutline->ItemAt(selected);
+		if (device != NULL)
+			selectedCookie = device->NodeCookie();
+	}
+
+	fOrderBy = orderBy;
+	RescanDevices();
+	RebuildDevicesOutline();
+
+	if (selectedCookie != 0) {
+		for (int32 i = 0; i < fDevicesOutline->CountItems(); i++) {
+			Device* device = (Device*)fDevicesOutline->ItemAt(i);
+			if (device != NULL && device->NodeCookie() == selectedCookie) {
+				fDevicesOutline->Select(i);
+				fDevicesOutline->ScrollToSelection();
+				break;
+			}
+		}
+	}
+}
+
+
+void
 DevicesView::_UpdateBlockButton(Device* device)
 {
 	fBlockButton->SetTarget(this);
@@ -636,25 +666,19 @@ DevicesView::MessageReceived(BMessage *msg)
 
 		case kMsgOrderBus:
 		{
-			fOrderBy = ORDER_BY_BUS;
-			RescanDevices();
-			RebuildDevicesOutline();
+			_SetOrderBy(ORDER_BY_BUS);
 			break;
 		}
 
 		case kMsgOrderCategory:
 		{
-			fOrderBy = ORDER_BY_CATEGORY;
-			RescanDevices();
-			RebuildDevicesOutline();
+			_SetOrderBy(ORDER_BY_CATEGORY);
 			break;
 		}
 
 		case kMsgOrderConnection:
 		{
-			fOrderBy = ORDER_BY_CONNECTION;
-			RescanDevices();
-			RebuildDevicesOutline();
+			_SetOrderBy(ORDER_BY_CONNECTION);
 			break;
 		}
 

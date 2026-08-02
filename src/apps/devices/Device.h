@@ -9,6 +9,7 @@
 #define DEVICE_H
 
 
+#include "device_manager_defs.h"
 #include <map>
 #include <vector>
 
@@ -93,7 +94,10 @@ public:
 								{ return fPhysicalParent; }
 	virtual BusType			GetBusType() const
 								{ return fBusType; }
-
+	virtual device_node_cookie	NodeCookie() const
+								{ return fNodeCookie; }
+	virtual void				SetNodeCookie(device_node_cookie cookie)
+								{ fNodeCookie = cookie; }
 	virtual Attributes		GetAllAttributes() const;
 	virtual BString			GetAllStrings() const;
 
@@ -111,10 +115,11 @@ public:
 	virtual void			InitFromAttributes() { return; }
 
 protected:
-			AttributeMap	fAttributeMap;
-			BusType			fBusType;
-			Category		fCategory;
-			Device*			fPhysicalParent;
+			AttributeMap		fAttributeMap;
+			BusType				fBusType;
+			Category			fCategory;
+			Device*				fPhysicalParent;
+			device_node_cookie	fNodeCookie;
 };
 
 #endif /* DEVICE_H */

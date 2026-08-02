@@ -60,7 +60,8 @@ Device::Device(Device* physicalParent, BusType busType, Category category,
 	BStringItem(name.String()),
 	fBusType(busType),
 	fCategory(category),
-	fPhysicalParent(physicalParent)
+	fPhysicalParent(physicalParent),
+	fNodeCookie(0)
 {
 	SetAttribute(B_TRANSLATE("Device name"), B_TRANSLATE_NOCOLLECT(name));
 	SetAttribute(B_TRANSLATE("Manufacturer"), B_TRANSLATE_NOCOLLECT(manufacturer));

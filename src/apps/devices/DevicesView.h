@@ -78,6 +78,8 @@ class DevicesView : public BView {
 		void				_ShowDisableDriverAlert(const BPath& settingsPath,
 								const BString& relativePath);
 
+		void				_SetOrderBy(OrderByType orderBy);
+
 		void				_UpdateBlockButton(Device* device);
 
 		BOutlineListView*	fDevicesOutline;
