@@ -54,8 +54,10 @@ typedef std::vector<Device*> Devices;
 
 class DevicesView : public BView {
 	public:
-				DevicesView();
+				DevicesView(OrderByType OrderBy = ORDER_BY_CATEGORY);
 				~DevicesView();
+
+		OrderByType OrderBy() const { return fOrderBy; };
 
 		virtual void CreateLayout();
 

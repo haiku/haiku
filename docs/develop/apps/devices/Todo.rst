@@ -8,6 +8,5 @@ TODO
 * Find a place for unknown devices (or decypher the names better)
 * Reselect currently selected on sort-by change - unique device id (device_node_cookie?)
 * Check for keyboard navigation
-* Loading and saving settings (sort by, position, size and sizes of views)
 * Icons per device type
 * Index attributes by enum, not string

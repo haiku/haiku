@@ -41,9 +41,10 @@
 #define B_TRANSLATION_CONTEXT "DevicesView"
 
 
-DevicesView::DevicesView()
+DevicesView::DevicesView(OrderByType OrderBy)
 	:
 	BView("DevicesView", B_WILL_DRAW | B_FRAME_EVENTS),
+	fOrderBy(OrderBy),
 	fHasShownDisableAlert(false),
 	fRebootNeeded(false)
 {
@@ -99,11 +100,13 @@ DevicesView::CreateLayout()
 		new BMessage(kMsgOrderCategory));
 	BMenuItem* byConnection = new BMenuItem(B_TRANSLATE("Connection"),
 		new BMessage(kMsgOrderConnection));
-	byCategory->SetMarked(true);
-	fOrderBy = byCategory->IsMarked() ? ORDER_BY_CATEGORY : ORDER_BY_CONNECTION;
 	orderByPopupMenu->AddItem(byBus);
 	orderByPopupMenu->AddItem(byCategory);
 	orderByPopupMenu->AddItem(byConnection);
+
+	item = orderByPopupMenu->ItemAt((int32)fOrderBy);
+	if (item != NULL)
+		item->SetMarked(true);
 	fOrderByMenu = new BMenuField(B_TRANSLATE("Order by:"), orderByPopupMenu);
 	fAttributesView = new PropertyList("attributesView");
 	fBlockButton
