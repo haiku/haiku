@@ -29,6 +29,7 @@ struct ServerRemoteDevice
 	uint8				classOfDevice[3];
 	linkkey_t			link_key;
 	uint8				link_type;
+	uint8				encryption_enabled;
 
 	uint16				handle;
 	RemoteDevice::ConnectionState			conn_state;
@@ -59,6 +60,7 @@ public:
 	void CreateConnection(BMessage* message);
 	void CancelConnection(BMessage* message);
 	void Disconnect(BMessage* message);
+	void SetConnEncryption(uint16 handle, bool encryption_enabled);
 
 	ServerRemoteDevice*	RemoteDeviceByAddr(bdaddr_t bdaddr);
 	ServerRemoteDevice*	RemoteDeviceByHandle(uint16 handle);
@@ -124,6 +126,8 @@ private:
 	void SimplePairingComplete(struct hci_ev_simple_pairing_complete* event,
 		BMessage* request);
 	void AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* request);
+
+	void EncryptChange(struct hci_ev_encrypt_change* eventData);
 };
 
 #endif

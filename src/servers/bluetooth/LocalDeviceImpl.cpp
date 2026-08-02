@@ -244,6 +244,10 @@ LocalDeviceImpl::HandleUnexpectedEvent(struct hci_event_header* event)
 			ConnectionComplete(JumpEventHeader<struct hci_ev_conn_complete>(event));
 			break;
 
+		case HCI_EVENT_ENCRYPT_CHANGE:
+			EncryptChange(JumpEventHeader<struct hci_ev_encrypt_change>(event));
+			break;
+
 		default:
 			TRACE_BT("Couldn't handle the unexpected event with code: %x", event->ecode);
 			break;
@@ -274,9 +278,6 @@ LocalDeviceImpl::HandleExpectedRequest(struct hci_event_header* event,
 				JumpEventHeader
 					<struct hci_ev_remote_name_request_complete_reply>
 				(event), request);
-			break;
-
-		case HCI_EVENT_ENCRYPT_CHANGE:
 			break;
 
 		case HCI_EVENT_CHANGE_CONN_LINK_KEY_COMPLETE:
@@ -859,6 +860,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 		}
 
 		// place here all CC that just replies a uint8 status
+		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_SET_CONN_ENCRYPT):
 		case PACK_OPCODE(OGF_LINK_CONTROL, OCF_CREATE_CONN_CANCEL):
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_RESET):
 		case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):
@@ -1475,6 +1477,34 @@ LocalDeviceImpl::Disconnect(BMessage* message)
 
 
 void
+LocalDeviceImpl::SetConnEncryption(uint16 handle, bool encryption_enabled)
+{
+	TRACE_BT("LocalDeviceImpl: %s...\n", __FUNCTION__);
+
+	BluetoothCommand<typed_command(hci_cp_set_conn_encrypt)> command(OGF_LINK_CONTROL,
+		OCF_SET_CONN_ENCRYPT);
+
+	command->handle = handle;
+	command->encrypt = encryption_enabled;
+
+	if (fHCIDelegate->IssueCommand(command.Data(), command.Size()) == B_ERROR) {
+		TRACE_BT("LocalDeviceImpl: Command issued error for %s\n", __FUNCTION__);
+		return;
+	}
+	TRACE_BT("LocalDeviceImpl: Command issued for %s\n", __FUNCTION__);
+
+	BMessage* newRequest = new BMessage(BT_MSG_HANDLE_SIMPLE_REQUEST);
+
+	newRequest->AddInt32("hci_id", fHCIDelegate->Id());
+
+	newRequest->AddInt16("eventExpected", HCI_EVENT_CMD_STATUS);
+	newRequest->AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_SET_CONN_ENCRYPT));
+
+	AddWantedEvent(newRequest);
+}
+
+
+void
 LocalDeviceImpl::Authenticate(uint16 handle)
 {
 	TRACE_BT("LocalDeviceImpl: %s...\n", __FUNCTION__);
@@ -1519,6 +1549,7 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event)
 			rd->handle = event->handle;
 			rd->link_type = event->link_type;
 			rd->conn_state = RemoteDevice::CONNECTED;
+			rd->encryption_enabled = event->encrypt_mode;
 		}
 
 		// TODO: Review, this rDevice is leaked
@@ -1750,8 +1781,8 @@ LocalDeviceImpl::IOCapabilityRequest(struct hci_ev_io_capability_request* event,
 		bdaddrUtils::ToString(event->bdaddr).String());
 
 	// TODO: this should be temporary, need to change this to HCI_IO_CAP_DISPLAY_YES_NO
-	command = buildIOCapabilityRequestReply(event->bdaddr, HCI_IO_CAP_NO_INPUT_NO_OUTPUT,
-		HCI_OOB_DATA_NOT_PRESENT, HCI_AUTH_REQ_NO_MITM_NO_BOND, &size);
+	command = buildIOCapabilityRequestReply(event->bdaddr, HCI_IO_CAP_DISPLAY_YES_NO,
+		HCI_OOB_DATA_NOT_PRESENT, HCI_AUTH_REQ_MITM_GENERAL_BOND, &size);
 
 	BMessage* newrequest = new BMessage;
 
@@ -1835,6 +1866,8 @@ LocalDeviceImpl::AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* 
 	if (status == BT_OK) {
 		TRACE_BT("LocalDeviceImpl: Authentication Successful for handle %d\n", handle);
 		ServerRemoteDevice* rd = RemoteDeviceByHandle(eventData->handle);
+
+		SetConnEncryption(rd->handle, true);
 		((BluetoothServer*)be_app)->DiscoverServices(rd);
 	} else {
 		TRACE_BT("LocalDeviceImpl: Authentication Failed for handle %d with status 0x%02x\n",
@@ -1862,6 +1895,22 @@ LocalDeviceImpl::AuthComplete(struct hci_ev_auth_complete* eventData, BMessage* 
 	} else {
 		TRACE_BT("LocalDeviceImpl: Auth Complete received but no local request was waiting.\n");
 	}
+}
+
+
+void
+LocalDeviceImpl::EncryptChange(struct hci_ev_encrypt_change* event)
+{
+	TRACE_BT("LocalDeviceImpl: %s: Handle=%#x, encrypt=%x, status=%x\n",
+		__FUNCTION__, event->handle, event->encrypt, event->status);
+
+	ServerRemoteDevice* rd = RemoteDeviceByHandle(event->handle);
+	if (rd == NULL)
+		return;
+
+	rd->encryption_enabled = event->encrypt;
+	if (rd->encryption_enabled != 0)
+		((BluetoothServer*)be_app)->NotifyServices(rd);
 }
 
 
