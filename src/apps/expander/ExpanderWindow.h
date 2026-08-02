@@ -88,6 +88,7 @@ private:
 
 			ExpanderThread*		fExpandingThread;
 			bool				fExpandingStarted;
+			bool				fExpandingIgnoreErrors;
 
 			BMessage			fSettings;
 			ExpanderPreferences*	fPreferences;

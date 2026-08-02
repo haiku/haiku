@@ -97,6 +97,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fListingStarted(false),
 	fExpandingThread(NULL),
 	fExpandingStarted(false),
+	fExpandingIgnoreErrors(false),
 	fSettings(*settings),
 	fPreferences(NULL)
 {
@@ -445,8 +446,8 @@ ExpanderWindow::MessageReceived(BMessage* message)
 			BString string;
 			if (message->FindString("error", &string) == B_OK
 				&& fExpandingStarted) {
-				fExpandingThread->SuspendExternalExpander();
 				if (strstr(string.String(), "password") != NULL) {
+					fExpandingThread->SuspendExternalExpander();
 					BString password;
 					PasswordAlert* alert = new PasswordAlert("passwordAlert",
 						string);
@@ -454,15 +455,27 @@ ExpanderWindow::MessageReceived(BMessage* message)
 					fExpandingThread->ResumeExternalExpander();
 					fExpandingThread->PushInput(password);
 				} else {
+					if (fExpandingIgnoreErrors)
+						break;
+
+					fExpandingThread->SuspendExternalExpander();
 					BAlert* alert = new BAlert("stopAlert", string,
-						B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
-						B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+						B_TRANSLATE("Stop"), B_TRANSLATE("Ignore all"),
+						B_TRANSLATE("Ignore"), B_WIDTH_AS_USUAL,
+						B_OFFSET_SPACING, B_WARNING_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
-					if (alert->Go() == 0) {
+					alert->TextView()->SetAlignment(B_ALIGN_LEFT);
+
+					int32 value = alert->Go();
+					if (value == 0) {
 						fExpandingThread->ResumeExternalExpander();
 						StopExpanding();
-					} else
+					} else {
+						if (value == 1)
+							fExpandingIgnoreErrors = true;
+
 						fExpandingThread->ResumeExternalExpander();
+					}
 				}
 			}
 			break;
@@ -699,6 +712,7 @@ ExpanderWindow::StopExpanding(void)
 	}
 
 	fExpandingStarted = false;
+	fExpandingIgnoreErrors = false;
 
 	fExpandButton->SetLabel(B_TRANSLATE("Expand"));
 	fSourceButton->SetEnabled(true);
