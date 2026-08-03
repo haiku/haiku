@@ -77,13 +77,30 @@ parse_intel(const char* name)
 			index += 9;
 		} else if (!strncmp(&name[index], "  ", 2)) {
 			// Skip duplicate spaces
-			index++;
+			while (name[index + 2] == ' ')
+				index++;
 		} else if (!strncmp(&name[index], " @", 2)) {
 			// Cut off the remainder
 			break;
 		} else
 			buffer[outIndex++] = name[index];
 	}
+
+	// Older Intel CPUs add the clock speed into the Brand String
+	if (outIndex >= 3 && (!memcmp(&buffer[outIndex - 3], "MHz", 3)
+			|| !memcmp(&buffer[outIndex - 3], "GHz", 3))) {
+		outIndex -= 3;
+		// remove the numeric value ("900")
+		while (outIndex > 0
+			&& ((buffer[outIndex - 1] >= '0' && buffer[outIndex - 1] <= '9')
+				|| buffer[outIndex - 1] == '.')) {
+			outIndex--;
+		}
+	}
+
+	// cut off trailing spaces
+	while (outIndex > 0 && buffer[outIndex - 1] == ' ')
+		outIndex--;
 
 	buffer[outIndex] = '\0';
 	return buffer;
