@@ -102,6 +102,8 @@ const uint32 kLatchChanged = 'ltch';
 
 static const float kPopUpIndicatorWidth = 13.0f;
 
+static const int32 kMaxMostUsedItems = 5;
+
 const char* kDragNDropTypes[] = {
 	B_QUERY_MIMETYPE,
 	B_QUERY_TEMPLATE_MIMETYPE
@@ -140,7 +142,7 @@ namespace BPrivate {
 class MostUsedNames {
 public:
 								MostUsedNames(const char* fileName, const char* directory,
-									int32 maxCount = 5);
+									int32 maxCount = kMaxMostUsedItems);
 								~MostUsedNames();
 
 			bool				ObtainList(BStringList* list);
@@ -152,6 +154,7 @@ protected:
 			struct list_entry {
 				BString name;
 				int32 count;
+				int32 index;
 			};
 
 		static int CompareNames(const list_entry* a, const list_entry* b);
@@ -1761,9 +1764,10 @@ FindPanel::MessageReceived(BMessage* message)
 		{
 			BMenuItem* item;
 			if (message->FindPointer("source", (void**)&item) == B_OK) {
-				// don't add the "All files and folders" to the list
-				if (fMimeTypeMenu->IndexOf(item) != 0)
+				if (item->Menu() != fMimeTypeMenu) {
+					// submenu, add mime type
 					gMostUsedMimeTypes.AddName(item->Label());
+				}
 
 				SetCurrentMimeType(item);
 			}
@@ -2402,44 +2406,8 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 void
 FindPanel::AddMimeTypesToMenu()
 {
-	BMessage* itemMessage = new BMessage(kMIMETypeItem);
-	itemMessage->AddString("mimetype", kAllMimeTypes);
-
-	IconMenuItem* firstItem = new IconMenuItem(
-		B_TRANSLATE("All files and folders"), itemMessage,
-		static_cast<BBitmap*>(NULL));
-	MimeTypeMenu()->AddItem(firstItem);
-	MimeTypeMenu()->AddSeparatorItem();
-
-	// add recent MIME types
-
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	ASSERT(tracker != NULL);
-
-	BStringList list;
-	if (tracker != NULL && gMostUsedMimeTypes.ObtainList(&list)) {
-		int32 count = 0;
-		for (int32 index = 0; index < list.CountStrings(); index++) {
-			BString name = list.StringAt(index);
-
-			MimeTypeList* mimeTypes = tracker->MimeTypes();
-			if (mimeTypes != NULL) {
-				const ShortMimeInfo* info = mimeTypes->FindMimeType(name);
-				if (info == NULL)
-					continue;
-
-				BMessage* message = new BMessage(kMIMETypeItem);
-				message->AddString("mimetype", info->InternalName());
-
-				MimeTypeMenu()->AddItem(new BMenuItem(name, message));
-				count++;
-			}
-		}
-		if (count != 0)
-			MimeTypeMenu()->AddSeparatorItem();
-
-		gMostUsedMimeTypes.ReleaseList();
-	}
 
 	// add MIME type tree list
 
@@ -2454,33 +2422,76 @@ FindPanel::AddMimeTypesToMenu()
 			BMessage* message = new BMessage(kMIMETypeItem);
 			message->AddString("mimetype", superType);
 
-			MimeTypeMenu()->AddItem(new IconMenuItem(superMenu, message,
-				superType));
+			fMimeTypeMenu->AddItem(new IconMenuItem(superMenu, message, superType));
 
 			// the MimeTypeMenu's font is not correct at this time
 			superMenu->SetFont(be_plain_font);
 		}
 	}
 
-	if (tracker != NULL) {
-		tracker->MimeTypes()->EachCommonType(
-			&FindPanel::AddOneMimeTypeToMenu, MimeTypeMenu());
-	}
+	tracker->MimeTypes()->EachCommonType(&FindPanel::AddOneMimeTypeToMenu, fMimeTypeMenu);
 
 	// remove empty super type menus (and set target)
+	{
+		BMenuItem* item;
+		int32 index = fMimeTypeMenu->CountItems();
+		while (index-- > 0 && (item = fMimeTypeMenu->ItemAt(index)) != NULL) {
+			BMenu* submenu = item->Submenu();
+			if (submenu == NULL)
+				continue;
 
-	for (int32 index = MimeTypeMenu()->CountItems(); index-- > 2;) {
-		BMenuItem* item = MimeTypeMenu()->ItemAt(index);
-		BMenu* submenu = item->Submenu();
-		if (submenu == NULL)
-			continue;
-
-		if (submenu->CountItems() == 0) {
-			MimeTypeMenu()->RemoveItem(item);
-			delete item;
-		} else
-			submenu->SetTargetForItems(this);
+			if (submenu->CountItems() == 0) {
+				fMimeTypeMenu->RemoveItem(item);
+				delete item;
+			} else
+				submenu->SetTargetForItems(this);
+		}
 	}
+
+	// sort super types
+	fMimeTypeMenu->SortItems(CompareLabels);
+
+	// add most used MIME types
+
+	BStringList list;
+	if (tracker != NULL && gMostUsedMimeTypes.ObtainList(&list)) {
+		int32 count = 0;
+		for (int32 index = 0; index < list.CountStrings(); index++) {
+			BString name = list.StringAt(index);
+
+			MimeTypeList* mimeTypes = tracker->MimeTypes();
+			if (mimeTypes == NULL)
+				break;
+
+			const ShortMimeInfo* info = mimeTypes->FindMimeType(name);
+			if (info == NULL)
+				continue;
+
+			BMessage* message = new BMessage(kMIMETypeItem);
+			const char* type = info->InternalName();
+			message->AddString("mimetype", type);
+			fMimeTypeMenu->AddItem(new IconMenuItem(name, message, type), 0);
+
+			count++;
+		}
+
+		if (count > 0) {
+			BSeparatorItem* separator = new BSeparatorItem();
+			fMimeTypeMenu->AddItem(separator, count);
+		}
+
+		gMostUsedMimeTypes.ReleaseList();
+	}
+
+	// add "All files and folders"
+
+	BMessage* allMessage = new BMessage(kMIMETypeItem);
+	allMessage->AddString("mimetype", kAllMimeTypes);
+	IconMenuItem* allItem = new IconMenuItem(B_TRANSLATE("All files and folders"),
+		allMessage, static_cast<BBitmap*>(NULL));
+	fMimeTypeMenu->AddItem(allItem, 0);
+	BSeparatorItem* separator = new BSeparatorItem();
+	fMimeTypeMenu->AddItem(separator, 1);
 }
 
 
@@ -3840,8 +3851,7 @@ DraggableQueryIcon::DragStarted(BMessage* dragMessage)
 //	#pragma mark -
 
 
-MostUsedNames::MostUsedNames(const char* fileName, const char* directory,
-	int32 maxCount)
+MostUsedNames::MostUsedNames(const char* fileName, const char* directory, int32 maxCount)
 	:
 	fFileName(fileName),
 	fDirectory(directory),
@@ -3867,8 +3877,9 @@ MostUsedNames::~MostUsedNames()
 
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() == B_OK) {
-		for (int32 i = 0; i < fList.CountItems(); i++) {
-			list_entry* entry = fList.ItemAt(i);
+		int32 count = fList.CountItems();
+		for (int32 index = 0; index < count; index++) {
+			list_entry* entry = fList.ItemAt(index);
 
 			// limit upper bound to react more dynamically to changes
 			if (--entry->count > 20)
@@ -3876,7 +3887,7 @@ MostUsedNames::~MostUsedNames()
 
 			// if the item hasn't been chosen in a while, remove it
 			// (but leave at least one item in the list)
-			if (entry->count < -10 && i > 0)
+			if (entry->count < -10 && index > 0)
 				continue;
 
 			BString line;
@@ -3889,8 +3900,8 @@ MostUsedNames::~MostUsedNames()
 
 	// free data
 
-	for (int32 i = fList.CountItems(); i-- > 0;) {
-		list_entry* entry = fList.ItemAt(i);
+	for (int32 index = fList.CountItems(); index-- > 0;) {
+		list_entry* entry = fList.ItemAt(index);
 		delete entry;
 	}
 }
@@ -3908,13 +3919,14 @@ MostUsedNames::ObtainList(BStringList* list)
 	fLock.Lock();
 
 	list->MakeEmpty();
-	for (int32 i = 0; i < fCount; i++) {
-		list_entry* entry = fList.ItemAt(i);
+	for (int32 index = 0; index < fCount; index++) {
+		list_entry* entry = fList.ItemAt(index);
 		if (entry == NULL)
 			return true;
 
 		list->Add(entry->name);
 	}
+
 	return true;
 }
 
@@ -3934,39 +3946,48 @@ MostUsedNames::AddName(const BString& name)
 	if (!fLoaded)
 		LoadList();
 
-	// remove last entry if there are more than
-	// 2*fCount entries in the list
-
 	list_entry* entry = NULL;
 
-	if (fList.CountItems() > fCount * 2) {
-		entry = fList.RemoveItemAt(fList.CountItems() - 1);
-
-		// is this the name we want to add here?
-		if (name == entry->name) {
-			delete entry;
-			entry = NULL;
-		} else
-			fList.AddItem(entry);
+	// set entry to existing entry with this name if found
+	for (int32 i = 0; (entry = fList.ItemAt(i)) != NULL; i++) {
+		if (entry->name == name)
+			break;
 	}
 
 	if (entry == NULL) {
-		for (int32 i = 0; (entry = fList.ItemAt(i)) != NULL; i++) {
-			if (entry->name == name)
-				break;
-		}
-	}
-
-	if (entry == NULL) {
+		// add new entry
 		entry = new list_entry;
 		entry->name = name;
 		entry->count = 1;
+		entry->index = fList.CountItems();
+
+		// remove item if over limit
+		if (entry->index >= kMaxMostUsedItems) {
+			// find the smallest count
+			int32 smallest = fList.ItemAt(0)->count;
+			for (int32 index = 0; index < kMaxMostUsedItems; index++)
+				smallest = std::min(smallest, fList.ItemAt(index)->count);
+
+			// delete the first item with the smallest count
+			for (int32 index = 0; index < kMaxMostUsedItems; index++) {
+				if (smallest == fList.ItemAt(index)->count) {
+					delete fList.RemoveItemAt(index);
+					break;
+				}
+			}
+		}
 
 		fList.AddItem(entry);
-	} else if (entry->count < 0)
-		entry->count = 1;
-	else
-		entry->count++;
+	} else {
+		// update existing entry
+		if (entry->count < 0) {
+			// negative count means old known mime type, put count back to 1
+			entry->count = 1;
+		} else {
+			// mime type queried again
+			entry->count++;
+		}
+	}
 
 	fLock.Unlock();
 	UpdateList();
@@ -3977,7 +3998,7 @@ int
 MostUsedNames::CompareNames(const list_entry* entryA, const list_entry* entryB)
 {
 	if (entryA->count == entryB->count)
-		return entryA->name.ICompare(entryB->name);
+		return entryB->index < entryA->index;
 
 	return entryB->count - entryA->count;
 }
@@ -3988,6 +4009,7 @@ MostUsedNames::LoadList()
 {
 	if (fLoaded)
 		return;
+
 	fLoaded = true;
 
 	// load the most used names list
@@ -4002,6 +4024,7 @@ MostUsedNames::LoadList()
 	if (file == NULL)
 		return;
 
+	int32 index = 0;
 	char line[B_FILE_NAME_LENGTH + 5];
 	while (fgets(line, sizeof(line), file) != NULL) {
 		int32 length = (int32)strlen(line) - 1;
@@ -4017,8 +4040,10 @@ MostUsedNames::LoadList()
 		list_entry* entry = new list_entry;
 		entry->name = name;
 		entry->count = count;
+		entry->index = index;
 
 		fList.AddItem(entry);
+		index++;
 	}
 	fclose(file);
 }
@@ -4035,6 +4060,11 @@ MostUsedNames::UpdateList()
 	// sort list items
 
 	fList.SortItems(MostUsedNames::CompareNames);
+
+	// reindex list
+	int32 itemCount = fList.CountItems();
+	for (int32 index = 0; index < itemCount; index++)
+		fList.ItemAt(index)->index = index;
 }
 
 }	// namespace BPrivate
