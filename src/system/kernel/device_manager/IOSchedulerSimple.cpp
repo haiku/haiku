@@ -801,10 +801,9 @@ panic("no more requests for owner %p (thread %" B_PRId32 ")", owner, owner->thre
 				_NextActiveRequestOwner(owner, quantum);
 		}
 
-		// If the current owner doesn't have anymore requests, we have to
-		// insert our marker, since the owner will be gone in the next
-		// iteration.
-		if (owner->requests.IsEmpty()) {
+		// Since we're going to drop the lock, we have to use the marker to
+		// keep track of where we are in the ActiveRequestOwners list.
+		if (owner != NULL) {
 			fActiveRequestOwners.InsertBefore(owner, &marker);
 			owner = NULL;
 		}
