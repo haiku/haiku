@@ -691,6 +691,12 @@ VMCache::Delete()
 				"@!page %p; cache %p", page, this, page, this);
 		}
 
+		if (page->State() == PAGE_STATE_MODIFIED) {
+			// pages can't be freed in MODIFIED state
+			page->modified = false;
+			vm_page_set_state(page, PAGE_STATE_CACHED);
+		}
+
 		// remove it
 		pages.Remove(page);
 		page->SetCacheRef(NULL);
