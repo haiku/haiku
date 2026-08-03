@@ -59,10 +59,8 @@ static ssize_t
 utf16_to_utf8(const uint16* source, size_t sourceCodeUnitCount, char* target,
 	size_t targetLength, bool isLittleEndian)
 {
-	if (source == NULL || sourceCodeUnitCount == 0
-		|| target == NULL || targetLength == 0) {
+	if (source == NULL || target == NULL || targetLength == 0)
 		return B_BAD_VALUE;
-	}
 
 	ssize_t outLength = 0;
 
