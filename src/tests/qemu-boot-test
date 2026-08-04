@@ -26,24 +26,24 @@ function check_logs {
 	FILE=$1
 	echo -n "    Haiku kernel loaded: "
 	# First output from kernel on boot
-	if grep -q "Welcome to kernel debugger output" $FILE; then
+	if strings $FILE | grep -q "Welcome to kernel debugger output"; then
 		echo "YES"
 	else
 		echo "NO"
 	fi
 	# Checking for a KDL
 	echo -n "    Potential KDL Detected: "
-	if grep -q "kdebug>" $FILE; then
+	if strings $FILE | grep -q "kdebug>"; then
 		echo "YES"
 	else
 		echo "NO"
 	fi
 	echo "=============================================="
 	echo "    Summary of issues in logs:"
-	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error" | cut -d':' -f1 | sort | uniq -c | sort -nr
+	strings $FILE | grep -E -i "FATAL|ERROR|FAIL|GDB" | grep -vi " No error" | cut -d':' -f1 | sort | uniq -c | sort -nr
 	echo "=============================================="
 	echo "    Potential issues in logs:"
-	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+	strings $FILE | grep -E -i "FATAL|ERROR|FAIL|GDB" | grep -vi " No error"
 	echo "=============================================="
 }
 
@@ -123,6 +123,7 @@ case "$ARCH" in
 		-device qemu-xhci -device usb-tablet -device usb-kbd \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
 		-device virtio-net-device,netdev=testnet,bus=virtio-mmio-bus.1 \
+		-device virtio-gpu-device,bus=virtio-mmio-bus.2 \
 		-drive file=$TEST_FILE,format=raw,if=none,id=x0
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
