@@ -10559,9 +10559,12 @@ BPoseView::FilterPose(BPose* pose)
 	if (pose == NULL || !IsFiltering())
 		return false;
 
+	ModelNodeLazyOpener modelOpener(pose->TargetModel());
 	if (IsRefFiltering()) {
+		modelOpener.OpenNode();
+
 		Model* model = pose->TargetModel();
-		if (model->OpenNode() != B_OK)
+		if (!model->IsNodeOpen())
 			return false;
 
 		struct stat_beos stat;
@@ -10576,7 +10579,6 @@ BPoseView::FilterPose(BPose* pose)
 	bool found[stringCount];
 	memset(found, 0, sizeof(found));
 
-	ModelNodeLazyOpener modelOpener(pose->TargetModel());
 	for (int32 i = 0; i < CountColumns(); i++) {
 		BTextWidget* widget = pose->WidgetFor(ColumnAt(i), this, modelOpener);
 		const char* text = NULL;
