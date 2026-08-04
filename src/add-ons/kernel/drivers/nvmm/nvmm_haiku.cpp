@@ -192,14 +192,15 @@ haiku_thread_unpin()
 extern "C" void
 os_preempt_disable()
 {
-	thread_get_current_thread()->cpu->reschedule_disabled = true;
+	thread_get_current_thread()->cpu->reschedule_disabled++;
 }
 
 
 extern "C" void
 os_preempt_enable()
 {
-	thread_get_current_thread()->cpu->reschedule_disabled = false;
+	ASSERT(os_preempt_disabled());
+	thread_get_current_thread()->cpu->reschedule_disabled--;
 	if (os_return_needed())
 		scheduler_reschedule_if_necessary();
 }
