@@ -552,7 +552,7 @@ virtio_block_init_driver(device_node *node, void **cookie)
 	if (info == NULL)
 		return B_NO_MEMORY;
 
-	memset(info, 0, sizeof(*info));
+	memset((void*)info, 0, sizeof(*info));
 
 	info->media_status = B_OK;
 	info->dma_resource = new(std::nothrow) DMAResource;
