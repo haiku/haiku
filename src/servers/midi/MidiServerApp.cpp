@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
  * Copyright 2002-2004, Matthijs Hollemans
  * Copyright 2021, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * Distributed under the terms of the MIT License.
@@ -9,6 +9,7 @@
  *		Matthijs Hollemans
  *		Oliver Tappe
  *		Panagiotis "Ivory" Vasilopoulos
+ *		Pete Goodeve
  *		Philippe Houdoin
  */
 
@@ -84,6 +85,7 @@ MidiServerApp::AboutRequested()
 		"Matthijs Hollemans",
 		"Oliver Tappe",
 		"Panagiotis \"Ivory\" Vasilopoulos",
+		"Pete Goodeve",
 		"Philippe Houdoin",
 		NULL
 	};

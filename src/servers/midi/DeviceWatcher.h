@@ -34,15 +34,16 @@ private:
 	void _ScanDevices(const char* path);
 	void _AddDevice(const char* path);
 	void _RemoveDevice(const char* path);
-	void _SetIcons(BMidiEndpoint* endp);
+	void _SetProperties(int fd, const char* path, BMidiEndpoint* endp);
+	status_t _GetVectorIcon(int fd, uint8** _data, size_t * _size);
 
 	typedef HashMap<HashString, DeviceEndpoints*> DeviceEndpointsMap;
 	DeviceEndpointsMap		fDeviceEndpointsMap;
 
-	uint8* fVectorIconData;
-	size_t fVectorIconDataSize;
-	BBitmap* fLargeIcon;
-	BBitmap* fMiniIcon;
+	uint8* fDefaultVectorIconData;
+	size_t fDefaultVectorIconDataSize;
+	BBitmap* fDefaultLargeIcon;
+	BBitmap* fDefaultMiniIcon;
 };
 
 #endif // DEVICE_WATCHER_H

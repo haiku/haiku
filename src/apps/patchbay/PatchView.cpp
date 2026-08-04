@@ -2,7 +2,7 @@
  * -------------
  * Implements the main PatchBay view class.
  *
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Revisions by Pete Goodeve
@@ -10,7 +10,7 @@
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
  */
- 
+
 #include "PatchView.h"
 
 #include <Application.h>
@@ -133,6 +133,19 @@ PatchView::GetToolTipAt(BPoint point, BToolTip** tip)
 
 	BString str;
 	str << "<" << obj->ID() << ">: " << obj->Name();
+
+	// if endpoint is from a device, display
+	// its device path also
+	BMessage properties;
+	if (obj->GetProperties(&properties) == B_OK) {
+		BString deviceName;
+		if (properties.FindString("device", &deviceName) == B_OK
+			&& strcmp(obj->Name(), deviceName.String()) != 0) {
+			// endpoint name is not the device path
+			str << "\n(" << deviceName << ")";
+		}
+	}
+
 	obj->Release();
 
 	SetToolTip(str.String());
