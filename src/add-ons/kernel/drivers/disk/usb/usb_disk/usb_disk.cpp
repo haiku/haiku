@@ -1946,7 +1946,13 @@ usb_disk_uninit_driver(void *_cookie)
 	disk_device *device = (disk_device *)_cookie;
 	mutex_lock(&device->lock);
 
-	ASSERT(device->open_count == 0 && device->removed);
+	if (!device->removed) {
+		mutex_unlock(&device->lock);
+		usb_disk_device_removed(_cookie);
+		mutex_lock(&device->lock);
+	}
+
+	ASSERT(device->open_count == 0);
 	usb_disk_free_device_and_luns(device);
 }
 
