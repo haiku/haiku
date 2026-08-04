@@ -863,6 +863,11 @@ panic("no more requests for owner %p (thread %" B_PRId32 ")", owner, owner->thre
 		}
 	}
 
+	if (owner == NULL) {
+		MutexLocker locker(fLock);
+		fActiveRequestOwners.Remove(&marker);
+	}
+
 	return B_OK;
 }
 
