@@ -9,9 +9,9 @@
 #include "pthread_private.h"
 
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 #include <TLS.h>
 
