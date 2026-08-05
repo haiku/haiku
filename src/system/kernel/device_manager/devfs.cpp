@@ -294,6 +294,9 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 	// remove it from the global hash table
 	fs->vnode_hash->Remove(vnode);
 
+	// unlock before calling hooks, to avoid lock order inversions
+	recursive_lock_unlock(&fs->lock);
+
 	if (S_ISCHR(vnode->stream.type)) {
 		if (vnode->stream.u.dev.partition == NULL) {
 			// pass the call through to the underlying device
@@ -311,6 +314,7 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 	free(vnode->name);
 	free(vnode);
 
+	recursive_lock_lock(&fs->lock);
 	return B_OK;
 }
 
@@ -962,7 +966,6 @@ static status_t
 devfs_unmount(fs_volume* _volume)
 {
 	struct devfs* fs = (struct devfs*)_volume->private_volume;
-	struct devfs_vnode* vnode;
 
 	TRACE(("devfs_unmount: entry fs = %p\n", fs));
 
@@ -974,8 +977,11 @@ devfs_unmount(fs_volume* _volume)
 	// delete all of the vnodes
 	NodeTable::Iterator i(fs->vnode_hash);
 	while (i.HasNext()) {
-		vnode = i.Next();
+		struct devfs_vnode* vnode = i.Next();
 		devfs_delete_vnode(fs, vnode, true);
+
+		// devfs_delete_vnode() unlocks temporarily, so reset the iterator
+		i.Rewind();
 	}
 	delete fs->vnode_hash;
 
@@ -1094,13 +1100,12 @@ devfs_remove_vnode(fs_volume* _volume, fs_vnode* _v, bool reenter)
 
 	RecursiveLocker locker(&fs->lock);
 
-	if (vnode->dir_next) {
+	if (vnode->dir_next != NULL) {
 		// can't remove node if it's linked to the dir
-		panic("devfs_removevnode: vnode %p asked to be removed is present in dir\n", vnode);
+		panic("devfs_remove_vnode: vnode %p asked to be removed is present in dir\n", vnode);
 	}
 
 	devfs_delete_vnode(fs, vnode, false);
-
 	return B_OK;
 }
 
