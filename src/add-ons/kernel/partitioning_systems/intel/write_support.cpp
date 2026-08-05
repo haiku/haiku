@@ -2173,14 +2173,14 @@ ep_set_type(int fd, partition_id partitionID, const char* type, disk_job_id job)
 	uint8 oldType = logical->Type();
 	logical->SetType(ptype.Type());
 
-	int parentFD = open_partition(disk->id, O_RDWR);
-	if (parentFD < 0)
+	FileDescriptorCloser parentFD(open_partition(disk->id, O_RDWR));
+	if (!parentFD.IsSet())
 		return B_IO_ERROR;
 
-	PartitionMapWriter writer(parentFD, partition->block_size);
+	PartitionMapWriter writer(parentFD.Get(), partition->block_size);
 	// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(logical, primary, false);
-	close(parentFD);
+	parentFD.Unset();
 
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
@@ -2330,15 +2330,15 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	logical->SetBlockSize(partition->block_size);
 	primary->AddLogicalPartition(logical);
 
-	int parentFD = open_partition(parent->id, O_RDWR);
-	if (parentFD < 0) {
+	FileDescriptorCloser parentFD(open_partition(parent->id, O_RDWR));
+	if (!parentFD.IsSet()) {
 		primary->RemoveLogicalPartition(logical);
 		delete logical;
 		return B_IO_ERROR;
 	}
 
 	// write changes to disk
-	PartitionMapWriter writer(parentFD, primary->BlockSize());
+	PartitionMapWriter writer(parentFD.Get(), primary->BlockSize());
 
 	// Write the logical partition's EBR first in case of failure.
 	// This way we will not add a partition to the previous logical
@@ -2360,6 +2360,8 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 			return error;
 		}
 	}
+	parentFD.Unset();
+
 	*childID = child->id;
 
 	child->block_size = logical->BlockSize();
@@ -2413,12 +2415,12 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 	primary->RemoveLogicalPartition(logical);
 	delete logical;
 
-	int parentFD = open_partition(parent->id, O_RDWR);
-	if (parentFD < 0)
+	FileDescriptorCloser parentFD(open_partition(parent->id, O_RDWR));
+	if (!parentFD.IsSet())
 		return B_IO_ERROR;
 
 	// write changes to disk
-	PartitionMapWriter writer(parentFD, primary->BlockSize());
+	PartitionMapWriter writer(parentFD.Get(), primary->BlockSize());
 
 	status_t error;
 	if (previous != NULL) {
@@ -2440,8 +2442,7 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 			}
 		}
 	}
-
-	close(parentFD);
+	parentFD.Unset();
 
 	if (error != B_OK)
 		return error;
