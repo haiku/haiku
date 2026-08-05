@@ -11,6 +11,7 @@
 #include <NetBufferUtilities.h>
 
 #include "L2capEndpointManager.h"
+#include "SupportDefs.h"
 #include "l2cap_signal.h"
 #include <btDebug.h>
 
@@ -430,7 +431,12 @@ L2capEndpoint::ReceiveData(net_buffer* buffer)
 {
 	CALLED();
 	// FIXME: Check address specified in net_buffer!
-	return gStackModule->fifo_enqueue_buffer(&fReceiveQueue, buffer);
+	status_t status = gStackModule->fifo_enqueue_buffer(&fReceiveQueue, buffer);
+
+	if (status == B_OK)
+		gSocketModule->notify(socket, B_SELECT_READ, Receivable());
+
+	return status;
 }
 
 
