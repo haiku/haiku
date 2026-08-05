@@ -1,11 +1,14 @@
 /*
- * Copyright 2003-2013, Haiku, Inc.
+ * Copyright 2003-2026, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
+ *		Axel Dörfler, axeld@pinc-software.de.
  *		Puck Meerburg, puck@puckipedia.nl
+ *		Dario Casalinuovo, b.vitruvio@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef MIXER_CONTROL_H
 #define MIXER_CONTROL_H
@@ -24,21 +27,24 @@ class BParameterWeb;
 
 class MixerControl {
 public:
-							MixerControl(int32 volumeWhich = VOLUME_USE_MIXER);
+							MixerControl();
 							~MixerControl();
 
-			bool			Connect(int32 volumeWhich, float* _value = NULL,
-								const char** _error = NULL);
-			bool			Connected();
+			bool			Connect(float* _value = NULL, const char** _error = NULL);
+			bool			IsConnected();
 
-			int32			VolumeWhich() const;
-			float			Volume() const;
+			void			SetVolumeWhich(int32 volumeWhich) { fVolumeWhich = volumeWhich; };
+			int32			VolumeWhich() const { return fVolumeWhich; };
+
+			void			SetBeep(bool beep) { fBeep = beep; };
+			int32			Beep() const { return fBeep; };
+
+			void			SetMuted(bool mute);
+			bool			IsMuted();
 
 			void			SetVolume(float volume);
 			void			ChangeVolumeBy(float value);
-
-			void			SetMute(bool muted);
-			bool			Mute();
+			float			Volume() const;
 
 			float			Minimum() const { return fMin; }
 			float			Maximum() const { return fMax; }
@@ -48,8 +54,11 @@ public:
 
 private:
 			void			_Disconnect();
+			void			_LoadSettings();
+			void			_SaveSettings();
 
-			int32			fVolumeWhich;
+			int32			fVolumeWhich;		// act on mixer or physical output
+			bool			fBeep;				// beep on volume change (default true)
 			media_node		fGainMediaNode;
 			media_node		fMuteMediaNode;
 			BParameterWeb*	fParameterWeb;
@@ -60,5 +69,6 @@ private:
 			float			fStep;
 			BMediaRoster*	fRoster;
 };
+
 
 #endif	// MIXER_CONTROL_H

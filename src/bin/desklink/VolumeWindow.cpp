@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -13,21 +14,17 @@
 
 #include <Box.h>
 #include <GroupLayout.h>
+#include <MenuItem.h>
 #include <MessageRunner.h>
 #include <Screen.h>
 
 #include "VolumeControl.h"
 
 
-static const uint32 kMsgVolumeUpdate = 'vlup';
-static const uint32 kMsgVolumeChanged = 'vlcg';
-
-
-VolumeWindow::VolumeWindow(BRect frame, bool dontBeep, int32 volumeWhich)
-	: BWindow(frame, "VolumeWindow", B_BORDERED_WINDOW_LOOK,
-		B_FLOATING_ALL_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK
-		| B_AUTO_UPDATE_SIZE_LIMITS, 0),
+VolumeWindow::VolumeWindow(BRect frame)
+	:
+	BWindow(frame, "VolumeWindow", B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK | B_AUTO_UPDATE_SIZE_LIMITS, 0),
 	fUpdatedCount(0)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -40,12 +37,11 @@ VolumeWindow::VolumeWindow(BRect frame, bool dontBeep, int32 volumeWhich)
 	box->SetBorder(B_PLAIN_BORDER);
 	AddChild(box);
 
-	BSlider* slider = new VolumeControl(volumeWhich, !dontBeep,
-		new BMessage(kMsgVolumeChanged));
-	slider->SetModificationMessage(new BMessage(kMsgVolumeUpdate));
-	box->AddChild(slider);
+	fVolumeSlider = new VolumeControl();
+	fVolumeSlider->SetModificationMessage(new BMessage(kMsgVolumeUpdate));
+	box->AddChild(fVolumeSlider);
 
-	slider->SetTarget(this);
+	fVolumeSlider->SetTarget(this);
 	ResizeTo(300, 50);
 
 	// Make sure it's not outside the screen.
@@ -69,9 +65,9 @@ VolumeWindow::~VolumeWindow()
 
 
 void
-VolumeWindow::MessageReceived(BMessage *msg)
+VolumeWindow::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case kMsgVolumeUpdate:
 			fUpdatedCount++;
 			break;
@@ -86,13 +82,13 @@ VolumeWindow::MessageReceived(BMessage *msg)
 			} else
 				Quit();
 			break;
-		
+
 		case B_QUIT_REQUESTED:
 			Quit();
 			break;
 
 		default:
-			BWindow::MessageReceived(msg);
+			BWindow::MessageReceived(message);
 			break;
 	}
 }

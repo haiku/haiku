@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013, Haiku, Inc.
+ * Copyright 2003-2026, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Puck Meerburg, puck@puckipedia.nl
  *		Dario Casalinuovo, b.vitruvio@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -16,12 +17,19 @@
 #include <string.h>
 
 #include <Debug.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <ParameterWeb.h>
+#include <Path.h>
 
 
-MixerControl::MixerControl(int32 volumeWhich)
+static const char* kSettingsFile = "x-vnd.Haiku-desklink";
+
+
+MixerControl::MixerControl()
 	:
-	fVolumeWhich(volumeWhich),
+	fVolumeWhich(VOLUME_USE_MIXER),
+	fBeep(true),
 	fGainMediaNode(media_node::null),
 	fMuteMediaNode(media_node::null),
 	fParameterWeb(NULL),
@@ -33,20 +41,21 @@ MixerControl::MixerControl(int32 volumeWhich)
 	fRoster(NULL)
 {
 	fRoster = BMediaRoster::Roster();
+
+	_LoadSettings();
 }
 
 
 MixerControl::~MixerControl()
 {
+	_SaveSettings();
 	_Disconnect();
 }
 
 
 bool
-MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
+MixerControl::Connect(float* _value, const char** _error)
 {
-	fVolumeWhich = volumeWhich;
-
 	_Disconnect();
 
 	status_t status = B_OK;
@@ -54,83 +63,91 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 	if (fRoster == NULL)
 		fRoster = BMediaRoster::Roster(&status);
 
-	if (BMediaRoster::IsRunning() && fRoster != NULL
-			&& status == B_OK) {
-		switch (volumeWhich) {
+	if (BMediaRoster::IsRunning() && fRoster != NULL && status == B_OK) {
+		switch (fVolumeWhich) {
 			case VOLUME_USE_MIXER:
 				status = fRoster->GetAudioMixer(&fGainMediaNode);
 				break;
+
 			case VOLUME_USE_PHYS_OUTPUT:
 				status = fRoster->GetAudioOutput(&fGainMediaNode);
 				break;
 		}
+
 		if (status == B_OK) {
 			status = fRoster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
 			if (status == B_OK) {
 				// Finding the Mixer slider in the audio output ParameterWeb
 				int32 numParams = fParameterWeb->CountParameters();
-				BParameter* p = NULL;
+				BParameter* param = NULL;
 				bool foundMixerLabel = false;
 				for (int i = 0; i < numParams; i++) {
-					p = fParameterWeb->ParameterAt(i);
+					param = fParameterWeb->ParameterAt(i);
 
 					// assume the mute preceeding master gain control
-					if (!strcmp(p->Kind(), B_MUTE)) {
-						fMuteParameter = p;
+					if (strcmp(param->Kind(), B_MUTE) == 0) {
+						fMuteParameter = param;
 						fMuteMediaNode = fMuteParameter->Web()->Node();
 					}
 
-					PRINT(("BParameter[%i]: %s\n", i, p->Name()));
-					if (volumeWhich == VOLUME_USE_MIXER) {
-						if (!strcmp(p->Kind(), B_MASTER_GAIN))
+					PRINT(("BParameter[%i]: %s\n", i, param->Name()));
+					if (fVolumeWhich == VOLUME_USE_MIXER) {
+						if (strcmp(param->Kind(), B_MASTER_GAIN) == 0)
 							break;
-					} else if (volumeWhich == VOLUME_USE_PHYS_OUTPUT) {
+					} else if (fVolumeWhich == VOLUME_USE_PHYS_OUTPUT) {
 						/* not all cards use the same name, and
 						 * they don't seem to use Kind() == B_MASTER_GAIN
 						 */
-						if (!strcmp(p->Kind(), B_MASTER_GAIN))
+						if (strcmp(param->Kind(), B_MASTER_GAIN) == 0)
 							break;
+
 						PRINT(("not MASTER_GAIN \n"));
 
 						/* some audio card
 						 */
-						if (!strcmp(p->Name(), "Master"))
+						if (strcmp(param->Name(), "Master") == 0)
 							break;
 						PRINT(("not 'Master' \n"));
 
 						/* some Ensonic card have all controls names 'Volume', so
 						 * need to fint the one that has the 'Mixer' text label
 						 */
-						if (foundMixerLabel && !strcmp(p->Name(), "Volume"))
+						if (foundMixerLabel && strcmp(param->Name(), "Volume") == 0)
 							break;
-						if (!strcmp(p->Name(), "Mixer"))
+
+						if (strcmp(param->Name(), "Mixer") == 0)
 							foundMixerLabel = true;
+
 						PRINT(("not 'Mixer' \n"));
 					}
 #if 0
-					//if (!strcmp(p->Name(), "Master")) {
-					if (!strcmp(p->Kind(), B_MASTER_GAIN)) {
+					//if (strcmp(param->Name(), "Master") == 0) {
+					if (strcmp(param->Kind(), B_MASTER_GAIN) == 0) {
 						for (; i < numParams; i++) {
-							p = fParamWeb->ParameterAt(i);
-							if (strcmp(p->Kind(), B_MASTER_GAIN))
-								p = NULL;
-							else
+							param = fParameterWeb->ParameterAt(i);
+							if (strcmp(param->Kind(), B_MASTER_GAIN) == 0)
 								break;
+							else
+								param = NULL;
 						}
 						break;
-					} else
-						p = NULL;
+					} else {
+						param = NULL;
+					}
 #endif
-					p = NULL;
+					param = NULL;
 				}
-				if (p == NULL) {
-					errorString = volumeWhich ? "Could not find the soundcard"
+
+				if (param == NULL) {
+					errorString = fVolumeWhich
+						? "Could not find the soundcard"
 						: "Could not find the mixer";
-				} else if (p->Type() != BParameter::B_CONTINUOUS_PARAMETER) {
-					errorString = volumeWhich ? "Soundcard control unknown"
+				} else if (param->Type() != BParameter::B_CONTINUOUS_PARAMETER) {
+					errorString = fVolumeWhich
+						? "Soundcard control unknown"
 						: "Mixer control unknown";
 				} else {
-					fMixerParameter = static_cast<BContinuousParameter*>(p);
+					fMixerParameter = static_cast<BContinuousParameter*>(param);
 					fMin = fMixerParameter->MinValue();
 					fMax = fMixerParameter->MaxValue();
 					fStep = fMixerParameter->ValueStep();
@@ -148,22 +165,26 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 				errorString = "No parameter web";
 				fParameterWeb = NULL;
 			}
-		} else
-			errorString = volumeWhich ? "No Audio output" : "No Mixer";
-
-	} else
+		} else {
+			errorString = fVolumeWhich
+				? "No Audio output"
+				: "No Mixer";
+		}
+	} else {
 		errorString = "Media services not running";
+	}
 
 	if (status != B_OK) {
 		_Disconnect();
 		fMuteMediaNode = media_node::null;
 	}
 
-	if (errorString) {
+	if (errorString != NULL) {
 		fprintf(stderr, "MixerControl: %s.\n", errorString);
-		if (_error)
+		if (_error != NULL)
 			*_error = errorString;
 	}
+
 	if (fMixerParameter == NULL && _value != NULL)
 		*_value = 0;
 
@@ -172,56 +193,34 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 
 
 bool
-MixerControl::Connected()
+MixerControl::IsConnected()
 {
 	return fGainMediaNode != media_node::null;
 }
 
 
-int32
-MixerControl::VolumeWhich() const
-{
-	return fVolumeWhich;
-}
-
-
 void
-MixerControl::SetMute(bool muted)
+MixerControl::SetMuted(bool mute)
 {
 	if (fMuteParameter == NULL)
 		return;
 
-	int32 mute = muted ? 1 : 0;
-	fMuteParameter->SetValue(&mute, sizeof(int32), system_time());
+	int32 muted = mute ? 1 : 0;
+	fMuteParameter->SetValue(&muted, sizeof(int32), system_time());
 }
 
 
 bool
-MixerControl::Mute()
+MixerControl::IsMuted()
 {
 	if (fMuteParameter == NULL)
 		return false;
 
-	int32 mute = 0;
+	int32 muted = 0;
 	bigtime_t lastChange = 0;
 	size_t size = sizeof(int32);
-	fMuteParameter->GetValue(&mute, &size, &lastChange);
-	return mute != 0;
-}
-
-
-float
-MixerControl::Volume() const
-{
-	if (fMixerParameter == NULL)
-		return 0.0f;
-
-	float volume = 0;
-	bigtime_t lastChange;
-	size_t size = sizeof(float);
-	fMixerParameter->GetValue(&volume, &size, &lastChange);
-
-	return volume;
+	fMuteParameter->GetValue(&muted, &size, &lastChange);
+	return muted != 0;
 }
 
 
@@ -252,6 +251,21 @@ MixerControl::ChangeVolumeBy(float value)
 }
 
 
+float
+MixerControl::Volume() const
+{
+	if (fMixerParameter == NULL)
+		return 0.0f;
+
+	float volume = 0;
+	bigtime_t lastChange;
+	size_t size = sizeof(float);
+	fMixerParameter->GetValue(&volume, &size, &lastChange);
+
+	return volume;
+}
+
+
 void
 MixerControl::_Disconnect()
 {
@@ -266,4 +280,53 @@ MixerControl::_Disconnect()
 		fRoster->ReleaseNode(fGainMediaNode);
 
 	fGainMediaNode = media_node::null;
+}
+
+
+void
+MixerControl::_LoadSettings()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false) < B_OK)
+		return;
+
+	path.Append(kSettingsFile);
+
+	BFile settings(path.Path(), B_READ_ONLY);
+	if (settings.InitCheck() != B_OK)
+		return;
+
+	BMessage message;
+	if (message.Unflatten(&settings) != B_OK)
+		return;
+
+	int32 volumeWhich;
+	if (message.FindInt32("volwhich", &volumeWhich) == B_OK)
+		SetVolumeWhich(volumeWhich);
+
+	bool dontBeep;
+	if (message.FindBool("dontbeep", &dontBeep) == B_OK)
+		SetBeep(!dontBeep);
+}
+
+
+void
+MixerControl::_SaveSettings()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, false) != B_OK)
+		return;
+
+	path.Append(kSettingsFile);
+
+	BFile settings(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (settings.InitCheck() != B_OK)
+		return;
+
+	BMessage message('CNFG');
+	message.AddInt32("volwhich", VolumeWhich());
+	message.AddBool("dontbeep", !Beep());
+
+	ssize_t size = 0;
+	message.Flatten(&settings, &size);
 }

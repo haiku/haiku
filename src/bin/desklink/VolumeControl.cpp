@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2010, Haiku, Inc.
+ * Copyright 2003-2026, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -20,7 +21,9 @@
 #include <ControlLook.h>
 #include <Dragger.h>
 #include <MediaRoster.h>
+#include <MenuItem.h>
 #include <MessageRunner.h>
+#include <PopUpMenu.h>
 
 #include <AppMisc.h>
 
@@ -36,11 +39,11 @@
 static const uint32 kMsgReconnectVolume = 'rcms';
 
 
-VolumeControl::VolumeControl(int32 volumeWhich, bool beep, BMessage* message)
+VolumeControl::VolumeControl()
 	:
-	BSlider("VolumeControl", B_TRANSLATE("Volume"), message, 0, 1, B_HORIZONTAL),
-	fMixerControl(new MixerControl(volumeWhich)),
-	fBeep(beep),
+	BSlider("VolumeControl", B_TRANSLATE("Volume"),
+		new BMessage(kMsgVolumeChanged), 0, 1, B_HORIZONTAL),
+	fMixerControl(new MixerControl()),
 	fSnapping(false),
 	fConnectRetries(0)
 {
@@ -63,17 +66,10 @@ VolumeControl::VolumeControl(BMessage* archive)
 	fSnapping(false),
 	fConnectRetries(0)
 {
-	if (archive->FindBool("beep", &fBeep) != B_OK)
-		fBeep = false;
+	fMixerControl = new MixerControl();
 
-	int32 volumeWhich;
-	if (archive->FindInt32("volume which", &volumeWhich) != B_OK)
-		volumeWhich = VOLUME_USE_MIXER;
-
-	fMixerControl = new MixerControl(volumeWhich);
-
-	BMessage msg(B_QUIT_REQUESTED);
-	archive->SendReply(&msg);
+	BMessage message(B_QUIT_REQUESTED);
+	archive->SendReply(&message);
 }
 
 
@@ -86,21 +82,25 @@ VolumeControl::~VolumeControl()
 status_t
 VolumeControl::Archive(BMessage* into, bool deep) const
 {
-	status_t status;
+	status_t result = B_ERROR;
 
-	status = BView::Archive(into, deep);
-	if (status < B_OK)
-		return status;
+	result = BView::Archive(into, deep);
+	if (result != B_OK)
+		return result;
 
-	status = into->AddString("add_on", kAppSignature);
-	if (status < B_OK)
-		return status;
+	result = into->AddString("add_on", kAppSignature);
+	if (result != B_OK)
+		return result;
 
-	status = into->AddBool("beep", fBeep);
-	if (status != B_OK)
-		return status;
+	result = into->AddInt32("volume which", fMixerControl->VolumeWhich());
+	if (result != B_OK)
+		return result;
 
-	return into->AddInt32("volume which", fMixerControl->VolumeWhich());
+	result = into->AddBool("beep", fMixerControl->Beep());
+	if (result != B_OK)
+		return result;
+
+	return result;
 }
 
 
@@ -133,7 +133,7 @@ VolumeControl::AttachedToWindow()
 
 	_ConnectVolume();
 
-	if (!fMixerControl->Connected()) {
+	if (!fMixerControl->IsConnected()) {
 		// Wait a bit, and try again - the media server might not have been
 		// ready yet
 		BMessage reconnect(kMsgReconnectVolume);
@@ -164,12 +164,15 @@ VolumeControl::DetachedFromWindow()
 void
 VolumeControl::MouseDown(BPoint where)
 {
-	// Ignore clicks on the dragger
+	if (Looper() == NULL || Looper()->CurrentMessage() == NULL)
+		return;
+
 	int32 viewToken;
-	if (Bounds().Contains(where) && Looper()->CurrentMessage() != NULL
-		&& Looper()->CurrentMessage()->FindInt32("_view_token",
-				&viewToken) == B_OK
-		&& viewToken != _get_object_token_(this))
+	if (Looper()->CurrentMessage()->FindInt32("_view_token", &viewToken) != B_OK)
+		viewToken = -1;
+
+	// ignore clicks on the dragger
+	if (Bounds().Contains(where) && viewToken >= 0 && viewToken != _get_object_token_(this))
 		return;
 
 	// TODO: investigate why this does not work as expected (the dragger
@@ -180,6 +183,28 @@ VolumeControl::MouseDown(BPoint where)
 			return;
 	}
 #endif
+
+	uint32 buttons;
+	if (Looper()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) != B_OK)
+		buttons = 0;
+
+	BPoint whereScreen;
+	if (Looper()->CurrentMessage()->FindPoint("screen_where", &whereScreen) != B_OK)
+		whereScreen = ConvertToScreen(where);
+
+	if (_IsReplicant() && (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		BPopUpMenu* menu = new BPopUpMenu("", false, false);
+		menu->SetFont(be_plain_font);
+
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Mute"), new BMessage(kMsgToggleMute));
+		item->SetMarked(fMixerControl->IsMuted());
+		menu->AddItem(item);
+
+		menu->SetTargetForItems(this);
+		menu->Go(whereScreen, true, false, true);
+
+		return; // do not invoke
+	}
 
 	if (!IsEnabled() || !Bounds().Contains(where)) {
 		Invoke();
@@ -260,19 +285,19 @@ VolumeControl::MouseMoved(BPoint where, uint32 transit,
 
 
 void
-VolumeControl::MessageReceived(BMessage* msg)
+VolumeControl::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			if (!fMixerControl->Connected())
+			if (!fMixerControl->IsConnected())
 				return;
 
 			// Even though the volume bar is horizontal, we use the more common
 			// vertical mouse wheel change
 			float deltaY = 0.0f;
 
-			msg->FindFloat("be:wheel_delta_y", &deltaY);
+			message->FindFloat("be:wheel_delta_y", &deltaY);
 
 			if (deltaY == 0.0f)
 				return;
@@ -311,16 +336,7 @@ VolumeControl::MessageReceived(BMessage* msg)
 		}
 
 		case B_QUIT_REQUESTED:
-			Window()->MessageReceived(msg);
-			break;
-
-		case kMsgReconnectVolume:
-			_ConnectVolume();
-			if (!fMixerControl->Connected() && --fConnectRetries > 1) {
-				BMessage reconnect(kMsgReconnectVolume);
-				BMessageRunner::StartSending(this, &reconnect,
-					6000000LL / fConnectRetries, 1);
-			}
+			Window()->MessageReceived(message);
 			break;
 
 		case B_WORKSPACE_ACTIVATED:
@@ -328,8 +344,34 @@ VolumeControl::MessageReceived(BMessage* msg)
 				Invalidate();
 			break;
 
+		case kMsgToggleMute:
+		{
+			if (fMixerControl == NULL)
+				break;
+
+			BMenuItem* item;
+			if (message->FindPointer("source", (void**)&item) != B_OK)
+				break;
+
+			if (!item->IsEnabled())
+				break;
+
+			item->SetMarked(!item->IsMarked());
+			fMixerControl->SetMuted(item->IsMarked());
+			break;
+		}
+
+		case kMsgReconnectVolume:
+			_ConnectVolume();
+			if (!fMixerControl->IsConnected() && --fConnectRetries > 1) {
+				BMessage reconnect(kMsgReconnectVolume);
+				BMessageRunner::StartSending(this, &reconnect,
+					6000000LL / fConnectRetries, 1);
+			}
+			break;
+
 		default:
-			return BView::MessageReceived(msg);
+			return BView::MessageReceived(message);
 	}
 }
 
@@ -337,7 +379,7 @@ VolumeControl::MessageReceived(BMessage* msg)
 status_t
 VolumeControl::Invoke(BMessage* message)
 {
-	if (fBeep && fOriginalValue != Value() && message == NULL) {
+	if (fMixerControl->Beep() && fOriginalValue != Value() && message == NULL) {
 		beep();
 		fOriginalValue = Value();
 	}
@@ -396,8 +438,8 @@ VolumeControl::_ConnectVolume()
 	_DisconnectVolume();
 
 	const char* errorString = NULL;
-	float volume = 0.0;
-	fMixerControl->Connect(fMixerControl->VolumeWhich(), &volume, &errorString);
+	float volume = 0.0f;
+	fMixerControl->Connect(&volume, &errorString);
 
 	if (errorString != NULL) {
 		SetLabel(errorString);

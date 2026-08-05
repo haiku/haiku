@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef VOLUME_SLIDER_H
 #define VOLUME_SLIDER_H
@@ -14,13 +15,20 @@
 #include <String.h>
 #include <Slider.h>
 
-class MixerControl;
 
+static const uint32 kMsgVolumeWhich = 'svwh';
+static const uint32 kMsgToggleBeep = 'tdbp';
+static const uint32 kMsgToggleMute = 'tdmt';
+static const uint32 kMsgVolumeUpdate = 'vlup';
+static const uint32 kMsgVolumeChanged = 'vlcg';
+
+
+class BMenu;
+class MixerControl;
 
 class VolumeControl : public BSlider {
 public:
-							VolumeControl(int32 volumeWhich, bool beep,
-								BMessage* message);
+							VolumeControl();
 							VolumeControl(BMessage* archive);
 	virtual					~VolumeControl();
 
@@ -51,7 +59,6 @@ private:
 			mutable BString	fText;
 			MixerControl*	fMixerControl;
 			int32			fOriginalValue;
-			bool			fBeep;
 
 			bool			fSnapping;
 			float			fMinSnap;
