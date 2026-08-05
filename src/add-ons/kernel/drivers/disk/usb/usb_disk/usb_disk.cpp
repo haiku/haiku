@@ -944,6 +944,9 @@ usb_disk_update_capacity(device_lun *lun)
 			return result;
 	}
 
+	if (usb_disk_mode_sense(lun) != B_OK)
+		lun->write_protected = false;
+
 	if (lun->io_scheduler != NULL
 			&& lun->io_scheduler->GetDMAResource()->BlockSize() != lun->block_size) {
 		// We need to replace the IOScheduler.
@@ -1204,17 +1207,11 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 			status_t ready = usb_disk_test_unit_ready(lun, &action);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA
 				|| ready == B_DEV_MEDIA_CHANGED) {
-				if (lun->device_type == B_CD)
-					lun->write_protected = true;
-				else if (usb_disk_mode_sense(lun) != B_OK)
-					lun->write_protected = false;
-
-				TRACE("usb lun %" B_PRIu8 " ready. write protected = %c%s\n", i,
-					lun->write_protected ? 'y' : 'n',
+				TRACE("usb lun %" B_PRIu8 " ready. %s\n", i,
 					ready == B_DEV_NO_MEDIA ? " (no media inserted)" : "");
-
 				break;
 			}
+
 			TRACE("usb lun %" B_PRIu8 " inquiry attempt %" B_PRIu32 " failed\n",
 				i, tries);
 			if (action != err_act_retry && action != err_act_many_retries)
