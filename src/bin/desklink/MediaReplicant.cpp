@@ -48,8 +48,6 @@
 
 
 static const uint32 kMsgOpenMediaSettings = 'mese';
-static const uint32 kMsgOpenSoundSettings = 'sose';
-static const uint32 kMsgOpenMediaPlayer = 'omep';
 
 static const char* kReplicantName = "MediaReplicant";
 	// R5 name needed, Media prefs manel removes by name
@@ -244,14 +242,6 @@ MediaReplicant::MouseDown(BPoint where)
 
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Media preferences" B_UTF8_ELLIPSIS),
 			new BMessage(kMsgOpenMediaSettings)));
-		menu->AddItem(new BMenuItem(
-			B_TRANSLATE("Sounds preferences" B_UTF8_ELLIPSIS),
-			new BMessage(kMsgOpenSoundSettings)));
-
-		menu->AddSeparatorItem();
-
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Open MediaPlayer"),
-			new BMessage(kMsgOpenMediaPlayer)));
 
 		menu->AddSeparatorItem();
 
@@ -296,19 +286,9 @@ void
 MediaReplicant::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgOpenMediaPlayer:
-			_Launch("MediaPlayer", "application/x-vnd.Haiku-MediaPlayer",
-				B_SYSTEM_APPS_DIRECTORY, "MediaPlayer");
-			break;
-
 		case kMsgOpenMediaSettings:
 			_Launch("Media Preferences", "application/x-vnd.Haiku-Media",
 				B_SYSTEM_PREFERENCES_DIRECTORY, "Media");
-			break;
-
-		case kMsgOpenSoundSettings:
-			_Launch("Sounds Preferences", "application/x-vnd.Haiku-Sounds",
-				B_SYSTEM_PREFERENCES_DIRECTORY, "Sounds");
 			break;
 
 		case kMsgVolumeWhich:
