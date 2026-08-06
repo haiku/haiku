@@ -161,8 +161,8 @@ EFIEthernetInterface::Init()
 	// Recognize a subset of the ip= parameter as defined for Linux:
 	// https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt
 	efi_loaded_image_protocol* loadedImageProtocol;
-	status = kSystemTable->BootServices->LocateProtocol(
-		&sLoadedImageProtocolGUID, NULL, (void**)&loadedImageProtocol);
+	status = kSystemTable->BootServices->HandleProtocol(
+		kImage, &sLoadedImageProtocolGUID, (void**)&loadedImageProtocol);
 
 	if (status == EFI_SUCCESS) {
 		char buffer[256];
