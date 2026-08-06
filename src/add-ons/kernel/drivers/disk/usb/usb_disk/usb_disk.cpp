@@ -89,7 +89,7 @@ static void	usb_disk_callback(void *cookie, status_t status, void *data,
 static status_t usb_disk_do_io(void* cookie, IOOperation* operation);
 
 uint8		usb_disk_get_max_lun(disk_device *device);
-void		usb_disk_reset_recovery(disk_device *device);
+void		usb_disk_reset_recovery(disk_device *device, err_act *_action);
 status_t	usb_disk_receive_csw(disk_device *device,
 				usb_massbulk_command_status_wrapper *status);
 
@@ -709,6 +709,8 @@ usb_disk_mode_sense(device_lun *lun)
 	commandBlock[0] = SCSI_MODE_SENSE_6;
 	commandBlock[1] = SCSI_MODE_SENSE_DISABLE_BLOCK_DESCRIPTORS;
 	commandBlock[2] = SCSI_MODE_PAGE_DEVICE_CONFIGURATION;
+	commandBlock[3] = 0;
+	commandBlock[4] = dataLength;
 
 	scsi_mode_sense_6_parameter parameter;
 	status_t result = usb_disk_operation(lun, commandBlock, 6,
