@@ -244,21 +244,19 @@ BTextWidget::CalcClickRect(BPoint poseLoc, const BColumn* column, const BPoseVie
 void
 BTextWidget::CheckExpiration()
 {
-	if (IsEditable() && fParams.pose->IsSelected() && fLastClickedTime) {
+	if (fLastClickedTime > 0 && IsEditable() && fParams.pose->IsSelected()) {
 		bigtime_t doubleClickSpeed;
 		get_click_speed(&doubleClickSpeed);
 
 		bigtime_t delta = system_time() - fLastClickedTime;
 
 		if (delta > doubleClickSpeed) {
-			// at least 'doubleClickSpeed' microseconds ellapsed and no click
-			// was registered since.
+			// at least 'doubleClickSpeed' microseconds elapsed with no click
 			fLastClickedTime = 0;
 			StartEdit(fParams.bounds, fParams.poseView, fParams.pose);
 		}
 	} else {
-		fLastClickedTime = 0;
-		fParams.poseView->SetTextWidgetToCheck(NULL);
+		CancelWait();
 	}
 }
 
@@ -443,10 +441,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	view->SetTextWidgetToCheck(NULL, this);
 	if (!IsEditable() || IsActive())
-		return;
-
-	// do not start edit while dragging
-	if (view->IsDragging())
 		return;
 
 	view->SetActiveTextWidget(this);

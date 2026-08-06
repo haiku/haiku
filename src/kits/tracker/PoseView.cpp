@@ -970,9 +970,8 @@ BPoseView::Pulse()
 		}
 	}
 
-	// do we have a TextWidget waiting for expiracy of its double-click
-	// check?
-	if (fTextWidgetToCheck != NULL)
+	// Do we have a TextWidget waiting for its double-click check to expire?
+	if (fTextWidgetToCheck != NULL && !IsDragging())
 		fTextWidgetToCheck->CheckExpiration();
 }
 
