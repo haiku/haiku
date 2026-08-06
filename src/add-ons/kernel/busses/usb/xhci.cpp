@@ -1142,11 +1142,6 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 	MutexLocker endpointLocker(endpoint->lock);
 
-	if (endpoint->td_head == NULL) {
-		// There aren't any currently pending transfers to cancel.
-		return B_OK;
-	}
-
 	// Calling the callbacks while holding the endpoint lock could potentially
 	// cause deadlocks, so we instead store them in a pointer array. We need
 	// to do this separately from freeing the TDs, for in the case we fail
