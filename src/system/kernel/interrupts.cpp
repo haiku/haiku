@@ -470,7 +470,7 @@ install_io_interrupt_handler(int32 vector, interrupt_handler handler, void *data
 		cpu_ent* cpu = &gCPU[cpuID];
 		SpinLocker _(cpu->irqs_lock);
 		atomic_add(&sVectors[vector].assigned_cpu->handlers_count, 1);
-		list_add_item(&cpu->irqs, sVectors[vector].assigned_cpu);
+		cpu->irqs.Add(sVectors[vector].assigned_cpu);
 	}
 
 	if ((flags & B_NO_HANDLED_INFO) != 0
@@ -583,7 +583,7 @@ remove_io_interrupt_handler(int32 vector, interrupt_handler handler, void *data)
 			} while (sVectors[vector].assigned_cpu->cpu != oldCPU);
 
 			sVectors[vector].assigned_cpu->cpu = -1;
-			list_remove_item(&cpu->irqs, sVectors[vector].assigned_cpu);
+			cpu->irqs.Remove(sVectors[vector].assigned_cpu);
 		}
 	}
 
@@ -737,12 +737,12 @@ assign_io_interrupt_to_cpu(int32 vector, int32 newCPU)
 
 	SpinLocker locker(cpu->irqs_lock);
 	sVectors[vector].assigned_cpu->cpu = -1;
-	list_remove_item(&cpu->irqs, sVectors[vector].assigned_cpu);
+	cpu->irqs.Remove(sVectors[vector].assigned_cpu);
 	locker.Unlock();
 
 	newCPU = arch_int_assign_to_cpu(vector, newCPU);
 	sVectors[vector].assigned_cpu->cpu = newCPU;
 	cpu = &gCPU[newCPU];
 	locker.SetTo(cpu->irqs_lock, false);
-	list_add_item(&cpu->irqs, sVectors[vector].assigned_cpu);
+	cpu->irqs.Add(sVectors[vector].assigned_cpu);
 }

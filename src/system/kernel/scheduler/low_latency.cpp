@@ -144,14 +144,14 @@ rebalance_irqs(bool idle)
 	SpinLocker locker(cpu->irqs_lock);
 
 	irq_assignment* chosen = NULL;
-	irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
+	irq_assignment* irq = cpu->irqs.First();
 
 	int32 totalLoad = 0;
 	while (irq != NULL) {
 		if (chosen == NULL || chosen->load < irq->load)
 			chosen = irq;
 		totalLoad += irq->load;
-		irq = (irq_assignment*)list_get_next_item(&cpu->irqs, irq);
+		irq = cpu->irqs.GetNext(irq);
 	}
 
 	locker.Unlock();

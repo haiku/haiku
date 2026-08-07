@@ -112,15 +112,14 @@ CPUEntry::Stop()
 
 	// get rid of irqs
 	SpinLocker locker(entry->irqs_lock);
-	irq_assignment* irq
-		= (irq_assignment*)list_get_first_item(&entry->irqs);
+	irq_assignment* irq = entry->irqs.First();
 	while (irq != NULL) {
 		locker.Unlock();
 
 		assign_io_interrupt_to_cpu(irq->irq, -1);
 
 		locker.Lock();
-		irq = (irq_assignment*)list_get_first_item(&entry->irqs);
+		irq = entry->irqs.First();
 	}
 	locker.Unlock();
 }
