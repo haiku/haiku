@@ -2883,7 +2883,7 @@ thread_init(kernel_args *args)
 	new(&sUndertakerEntries) DoublyLinkedList<UndertakerEntry>();
 	sUndertakerCondition.Init(&sUndertakerEntries, "undertaker entries");
 
-	thread_id undertakerThread = spawn_kernel_thread(&undertaker, "undertaker",
+	thread_id undertakerThread = spawn_kernel_thread(&undertaker, "thread undertaker",
 		B_DISPLAY_PRIORITY, NULL);
 	if (undertakerThread < 0)
 		panic("Failed to create undertaker thread!");
