@@ -339,6 +339,11 @@ object_cache* sFileDescriptorCache;
 static VnodeTable* sVnodeTable;
 static struct vnode* sRoot;
 
+static UnusedVnodeList sToBeFreedVnodes;
+static spinlock sToBeFreedVnodesLock;
+static int32 sFreeUnusedVnodes;
+static ConditionVariable sVnodeUndertakerCondition;
+
 #define MOUNTS_HASH_TABLE_SIZE 16
 static MountTable* sMountsTable;
 static dev_t sNextMountID = 1;
@@ -350,6 +355,7 @@ static dev_t sNextMountID = 1;
 #define BUSY_VNODE_DELAY 5000
 
 mode_t __gUmask = 022;
+
 
 /* function declarations */
 
@@ -1028,9 +1034,8 @@ free_vnode(struct vnode* vnode, bool reenter)
 	rw_lock_write_unlock(&sVnodeLock);
 
 	// if we have a VMCache attached, remove it
-	if (vnode->cache)
+	if (vnode->cache != NULL)
 		vnode->cache->ReleaseRef();
-
 	vnode->cache = NULL;
 
 	remove_vnode_from_mount_list(vnode, vnode->mount);
@@ -1048,9 +1053,9 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	\param vnode the vnode.
 	\param alwaysFree don't move this vnode into the unused list, but really
-		   delete it if possible.
+		   delete it (directly) if possible.
 	\param reenter \c true, if this function is called (indirectly) from within
-		   a file system. This will be passed to file system hooks only.
+		   a file system. This will be passed to file system hooks.
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 static status_t
@@ -1071,28 +1076,33 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	if (vnode->IsBusy())
 		panic("dec_vnode_ref_count: called on busy vnode %p\n", vnode);
 
-	if (vnode->mount->unmounting)
-		alwaysFree = true;
-
 	bool freeNode = false;
 	bool freeUnusedNodes = false;
 
-	// Just insert the vnode into an unused list if we don't need
-	// to delete it
-	if (vnode->IsRemoved() || alwaysFree) {
+	if (vnode->IsRemoved() || alwaysFree || vnode->mount->unmounting) {
 		vnode_to_be_freed(vnode);
 		vnode->SetBusy(true);
 		freeNode = true;
-	} else
+	} else {
 		freeUnusedNodes = vnode_unused(vnode);
+	}
 
 	nodeLocker.Unlock();
 	locker.Unlock();
 
-	if (freeNode)
-		free_vnode(vnode, reenter);
-	else if (freeUnusedNodes)
-		free_unused_vnodes();
+	if (freeNode) {
+		if (alwaysFree || reenter) {
+			free_vnode(vnode, reenter);
+		} else {
+			InterruptsSpinLocker locker(sToBeFreedVnodesLock);
+			sToBeFreedVnodes.Add(vnode);
+			locker.Unlock();
+			sVnodeUndertakerCondition.NotifyOne();
+		}
+	} else if (freeUnusedNodes) {
+		atomic_add(&sFreeUnusedVnodes, 1);
+		sVnodeUndertakerCondition.NotifyOne();
+	}
 
 	return B_OK;
 }
@@ -1382,6 +1392,40 @@ free_unused_vnodes(int32 level)
 	}
 
 	unused_vnodes_check_done();
+}
+
+
+/*!	\brief Thread that frees vnodes.
+
+	Freeing vnodes usually requires acquiring filesystem locks and sometimes doing
+	disk writes. To avoid that expensive operation occurring at arbitrary places
+	and causing slowdowns (or, for page writer threads, potential deadlocks), we
+	use this dedicated thread for most of them.
+*/
+static status_t
+vnode_undertaker(void*)
+{
+	while (true) {
+		{
+			ConditionVariableEntry entry;
+			sVnodeUndertakerCondition.Add(&entry);
+			if (sToBeFreedVnodes.IsEmpty() && atomic_get(&sFreeUnusedVnodes) == 0)
+				entry.Wait();
+		}
+
+		while (true) {
+			InterruptsSpinLocker listLocker(sToBeFreedVnodesLock);
+			Vnode* node = sToBeFreedVnodes.RemoveHead();
+			listLocker.Unlock();
+			if (node == NULL)
+				break;
+
+			free_vnode(node, false);
+		}
+
+		if (atomic_get_and_set(&sFreeUnusedVnodes, 0) != 0)
+			free_unused_vnodes();
+	}
 }
 
 
@@ -5337,6 +5381,15 @@ vfs_init(kernel_args* args)
 	if (sVnodeTable == NULL || sVnodeTable->Init(VNODE_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating vnode hash table\n");
 
+	sVnodeUndertakerCondition.Init(NULL, "vnode undertaker");
+	thread_id vnodeUndertaker = spawn_kernel_thread(vnode_undertaker, "vnode undertaker",
+		B_NORMAL_PRIORITY, NULL);
+	if (vnodeUndertaker < 0)
+		panic("vfs_init: error creating vnode undertaker");
+	vnodeUndertaker = resume_thread(vnodeUndertaker);
+	if (vnodeUndertaker < 0)
+		panic("vfs_init: error creating vnode undertaker");
+
 	sMountsTable = new(std::nothrow) MountTable();
 	if (sMountsTable == NULL
 			|| sMountsTable->Init(MOUNTS_HASH_TABLE_SIZE) != B_OK)
@@ -6697,6 +6750,10 @@ common_unlink(int fd, char* path, bool kernel)
 		status = FS_CALL(vnode.Get(), unlink, filename);
 	else
 		status = B_READ_ONLY_DEVICE;
+
+	// If nobody else is using this vnode, we don't want this removal
+	// to go through the vnode undertaker, so release it directly.
+	dec_vnode_ref_count(vnode.Detach(), true, false);
 
 	return status;
 }
