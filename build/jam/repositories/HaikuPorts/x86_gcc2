@@ -263,8 +263,8 @@ RemotePackageRepository HaikuPorts
 	libunistring_x86-1.3-1
 	libvorbis_x86-1.3.7-1
 	libvorbis_x86_devel-1.3.7-1
-	libvpx_x86-1.13.1-1
-	libvpx_x86_devel-1.13.1-1
+	libvpx1.15_x86-1.15.2-1
+	libvpx1.15_x86_devel-1.15.2-1
 	libwebp_x86-1.6.0-3
 	libwebp_x86_devel-1.6.0-3
 	libxml2_x86-2.15.3-1
@@ -409,7 +409,6 @@ RemotePackageRepository HaikuPorts
 	libunistring
 	libuuid
 	libvorbis
-	libvpx_x86
 	libwebp
 	libxml2
 	libxslt
