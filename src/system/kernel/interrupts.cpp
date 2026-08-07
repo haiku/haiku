@@ -736,6 +736,7 @@ assign_io_interrupt_to_cpu(int32 vector, int32 newCPU)
 	cpu_ent* cpu = &gCPU[oldCPU];
 
 	SpinLocker locker(cpu->irqs_lock);
+	ASSERT(sVectors[vector].assigned_cpu->cpu == oldCPU);
 	sVectors[vector].assigned_cpu->cpu = -1;
 	cpu->irqs.Remove(sVectors[vector].assigned_cpu);
 	locker.Unlock();
