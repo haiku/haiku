@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <cpu.h>
+#include <util/AutoLock.h>
 
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_int.h>
@@ -102,6 +103,7 @@ struct ioapic {
 	uint64				level_triggered_mask;
 	uint64				nmi_mask;
 
+	spinlock			registers_lock;
 	area_id				register_area;
 	ioapic_registers*	registers;
 
@@ -254,6 +256,7 @@ ioapic_assign_interrupt_to_cpu(int32 gsi, int32 cpu)
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
 		return;
+	SpinLocker _(ioapic->registers_lock);
 
 	uint32 apicid = x86_get_cpu_apic_id(cpu);
 
@@ -282,6 +285,7 @@ ioapic_enable_io_interrupt(int32 gsi)
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
 		return;
+	SpinLocker _(ioapic->registers_lock);
 
 	x86_set_irq_source(gsi, IRQ_SOURCE_IOAPIC);
 
@@ -301,6 +305,7 @@ ioapic_disable_io_interrupt(int32 gsi)
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
 		return;
+	SpinLocker _(ioapic->registers_lock);
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
 	TRACE("ioapic_disable_io_interrupt: gsi %" B_PRId32
@@ -318,6 +323,7 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
 		return;
+	InterruptsSpinLocker _(ioapic->registers_lock);
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
 	TRACE("ioapic_configure_io_interrupt: gsi %" B_PRId32
@@ -332,6 +338,7 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 static status_t
 ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 {
+	ioapic.registers_lock = B_SPINLOCK_INITIALIZER;
 	ioapic.register_area = vm_map_physical_memory(B_SYSTEM_TEAM, "io-apic",
 		(void**)&ioapic.registers, ioapic.registers != NULL ? B_EXACT_ADDRESS
 		: B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA
