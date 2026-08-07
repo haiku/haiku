@@ -90,9 +90,7 @@ list_remove_link(list_link *link)
 	link->next->prev = link->prev;
 	link->prev->next = link->next;
 
-#if DEBUG_DOUBLY_LINKED_LIST
 	link->prev = link->next = NULL;
-#endif
 }
 
 
@@ -266,5 +264,3 @@ list_move_to_list(struct list *sourceList, struct list *targetList)
 	// empty source list
 	sourceList->link.next = sourceList->link.prev = &sourceList->link;
 }
-
-
