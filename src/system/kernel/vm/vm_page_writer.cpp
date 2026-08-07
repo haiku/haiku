@@ -95,6 +95,7 @@ class PageWriteWrapper;
 class PageWriterRun {
 public:
 	status_t Init(uint32 maxPages);
+	~PageWriterRun();
 
 	void PrepareNextRun();
 	void AddPage(vm_page* page);
@@ -417,6 +418,13 @@ PageWriterRun::Init(uint32 maxPages)
 		return B_NO_MEMORY;
 
 	return B_OK;
+}
+
+
+PageWriterRun::~PageWriterRun()
+{
+	delete[] fWrappers;
+	delete[] fTransfers;
 }
 
 
