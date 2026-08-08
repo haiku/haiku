@@ -224,7 +224,7 @@ vm_page::vm_page(page_num_t pageNumber)
 }
 
 
-#if DEBUG_PAGE_ACCESS
+#if DEBUG_PAGE_ACCESS && __GNUC__ != 2
 #	include <thread.h>
 
 static inline void

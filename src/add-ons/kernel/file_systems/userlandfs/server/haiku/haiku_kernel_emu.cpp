@@ -35,10 +35,10 @@
 // headers.
 #if __GNUC__ == 2
 
-#include <cpu.h>
 #include <smp.h>
 
-cpu_ent gCPU[1];
+struct cpu_ent {
+} gCPU[1];
 
 
 int32
