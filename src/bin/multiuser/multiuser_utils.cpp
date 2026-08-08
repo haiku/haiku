@@ -179,13 +179,13 @@ setup_environment(struct passwd* passwd, bool preserveEnvironment, bool chngdir)
 			return errno;
 	}
 
-	if (passwd->pw_gid && setgid(passwd->pw_gid) != 0)
+	if (setresgid(passwd->pw_gid, passwd->pw_gid, passwd->pw_gid) != 0)
 		return errno;
 
 	if (initgroups(passwd->pw_name, passwd->pw_gid) != 0)
 		return errno;
 
-	if (passwd->pw_uid && setuid(passwd->pw_uid) != 0)
+	if (setresuid(passwd->pw_uid, passwd->pw_uid, passwd->pw_uid) != 0)
 		return errno;
 
 	if (chngdir) {
