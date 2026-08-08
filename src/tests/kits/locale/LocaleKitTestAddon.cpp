@@ -7,29 +7,9 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "CollatorTest.h"
-#include "DateFormatTest.h"
-#include "DurationFormatTest.h"
-#include "LanguageTest.h"
-#include "NumberFormatTest.h"
-#include "RelativeDateTimeFormatTest.h"
-#include "StringFormatTest.h"
-#include "UnicodeCharTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("LocaleKit");
-
-	CollatorTest::AddTests(*suite);
-	DateFormatTest::AddTests(*suite);
-	DurationFormatTest::AddTests(*suite);
-	LanguageTest::AddTests(*suite);
-	NumberFormatTest::AddTests(*suite);
-	StringFormatTest::AddTests(*suite);
-	RelativeDateTimeFormatTest::AddTests(*suite);
-	UnicodeCharTest::AddTests(*suite);
-
-	return suite;
+	return "LocaleKit";
 }

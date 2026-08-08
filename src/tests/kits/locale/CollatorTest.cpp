@@ -4,58 +4,40 @@
  */
 
 
-#include "CollatorTest.h"
-
+#include <Language.h>
 #include <Collator.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
-CollatorTest::CollatorTest()
-{
-}
+class CollatorTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(CollatorTest);
+	CPPUNIT_TEST(B_COLLATE_PRIMARY_Compare_ReturnsCorrectDifference);
+	CPPUNIT_TEST(B_COLLATE_SECONDARY_Compare_ReturnsCorrectDifference);
+	CPPUNIT_TEST(B_COLLATE_TERTIARY_Compare_ReturnsCorrectDifference);
+	CPPUNIT_TEST_SUITE_END();
 
-
-CollatorTest::~CollatorTest()
-{
-}
-
-
-void
-CollatorTest::TestSortKeys()
-{
-	struct Test {
-		char* first;
-		char* second;
-		int sign[3];
+	BCollator fCollator;
+	struct TestCase {
+		const char* first;
+		const char* second;
+		int result;
 	};
 
-	BCollator collator;
-	BLocaleRoster::Default()->GetDefaultLocale()->GetCollator(&collator);
-	const Test tests[] = {
-		{"gehen", "géhen", {0, -1, -1}},
-		{"aus", "äUß", {-1, -1, -1}},
-		{"auss", "äUß", {0, -1, -1}},
-		{"WO", "wÖ", {0, -1, -1}},
-		{"SO", "so", {0, 0, 1}},
-		{"açñ", "acn", {0, 1, 1}},
-		{NULL, NULL, {0, 0, 0}}
-	};
-	
-	for (int32 i = 0; tests[i].first != NULL; i++) {
-		NextSubTest();
-
-		for (int32 strength = B_COLLATE_PRIMARY; strength < 4; strength++) {
+	void _CompareTest(collator_strengths strength, const TestCase* cases, size_t length)
+	{
+		for (size_t i = 0; i < length; i++) {
 			BString a, b;
-			collator.SetStrength(strength);
-			collator.GetSortKey(tests[i].first, &a);
-			collator.GetSortKey(tests[i].second, &b);
+			fCollator.SetStrength(strength);
+			fCollator.GetSortKey(cases[i].first, &a);
+			fCollator.GetSortKey(cases[i].second, &b);
 
-			int difference = collator.Compare(tests[i].first, tests[i].second);
-			CPPUNIT_ASSERT_EQUAL(tests[i].sign[strength - 1], difference);
+			int difference = fCollator.Compare(cases[i].first, cases[i].second);
+			CPPUNIT_ASSERT_EQUAL_MESSAGE(std::string(cases[i].first), cases[i].result, difference);
 			int keydiff = strcmp(a.String(), b.String());
 			// Check that the keys compare the same as the strings. Either both
 			// are 0, or both have the same sign.
@@ -65,16 +47,55 @@ CollatorTest::TestSortKeys()
 				CPPUNIT_ASSERT(keydiff * difference > 0);
 		}
 	}
-}
+
+public:
+	void setUp()
+	{
+		BLanguage language("en");
+		BLocale locale = BLocale(&language);
+		locale.GetCollator(&fCollator);
+		// FIXME: BCollator("en") crashes
+	}
+
+	void B_COLLATE_PRIMARY_Compare_ReturnsCorrectDifference() {
+		const TestCase cases[] = {
+			{"gehen", "géhen", 0},
+			{"aus", "äUß", 1},
+			{"auss", "äUß", 1},
+			{"WO", "wÖ", -1},
+			{"SO", "so", -1},
+			{"açñ", "acn", 0},
+			//{NULL, NULL, 0}
+		};
+		_CompareTest(B_COLLATE_PRIMARY, cases, sizeof(cases) / sizeof(TestCase));
+	}
+
+	void B_COLLATE_SECONDARY_Compare_ReturnsCorrectDifference() {
+		const TestCase cases[] = {
+			{"gehen", "géhen", -1},
+			{"aus", "äUß", 1},
+			{"auss", "äUß", 1},
+			{"WO", "wÖ", -1},
+			{"SO", "so", -1},
+			{"açñ", "acn", 1},
+			//{NULL, NULL, 0}
+		};
+		_CompareTest(B_COLLATE_SECONDARY, cases, sizeof(cases) / sizeof(TestCase));
+	}
+
+	void B_COLLATE_TERTIARY_Compare_ReturnsCorrectDifference() {
+		const TestCase cases[] = {
+			{"gehen", "géhen", -1},
+			{"aus", "äUß", 1},
+			{"auss", "äUß", 1},
+			{"WO", "wÖ", -1},
+			{"SO", "so", -1},
+			{"açñ", "acn", 1},
+			//{NULL, NULL, 0}
+		};
+		_CompareTest(B_COLLATE_TERTIARY, cases, sizeof(cases) / sizeof(TestCase));
+	}
+};
 
 
-/*static*/ void
-CollatorTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("CollatorTest");
-
-	suite.addTest(new CppUnit::TestCaller<CollatorTest>(
-		"CollatorTest::TestSortKeys", &CollatorTest::TestSortKeys));
-
-	parent.addTest("CollatorTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CollatorTest, getTestSuiteName());

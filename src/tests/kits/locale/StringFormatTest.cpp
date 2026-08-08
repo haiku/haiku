@@ -4,136 +4,153 @@
  */
 
 
-#include "StringFormatTest.h"
-
 #include <Locale.h>
 #include <StringFormat.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
-StringFormatTest::StringFormatTest()
-{
-}
+class StringFormatTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(StringFormatTest);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithNoPlural_NoPlural);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPlural_Returns1Beer);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPlural_Returns0Beers);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPlural_ReturnsManyBeers);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPlural_ReturnsNegativeBeers);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPlural_ReturnsNegative1Beer);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPluralAndNoPlaceholder_ReturnsALizard);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPluralAndNoPlaceholder_ReturnsMoreLizards);
+	CPPUNIT_TEST(EnUSLocale_TemplateWithPluralAndHex_ReturnsHex);
+	CPPUNIT_TEST(FrFRLocale_TemplateWithPlural_ReturnsManyBeers);
+	CPPUNIT_TEST(PlPLLocale_TemplateWithPlural_Returns1Obiekt);
+	CPPUNIT_TEST(PlPLLocale_TemplateWithPlural_Returns3Obiekty);
+	CPPUNIT_TEST(PlPLLocale_TemplateWithPlural_Returns5Obiektow);
+	CPPUNIT_TEST(PlPLLocale_TemplateWithPlural_Returns23Obiekty);
+	CPPUNIT_TEST(RuRULocale_TemplateWithPlural_Returns1Obiekt);
+	CPPUNIT_TEST(RuRULocale_TemplateWithPlural_Returns2Obiekta);
+	CPPUNIT_TEST(RuRULocale_TemplateWithPlural_Returns5Obiektow);
+	CPPUNIT_TEST(InvalidTemplate_MissingClosingBrace_ReturnsNotOK);
+	CPPUNIT_TEST(InvalidTemplate_ExtraComma_ReturnsNotOK);
+	CPPUNIT_TEST(InvalidTemplate_MissingOther_ReturnsNotOK);
+	CPPUNIT_TEST(InvalidTemplate_InvalidRule_ReturnsNotOK);
+	CPPUNIT_TEST_SUITE_END();
 
+	static const char* kEnglishTemplate;
+	static const char* kPolishTemplate;
+	static const char* kRussianTemplate;
 
-StringFormatTest::~StringFormatTest()
-{
-}
-
-
-void
-StringFormatTest::TestFormat()
-{
-	BString output;
-
-	struct Test {
-		const char* locale;
-		const char* pattern;
-		int32 number;
-		const char* expected;
-	};
-
-	static const char* polishTemplate = "{0, plural, one{Wybrano # obiekt} "
-		"few{Wybrano # obiekty} many{Wybrano # obiektów} "
-		"other{Wybrano # obiektu}}";
-
-	// There are 4 rules in russian: one (1, 21, ...), few (2-4, 22-24, ...),
-	// many (anything else), and other (non-integer numbers). When formatting
-	// integers only, either both many and other must be there (with other
-	// not being used), or one/few/other must be used.
-	static const char* russianTemplate = "{0, plural, one{# объект} "
-		"few{# объекта} other{# объектов}}";
-
-	static const Test tests[] = {
-		{"en_US", "A QA engineer walks into a bar.", 0,
-			"A QA engineer walks into a bar."},
-		{"en_US", "Orders {0, plural, one{# beer} other{# beers}}.", 1,
-			"Orders 1 beer."},
-		{"en_US", "Orders {0, plural, one{# beer} other{# beers}}.", 0,
-			"Orders 0 beers."},
-		{"en_US", "Orders {0, plural, one{# beer} other{# beers}}.", 99999999,
-			"Orders 99,999,999 beers."},
-		{"en_US", "Orders {0, plural, one{# beer} other{# beers}}.", -INT_MAX,
-			"Orders -2,147,483,647 beers."},
-		{"en_US", "Orders {0, plural, one{# beer} other{# beers}}.", -1,
-			"Orders -1 beer."},
-		{"en_US", "Orders {0, plural, one{a lizard} other{more lizards}}.", 1,
-			"Orders a lizard."},
-		{"en_US", "Orders {0, plural, one{a lizard} other{more lizards}}.", 2,
-			"Orders more lizards."},
-		{"en_US", "Orders {0, plural, one{# \x8A} other{# \x02}}.", 2,
-			"Orders 2 \x02."},
-		{"fr_FR", "Commande {0, plural, one{# bière} other{# bières}}.",
-			99999999, "Commande 99\xe2\x80\xaf""999\xe2\x80\xaf""999 bières."},
-		{"pl_PL", polishTemplate, 1, "Wybrano 1 obiekt"},
-		{"pl_PL", polishTemplate, 3, "Wybrano 3 obiekty"},
-		{"pl_PL", polishTemplate, 5, "Wybrano 5 obiektów"},
-		{"pl_PL", polishTemplate, 23, "Wybrano 23 obiekty"},
-		{"ru_RU", russianTemplate, 1, "1 объект"},
-		{"ru_RU", russianTemplate, 2, "2 объекта"},
-		{"ru_RU", russianTemplate, 5, "5 объектов"},
-		{NULL, NULL, 0, NULL}
-	};
-
-	for (int i = 0; tests[i].pattern != NULL; i++) {
-		status_t result;
-		NextSubTest();
-		output.Truncate(0);
-		BLanguage language(tests[i].locale);
-		BStringFormat formatter(language, tests[i].pattern);
-
-		result = formatter.Format(output, tests[i].number);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected), output);
-	}
-}
-
-
-void
-StringFormatTest::TestBogus()
-{
-	struct Test {
-		const char* pattern;
-	};
-
-	static const Test tests[] = {
-		{ "{0, plural, one{# dog} other{# dogs}" }, // Missing closing brace
-		{ "{0, plural, one{# dog}, other{# dogs}}" }, // Extra comma
-		{ "{0, plural, one{# dog}" }, // Missing "other"
-		//{ "{4099, plural, one{# dog} other{# dogs}}" }, // Out of bounds arg
-		{ "{0, invalid, one{# dog} other{# dogs}}" }, // Invalid rule
-		{ NULL }
-	};
-
-	for (int i = 0; tests[i].pattern != NULL; i++) {
-		NextSubTest();
-
-		status_t result;
+	void _Template(const char* locale, const char* pattern, int32 number, const char* expected)
+	{
 		BString output;
+		BLanguage language(locale);
+		BStringFormat formatter(language, pattern);
 
-		BStringFormat formatter(tests[i].pattern);
-		CPPUNIT_ASSERT(formatter.InitCheck() != B_OK);
-
-		result = formatter.Format(output, 1);
-		CPPUNIT_ASSERT(result != B_OK);
-
-		result = formatter.Format(output, 2);
-		CPPUNIT_ASSERT(result != B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, formatter.Format(output, number));
+		CPPUNIT_ASSERT_EQUAL(BString(expected), output);
 	}
-}
+
+	void _Invalid(const char* pattern)
+	{
+		BString output;
+		BStringFormat formatter(pattern);
+
+		CPPUNIT_ASSERT(formatter.InitCheck() != B_OK);
+		CPPUNIT_ASSERT(formatter.Format(output, 1) != B_OK);
+		CPPUNIT_ASSERT(formatter.Format(output, 2) != B_OK);
+	}
+
+public:
+	void EnUSLocale_TemplateWithNoPlural_NoPlural()
+	{
+		_Template("en_US", "A QA engineer walks into a bar.", 0,
+			"A QA engineer walks into a bar.");
+	}
+
+	void EnUSLocale_TemplateWithPlural_Returns1Beer()
+	{
+		_Template("en_US", kEnglishTemplate, 1, "Orders 1 beer.");
+	}
+
+	void EnUSLocale_TemplateWithPlural_Returns0Beers()
+	{
+		_Template("en_US", kEnglishTemplate, 0, "Orders 0 beers.");
+	}
+
+	void EnUSLocale_TemplateWithPlural_ReturnsManyBeers()
+	{
+		_Template("en_US", kEnglishTemplate, 99999999, "Orders 99,999,999 beers.");
+	}
+
+	void EnUSLocale_TemplateWithPlural_ReturnsNegativeBeers()
+	{
+		_Template("en_US", kEnglishTemplate, -INT_MAX, "Orders -2,147,483,647 beers.");
+	}
+
+	void EnUSLocale_TemplateWithPlural_ReturnsNegative1Beer()
+	{
+		_Template("en_US", kEnglishTemplate, -1, "Orders -1 beer.");
+	}
+
+	void EnUSLocale_TemplateWithPluralAndNoPlaceholder_ReturnsALizard()
+	{
+		_Template("en_US", "Orders {0, plural, one{a lizard} other{more lizards}}.", 1,
+			"Orders a lizard.");
+	}
+
+	void EnUSLocale_TemplateWithPluralAndNoPlaceholder_ReturnsMoreLizards()
+	{
+		_Template("en_US", "Orders {0, plural, one{a lizard} other{more lizards}}.", 2,
+			"Orders more lizards.");
+	}
+
+	void EnUSLocale_TemplateWithPluralAndHex_ReturnsHex()
+	{
+		_Template("en_US", "Orders {0, plural, one{# \x8A} other{# \x02}}.", 2, "Orders 2 \x02.");
+	}
+
+	void FrFRLocale_TemplateWithPlural_ReturnsManyBeers()
+	{
+		_Template("fr_FR", "Commande {0, plural, one{# bière} other{# bières}}.",
+			99999999, "Commande 99\xe2\x80\xaf""999\xe2\x80\xaf""999 bières.");
+	}
+
+	void PlPLLocale_TemplateWithPlural_Returns1Obiekt() {
+		_Template("pl_PL", kPolishTemplate, 1, "Wybrano 1 obiekt");
+	}
+
+	void PlPLLocale_TemplateWithPlural_Returns3Obiekty() {
+		_Template("pl_PL", kPolishTemplate, 3, "Wybrano 3 obiekty");
+	}
+
+	void PlPLLocale_TemplateWithPlural_Returns5Obiektow() {
+		_Template("pl_PL", kPolishTemplate, 5, "Wybrano 5 obiektów");
+	}
+
+	void PlPLLocale_TemplateWithPlural_Returns23Obiekty() {
+		_Template("pl_PL", kPolishTemplate, 23, "Wybrano 23 obiekty");
+	}
+
+	void RuRULocale_TemplateWithPlural_Returns1Obiekt() { _Template("ru_RU", kRussianTemplate, 1, "1 объект"); }
+	void RuRULocale_TemplateWithPlural_Returns2Obiekta() { _Template("ru_RU", kRussianTemplate, 2, "2 объекта"); }
+	void RuRULocale_TemplateWithPlural_Returns5Obiektow() { _Template("ru_RU", kRussianTemplate, 5, "5 объектов"); }
+
+	void InvalidTemplate_MissingClosingBrace_ReturnsNotOK() { _Invalid("{0, plural, one{# dog} other{# dogs}"); }
+	void InvalidTemplate_ExtraComma_ReturnsNotOK() { _Invalid("{0, plural, one{# dog}, other{# dogs}}"); }
+	void InvalidTemplate_MissingOther_ReturnsNotOK() { _Invalid("{0, plural, one{# dog}"); }
+	void InvalidTemplate_InvalidRule_ReturnsNotOK() { _Invalid("{0, invalid, one{# dog} other{# dogs}}"); }
+};
 
 
-/*static*/ void
-StringFormatTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("StringFormatTest");
+const char* StringFormatTest::kEnglishTemplate = "Orders {0, plural, one{# beer} other{# beers}}.";
 
-	suite.addTest(new CppUnit::TestCaller<StringFormatTest>(
-		"StringFormatTest::TestFormat", &StringFormatTest::TestFormat));
-	suite.addTest(new CppUnit::TestCaller<StringFormatTest>(
-		"StringFormatTest::TestBogus", &StringFormatTest::TestBogus));
+const char* StringFormatTest::kPolishTemplate = "{0, plural, one{Wybrano # obiekt} "
+	"few{Wybrano # obiekty} many{Wybrano # obiektów} "
+	"other{Wybrano # obiektu}}";
 
-	parent.addTest("StringFormatTest", &suite);
-}
+const char* StringFormatTest::kRussianTemplate = "{0, plural, one{# объект} "
+	"few{# объекта} other{# объектов}}";
+
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(StringFormatTest, getTestSuiteName());

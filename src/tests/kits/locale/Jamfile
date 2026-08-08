@@ -49,12 +49,14 @@ UnitTestLib liblocaletest.so :
 	LocaleKitTestAddon.cpp
 
 	CollatorTest.cpp
-	DateFormatTest.cpp
+	DateFormatTest.cpp 
+	DateTimeFormatTest.cpp
 	DurationFormatTest.cpp
 	LanguageTest.cpp
 	NumberFormatTest.cpp
 	RelativeDateTimeFormatTest.cpp
 	StringFormatTest.cpp
+	TimeFormatTest.cpp
 	UnicodeCharTest.cpp
 
 	: be [ TargetLibstdc++ ]

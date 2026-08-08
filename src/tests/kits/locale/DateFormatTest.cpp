@@ -4,365 +4,28 @@
  */
 
 
-#include "DateFormatTest.h"
-
 #include <DateFormat.h>
+#include <DateTime.h>
 #include <FormattingConventions.h>
 #include <Language.h>
-#include <TimeFormat.h>
 #include <TimeZone.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-
-
-DateFormatTest::DateFormatTest()
-{
-}
-
-
-DateFormatTest::~DateFormatTest()
-{
-}
-
-
-void
-DateFormatTest::TestCustomFormat()
-{
-	struct Test {
-		const char* language;
-		const char* formatting;
-		const char* timeZone;
-		int32 fields;
-
-		BString expected;
-		BString force24;
-		BString force12;
-	};
-
-	BString buffer;
-
-	const Test tests[] = {
-		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
-			"10:21\xe2\x80\xafPM", "22:21", "10:21\xe2\x80\xafPM" },
-		{ "en", "en_US", "GMT+1",
-			B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE | B_DATE_ELEMENT_SECOND,
-			"10:21:18\xe2\x80\xafPM", "22:21:18", "10:21:18\xe2\x80\xafPM" },
-		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
-			| B_DATE_ELEMENT_TIMEZONE,
-			"10:21\xe2\x80\xafPM GMT+1", "22:21 GMT+1",
-			"10:21\xe2\x80\xafPM GMT+1" },
-		{ "en", "en_US", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE
-			| B_DATE_ELEMENT_SECOND | B_DATE_ELEMENT_TIMEZONE,
-			"10:21:18\xe2\x80\xafPM GMT+1", "22:21:18 GMT+1",
-			"10:21:18\xe2\x80\xafPM GMT+1" },
-		{ "fr", "fr_FR", "GMT+1", B_DATE_ELEMENT_HOUR | B_DATE_ELEMENT_MINUTE,
-			"22:21", "22:21", "10:21\xe2\x80\xafPM" },
-		{ NULL }
-	};
-
-	for (int i = 0; tests[i].language != NULL; i++)
-	{
-		NextSubTest();
-
-		BLanguage language(tests[i].language);
-		BFormattingConventions formatting(tests[i].formatting);
-		BTimeZone timeZone(tests[i].timeZone);
-		status_t result;
-
-		// Test default for language/formatting
-		{
-			BDateTimeFormat format(language, formatting);
-			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-				tests[i].fields);
-
-			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT, &timeZone);
-
-			CPPUNIT_ASSERT_EQUAL(B_OK, result);
-			CPPUNIT_ASSERT_EQUAL(tests[i].expected, buffer);
-		}
-
-		// Test forced 24 hours
-		{
-			formatting.SetExplicitUse24HourClock(true);
-			BDateTimeFormat format(language, formatting);
-			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-				tests[i].fields);
-			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT, &timeZone);
-
-			CPPUNIT_ASSERT_EQUAL(B_OK, result);
-			CPPUNIT_ASSERT_EQUAL(tests[i].force24, buffer);
-		}
-
-		// Test forced 12 hours
-		{
-			formatting.SetExplicitUse24HourClock(false);
-			BDateTimeFormat format(language, formatting);
-			format.SetDateTimeFormat(B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT,
-				tests[i].fields);
-			result = format.Format(buffer, 12345678, B_SHORT_DATE_FORMAT,
-				B_SHORT_TIME_FORMAT, &timeZone);
-
-			CPPUNIT_ASSERT_EQUAL(B_OK, result);
-			CPPUNIT_ASSERT_EQUAL(tests[i].force12, buffer);
-		}
-	}
-}
-
-
-void
-DateFormatTest::TestFormat()
-{
-	struct Value {
-		const char* language;
-		const char* convention;
-		const char* timeZone;
-		time_t time;
-		const char* shortDate;
-		const char* longDate;
-		const char* shortTime;
-		const char* longTime;
-		const char* shortDateTime;
-	};
-
-	static const Value values[] = {
-		{"en", "en_US", "GMT+1", 12345, "1/1/70", "January 1, 1970",
-			"4:25\xe2\x80\xaf""AM", "4:25:45\xe2\x80\xaf""AM",
-			"1/1/70, 4:25\xe2\x80\xaf""AM"},
-		{"fr", "fr_FR", "GMT+1", 12345, "01/01/1970", "1 janvier 1970",
-			"04:25", "04:25:45", "01/01/1970 04:25"},
-		{"fr", "fr_FR", "GMT+1", 12345678, "23/05/1970", "23 mai 1970",
-			"22:21", "22:21:18", "23/05/1970 22:21"},
-		{NULL}
-	};
-
-	BString output;
-	status_t result;
-
-	for (int i = 0; values[i].language != NULL; i++) {
-		NextSubTest();
-
-		BLanguage language(values[i].language);
-		BFormattingConventions formatting(values[i].convention);
-		BTimeZone timeZone(values[i].timeZone);
-		BDateFormat dateFormat(language, formatting);
-		BTimeFormat timeFormat(language, formatting);
-		BDateTimeFormat dateTimeFormat(language, formatting);
-
-		result = dateFormat.Format(output, values[i].time, B_SHORT_DATE_FORMAT,
-			&timeZone);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDate), output);
-
-		result = dateFormat.Format(output, values[i].time, B_LONG_DATE_FORMAT,
-			&timeZone);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(values[i].longDate), output);
-
-		result = timeFormat.Format(output, values[i].time, B_SHORT_TIME_FORMAT,
-			&timeZone);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortTime), output);
-
-		result = timeFormat.Format(output, values[i].time, B_MEDIUM_TIME_FORMAT,
-			&timeZone);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(values[i].longTime), output);
-
-		result = dateTimeFormat.Format(output, values[i].time,
-			B_SHORT_DATE_FORMAT, B_SHORT_TIME_FORMAT, &timeZone);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString(values[i].shortDateTime), output);
-	}
-}
-
-
-void
-DateFormatTest::TestFormatDate()
-{
-		BLanguage language("en");
-		BFormattingConventions formatting("en_US");
-		BDateFormat format(language, formatting);
-
-		BString output;
-		status_t result;
-
-		BDate date(2014, 9, 29);
-
-		result = format.Format(output, date, B_LONG_DATE_FORMAT);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
-		CPPUNIT_ASSERT_EQUAL(BString("September 29, 2014"), output);
-
-		// Test an invalid date - must return B_BAD_DATA
-		date.SetDate(2014, 29, 29);
-		result = format.Format(output, date, B_LONG_DATE_FORMAT);
-		CPPUNIT_ASSERT_EQUAL(B_BAD_DATA, result);
-}
-
-
-void
-DateFormatTest::TestMonthNames()
-{
-	BLanguage language("en");
-	BFormattingConventions formatting("en_US");
-	BDateFormat format(language, formatting);
-
-	BString buffer;
-	status_t result = format.GetMonthName(1, buffer);
-
-	CPPUNIT_ASSERT_EQUAL(BString("January"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(12, buffer);
-
-	CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(1, buffer, B_FULL_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("January"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(12, buffer, B_FULL_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(1, buffer, B_LONG_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Jan"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(12, buffer, B_LONG_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Dec"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(1, buffer, B_MEDIUM_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Jan"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(12, buffer, B_MEDIUM_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Dec"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(1, buffer, B_SHORT_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("J"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetMonthName(12, buffer, B_SHORT_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("D"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-}
-
-
-void
-DateFormatTest::TestDayNames()
-{
-	BLanguage language("en");
-	BFormattingConventions formatting("en_US");
-	BDateFormat format(language, formatting);
-
-	BString buffer;
-	status_t result = format.GetDayName(1, buffer);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Monday"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(2, buffer);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Tuesday"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(1, buffer, B_FULL_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Monday"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(2, buffer, B_FULL_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Tuesday"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(1, buffer, B_LONG_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Mon"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(2, buffer, B_LONG_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Tue"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(1, buffer, B_MEDIUM_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Mo"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(2, buffer, B_MEDIUM_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("Tu"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(1, buffer, B_SHORT_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("M"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-
-	buffer.Truncate(0);
-	result = format.GetDayName(2, buffer, B_SHORT_DATE_FORMAT);
-
-	CPPUNIT_ASSERT_EQUAL(BString("T"), buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, result);
-}
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
 namespace BPrivate {
 
 
-std::ostream& operator<<(std::ostream& stream, const BDate& date)
+std::ostream&
+operator<<(std::ostream& stream, const BDate& date)
 {
 	stream << date.Year();
 	stream << '-';
-	stream << date.Month();
+	stream << (int)date.Month();
 	stream << '-';
-	stream << date.Day();
-
-	return stream;
-}
-
-
-std::ostream& operator<<(std::ostream& stream, const BTime& date)
-{
-	stream << date.Hour();
-	stream << ':';
-	stream << date.Minute();
-	stream << ':';
-	stream << date.Second();
+	stream << (int)date.Day();
 
 	return stream;
 }
@@ -371,87 +34,237 @@ std::ostream& operator<<(std::ostream& stream, const BTime& date)
 } // namespace BPrivate
 
 
-void
-DateFormatTest::TestParseDate()
-{
-	BLanguage language("en");
-	BFormattingConventions formatting("en_US");
-	BDateFormat format(language, formatting);
-	BDate date;
-	status_t result;
+class DateFormatTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(DateFormatTest);
+	CPPUNIT_TEST(EnUSLocale_FormatTimeT_ReturnsCorrectFormat);
+	CPPUNIT_TEST(FrFRLocale_FormatTimeT_ReturnsCorrectFormat);
+	CPPUNIT_TEST(FrFRLocaleTimeTMay1970_FormatTimeT_ReturnsCorrectFormat);
+	CPPUNIT_TEST(ValidDate_Format_ReturnsCorrectFormat);
+	CPPUNIT_TEST(InvalidDate_Format_ReturnsBadData);
+	CPPUNIT_TEST(EnUSLocale_GetMonthNameWithoutStyle_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetMonthNameWithFullDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetMonthNameWithLongDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetMonthNameWithMediumDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetMonthNameWithShortDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetDayNameWithoutStyle_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetDayNameWithFullDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetDayNameWithLongDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetDayNameWithMediumDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale_GetDayNameWithShortDateFormat_ReturnsCorrectName);
+	CPPUNIT_TEST(EnUSLocale01011970_ParseWithShortDateFormat_ReturnsCorrectDate);
+	CPPUNIT_TEST(EnUSLocale05071988_ParseWithShortDateFormat_ReturnsCorrectDate);
+	CPPUNIT_TEST(EnUSLocale07312345_ParseWithShortDateFormat_ReturnsCorrectDate);
+	CPPUNIT_TEST_SUITE_END();
 
-	struct Test {
-		const char* input;
-		BDate output;
-	};
+	void _TestFormatTimeT(const char* lang, const char* conv, const char* tz, time_t time,
+						  const char* shortDate, const char* longDate)
+	{
+		BLanguage language(lang);
+		BFormattingConventions formatting(conv);
+		BTimeZone timeZone(tz);
+		BDateFormat dateFormat(language, formatting);
+		BString output;
 
-	static const Test tests[] = {
-		{"01/01/1970", BDate(1970, 1, 1)},
-		{"05/07/1988", BDate(1988, 5, 7)},
-		{"07/31/2345", BDate(2345, 7, 31)},
-		{NULL}
-	};
+		CPPUNIT_ASSERT_EQUAL(B_OK, dateFormat.Format(output, time, B_SHORT_DATE_FORMAT, &timeZone));
+		CPPUNIT_ASSERT_EQUAL(BString(shortDate), output);
 
-	for (int i = 0; tests[i].input != NULL; i++) {
-		NextSubTest();
-		result = format.Parse(tests[i].input, B_SHORT_DATE_FORMAT, date);
-
-		CPPUNIT_ASSERT_EQUAL(tests[i].output, date);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+		CPPUNIT_ASSERT_EQUAL(B_OK, dateFormat.Format(output, time, B_LONG_DATE_FORMAT, &timeZone));
+		CPPUNIT_ASSERT_EQUAL(BString(longDate), output);
 	}
-}
 
-
-void
-DateFormatTest::TestParseTime()
-{
-	BLanguage language("fr");
-	BFormattingConventions formatting("fr_FR");
-	BTimeFormat format(language, formatting);
-	BTime date;
-	status_t result;
-
-	struct Test {
-		const char* input;
-		BTime output;
-	};
-
-	static const Test tests[] = {
-		{"03:25", BTime(3, 25, 0)},
-		{"16:18", BTime(16, 18, 0)},
-		{"23:59", BTime(23, 59, 0)},
-		{NULL}
-	};
-
-	for (int i = 0; tests[i].input != NULL; i++) {
-		NextSubTest();
-		result = format.Parse(tests[i].input, B_SHORT_TIME_FORMAT, date);
-
-		CPPUNIT_ASSERT_EQUAL(tests[i].output, date);
-		CPPUNIT_ASSERT_EQUAL(B_OK, result);
+	void _TestParse(const char* input, BDate expected)
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+		BDate date;
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.Parse(input, B_SHORT_DATE_FORMAT, date));
+		CPPUNIT_ASSERT_EQUAL(expected, date);
 	}
-}
+
+	void _AssertMonthName(const BDateFormat& format, int month, const char* expected,
+						  const BDateFormatStyle style)
+	{
+		BString buffer;
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetMonthName(month, buffer, style));
+		CPPUNIT_ASSERT_EQUAL(BString(expected), buffer);
+	}
+
+	void _AssertDayName(const BDateFormat& format, int day, const char* expected,
+						const BDateFormatStyle style)
+	{
+		BString buffer;
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetDayName(day, buffer, style));
+		CPPUNIT_ASSERT_EQUAL(BString(expected), buffer);
+	}
+
+public:
+	void EnUSLocale_FormatTimeT_ReturnsCorrectFormat()
+	{
+		_TestFormatTimeT("en", "en_US", "GMT+1", 12345, "1/1/70", "January 1, 1970");
+	}
+
+	void FrFRLocale_FormatTimeT_ReturnsCorrectFormat()
+	{
+		_TestFormatTimeT("fr", "fr_FR", "GMT+1", 12345, "01/01/1970", "1 janvier 1970");
+	}
+
+	void FrFRLocaleTimeTMay1970_FormatTimeT_ReturnsCorrectFormat()
+	{
+		_TestFormatTimeT("fr", "fr_FR", "GMT+1", 12345678, "23/05/1970", "23 mai 1970");
+	}
+
+	void ValidDate_Format_ReturnsCorrectFormat()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		BString output;
+		BDate date(2014, 9, 29);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.Format(output, date, B_LONG_DATE_FORMAT));
+		CPPUNIT_ASSERT_EQUAL(BString("September 29, 2014"), output);
+	}
+
+	void InvalidDate_Format_ReturnsBadData()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		BString output;
+		BDate date(2014, 29, 29);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_DATA, format.Format(output, date, B_LONG_DATE_FORMAT));
+	}
+
+	void EnUSLocale_GetMonthNameWithoutStyle_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		BString buffer;
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetMonthName(1, buffer));
+		CPPUNIT_ASSERT_EQUAL(BString("January"), buffer);
+
+		buffer.Truncate(0);
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetMonthName(12, buffer));
+		CPPUNIT_ASSERT_EQUAL(BString("December"), buffer);
+	}
+
+	void EnUSLocale_GetMonthNameWithFullDateFormat_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertMonthName(format, 1, "January", B_FULL_DATE_FORMAT);
+		_AssertMonthName(format, 12, "December", B_FULL_DATE_FORMAT);
+	}
+
+	void EnUSLocale_GetMonthNameWithLongDateFormat_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertMonthName(format, 1, "Jan", B_LONG_DATE_FORMAT);
+		_AssertMonthName(format, 12, "Dec", B_LONG_DATE_FORMAT);
+	}
+
+	void EnUSLocale_GetMonthNameWithMediumDateFormat_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertMonthName(format, 1, "Jan", B_MEDIUM_DATE_FORMAT);
+		_AssertMonthName(format, 12, "Dec", B_MEDIUM_DATE_FORMAT);
+	}
+
+	void EnUSLocale_GetMonthNameWithShortDateFormat_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertMonthName(format, 1, "J", B_SHORT_DATE_FORMAT);
+		_AssertMonthName(format, 12, "D", B_SHORT_DATE_FORMAT);
+	}
+
+	void EnUSLocale_GetDayNameWithoutStyle_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		BString buffer;
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetDayName(1, buffer));
+		CPPUNIT_ASSERT_EQUAL(BString("Monday"), buffer);
+
+		buffer.Truncate(0);
+		CPPUNIT_ASSERT_EQUAL(B_OK, format.GetDayName(2, buffer));
+		CPPUNIT_ASSERT_EQUAL(BString("Tuesday"), buffer);
+	}
+
+	void EnUSLocale_GetDayNameWithFullDateFormat_ReturnsCorrectName()
+	{
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertDayName(format, 1, "Monday", B_FULL_DATE_FORMAT);
+		_AssertDayName(format, 2, "Tuesday", B_FULL_DATE_FORMAT);
+	}
+	void EnUSLocale_GetDayNameWithLongDateFormat_ReturnsCorrectName()
+	{
+
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertDayName(format, 1, "Mon", B_LONG_DATE_FORMAT);
+		_AssertDayName(format, 2, "Tue", B_LONG_DATE_FORMAT);
+	}
+	void EnUSLocale_GetDayNameWithMediumDateFormat_ReturnsCorrectName()
+	{
+
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertDayName(format, 1, "Mo", B_MEDIUM_DATE_FORMAT);
+		_AssertDayName(format, 2, "Tu", B_MEDIUM_DATE_FORMAT);
+	}
+	void EnUSLocale_GetDayNameWithShortDateFormat_ReturnsCorrectName()
+	{
+
+		BLanguage language("en");
+		BFormattingConventions formatting("en_US");
+		BDateFormat format(language, formatting);
+
+		_AssertDayName(format, 1, "M", B_SHORT_DATE_FORMAT);
+		_AssertDayName(format, 2, "T", B_SHORT_DATE_FORMAT);
+	}
+
+	void EnUSLocale01011970_ParseWithShortDateFormat_ReturnsCorrectDate()
+	{
+		_TestParse("01/01/1970", BDate(1970, 1, 1));
+	}
+
+	void EnUSLocale05071988_ParseWithShortDateFormat_ReturnsCorrectDate()
+	{
+		_TestParse("05/07/1988", BDate(1988, 5, 7));
+	}
+
+	void EnUSLocale07312345_ParseWithShortDateFormat_ReturnsCorrectDate()
+	{
+		_TestParse("07/31/2345", BDate(2345, 7, 31));
+	}
+};
 
 
-/*static*/ void
-DateFormatTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("DateFormatTest");
-
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestCustomFormat", &DateFormatTest::TestCustomFormat));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestFormat", &DateFormatTest::TestFormat));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestFormatDate", &DateFormatTest::TestFormatDate));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestMonthNames", &DateFormatTest::TestMonthNames));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestDayNames", &DateFormatTest::TestDayNames));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestParseDate", &DateFormatTest::TestParseDate));
-	suite.addTest(new CppUnit::TestCaller<DateFormatTest>(
-		"DateFormatTest::TestParseTime", &DateFormatTest::TestParseTime));
-
-	parent.addTest("DateFormatTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(DateFormatTest, getTestSuiteName());
