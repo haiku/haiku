@@ -691,6 +691,8 @@ VMCache::Delete()
 				"@!page %p; cache %p", page, this, page, this);
 		}
 
+		DEBUG_PAGE_ACCESS_START(page);
+
 		if (page->State() == PAGE_STATE_MODIFIED) {
 			// pages can't be freed in MODIFIED state
 			page->modified = false;
@@ -704,7 +706,6 @@ VMCache::Delete()
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			page->physical_page_number));
-		DEBUG_PAGE_ACCESS_START(page);
 		vm_page_free_etc(this, page, &reservation);
 	}
 	vm_page_unreserve_pages(&reservation);
