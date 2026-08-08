@@ -124,6 +124,8 @@ const struct supported_device {
 	{0x0f00, 0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+
+	{0x2280, 0x22b1, INTEL_MODEL_CHVM, "Braswell GT1"},
 #endif
 
 	// XXX: 0x1604 only confirmed on 0x1616
@@ -255,6 +257,9 @@ const struct supported_device {
 	{0x4621, 0x46a6, INTEL_MODEL_ALDM, "Alder Lake-P GT2"},
 	{0x4621, 0x46d1, INTEL_MODEL_ALDM, "Alder Lake-N GT2"},
 	{0x4641, 0x46a6, INTEL_MODEL_ALDM, "Alder Lake-P GT2"},
+#if 0
+	{0x4601, 0x46a8, INTEL_MODEL_ALDM, "Alder Lake-UP3 GT2"},
+#endif
 };
 
 struct intel_info {
