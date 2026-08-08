@@ -150,6 +150,13 @@ PackageCheckBox::~PackageCheckBox()
 
 
 void
+PackageCheckBox::AttachedToWindow()
+{
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+}
+
+
+void
 PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
@@ -303,6 +310,7 @@ PackagesView::Draw(BRect updateRect)
 {
 	if (CountChildren() > 0)
 		return;
+
 	rgb_color highColor = HighColor();
 	be_control_look->DrawLabel(this,
 		B_TRANSLATE("No optional packages available."),
