@@ -696,7 +696,7 @@ intel_extreme_init(intel_info &info)
 	}
 
 	// Everything in the display PRM gets +0x180000
-	if (info.device_type.InGroup(INTEL_GROUP_VLV)) {
+	if (info.device_type.InGroup(INTEL_GROUP_VLV) || info.device_type.InGroup(INTEL_GROUP_CHV)) {
 		// "I nearly got violent with the hw guys when they told me..."
 		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)] += VLV_DISPLAY_BASE;
@@ -958,4 +958,3 @@ intel_extreme_uninit(intel_info &info)
 	delete_area(info.registers_area);
 	delete_area(info.shared_area);
 }
-
