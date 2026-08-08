@@ -19,8 +19,6 @@ bool verify_password(passwd* passwd, spwd* spwd, const char* plainPassword);
 
 status_t authenticate_user(const char* prompt, passwd* passwd, spwd* spwd,
 			int maxTries, bool useStdio);
-status_t authenticate_user(const char* prompt, const char* user,
-			passwd** _passwd, spwd** _spwd, int maxTries, bool useStdio);
 
 status_t setup_environment(struct passwd* passwd, bool preserveEnvironment,
 			bool chngdir = true);

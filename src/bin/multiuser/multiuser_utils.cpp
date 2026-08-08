@@ -153,26 +153,6 @@ authenticate_user(const char* prompt, passwd* passwd, spwd* spwd, int maxTries,
 
 
 status_t
-authenticate_user(const char* prompt, const char* user, passwd** _passwd,
-	spwd** _spwd, int maxTries, bool useStdio)
-{
-	struct passwd* passwd = getpwnam(user);
-	struct spwd* spwd = getspnam(user);
-
-	status_t error = authenticate_user(prompt, passwd, spwd, maxTries,
-		useStdio);
-	if (error == B_OK) {
-		if (_passwd)
-			*_passwd = passwd;
-		if (_spwd)
-			*_spwd = spwd;
-	}
-
-	return error;
-}
-
-
-status_t
 setup_environment(struct passwd* passwd, bool preserveEnvironment, bool chngdir)
 {
 	const char* term = getenv("TERM");
