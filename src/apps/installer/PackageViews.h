@@ -84,6 +84,7 @@ public:
 								PackageCheckBox(Package* item);
 	virtual						~PackageCheckBox();
 
+	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseMoved(BPoint point, uint32 transit,
 									const BMessage* dragMessage);
