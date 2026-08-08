@@ -4,84 +4,65 @@
  */
 
 
-#include "SizeofTest.h"
-
 #include <MediaKit.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
-SizeofTest::SizeofTest()
-{
-}
+class SizeofTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(SizeofTest);
+	CPPUNIT_TEST(API32Bit_Sizeof_ReturnsExpected);
+	CPPUNIT_TEST_SUITE_END();
 
-
-SizeofTest::~SizeofTest()
-{
-}
-
-
-void
-SizeofTest::TestSize()
-{
-#if B_HAIKU_32_BIT
-	CPPUNIT_ASSERT_EQUAL(264, sizeof(BBuffer));
-	CPPUNIT_ASSERT_EQUAL(240, sizeof(BBufferConsumer));
-	CPPUNIT_ASSERT_EQUAL(56, sizeof(BBufferGroup));
-	CPPUNIT_ASSERT_EQUAL(244, sizeof(BBufferProducer));
-	CPPUNIT_ASSERT_EQUAL(140, sizeof(BContinuousParameter));
-	CPPUNIT_ASSERT_EQUAL(240, sizeof(BControllable));
-	CPPUNIT_ASSERT_EQUAL(124, sizeof(BDiscreteParameter));
-	CPPUNIT_ASSERT_EQUAL(236, sizeof(BFileInterface));
-	CPPUNIT_ASSERT_EQUAL(40, sizeof(BMediaAddOn));
-	CPPUNIT_ASSERT_EQUAL(340, sizeof(BMediaEventLooper));
-	CPPUNIT_ASSERT_EQUAL(560, sizeof(BMediaFile));
-	CPPUNIT_ASSERT_EQUAL(72, sizeof(BMediaFiles));
-	CPPUNIT_ASSERT_EQUAL(128, sizeof(BMediaFormats));
-	CPPUNIT_ASSERT_EQUAL(164, sizeof(BMediaNode));
-	CPPUNIT_ASSERT_EQUAL(440, sizeof(BMediaRoster));
-	CPPUNIT_ASSERT_EQUAL(68, sizeof(BMediaTheme));
-	CPPUNIT_ASSERT_EQUAL(760, sizeof(BMediaTrack));
-	CPPUNIT_ASSERT_EQUAL(116, sizeof(BNullParameter));
-	CPPUNIT_ASSERT_EQUAL(84, sizeof(BParameter));
-	CPPUNIT_ASSERT_EQUAL(52, sizeof(BParameterGroup));
-	CPPUNIT_ASSERT_EQUAL(124, sizeof(BSound));
-	CPPUNIT_ASSERT_EQUAL(164, sizeof(BTimeCode));
-	CPPUNIT_ASSERT_EQUAL(72, sizeof(BParameterWeb));
-	CPPUNIT_ASSERT_EQUAL(264, sizeof(BSmallBuffer));
-	CPPUNIT_ASSERT_EQUAL(808, sizeof(BSoundPlayer));
-	CPPUNIT_ASSERT_EQUAL(32, sizeof(BTimedEventQueue));
-	CPPUNIT_ASSERT_EQUAL(236, sizeof(BTimeSource));
-	CPPUNIT_ASSERT_EQUAL(24, sizeof(media_node));
-	CPPUNIT_ASSERT_EQUAL(328, sizeof(media_input));
-	CPPUNIT_ASSERT_EQUAL(328, sizeof(media_output));
-	CPPUNIT_ASSERT_EQUAL(256, sizeof(live_node_info));
-	CPPUNIT_ASSERT_EQUAL(372, sizeof(media_request_info));
-	CPPUNIT_ASSERT_EQUAL(16, sizeof(media_destination));
-	CPPUNIT_ASSERT_EQUAL(16, sizeof(media_source));
-	CPPUNIT_ASSERT_EQUAL(200, sizeof(dormant_node_info));
-	CPPUNIT_ASSERT_EQUAL(116, sizeof(flavor_info));
-	CPPUNIT_ASSERT_EQUAL(320, sizeof(dormant_flavor_info));
-	CPPUNIT_ASSERT_EQUAL(192, sizeof(media_format));
+public:
+	void API32Bit_Sizeof_ReturnsExpected()
+	{
+#ifdef B_HAIKU_32_BIT
+		CPPUNIT_ASSERT_EQUAL(264, (int)sizeof(BBuffer));
+		CPPUNIT_ASSERT_EQUAL(240, (int)sizeof(BBufferConsumer));
+		CPPUNIT_ASSERT_EQUAL(56, (int)sizeof(BBufferGroup));
+		CPPUNIT_ASSERT_EQUAL(244, (int)sizeof(BBufferProducer));
+		CPPUNIT_ASSERT_EQUAL(140, (int)sizeof(BContinuousParameter));
+		CPPUNIT_ASSERT_EQUAL(240, (int)sizeof(BControllable));
+		CPPUNIT_ASSERT_EQUAL(124, (int)sizeof(BDiscreteParameter));
+		CPPUNIT_ASSERT_EQUAL(236, (int)sizeof(BFileInterface));
+		CPPUNIT_ASSERT_EQUAL(40, (int)sizeof(BMediaAddOn));
+		CPPUNIT_ASSERT_EQUAL(340, (int)sizeof(BMediaEventLooper));
+		CPPUNIT_ASSERT_EQUAL(560, (int)sizeof(BMediaFile));
+		CPPUNIT_ASSERT_EQUAL(72, (int)sizeof(BMediaFiles));
+		CPPUNIT_ASSERT_EQUAL(128, (int)sizeof(BMediaFormats));
+		CPPUNIT_ASSERT_EQUAL(164, (int)sizeof(BMediaNode));
+		CPPUNIT_ASSERT_EQUAL(440, (int)sizeof(BMediaRoster));
+		CPPUNIT_ASSERT_EQUAL(68, (int)sizeof(BMediaTheme));
+		CPPUNIT_ASSERT_EQUAL(760, (int)sizeof(BMediaTrack));
+		CPPUNIT_ASSERT_EQUAL(116, (int)sizeof(BNullParameter));
+		CPPUNIT_ASSERT_EQUAL(84, (int)sizeof(BParameter));
+		CPPUNIT_ASSERT_EQUAL(52, (int)sizeof(BParameterGroup));
+		CPPUNIT_ASSERT_EQUAL(124, (int)sizeof(BSound));
+		CPPUNIT_ASSERT_EQUAL(164, (int)sizeof(BTimeCode));
+		CPPUNIT_ASSERT_EQUAL(72, (int)sizeof(BParameterWeb));
+		CPPUNIT_ASSERT_EQUAL(264, (int)sizeof(BSmallBuffer));
+		CPPUNIT_ASSERT_EQUAL(808, (int)sizeof(BSoundPlayer));
+		CPPUNIT_ASSERT_EQUAL(32, (int)sizeof(BTimedEventQueue));
+		CPPUNIT_ASSERT_EQUAL(236, (int)sizeof(BTimeSource));
+		CPPUNIT_ASSERT_EQUAL(24, (int)sizeof(media_node));
+		CPPUNIT_ASSERT_EQUAL(328, (int)sizeof(media_input));
+		CPPUNIT_ASSERT_EQUAL(328, (int)sizeof(media_output));
+		CPPUNIT_ASSERT_EQUAL(256, (int)sizeof(live_node_info));
+		CPPUNIT_ASSERT_EQUAL(372, (int)sizeof(media_request_info));
+		CPPUNIT_ASSERT_EQUAL(16, (int)sizeof(media_destination));
+		CPPUNIT_ASSERT_EQUAL(16, (int)sizeof(media_source));
+		CPPUNIT_ASSERT_EQUAL(200, (int)sizeof(dormant_node_info));
+		CPPUNIT_ASSERT_EQUAL(116, (int)sizeof(flavor_info));
+		CPPUNIT_ASSERT_EQUAL(320, (int)sizeof(dormant_flavor_info));
+		CPPUNIT_ASSERT_EQUAL(192, (int)sizeof(media_format));
 #else
-	CPPUNIT_ASSERT(true);
+		CPPUNIT_ASSERT(true);
 #endif
-
-//	printf("BMediaBufferDecoder sizeof = %ld\n",sizeof(BMediaBufferDecoder));
-//	printf("MediaBufferEncoder sizeof = %ld\n",sizeof(MediaBufferEncoder));
-//	printf("BMediaDecoder sizeof = %ld\n",sizeof(BMediaDecoder));
-//	printf("BMediaEncoder  sizeof = %ld\n",sizeof(BMediaEncoder));
-}
+	}
+};
 
 
-/*static*/ void
-SizeofTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("AreaTest");
-
-	suite.addTest(new CppUnit::TestCaller<SizeofTest>(
-		"SizeofTest::TestSize", &SizeofTest::TestSize));
-
-	parent.addTest("SizeofTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(SizeofTest, getTestSuiteName());

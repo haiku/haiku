@@ -4,120 +4,118 @@
  */
 
 
-#include "BufferTest.h"
-
 #include <Application.h>
-#include <BufferGroup.h>
 #include <Buffer.h>
+#include <BufferGroup.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-
-
-BufferTest::BufferTest()
-{
-}
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 
-BufferTest::~BufferTest()
-{
-}
+class BufferTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(BufferTest);
+	CPPUNIT_TEST(DefaultBufferGroup_InitCheckAndCount_ReturnsCorrectValues);
+	CPPUNIT_TEST(DefaultBufferGroup_Size_ReturnsThreeBuffersAndCorrectSize);
+	CPPUNIT_TEST(TwoBufferGroups_ReferencingBufferFromOtherGroup_ReturnsCorrectSize);
+	CPPUNIT_TEST_SUITE_END();
 
+public:
+	void DefaultBufferGroup_InitCheckAndCount_ReturnsCorrectValues()
+	{
+		// app_server connection (no need to run it)
+		BApplication app("application/x-vnd-test");
 
-void
-BufferTest::TestDefault()
-{
-	// app_server connection (no need to run it)
-	BApplication app("application/x-vnd-test"); 
+		BBufferGroup* group;
+		status_t s;
+		int32 count;
+
+		group = new BBufferGroup();
+
+		s = group->InitCheck();
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
+
+		s = group->CountBuffers(&count);
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
+		CPPUNIT_ASSERT_EQUAL(0, count);
+
+		delete group;
+	}
 	
-	BBufferGroup * group;
-	status_t s;
-	int32 count;
+	void DefaultBufferGroup_Size_ReturnsThreeBuffersAndCorrectSize()
+	{
+		BBufferGroup* group;
+		status_t s;
+		int32 count;
+		BBuffer* buffer;
 
-	group = new BBufferGroup();
+		group = new BBufferGroup(1234);
 
-	s = group->InitCheck();
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
-	
-	s = group->CountBuffers(&count);
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
-	CPPUNIT_ASSERT_EQUAL(0, count);
-}
+		s = group->InitCheck();
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
 
+		s = group->CountBuffers(&count);
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
+		CPPUNIT_ASSERT_EQUAL(3, count);
 
-void
-BufferTest::TestRef()
-{
-	BBufferGroup * group;
-	status_t s;
-	int32 count;
-	BBuffer *buffer;
+		s = group->GetBufferList(1, &buffer);
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
 
-	group = new BBufferGroup(1234);
+		CPPUNIT_ASSERT_EQUAL(1234, static_cast<int>(buffer->Size()));
+		CPPUNIT_ASSERT_EQUAL(1234, static_cast<int>(buffer->SizeAvailable()));
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(buffer->SizeUsed()));
 
-	s = group->InitCheck();
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
-	
-	s = group->CountBuffers(&count);
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
-	CPPUNIT_ASSERT_EQUAL(3, count);
+		delete group;
+	}
 
-	s = group->GetBufferList(1,&buffer);
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
+	void TwoBufferGroups_ReferencingBufferFromOtherGroup_ReturnsCorrectSize() {
 
-	CPPUNIT_ASSERT_EQUAL(1234, buffer->Size());
-	CPPUNIT_ASSERT_EQUAL(1234, buffer->SizeAvailable());
-	CPPUNIT_ASSERT_EQUAL(0, buffer->SizeUsed());
+		BBufferGroup* group;
+		status_t s;
+		int32 count;
+		BBuffer* buffer;
 
-	media_buffer_id id = buffer->ID();
-	BBufferGroup * group2 = new BBufferGroup(1,&id);
+		group = new BBufferGroup(1234);
 
-	s = group2->InitCheck();
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
+		s = group->InitCheck();
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
 
-	s = group2->CountBuffers(&count);
-	CPPUNIT_ASSERT_EQUAL(B_OK, s);
-	CPPUNIT_ASSERT_EQUAL(1, count);
+		s = group->GetBufferList(1, &buffer);
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
 
-	buffer = 0;
-	s = group2->GetBufferList(1,&buffer);
+		media_buffer_id id = buffer->ID();
+		BBufferGroup* group2 = new BBufferGroup(1, &id);
 
-	CPPUNIT_ASSERT_EQUAL(1234, buffer->Size());
-	CPPUNIT_ASSERT_EQUAL(1234, buffer->SizeAvailable());
-	CPPUNIT_ASSERT_EQUAL(0, buffer->SizeUsed());
+		s = group2->InitCheck();
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
 
-	delete group;
-	delete group2;
-}
+		s = group2->CountBuffers(&count);
+		CPPUNIT_ASSERT_EQUAL(B_OK, s);
+		CPPUNIT_ASSERT_EQUAL(1, count);
 
+		buffer = NULL;
+		s = group2->GetBufferList(1, &buffer);
 
-void
-BufferTest::TestSmall()
-{
-	// FIXME currently not implemented, BSmallBuffer constructor will debugger().
-#if 0
-	BSmallBuffer * sb = new BSmallBuffer;
-	CPPUNIT_ASSERT_EQUAL(0, sb->Size());
-	CPPUNIT_ASSERT_EQUAL(0, sb->SizeAvailable());
-	CPPUNIT_ASSERT_EQUAL(0, sb->SizeUsed());
-	CPPUNIT_ASSERT_EQUAL(0, sb->SmallBufferSizeLimit());
+		CPPUNIT_ASSERT_EQUAL(1234, static_cast<int>(buffer->Size()));
+		CPPUNIT_ASSERT_EQUAL(1234, static_cast<int>(buffer->SizeAvailable()));
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(buffer->SizeUsed()));
 
-	delete sb;
-#endif
-}
+		delete group;
+		delete group2;
+	}
+
+	void
+	SmallBuffer_Size_ReturnsCorrectValues()
+	{
+		BSmallBuffer * sb = new BSmallBuffer;
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(sb->Size()));
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(sb->SizeAvailable()));
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(sb->SizeUsed()));
+		CPPUNIT_ASSERT_EQUAL(0, static_cast<int>(sb->SmallBufferSizeLimit()));
+
+		delete sb;
+	}
+};
 
 
-/*static*/ void
-BufferTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("BufferTest");
-
-	suite.addTest(new CppUnit::TestCaller<BufferTest>(
-		"BufferTest::TestDefault", &BufferTest::TestDefault));
-	suite.addTest(new CppUnit::TestCaller<BufferTest>(
-		"BufferTest::TestRef", &BufferTest::TestRef));
-	suite.addTest(new CppUnit::TestCaller<BufferTest>(
-		"BufferTest::TestSmall", &BufferTest::TestSmall));
-
-	parent.addTest("BufferTest", &suite);
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(BufferTest, getTestSuiteName());

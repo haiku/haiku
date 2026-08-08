@@ -1,396 +1,387 @@
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <TimedEventQueue.h>
-#include <stdio.h>
 
-#define DEBUG 1
-#include <Debug.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
-BTimedEventQueue::queue_action DoForEachHook(media_timed_event *event, void *context);
-void DumpEvent(const media_timed_event & e);
-void DumpEvent(const media_timed_event * e);
-void InsertRemoveTest();
-void DoForEachTest();
-void MatchTest();
-void FlushTest();
 
-void DumpEvent(const media_timed_event & e)
-{
-	DumpEvent(&e);
-}
+class TimedEventQueueTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(TimedEventQueueTest);
+	CPPUNIT_TEST(NewQueue_EventCount_ReturnsZero);
+	CPPUNIT_TEST(NewQueue_HasEvents_ReturnsFalse);
+	CPPUNIT_TEST(MultipleEvents_RemoveEvent_QueueStaysConsistent);
+	CPPUNIT_TEST(MultipleEvents_DoForEach_QueueStaysConsistent);
+	CPPUNIT_TEST(MultipleEvents_FindFirstMatch_QueueStaysConsistent);
+	CPPUNIT_TEST(MultipleEvents_FlushEvents_QueueStaysConsistent);
+	CPPUNIT_TEST_SUITE_END();
 
-void DumpEvent(const media_timed_event * e)
-{
-	if (!e) {
-		printf("NULL\n");
-		return;
+	media_timed_event fDoForEachEvent;
+	int fDoForEachCount;
+
+	static BTimedEventQueue::queue_action DoForEachHook(media_timed_event* event, void* context)
+	{
+		TimedEventQueueTest* test = (TimedEventQueueTest*)context;
+		test->fDoForEachEvent = *event;
+		test->fDoForEachCount++;
+		return BTimedEventQueue::B_NO_ACTION;
 	}
-	printf("time = 0x%x, type = ",int(e->event_time));
-	switch (e->type) {
-		case BTimedEventQueue::B_NO_EVENT: printf("B_NO_EVENT\n"); break;
-		case BTimedEventQueue::B_ANY_EVENT: printf("B_ANY_EVENT\n"); break;
-		case BTimedEventQueue::B_START: printf("B_START\n"); break;
-		case BTimedEventQueue::B_STOP: printf("B_STOP\n"); break;
-		case BTimedEventQueue::B_SEEK: printf("B_SEEK\n"); break;
-		case BTimedEventQueue::B_WARP: printf("B_WARP\n"); break;
-		case BTimedEventQueue::B_TIMER: printf("B_TIMER\n"); break;
-		case BTimedEventQueue::B_HANDLE_BUFFER: printf("B_HANDLE_BUFFER\n"); break;
-		case BTimedEventQueue::B_DATA_STATUS: printf("B_DATA_STATUS\n"); break;
-		case BTimedEventQueue::B_HARDWARE: printf("B_HARDWARE\n"); break;
-		case BTimedEventQueue::B_PARAMETER: printf("B_PARAMETER\n"); break;
-		default: printf("0x%x\n",int(e->type));
+
+	BTimedEventQueue* fQueue;
+
+public:
+	void setUp() { fQueue = new BTimedEventQueue; }
+
+	void tearDown() { delete fQueue; }
+
+	void NewQueue_EventCount_ReturnsZero() { CPPUNIT_ASSERT_EQUAL(0, fQueue->EventCount()); }
+
+	void NewQueue_HasEvents_ReturnsFalse() { CPPUNIT_ASSERT_EQUAL(false, fQueue->HasEvents()); }
+
+	void MultipleEvents_FlushEvents_QueueStaysConsistent()
+	{
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		fQueue->AddEvent(media_timed_event(0x1001, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1002, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1003, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1004, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1005, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		fQueue->AddEvent(media_timed_event(0x1007, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1008, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1009, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1010, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1011, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1012, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_SEEK));
+		CPPUNIT_ASSERT_EQUAL(16, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
+
+		fQueue->FlushEvents(0x1007, BTimedEventQueue::B_AT_TIME);
+		CPPUNIT_ASSERT_EQUAL(15, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1012, BTimedEventQueue::B_AFTER_TIME, false);
+		CPPUNIT_ASSERT_EQUAL(12, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1fff, BTimedEventQueue::B_AFTER_TIME, false);
+		CPPUNIT_ASSERT_EQUAL(12, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1fff, BTimedEventQueue::B_AFTER_TIME, true);
+		CPPUNIT_ASSERT_EQUAL(12, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1010, BTimedEventQueue::B_AFTER_TIME, true);
+		CPPUNIT_ASSERT_EQUAL(9, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1006, BTimedEventQueue::B_BEFORE_TIME, false);
+		CPPUNIT_ASSERT_EQUAL(3, fQueue->EventCount());
+
+		fQueue->FlushEvents(0x1006, BTimedEventQueue::B_AT_TIME);
+		CPPUNIT_ASSERT_EQUAL(2, fQueue->EventCount());
+
+		fQueue->FlushEvents(0xffffff, BTimedEventQueue::B_BEFORE_TIME);
+		CPPUNIT_ASSERT_EQUAL(0, fQueue->EventCount());
 	}
-}
 
-void InsertRemoveTest()
-{
-	BTimedEventQueue *q =new BTimedEventQueue;
-	q->AddEvent(media_timed_event(0x1007,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1005,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x9999,BTimedEventQueue::B_STOP));//
-	q->AddEvent(media_timed_event(0x1006,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1002,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1011,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x0777,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1001,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_STOP));//
-	q->AddEvent(media_timed_event(0x1003,BTimedEventQueue::B_START));//
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));//
-	ASSERT(q->EventCount() == 12);
-	ASSERT(q->HasEvents() == true);
-	
-	media_timed_event e1(0x1003,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e1);
-	ASSERT(q->EventCount() == 11);
-	ASSERT(q->HasEvents() == true);
+	void MultipleEvents_FindFirstMatch_QueueStaysConsistent()
+	{
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		fQueue->AddEvent(media_timed_event(0x1001, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1002, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1003, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1010, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1011, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1012, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1004, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1005, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		fQueue->AddEvent(media_timed_event(0x1007, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1008, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1009, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_SEEK));
+		CPPUNIT_ASSERT_EQUAL(16, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	media_timed_event e2(0x1007,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e2);
-	ASSERT(q->EventCount() == 10);
-	ASSERT(q->HasEvents() == true);
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1001, BTimedEventQueue::B_AFTER_TIME, true, BTimedEventQueue::B_STOP);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1006, BTimedEventQueue::B_AT_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		}
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1007, BTimedEventQueue::B_BEFORE_TIME, true, BTimedEventQueue::B_STOP);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1006, BTimedEventQueue::B_BEFORE_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1006, BTimedEventQueue::B_AFTER_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		}
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1006, BTimedEventQueue::B_BEFORE_TIME, false, BTimedEventQueue::B_STOP);
+			CPPUNIT_ASSERT(result == NULL);
+		}
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1006, BTimedEventQueue::B_AFTER_TIME, false, BTimedEventQueue::B_STOP);
+			CPPUNIT_ASSERT(result == NULL);
+		}
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1006, BTimedEventQueue::B_AT_TIME, false, BTimedEventQueue::B_SEEK);
+			CPPUNIT_ASSERT(result == NULL);
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1000, BTimedEventQueue::B_AFTER_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1010, BTimedEventQueue::B_BEFORE_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1007, BTimedEventQueue::B_BEFORE_TIME, false);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		}
+		{
+			const media_timed_event* result = fQueue->FindFirstMatch(
+				0x1001, BTimedEventQueue::B_AFTER_TIME, false, BTimedEventQueue::B_SEEK);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1013, BTimedEventQueue::B_SEEK));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1009, BTimedEventQueue::B_AFTER_TIME, false);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1010, BTimedEventQueue::B_START));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1010, BTimedEventQueue::B_AFTER_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1010, BTimedEventQueue::B_START));
+		}
+		{
+			const media_timed_event* result
+				= fQueue->FindFirstMatch(0x1010, BTimedEventQueue::B_AT_TIME, true);
+			CPPUNIT_ASSERT(result != NULL);
+			CPPUNIT_ASSERT(*result == media_timed_event(0x1010, BTimedEventQueue::B_START));
+		}
+	}
 
-	media_timed_event e3(0x1000,BTimedEventQueue::B_STOP);
-	q->RemoveEvent(&e3);
-	ASSERT(q->EventCount() == 9);
-	ASSERT(q->HasEvents() == true);
+	void MultipleEvents_DoForEach_QueueStaysConsistent()
+	{
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		fQueue->AddEvent(media_timed_event(0x1001, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1002, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1003, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1010, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1011, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1012, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1004, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1005, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		fQueue->AddEvent(media_timed_event(0x1007, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1008, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1009, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1013, BTimedEventQueue::B_SEEK));
+		CPPUNIT_ASSERT_EQUAL(16, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	media_timed_event e4(0x1000,BTimedEventQueue::B_SEEK);
-	q->RemoveEvent(&e4);
-	ASSERT(q->EventCount() == 8);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1000, BTimedEventQueue::B_AT_TIME);
+		CPPUNIT_ASSERT(fDoForEachEvent == media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		CPPUNIT_ASSERT_EQUAL(1, fDoForEachCount);
 
-	//remove non existing element (time)
-	media_timed_event e5(0x1111,BTimedEventQueue::B_STOP);
-	q->RemoveEvent(&e5);
-	ASSERT(q->EventCount() == 8);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1006, BTimedEventQueue::B_AT_TIME);
+		CPPUNIT_ASSERT(fDoForEachEvent == media_timed_event(0x1006, BTimedEventQueue::B_STOP));
+		CPPUNIT_ASSERT_EQUAL(1, fDoForEachCount);
 
-	//remove non existing element (type)
-	media_timed_event e6(0x1011,BTimedEventQueue::B_STOP);
-	q->RemoveEvent(&e6);
-	ASSERT(q->EventCount() == 8);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1013, BTimedEventQueue::B_AT_TIME);
+		CPPUNIT_ASSERT_EQUAL(3, fDoForEachCount);
 
-	media_timed_event e7(0x1000,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e7);
-	ASSERT(q->EventCount() == 7);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1003, BTimedEventQueue::B_BEFORE_TIME,
+						  false);
+		CPPUNIT_ASSERT_EQUAL(3, fDoForEachCount);
 
-	media_timed_event e8(0x1011,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e8);
-	ASSERT(q->EventCount() == 6);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1003, BTimedEventQueue::B_BEFORE_TIME,
+						  true);
+		CPPUNIT_ASSERT_EQUAL(4, fDoForEachCount);
 
-	media_timed_event e9(0x1002,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e9);
-	ASSERT(q->EventCount() == 5);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1012, BTimedEventQueue::B_AFTER_TIME,
+						  false);
+		CPPUNIT_ASSERT_EQUAL(3, fDoForEachCount);
 
-	media_timed_event e10(0x0777,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e10);
-	ASSERT(q->EventCount() == 4);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1012, BTimedEventQueue::B_AFTER_TIME, true);
+		CPPUNIT_ASSERT_EQUAL(4, fDoForEachCount);
 
-	media_timed_event e11(0x9999,BTimedEventQueue::B_STOP);
-	q->RemoveEvent(&e11);
-	ASSERT(q->EventCount() == 3);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1013, BTimedEventQueue::B_AFTER_TIME,
+						  false);
+		CPPUNIT_ASSERT_EQUAL(0, fDoForEachCount);
 
-	media_timed_event e12(0x1006,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e12);
-	ASSERT(q->EventCount() == 2);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1013, BTimedEventQueue::B_AFTER_TIME, true);
+		CPPUNIT_ASSERT_EQUAL(3, fDoForEachCount);
 
-	media_timed_event e13(0x1001,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e13);
-	ASSERT(q->EventCount() == 1);
-	ASSERT(q->HasEvents() == true);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x0, BTimedEventQueue::B_ALWAYS);
+		CPPUNIT_ASSERT_EQUAL(16, fDoForEachCount);
 
-	media_timed_event e14(0x1005,BTimedEventQueue::B_START);
-	q->RemoveEvent(&e14);
-	ASSERT(q->EventCount() == 0);
-	ASSERT(q->HasEvents() == false);
-	
-	delete q;
-}
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x0, BTimedEventQueue::B_ALWAYS, false,
+						  BTimedEventQueue::B_WARP);
+		CPPUNIT_ASSERT_EQUAL(0, fDoForEachCount);
 
-media_timed_event DoForEachEvent;
-int DoForEachCount;
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x0, BTimedEventQueue::B_ALWAYS, false,
+						  BTimedEventQueue::B_SEEK);
+		CPPUNIT_ASSERT_EQUAL(2, fDoForEachCount);
 
-BTimedEventQueue::queue_action 
-DoForEachHook(media_timed_event *event, void *context)
-{
-	DoForEachEvent = *event;
-	DoForEachCount++;
-	printf("Callback, event_time = %x\n",int(event->event_time));
-	return BTimedEventQueue::B_NO_ACTION;
-}
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x0999, BTimedEventQueue::B_AFTER_TIME, false,
+						  BTimedEventQueue::B_SEEK);
+		CPPUNIT_ASSERT_EQUAL(2, fDoForEachCount);
 
-void DoForEachTest()
-{
-	BTimedEventQueue *q =new BTimedEventQueue;
-	ASSERT(q->EventCount() == 0);
-	ASSERT(q->HasEvents() == false);
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x1014, BTimedEventQueue::B_BEFORE_TIME,
+						  false, BTimedEventQueue::B_SEEK);
+		CPPUNIT_ASSERT_EQUAL(2, fDoForEachCount);
 
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	q->AddEvent(media_timed_event(0x1001,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1002,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1003,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1011,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1012,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1004,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1005,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	q->AddEvent(media_timed_event(0x1007,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1008,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1009,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_SEEK));
-	ASSERT(q->EventCount() == 16);
-	ASSERT(q->HasEvents() == true);
-	
+		fDoForEachCount = 0;
+		fQueue->DoForEach(DoForEachHook, (void*)this, 0x0004, BTimedEventQueue::B_BEFORE_TIME,
+						  true);
+		CPPUNIT_ASSERT_EQUAL(0, fDoForEachCount);
+	}
 
-	printf("\n expected: 0x1000\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1000,BTimedEventQueue::B_AT_TIME);
-	ASSERT(DoForEachEvent == media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	ASSERT(DoForEachCount == 1);
-	
+	void MultipleEvents_RemoveEvent_QueueStaysConsistent()
+	{
+		fQueue->AddEvent(media_timed_event(0x1007, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1005, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x9999, BTimedEventQueue::B_STOP));
+		fQueue->AddEvent(media_timed_event(0x1006, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1002, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1011, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x0777, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1001, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_STOP));
+		fQueue->AddEvent(media_timed_event(0x1003, BTimedEventQueue::B_START));
+		fQueue->AddEvent(media_timed_event(0x1000, BTimedEventQueue::B_SEEK));
+		CPPUNIT_ASSERT_EQUAL(12, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1006\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1006,BTimedEventQueue::B_AT_TIME);
-	ASSERT(DoForEachEvent == media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	ASSERT(DoForEachCount == 1);
+		media_timed_event e1(0x1003, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e1);
+		CPPUNIT_ASSERT_EQUAL(11, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1013, 0x1013, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1013,BTimedEventQueue::B_AT_TIME);
-	ASSERT(DoForEachCount == 3);
+		media_timed_event e2(0x1007, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e2);
+		CPPUNIT_ASSERT_EQUAL(10, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1000, 0x1001, 0x1002\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1003,BTimedEventQueue::B_BEFORE_TIME,false);
-	ASSERT(DoForEachCount == 3);
+		media_timed_event e3(0x1000, BTimedEventQueue::B_STOP);
+		fQueue->RemoveEvent(&e3);
+		CPPUNIT_ASSERT_EQUAL(9, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1000, 0x1001, 0x1002, 0x1003\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1003,BTimedEventQueue::B_BEFORE_TIME,true);
-	ASSERT(DoForEachCount == 4);
+		media_timed_event e4(0x1000, BTimedEventQueue::B_SEEK);
+		fQueue->RemoveEvent(&e4);
+		CPPUNIT_ASSERT_EQUAL(8, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1013, 0x1013, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1012,BTimedEventQueue::B_AFTER_TIME,false);
-	ASSERT(DoForEachCount == 3);
+		// remove non existing element (time)
+		media_timed_event e5(0x1111, BTimedEventQueue::B_STOP);
+		fQueue->RemoveEvent(&e5);
+		CPPUNIT_ASSERT_EQUAL(8, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1012, 0x1013, 0x1013, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1012,BTimedEventQueue::B_AFTER_TIME,true);
-	ASSERT(DoForEachCount == 4);
+		// remove non existing element (type)
+		media_timed_event e6(0x1011, BTimedEventQueue::B_STOP);
+		fQueue->RemoveEvent(&e6);
+		CPPUNIT_ASSERT_EQUAL(8, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: none\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1013,BTimedEventQueue::B_AFTER_TIME,false);
-	ASSERT(DoForEachCount == 0);
+		media_timed_event e7(0x1000, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e7);
+		CPPUNIT_ASSERT_EQUAL(7, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1013, 0x1013, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1013,BTimedEventQueue::B_AFTER_TIME,true);
-	ASSERT(DoForEachCount == 3);
+		media_timed_event e8(0x1011, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e8);
+		CPPUNIT_ASSERT_EQUAL(6, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: all 16\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x0,BTimedEventQueue::B_ALWAYS);
-	ASSERT(DoForEachCount == 16);
+		media_timed_event e9(0x1002, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e9);
+		CPPUNIT_ASSERT_EQUAL(5, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: none\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x0,BTimedEventQueue::B_ALWAYS,false,BTimedEventQueue::B_WARP);
-	ASSERT(DoForEachCount == 0);
+		media_timed_event e10(0x0777, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e10);
+		CPPUNIT_ASSERT_EQUAL(4, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1000, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x0,BTimedEventQueue::B_ALWAYS,false,BTimedEventQueue::B_SEEK);
-	ASSERT(DoForEachCount == 2);
+		media_timed_event e11(0x9999, BTimedEventQueue::B_STOP);
+		fQueue->RemoveEvent(&e11);
+		CPPUNIT_ASSERT_EQUAL(3, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1000, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x0999,BTimedEventQueue::B_AFTER_TIME,false,BTimedEventQueue::B_SEEK);
-	ASSERT(DoForEachCount == 2);
+		media_timed_event e12(0x1006, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e12);
+		CPPUNIT_ASSERT_EQUAL(2, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: 0x1000, 0x1013\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x1014,BTimedEventQueue::B_BEFORE_TIME,false,BTimedEventQueue::B_SEEK);
-	ASSERT(DoForEachCount == 2);
+		media_timed_event e13(0x1001, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e13);
+		CPPUNIT_ASSERT_EQUAL(1, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(true, fQueue->HasEvents());
 
-	printf("\n expected: none\n");
-	DoForEachCount = 0;	
-	q->DoForEach(DoForEachHook,(void*)1234,0x0004,BTimedEventQueue::B_BEFORE_TIME,true);
-	ASSERT(DoForEachCount == 0);
-
-	delete q;
-}	
-
-void MatchTest()
-{
-	BTimedEventQueue *q = new BTimedEventQueue;
-	ASSERT(q->EventCount() == 0);
-	ASSERT(q->HasEvents() == false);
-
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	q->AddEvent(media_timed_event(0x1001,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1002,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1003,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1011,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1012,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1004,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1005,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	q->AddEvent(media_timed_event(0x1007,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1008,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1009,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_SEEK));
-	ASSERT(q->EventCount() == 16);
-	ASSERT(q->HasEvents() == true);
-	
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1001,BTimedEventQueue::B_AFTER_TIME,true,BTimedEventQueue::B_STOP));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_AT_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1007,BTimedEventQueue::B_BEFORE_TIME,true,BTimedEventQueue::B_STOP));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_BEFORE_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_AFTER_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(0);
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_BEFORE_TIME,false,BTimedEventQueue::B_STOP));
-
-	printf("\nexpected: "); DumpEvent(0);
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_AFTER_TIME,false,BTimedEventQueue::B_STOP));
-
-	printf("\nexpected: "); DumpEvent(0);
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1006,BTimedEventQueue::B_AT_TIME,false,BTimedEventQueue::B_SEEK));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1000,BTimedEventQueue::B_AFTER_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1010,BTimedEventQueue::B_BEFORE_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1007,BTimedEventQueue::B_BEFORE_TIME,false));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1013,BTimedEventQueue::B_SEEK));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1001,BTimedEventQueue::B_AFTER_TIME,false,BTimedEventQueue::B_SEEK));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1009,BTimedEventQueue::B_AFTER_TIME,false));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1010,BTimedEventQueue::B_AFTER_TIME,true));
-
-	printf("\nexpected: "); DumpEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	printf("found:    "); DumpEvent(q->FindFirstMatch(0x1010,BTimedEventQueue::B_AT_TIME,true));
-	
-	delete q;
-}	
-
-void FlushTest()
-{
-	BTimedEventQueue *q = new BTimedEventQueue;
-	ASSERT(q->EventCount() == 0);
-	ASSERT(q->HasEvents() == false);
-
-	q->AddEvent(media_timed_event(0x1000,BTimedEventQueue::B_SEEK));
-	q->AddEvent(media_timed_event(0x1001,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1002,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1003,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1004,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1005,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1006,BTimedEventQueue::B_STOP));
-	q->AddEvent(media_timed_event(0x1007,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1008,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1009,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1010,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1011,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1012,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_START));
-	q->AddEvent(media_timed_event(0x1013,BTimedEventQueue::B_SEEK));
-	ASSERT(q->EventCount() == 16);
-	ASSERT(q->HasEvents() == true);
-
-	printf("### removing 0x1007\n");	
-	q->FlushEvents(0x1007, BTimedEventQueue::B_AT_TIME);
-	ASSERT(q->EventCount() == 15);
-
-	printf("### removing 0x1013\n");	
-	q->FlushEvents(0x1012, BTimedEventQueue::B_AFTER_TIME,false);
-	ASSERT(q->EventCount() == 12);
-
-	printf("### removing none\n");	
-	q->FlushEvents(0x1fff, BTimedEventQueue::B_AFTER_TIME,false);
-	ASSERT(q->EventCount() == 12);
-
-	printf("### removing none\n");	
-	q->FlushEvents(0x1fff, BTimedEventQueue::B_AFTER_TIME,true);
-	ASSERT(q->EventCount() == 12);
-
-	printf("### removing 0x1010, 0x1011, 0x1012\n");	
-	q->FlushEvents(0x1010, BTimedEventQueue::B_AFTER_TIME,true);
-	ASSERT(q->EventCount() == 9);
-
-	printf("### removing 0x1000 to 0x1005\n");	
-	q->FlushEvents(0x1006, BTimedEventQueue::B_BEFORE_TIME,false);
-	ASSERT(q->EventCount() == 3);
-
-	printf("### removing 0x1006\n");	
-	q->FlushEvents(0x1006, BTimedEventQueue::B_AT_TIME);
-	ASSERT(q->EventCount() == 2);
-
-	printf("### removing 0x1008 0x1009\n");	
-	q->FlushEvents(0xffffff, BTimedEventQueue::B_BEFORE_TIME);
-	ASSERT(q->EventCount() == 0);
-
-	delete q;
-}	
+		media_timed_event e14(0x1005, BTimedEventQueue::B_START);
+		fQueue->RemoveEvent(&e14);
+		CPPUNIT_ASSERT_EQUAL(0, fQueue->EventCount());
+		CPPUNIT_ASSERT_EQUAL(false, fQueue->HasEvents());
+	}
+};
 
 
-int main()
-{
-	InsertRemoveTest();
-	DoForEachTest();
-	MatchTest();
-	FlushTest();
-	return 0;
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(TimedEventQueueTest, getTestSuiteName());
