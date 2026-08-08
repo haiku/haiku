@@ -85,7 +85,7 @@ main(int argc, char *argv[])
 	// if not root, the user needs to authenticate
 	status_t status = B_ERROR;
 	if (getuid() != 0) {
-		status = authenticate_user("password: ", passwd, NULL, kRetries, false);
+		status = authenticate_user("password: ", passwd, getspnam(user), kRetries, false);
 
 		if (status < B_OK) {
 			syslog(LOG_NOTICE, "su failed for \"%s\"", passwd->pw_name);
