@@ -389,6 +389,15 @@ ieee80211_check_scan(struct ieee80211vap *vap, int flags,
 		flags |= IEEE80211_SCAN_FLUSH;
 	}
 
+#ifdef __HAIKU__
+	/* We never want to join if not explicitly looking for an SSID */
+	if (nssid == 0 && (flags & IEEE80211_SCAN_NOJOIN) == 0) {
+		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SCAN,
+			"%s: setting nojoin due to no configured ssid\n", __func__);
+		flags |= IEEE80211_SCAN_NOJOIN;
+	}
+#endif
+
 	/*
 	 * XXX TODO: separate things out a bit better.
 	 */
