@@ -3126,7 +3126,7 @@ vm_set_area_protection(area_id areaID, uint32 newProtection,
 	bool kernel)
 {
 	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
-		", protection = %#" B_PRIx32 ")\n", team, areaID, newProtection));
+		", protection = %#" B_PRIx32 ")\n", team_get_current_team_id(), areaID, newProtection));
 
 	bool becomesWritable
 		= (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
@@ -4433,7 +4433,7 @@ vm_try_reserve_internal(int64& pool, uint32 resource,
 {
 	ASSERT((amount % B_PAGE_SIZE) == 0);
 	ASSERT(priority >= 0 && priority < (int)B_COUNT_OF(kMemoryReserveForPriority));
-	TRACE(("try to reserve %lu bytes, %Lu left\n", amount, pool));
+	TRACE(("try to reserve %" B_PRIuSIZE " bytes, %" B_PRIdOFF " left\n", amount, pool));
 
 	const size_t reserve = kMemoryReserveForPriority[priority];
 	const int64 amountPlusReserve = amount + reserve;
