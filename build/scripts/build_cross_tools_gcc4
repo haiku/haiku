@@ -73,7 +73,7 @@ riscv*-*)
 	;;
 powerpc-*)
 	binutilsConfigureArgs="--disable-multilib"
-	gccConfigureArgs="--disable-multilib"
+	gccConfigureArgs="--disable-multilib --enable-secureplt"
 	binutilsTargets="$binutilsTargets,powerpc-apple-linux,powerpc-apple-freebsd,powerpc-apple-vxworks"
 	gdbConfigureArgs="--disable-multilib --disable-werror"
 	gdbTarget="powerpc-unknown-elf"
@@ -84,7 +84,7 @@ powerpc-*)
 	;;
 powerpc64-*)
 	binutilsConfigureArgs="--disable-multilib"
-	gccConfigureArgs="--disable-multilib"
+	gccConfigureArgs="--disable-multilib --enable-secureplt"
 	gdbConfigureArgs="--disable-multilib --disable-werror"
 	gdbTarget="powerpc64-unknown-elf"
 

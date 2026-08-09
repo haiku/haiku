@@ -9,24 +9,30 @@
 
 #ifdef _BOOT_MODE
 #include <boot/arch.h>
+#include <boot/platform.h>
 #endif
 
 #include <KernelExport.h>
 
-#include <elf_priv.h>
 #include <arch/elf.h>
+#include <elf_priv.h>
 
 
-#define CHATTY 0
+#define TRACE_ARCH_ELF
+#ifdef TRACE_ARCH_ELF
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image, Elf32_Rel *rel,
-	int rel_len)
+boot_arch_elf_relocate_rel(struct preloaded_elf32_image* image, Elf32_Rel* rel, int rel_len)
 #else
 int
-arch_elf_relocate_rel(struct elf_image_info *image,
-	struct elf_image_info *resolve_image, Elf32_Rel *rel, int rel_len)
+arch_elf_relocate_rel(struct elf_image_info* image, struct elf_image_info* resolve_image,
+	Elf32_Rel* rel, int rel_len)
 #endif
 {
 	// there are no rel entries in PPC elf
@@ -55,8 +61,7 @@ write_low24_check(addr_t P, Elf32_Word value)
 	// bits 6:29
 	if ((value & 0x3f000000) && (~value & 0x3f800000))
 		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xfc000003)
-		| ((value & 0x00ffffff) << 2);
+	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xfc000003) | ((value & 0x00ffffff) << 2);
 	return true;
 }
 
@@ -67,8 +72,7 @@ write_low14_check(addr_t P, Elf32_Word value)
 	// bits 16:29
 	if ((value & 0x3fffc000) && (~value & 0x3fffe000))
 		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xffff0003)
-		| ((value & 0x00003fff) << 2);
+	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xffff0003) | ((value & 0x00003fff) << 2);
 	return true;
 }
 
@@ -95,35 +99,146 @@ write_half16_check(addr_t P, Elf32_Word value)
 static inline Elf32_Word
 lo(Elf32_Word value)
 {
-	return (value & 0xffff);
+	return value & 0xffff;
 }
 
 
 static inline Elf32_Word
 hi(Elf32_Word value)
 {
-	return ((value >> 16) & 0xffff);
+	return (value >> 16) & 0xffff;
 }
 
 
 static inline Elf32_Word
 ha(Elf32_Word value)
 {
-	return (((value >> 16) + (value & 0x8000 ? 1 : 0)) & 0xffff);
+	return ((value >> 16) + (value & 0x8000 ? 1 : 0)) & 0xffff;
 }
 
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rela(struct preloaded_elf32_image *image,
-	Elf32_Rela *rel, int rel_len)
+boot_arch_elf_relocate_rela(struct preloaded_elf32_image* image, Elf32_Rela* rel, int rel_len)
 #else
 int
-arch_elf_relocate_rela(struct elf_image_info *image,
-	struct elf_image_info *resolve_image, Elf32_Rela *rel, int rel_len)
+arch_elf_relocate_rela(struct elf_image_info* image, struct elf_image_info* resolve_image,
+	Elf32_Rela* rel, int rel_len)
 #endif
 {
 	int i;
+#ifdef _BOOT_MODE
+	Elf32_Dyn* dynamic_section = (Elf32_Dyn*)image->dynamic_section.start;
+#else
+	Elf32_Dyn* dynamic_section = (Elf32_Dyn*)image->dynamic_section;
+#endif
+
+	// there are two styles of PLTs. The new style is an array of
+	// addresses
+	if (((Elf32_Word*)dynamic_section)[DT_NUM + DT_PPC_GOT] != 0) {
+		TRACE(("detected new style PLT\n"));
+		for (i = 0; i * (int)sizeof(Elf32_Rela) < rel_len; i++) {
+			int symIndex = ELF32_R_SYM(rel[i].r_info);
+			Elf32_Addr symAddr = 0;
+			if (symIndex != 0) {
+				Elf32_Sym* symbol = SYMBOL(image, symIndex);
+
+				status_t status;
+#ifdef _BOOT_MODE
+				status = boot_elf_resolve_symbol(image, symbol, &symAddr);
+#else
+				status = elf_resolve_symbol(image, symbol, resolve_image, &symAddr);
+#endif
+				if (status < B_OK)
+					return status;
+			}
+
+			// Address of the relocation.
+			Elf32_Addr relocAddr = image->text_region.delta + rel[i].r_offset;
+#ifdef _BOOT_MODE
+			addr_t dest;
+			if (platform_kernel_address_to_bootloader_address(relocAddr, (void**)&dest) != B_OK)
+				panic("Couldn't convert address 0x%08x", (uint32_t)relocAddr);
+#else
+			addr_t dest = relocAddr;
+#endif
+
+			// Handle the different relocation types
+			switch (ELF32_R_TYPE(rel[i].r_info)) {
+				case R_PPC_NONE:
+					continue;
+
+				case R_PPC_ADDR32:
+				case R_PPC_UADDR32:
+				case R_PPC_JMP_SLOT:
+					write_word32(dest, symAddr + rel[i].r_addend);
+					break;
+
+				case R_PPC_ADDR24:
+					if (write_low24_check(dest, (symAddr + rel[i].r_addend) >> 2))
+						break;
+
+					dprintf("R_PPC_ADDR24 overflow\n");
+					return B_BAD_DATA;
+
+				case R_PPC_ADDR16:
+				case R_PPC_UADDR16:
+					if (write_half16_check(dest, symAddr + rel[i].r_addend))
+						break;
+					dprintf("R_PPC_ADDR16 overflow\n");
+					return B_BAD_DATA;
+
+				case R_PPC_ADDR16_LO:
+					write_half16(dest, lo(symAddr + rel[i].r_addend));
+					break;
+
+				case R_PPC_ADDR16_HI:
+					write_half16(dest, hi(symAddr + rel[i].r_addend));
+					break;
+
+				case R_PPC_ADDR16_HA:
+					write_half16(dest, ha(symAddr + rel[i].r_addend));
+					break;
+
+				case R_PPC_ADDR14:
+				case R_PPC_ADDR14_BRTAKEN:
+				case R_PPC_ADDR14_BRNTAKEN:
+					if (write_low14_check(dest, (symAddr + rel[i].r_addend) >> 2))
+						break;
+					dprintf("R_PPC_ADDR14 overflow\n");
+					return B_BAD_DATA;
+
+				case R_PPC_RELATIVE:
+					write_word32(dest, image->text_region.delta + rel[i].r_addend);
+					break;
+
+				case R_PPC_REL24:
+					if (write_low24_check(dest, (symAddr + rel[i].r_addend - dest) >> 2))
+						break;
+					dprintf("R_PPC_REL24 overflow: 0x%lx\n",
+						(symAddr + rel[i].r_addend - dest) >> 2);
+					return B_BAD_DATA;
+
+				case R_PPC_REL14:
+				case R_PPC_REL14_BRTAKEN:
+				case R_PPC_REL14_BRNTAKEN:
+					if (write_low14_check(symAddr, (symAddr + rel[i].r_addend - dest) >> 2))
+						break;
+					dprintf("R_PPC_REL14 overflow\n");
+					return B_BAD_DATA;
+
+				default:
+					dprintf("arch_elf_relocate_rela: unhandled relocation type %d\n",
+						ELF32_R_TYPE(rel[i].r_info));
+					return B_ERROR;
+			}
+		}
+
+		return B_NO_ERROR;
+	}
+
+	TRACE(("detected old style PLT\n"));
+
 	Elf32_Sym *sym;
 	int vlErr;
 
@@ -152,10 +267,10 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 		}
 
 	for (i = 0; i * (int)sizeof(Elf32_Rela) < rel_len; i++) {
-#if CHATTY
-		dprintf("looking at rel type %d, offset 0x%lx, sym 0x%lx, addend 0x%lx\n",
-			ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset, ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
-#endif
+
+		TRACE(("looking at rel type %d, offset 0x%lx, sym 0x%lx, addend 0x%lx\n",
+			ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset, ELF32_R_SYM(rel[i].r_info),
+			rel[i].r_addend));
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_PPC_SECTOFF:
 			case R_PPC_SECTOFF_LO:

@@ -553,6 +553,7 @@ typedef struct {
 #define DT_ENCODING			32
 #define DT_PREINIT_ARRAY	32	/* preinitialization array */
 #define DT_PREINIT_ARRAYSZ	33	/* preinitialization array size */
+#define DT_NUM				38	/* size of the machine-independent dynamic section */
 
 #define	DT_GNU_HASH		0x6ffffef5	/* GNU-style hash table */
 
