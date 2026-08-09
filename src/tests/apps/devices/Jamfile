@@ -1,0 +1,37 @@
+SubDir HAIKU_TOP src tests apps devices ;
+
+AddSubDirSupportedPlatforms libbe_test ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders interface ;
+UsePrivateHeaders app ;
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps devices ] ;
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) apps devices ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps devices ] ;
+
+Includes [ FGristFiles DeviceACPI.cpp ] : <src!apps!devices>acpipnpids.h <src!apps!devices>isapnpids.h ;
+Includes [ FGristFiles DevicePCI.cpp ] : <src!apps!devices>pcihdr.h ;
+Includes [ FGristFiles DeviceUSB.cpp ] : <src!apps!devices>usbhdr.h ;
+SEARCH on <src!apps!devices>acpipnpids.h <src!apps!devices>isapnpids.h <src!apps!devices>pcihdr.h <src!apps!devices>usbhdr.h
+	= [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) apps devices ] ;
+
+UnitTestLib devicestest.so :
+	DeviceTestAddon.cpp
+	DeviceTreeTest.cpp
+
+	Device.cpp
+	DeviceACPI.cpp
+	DevicePCI.cpp
+	DeviceSCSI.cpp
+	DeviceUSB.cpp
+	DevicesView.cpp
+	DriverUtils.cpp
+	PropertyList.cpp
+	dm_wrapper.c
+
+: be device libcolumnlistview.a shared tracker package [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
+;

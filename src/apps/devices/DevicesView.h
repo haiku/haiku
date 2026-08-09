@@ -63,12 +63,13 @@ class DevicesView : public BView {
 
 		virtual void MessageReceived(BMessage* msg);
 		virtual void RescanDevices();
-		virtual void CreateCategoryMap();
-		virtual void DeleteCategoryMap();
+		static void CreateCategoryMap(const Devices& devices, CategoryMap& categoryMap);
+		static void DeleteCategoryMap(CategoryMap& categoryMap);
 
 		virtual void DeleteDevices();
-		virtual void RebuildDevicesOutline();
-		virtual void AddChildrenToOutlineByConnection(Device* parent);
+		static void RebuildDevicesOutline(BOutlineListView* outline, const Devices& devices,
+			const CategoryMap& categoryMap, OrderByType orderBy);
+		static void AddChildrenToOutlineByConnection(BOutlineListView* outline, const Devices& devices, Device* parent);
 		virtual void AddDeviceAndChildren(device_node_cookie* node, Device* parent);
 		static int   SortItemsCompare(const BListItem*, const BListItem*);
 

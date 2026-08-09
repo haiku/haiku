@@ -50,7 +50,7 @@ DevicesView::DevicesView(OrderByType OrderBy)
 {
 	CreateLayout();
 	RescanDevices();
-	RebuildDevicesOutline();
+	RebuildDevicesOutline(fDevicesOutline, fDevices, fCategoryMap, fOrderBy);
 }
 
 
@@ -149,7 +149,7 @@ DevicesView::RescanDevices()
 	// Empty the outline and delete the devices in the list, incl. categories
 	fDevicesOutline->MakeEmpty();
 	DeleteDevices();
-	DeleteCategoryMap();
+	DeleteCategoryMap(fCategoryMap);
 
 	// Fill the devices list
 	status_t error;
@@ -165,7 +165,7 @@ DevicesView::RescanDevices()
 
 	uninit_dm_wrapper();
 
-	CreateCategoryMap();
+	CreateCategoryMap(fDevices, fCategoryMap);
 }
 
 
@@ -185,13 +185,13 @@ DevicesView::DeleteDevices()
 
 
 void
-DevicesView::CreateCategoryMap()
+DevicesView::CreateCategoryMap(const Devices& devices, CategoryMap& categoryMap)
 {
 	CategoryMapIterator iter;
-	for (unsigned int i = 0; i < fDevices.size(); i++) {
-		Category category = fDevices[i]->GetCategory();
+	for (unsigned int i = 0; i < devices.size(); i++) {
+		Category category = devices[i]->GetCategory();
 		if (category < 0 || category >= kCategoryStringLength) {
-			std::cerr << "CreateCategoryMap: device " << fDevices[i]->GetName()
+			std::cerr << "CreateCategoryMap: device " << devices[i]->GetName()
 				<< " returned an unknown category index (" << category << "). "
 				<< "Skipping device." << std::endl;
 			continue;
@@ -199,23 +199,22 @@ DevicesView::CreateCategoryMap()
 
 		const char* categoryName = kCategoryString[category];
 
-		iter = fCategoryMap.find(category);
-		if (iter == fCategoryMap.end()) {
+		iter = categoryMap.find(category);
+		if (iter == categoryMap.end()) {
 			// This category has not yet been added, add it.
-			fCategoryMap[category] = new Device(NULL, BUS_NONE, CAT_NONE, categoryName);
+			categoryMap[category] = new Device(NULL, BUS_NONE, CAT_NONE, categoryName);
 		}
 	}
 }
 
 
 void
-DevicesView::DeleteCategoryMap()
+DevicesView::DeleteCategoryMap(CategoryMap& categoryMap)
 {
 	CategoryMapIterator iter;
-	for (iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++) {
+	for (iter = categoryMap.begin(); iter != categoryMap.end(); iter++)
 		delete iter->second;
-	}
-	fCategoryMap.clear();
+	categoryMap.clear();
 }
 
 
@@ -234,60 +233,60 @@ DevicesView::SortItemsCompare(const BListItem *item1, const BListItem *item2)
 
 
 void
-DevicesView::RebuildDevicesOutline()
+DevicesView::RebuildDevicesOutline(BOutlineListView* outline, const Devices& devices,
+	const CategoryMap& categoryMap, OrderByType orderBy)
 {
 	// Rearranges existing Devices into the proper hierarchy
-	fDevicesOutline->MakeEmpty();
+	outline->MakeEmpty();
 
-	if (fOrderBy == ORDER_BY_BUS) {
+	if (orderBy == ORDER_BY_BUS) {
 		// add all bus controllers to the outline
-		for (unsigned int i = 0; i < fDevices.size(); i++)
-			if (fDevices[i]->GetCategory() == CAT_BUS)
-				fDevicesOutline->AddItem(fDevices[i]);
+		for (unsigned int i = 0; i < devices.size(); i++)
+			if (devices[i]->GetCategory() == CAT_BUS)
+				outline->AddItem(devices[i]);
 
 		// attach devices to their bus
-		for (unsigned int i = 0; i < fDevices.size(); i++) {
-			if (fDevices[i]->GetCategory() != CAT_BUS) {
-				Device* busParent = fDevices[i]->GetPhysicalParent();
+		for (unsigned int i = 0; i < devices.size(); i++) {
+			if (devices[i]->GetCategory() != CAT_BUS) {
+				Device* busParent = devices[i]->GetPhysicalParent();
 
 				while (busParent != NULL && busParent->GetCategory() != CAT_BUS) {
 					busParent = busParent->GetPhysicalParent();
 				}
 
 				if (busParent != NULL)
-					fDevicesOutline->AddUnder(fDevices[i], busParent);
+					outline->AddUnder(devices[i], busParent);
 				else
-					fDevicesOutline->AddItem(fDevices[i]);
+					outline->AddItem(devices[i]);
 			}
 		}
-		fDevicesOutline->SortItemsUnder(NULL, false, SortItemsCompare);
-	} else if (fOrderBy == ORDER_BY_CATEGORY) {
+		outline->SortItemsUnder(NULL, false, SortItemsCompare);
+	} else if (orderBy == ORDER_BY_CATEGORY) {
 		// Add all categories to the outline
 		CategoryMapIterator iter;
-		for (iter = fCategoryMap.begin(); iter != fCategoryMap.end(); iter++) {
-			fDevicesOutline->AddItem(iter->second);
-		}
+		for (iter = categoryMap.begin(); iter != categoryMap.end(); iter++)
+			outline->AddItem(iter->second);
 
 		// Add all devices under the categories
-		for (unsigned int i = 0; i < fDevices.size(); i++) {
-			Category category = fDevices[i]->GetCategory();
+		for (unsigned int i = 0; i < devices.size(); i++) {
+			Category category = devices[i]->GetCategory();
 
-			iter = fCategoryMap.find(category);
-			if (iter == fCategoryMap.end()) {
+			iter = categoryMap.find(category);
+			if (iter == categoryMap.end()) {
 				std::cerr
 					<< "Tried to add device without category, file a bug\n";
 				continue;
 			} else {
-				fDevicesOutline->AddUnder(fDevices[i], iter->second);
+				outline->AddUnder(devices[i], iter->second);
 			}
 		}
-		fDevicesOutline->SortItemsUnder(NULL, false, SortItemsCompare);
-	} else if (fOrderBy == ORDER_BY_CONNECTION) {
-		for (unsigned int i = 0; i < fDevices.size(); i++) {
-			if (fDevices[i]->GetPhysicalParent() == NULL) {
+		outline->SortItemsUnder(NULL, false, SortItemsCompare);
+	} else if (orderBy == ORDER_BY_CONNECTION) {
+		for (unsigned int i = 0; i < devices.size(); i++) {
+			if (devices[i]->GetPhysicalParent() == NULL) {
 				// process each parent device and its children
-				fDevicesOutline->AddItem(fDevices[i]);
-				AddChildrenToOutlineByConnection(fDevices[i]);
+				outline->AddItem(devices[i]);
+				AddChildrenToOutlineByConnection(outline, devices, devices[i]);
 			}
 		}
 	}
@@ -295,12 +294,13 @@ DevicesView::RebuildDevicesOutline()
 
 
 void
-DevicesView::AddChildrenToOutlineByConnection(Device* parent)
+DevicesView::AddChildrenToOutlineByConnection(BOutlineListView* outline, const Devices& devices,
+	Device* parent)
 {
-	for (unsigned int i = 0; i < fDevices.size(); i++) {
-		if (fDevices[i]->GetPhysicalParent() == parent) {
-			fDevicesOutline->AddUnder(fDevices[i], parent);
-			AddChildrenToOutlineByConnection(fDevices[i]);
+	for (unsigned int i = 0; i < devices.size(); i++) {
+		if (devices[i]->GetPhysicalParent() == parent) {
+			outline->AddUnder(devices[i], parent);
+			AddChildrenToOutlineByConnection(outline, devices, devices[i]);
 		}
 	}
 }
@@ -578,7 +578,7 @@ DevicesView::_SetOrderBy(OrderByType orderBy)
 
 	fOrderBy = orderBy;
 	RescanDevices();
-	RebuildDevicesOutline();
+	RebuildDevicesOutline(fDevicesOutline, fDevices, fCategoryMap, fOrderBy);
 
 	if (selectedCookie != 0) {
 		for (int32 i = 0; i < fDevicesOutline->CountItems(); i++) {
@@ -686,7 +686,7 @@ DevicesView::MessageReceived(BMessage *msg)
 		{
 			fAttributesView->Clear();
 			RescanDevices();
-			RebuildDevicesOutline();
+			RebuildDevicesOutline(fDevicesOutline, fDevices, fCategoryMap, fOrderBy);
 			break;
 		}
 
