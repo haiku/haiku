@@ -118,6 +118,13 @@ UnitTestLib haikudepottest.so :
 	localestub
 ;
 
+{
+	local sourceDir = [ FDirName resources ] ;
+	local destDir = [ FDirName apps haikudepot ] ;
+	local files = sample.tar ;
+	UnitTestResources $(files:D=$(sourceDir)) : $(destDir) ;
+}
+
 Application TextDocumentTest :
 	TextDocumentTest.cpp
 

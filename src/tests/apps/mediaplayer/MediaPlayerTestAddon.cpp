@@ -1,15 +1,15 @@
+/*
+ * Copyright 2026 Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "FileReadWriteTest.h"
 
-
-BTestSuite*
-getTestSuite()
+const char*
+getTestSuiteName()
 {
-	BTestSuite* suite = new BTestSuite("MediaPlayer");
-
-	FileReadWriteTest::AddTests(*suite);
-
-	return suite;
+	return "MediaPlayer";
 }

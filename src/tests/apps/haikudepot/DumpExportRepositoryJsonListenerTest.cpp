@@ -3,17 +3,16 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "DumpExportRepositoryJsonListener.h"
-#include "DumpExportRepositoryJsonListenerTest.h"
-#include "DumpExportRepositoryModel.h"
-
-#include <stdio.h>
 
 #include <AutoDeleter.h>
 #include <Json.h>
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
+#include "DumpExportRepositoryJsonListener.h"
+
 
 // This repository example is valid, but does have some additional
 // rubbish data at the start.  Some values have been shortened to make
@@ -120,15 +119,27 @@
 
 class TestBulkContainerItemListener : public DumpExportRepositoryListener {
 public:
-							TestBulkContainerItemListener();
-		virtual				~TestBulkContainerItemListener();
+							TestBulkContainerItemListener() { fWasCompleteInvoked = false; }
+		virtual				~TestBulkContainerItemListener() {}
 
-			bool			Handle(DumpExportRepositoryRef item);
-			void			Complete();
+			bool			Handle(DumpExportRepositoryRef item)
+			{
+				if (!fConcatenatedCodes.IsEmpty())
+					fConcatenatedCodes.Append(" ");
+				fConcatenatedCodes.Append(item->Code().String());
+				for (int32 i = 0; i < item->CountRepositorySources(); i++) {
+					if (!fConcatenatedSourcesUrl.IsEmpty())
+						fConcatenatedSourcesUrl.Append(" ");
+					fConcatenatedSourcesUrl.Append(
+						item->RepositorySourcesItemAt(i)->Identifier().String());
+				}
+				return true;
+			}
+			void			Complete() { fWasCompleteInvoked = true; }
 
-			BString			ConcatenatedCodes();
-			BString			ConcatenatedSourcesUrls();
-			bool			WasCompleteInvoked();
+			BString			ConcatenatedCodes() { return fConcatenatedCodes; }
+			BString			ConcatenatedSourcesUrls() { return fConcatenatedSourcesUrl; }
+			bool			WasCompleteInvoked() { return fWasCompleteInvoked; }
 
 private:
 			bool			fWasCompleteInvoked;
@@ -137,172 +148,87 @@ private:
 };
 
 
-DumpExportRepositoryJsonListenerTest::DumpExportRepositoryJsonListenerTest()
-{
-}
+class DumpExportRepositoryJsonListenerTest : public CppUnit::TestFixture {
+	CPPUNIT_TEST_SUITE(DumpExportRepositoryJsonListenerTest);
+	CPPUNIT_TEST(SingleRepositoryJson_Parse_ReturnsSuccess);
+	CPPUNIT_TEST(BulkContainerRepositoryJson_Parse_ReturnsSuccess);
+	CPPUNIT_TEST_SUITE_END();
 
+public:
+	void SingleRepositoryJson_Parse_ReturnsSuccess()
+	{
+		BDataIO* inputData = new BMemoryIO(SINGLE_REPOSITORY_WITH_RUBBISH,
+			strlen(SINGLE_REPOSITORY_WITH_RUBBISH));
+		ObjectDeleter<BDataIO> inputDataDeleter(inputData);
 
-DumpExportRepositoryJsonListenerTest::~DumpExportRepositoryJsonListenerTest()
-{
-}
+		SingleDumpExportRepositoryJsonListener* listener =
+			new SingleDumpExportRepositoryJsonListener();
+		ObjectDeleter<SingleDumpExportRepositoryJsonListener>
+			listenerDeleter(listener);
 
+		BPrivate::BJson::Parse(inputData, listener);
 
-void
-DumpExportRepositoryJsonListenerTest::TestBulkContainer()
-{
-	BDataIO* inputData = new BMemoryIO(BULK_CONTAINER_REPOSITORY_WITH_RUBBISH,
-		strlen(BULK_CONTAINER_REPOSITORY_WITH_RUBBISH));
-	ObjectDeleter<BDataIO> inputDataDeleter(inputData);
+		DumpExportRepositoryRef repository = listener->Result();
 
-	TestBulkContainerItemListener itemListener;
+		CPPUNIT_ASSERT_EQUAL(B_OK, listener->ErrorStatus());
 
-	BulkContainerDumpExportRepositoryJsonListener* listener =
-		new BulkContainerDumpExportRepositoryJsonListener(&itemListener);
-	ObjectDeleter<BulkContainerDumpExportRepositoryJsonListener>
-		listenerDeleter(listener);
+		CPPUNIT_ASSERT_EQUAL(
+			BString("haikuports"), (repository->Code()));
+		CPPUNIT_ASSERT_EQUAL(
+			BString("HaikuPorts"), (repository->Name()));
+		CPPUNIT_ASSERT_EQUAL(
+			BString("HaikuPorts is a centralized collection..."),
+			(repository->Description()));
+		CPPUNIT_ASSERT_EQUAL(
+			BString("https://example.com"),
+			(repository->InformationUrl()));
+		CPPUNIT_ASSERT_EQUAL(2, (int)repository->CountRepositorySources());
 
-// ----------------------
-	BPrivate::BJson::Parse(inputData, listener);
-// ----------------------
+		DumpExportRepositorySource *source0 =
+			repository->RepositorySourcesItemAt(0);
+		DumpExportRepositorySource *source1 =
+			repository->RepositorySourcesItemAt(1);
 
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("!B_OK",
-		B_OK, listener->ErrorStatus());
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("!WasCompleteInvoked",
-		true, itemListener.WasCompleteInvoked());
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("!ConcatenatedCodes",
-		BString("fatelk besly clasqm haikuports"),
-		itemListener.ConcatenatedCodes());
-	CPPUNIT_ASSERT_EQUAL_MESSAGE("!ConcatenatedSourcesUrls",
-		BString("can-be-anything"
-			" haiku:hpkr:wojfqdi23e"
-			" haiku:hpkr:23r829rro"
-			" haiku:hpkr:joihir32r"
-			" haiku:hpkr:jqod2333r3r"
-			" haiku:hpkr:wyeuhfwiewe"),
-		itemListener.ConcatenatedSourcesUrls());
-}
+		CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_64"), source0->Code());
+		CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_64"), source0->Identifier());
+		CPPUNIT_ASSERT_EQUAL(BString("zing"), source0->ExtraIdentifiersItemAt(0));
 
-
-void
-DumpExportRepositoryJsonListenerTest::TestSingle()
-{
-	BDataIO* inputData = new BMemoryIO(SINGLE_REPOSITORY_WITH_RUBBISH,
-		strlen(SINGLE_REPOSITORY_WITH_RUBBISH));
-	ObjectDeleter<BDataIO> inputDataDeleter(inputData);
-
-	SingleDumpExportRepositoryJsonListener* listener =
-		new SingleDumpExportRepositoryJsonListener();
-	ObjectDeleter<SingleDumpExportRepositoryJsonListener>
-		listenerDeleter(listener);
-
-// ----------------------
-	BPrivate::BJson::Parse(inputData, listener);
-// ----------------------
-
-	DumpExportRepositoryRef repository = listener->Result();
-
-	CPPUNIT_ASSERT_EQUAL(B_OK, listener->ErrorStatus());
-
-	CPPUNIT_ASSERT_EQUAL(BString("haikuports"), repository->Code());
-	CPPUNIT_ASSERT_EQUAL(BString("HaikuPorts"), repository->Name());
-	CPPUNIT_ASSERT_EQUAL(BString("HaikuPorts is a centralized collection..."),
-		repository->Description());
-	CPPUNIT_ASSERT_EQUAL(BString("https://example.com"), repository->InformationUrl());
-	CPPUNIT_ASSERT_EQUAL(2, repository->CountRepositorySources());
-
-	DumpExportRepositorySource *source0 =
-		repository->RepositorySourcesItemAt(0);
-	DumpExportRepositorySource *source1 =
-		repository->RepositorySourcesItemAt(1);
-
-	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_64"), source0->Code());
-	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_64"), source0->Identifier());
-	CPPUNIT_ASSERT_EQUAL(BString("zing"), source0->ExtraIdentifiersItemAt(0));
-
-	CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_gcc2"), source1->Code());
-	CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_gcc2"), source1->Identifier());
-}
-
-
-/*static*/ void
-DumpExportRepositoryJsonListenerTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite(
-		"DumpExportRepositoryJsonListenerTest");
-
-	suite.addTest(
-		new CppUnit::TestCaller<DumpExportRepositoryJsonListenerTest>(
-			"DumpExportRepositoryJsonListenerTest::TestSingle",
-			&DumpExportRepositoryJsonListenerTest::TestSingle));
-
-	suite.addTest(
-		new CppUnit::TestCaller<DumpExportRepositoryJsonListenerTest>(
-			"DumpExportRepositoryJsonListenerTest::TestBulkContainer",
-			&DumpExportRepositoryJsonListenerTest::TestBulkContainer));
-
-	parent.addTest("DumpExportRepositoryJsonListenerTest", &suite);
-}
-
-
-TestBulkContainerItemListener::TestBulkContainerItemListener()
-{
-	fWasCompleteInvoked = false;
-}
-
-
-TestBulkContainerItemListener::~TestBulkContainerItemListener()
-{
-}
-
-/*! Note that the item object will be deleted after this method
-    is invoked.  The Handle method need not take responsibility
-    for this.
-*/
-
-bool
-TestBulkContainerItemListener::Handle(DumpExportRepositoryRef item)
-{
-	int32 i;
-
-	if (!fConcatenatedCodes.IsEmpty())
-		fConcatenatedCodes.Append(" ");
-
-	fConcatenatedCodes.Append(item->Code().String());
-
-	for (i = 0; i < item->CountRepositorySources(); i++) {
-		if (!fConcatenatedSourcesUrl.IsEmpty())
-    		fConcatenatedSourcesUrl.Append(" ");
-
-		fConcatenatedSourcesUrl.Append(item->RepositorySourcesItemAt(i)->Identifier().String());
+		CPPUNIT_ASSERT_EQUAL(BString("haikuports_x86_gcc2"), source1->Code());
+		CPPUNIT_ASSERT_EQUAL(BString("haiku:hpkr:haikuports_x86_gcc2"), source1->Identifier());
 	}
 
-	return true;
-}
+	void BulkContainerRepositoryJson_Parse_ReturnsSuccess()
+	{
+		BDataIO* inputData = new BMemoryIO(BULK_CONTAINER_REPOSITORY_WITH_RUBBISH,
+			strlen(BULK_CONTAINER_REPOSITORY_WITH_RUBBISH));
+		ObjectDeleter<BDataIO> inputDataDeleter(inputData);
+
+		TestBulkContainerItemListener itemListener;
+
+		BulkContainerDumpExportRepositoryJsonListener* listener =
+			new BulkContainerDumpExportRepositoryJsonListener(&itemListener);
+		ObjectDeleter<BulkContainerDumpExportRepositoryJsonListener>
+			listenerDeleter(listener);
+
+		BPrivate::BJson::Parse(inputData, listener);
+
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("!B_OK",
+			B_OK, listener->ErrorStatus());
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("!WasCompleteInvoked",
+			true, itemListener.WasCompleteInvoked());
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("!ConcatenatedCodes",
+			BString("fatelk besly clasqm haikuports"),
+			itemListener.ConcatenatedCodes());
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("!ConcatenatedSourcesUrls",
+			BString("can-be-anything"
+				" haiku:hpkr:wojfqdi23e"
+				" haiku:hpkr:23r829rro"
+				" haiku:hpkr:joihir32r"
+				" haiku:hpkr:jqod2333r3r"
+				" haiku:hpkr:wyeuhfwiewe"),
+			itemListener.ConcatenatedSourcesUrls());
+	}
+};
 
 
-void
-TestBulkContainerItemListener::Complete()
-{
-	fWasCompleteInvoked = true;
-}
-
-
-BString
-TestBulkContainerItemListener::ConcatenatedCodes()
-{
-	return fConcatenatedCodes;
-}
-
-
-BString
-TestBulkContainerItemListener::ConcatenatedSourcesUrls()
-{
-	return fConcatenatedSourcesUrl;
-}
-
-
-bool
-TestBulkContainerItemListener::WasCompleteInvoked()
-{
-	return fWasCompleteInvoked;
-}
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(DumpExportRepositoryJsonListenerTest, getTestSuiteName());
