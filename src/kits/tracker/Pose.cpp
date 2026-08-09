@@ -196,17 +196,12 @@ BPose::Commit(bool saveChanges, BPoint loc, BPoseView* poseView, int32 poseIndex
 
 
 inline bool
-OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView,
-	BColumn* column, BPoint poseLoc, BPoint where)
+OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView, BColumn* column,
+	BPoint poseLoc, BPoint where)
 {
-	BRect rect;
-	if (poseView->ViewMode() == kListMode)
-		rect = widget->CalcClickRect(poseLoc, column, poseView);
-	else
-		rect = widget->CalcClickRect(pose->Location(poseView), NULL, poseView);
-
+	BRect rect(widget->CalcClickRect(poseLoc, column, poseView));
 	if (rect.Contains(where)) {
-		widget->MouseUp(rect, poseView, pose, where);
+		widget->DoMouseUp(poseView, pose);
 		return true;
 	}
 
@@ -215,7 +210,7 @@ OneMouseUp(BTextWidget* widget, BPose* pose, BPoseView* poseView,
 
 
 void
-BPose::MouseUp(BPoint poseLoc, BPoseView* poseView, BPoint where, int32)
+BPose::DoMouseUp(BPoseView* poseView, BPoint poseLoc, BPoint where)
 {
 	WhileEachTextWidget(this, poseView, OneMouseUp, poseLoc, where);
 }
@@ -388,19 +383,10 @@ BPose::EditFirstWidget(BPoint poseLoc, BPoseView* poseView)
 {
 	// find first editable widget
 	BColumn* column;
-	for (int32 i = 0; (column = poseView->ColumnAt(i)) != NULL; i++) {
+	for (int32 index = 0; (column = poseView->ColumnAt(index)) != NULL; index++) {
 		BTextWidget* widget = WidgetFor(column->AttrHash());
-
 		if (widget != NULL && widget->IsEditable()) {
-			BRect bounds;
-			// ToDo:
-			// fold the three StartEdit code sequences into a cover call
-			if (poseView->ViewMode() == kListMode)
-				bounds = widget->CalcRect(poseLoc, column, poseView);
-			else
-				bounds = widget->CalcRect(Location(poseView), NULL, poseView);
-
-			widget->StartEdit(bounds, poseView, this);
+			widget->StartEdit(poseView, this, column);
 			break;
 		}
 	}
@@ -412,8 +398,7 @@ BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 {
 	bool found = false;
 	int32 delta = next ? 1 : -1;
-	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ;
-			index += delta) {
+	for (int32 index = next ? 0 : poseView->CountColumns() - 1; ; index += delta) {
 		BColumn* column = poseView->ColumnAt(index);
 		if (column == NULL) {
 			// out of columns
@@ -433,15 +418,7 @@ BPose::EditPreviousNextWidgetCommon(BPoseView* poseView, bool next)
 		}
 
 		if (found && column->Editable()) {
-			BRect bounds;
-			if (poseView->ViewMode() == kListMode) {
-				int32 poseIndex = poseView->IndexOfPose(this);
-				BPoint poseLoc(0, poseIndex* poseView->ListElemHeight());
-				bounds = widget->CalcRect(poseLoc, column, poseView);
-			} else
-				bounds = widget->CalcRect(Location(poseView), NULL, poseView);
-
-			widget->StartEdit(bounds, poseView, this);
+			widget->StartEdit(poseView, this, column);
 			break;
 		}
 	}

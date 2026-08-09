@@ -49,7 +49,6 @@ class BColumn;
 
 struct MouseUpParams {
 	BPose* 		pose;
-	BRect 		bounds;
 	BPoseView* 	poseView;
 };
 
@@ -66,7 +65,7 @@ public:
 		// second call is used for offscreen drawing, where PoseView
 		// and current drawing view are different
 
-	void MouseUp(BRect bounds, BPoseView*, BPose*, BPoint mouseLoc);
+	void DoMouseUp(BPoseView*, BPose*);
 
 	BRect CalcRect(BPoint poseLoc, const BColumn*, const BPoseView*);
 		// returns the rect derived from the formatted string width
@@ -81,9 +80,8 @@ public:
 		// after an update call this to determine the old rect so that
 		// we can invalidate properly
 
-	void StartEdit(BRect bounds, BPoseView*, BPose*);
-	void StopEdit(bool saveChanges, BPoint loc, BPoseView*, BPose*,
-		int32 index);
+	void StartEdit(BPoseView*, BPose*, BColumn*);
+	void StopEdit(bool saveChanges, BPoint loc, BPoseView*, BPose*, int32 index);
 
 	void SelectAll(BPoseView* view);
 	void CheckAndUpdate(BPoint, const BColumn*, BPoseView*, bool visible);

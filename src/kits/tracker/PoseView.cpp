@@ -7560,15 +7560,15 @@ BPoseView::MouseUp(BPoint where)
 		if (!fTrackRightMouseUp) {
 			bool wasSelected = clickedPose->IsSelected();
 
-			BPoint loc;
+			BPoint poseLoc;
 			if (ViewMode() == kListMode)
-				loc = BPoint(0, index * fListElemHeight);
+				poseLoc = BPoint(0, index * fListElemHeight);
 			else
-				loc = clickedPose->Location(this);
+				poseLoc = clickedPose->Location(this);
 
 			// do not check for double-click or rename after dragging
 			if (!wasDragging)
-				clickedPose->MouseUp(loc, this, where, index);
+				clickedPose->DoMouseUp(this, poseLoc, where);
 
 			// reselect clicked pose
 			bool shouldSelect = wasSelected && !ExtendSelection();

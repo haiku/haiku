@@ -253,7 +253,8 @@ BTextWidget::CheckExpiration()
 		if (delta > doubleClickSpeed) {
 			// at least 'doubleClickSpeed' microseconds elapsed with no click
 			fLastClickedTime = 0;
-			StartEdit(fParams.bounds, fParams.poseView, fParams.pose);
+			BColumn* column = fParams.poseView->ColumnFor(fAttrHash);
+			StartEdit(fParams.poseView, fParams.pose, column);
 		}
 	} else {
 		CancelWait();
@@ -270,7 +271,7 @@ BTextWidget::CancelWait()
 
 
 void
-BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
+BTextWidget::DoMouseUp(BPoseView* view, BPose* pose)
 {
 	// Register the time of that click.  The PoseView, through its Pulse()
 	// will allow us to StartEdit() if no other click have been registered since
@@ -295,7 +296,6 @@ BTextWidget::MouseUp(BRect bounds, BPoseView* view, BPose* pose, BPoint)
 		view->SetTextWidgetToCheck(this);
 
 		fParams.pose = pose;
-		fParams.bounds = bounds;
 		fParams.poseView = view;
 	} else
 		fLastClickedTime = 0;
@@ -434,10 +434,11 @@ TextViewPasteFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 
 
 void
-BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
+BTextWidget::StartEdit(BPoseView* view, BPose* pose, BColumn* column)
 {
 	ASSERT(view != NULL);
 	ASSERT(view->Window() != NULL);
+	ASSERT(pose != NULL);
 
 	view->SetTextWidgetToCheck(NULL, this);
 	if (!IsEditable() || IsActive())
@@ -452,7 +453,14 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	else
 		initialTextColor = view->HighColor();
 
-	BRect rect(bounds);
+	// The pose may have been dragged to a new location.
+	BPoint poseLoc;
+	if (view->ViewMode() == kListMode)
+		poseLoc = BPoint(0, view->IndexOfPose(pose) * view->ListElemHeight());
+	else
+		poseLoc = pose->Location(view);
+
+	BRect rect(CalcRect(poseLoc, column, view));
 	rect.OffsetTo(roundf(rect.left), roundf(rect.top));
 
 	BTextView* textView = new BTextView(rect.InsetByCopy(-2, -2), "WidgetTextView",
@@ -489,6 +497,9 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	if (!view->SelectedVolumeIsReadOnly())
 		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 
+	// truncated text bounds
+	BRect bounds(rect);
+
 	// get full text length
 	rect.right = rect.left + textView->LineWidth() - 1;
 	rect.bottom = rect.top + textView->LineHeight() - 1;
@@ -502,7 +513,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 		// limit max width to 30em in icon and mini icon mode
 		fMaxWidth = textView->StringWidth("M") * 30;
 
-		// center under the icon if text is longer than column-width
+		// center under the icon if text is longer than truncated label width
 		if (view->ViewMode() == kIconMode && rect.Width() > bounds.Width()) {
 			float newWidth = std::min(fMaxWidth, rect.Width());
 			rect.OffsetBy(roundf((bounds.Width() - newWidth) / 2), 0);

@@ -76,7 +76,7 @@ public:
 
 	void DrawIcon(BPoint where, BView* view, BSize size, bool drawUnselected = false);
 	void DrawToggleSwitch(BRect, BPoseView*);
-	void MouseUp(BPoint poseLoc, BPoseView*, BPoint where, int32 index);
+	void DoMouseUp(BPoseView*, BPoint poseLoc, BPoint where);
 	Model* TargetModel() const;
 	Model* ResolvedModel() const;
 	void Select(bool selected);
