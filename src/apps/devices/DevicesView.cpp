@@ -260,7 +260,7 @@ DevicesView::RebuildDevicesOutline()
 					fDevicesOutline->AddItem(fDevices[i]);
 			}
 		}
-		fDevicesOutline->SortItemsUnder(NULL, true, SortItemsCompare);
+		fDevicesOutline->SortItemsUnder(NULL, false, SortItemsCompare);
 	} else if (fOrderBy == ORDER_BY_CATEGORY) {
 		// Add all categories to the outline
 		CategoryMapIterator iter;
@@ -281,7 +281,7 @@ DevicesView::RebuildDevicesOutline()
 				fDevicesOutline->AddUnder(fDevices[i], iter->second);
 			}
 		}
-		fDevicesOutline->SortItemsUnder(NULL, true, SortItemsCompare);
+		fDevicesOutline->SortItemsUnder(NULL, false, SortItemsCompare);
 	} else if (fOrderBy == ORDER_BY_CONNECTION) {
 		for (unsigned int i = 0; i < fDevices.size(); i++) {
 			if (fDevices[i]->GetPhysicalParent() == NULL) {
