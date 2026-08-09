@@ -261,6 +261,8 @@ arch_efi_default_prefix()
 	return BString("BOOTRISCV32");
 #elif defined(__riscv) && __riscv_xlen == 64
 	return BString("BOOTRISCV64");
+#elif defined(__powerpc__)
+	return BString("BOOTPPC");
 #else
 	#error "Error: Unknown EFI Architecture!"
 #endif
