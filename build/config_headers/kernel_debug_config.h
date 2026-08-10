@@ -5,7 +5,7 @@
 // 0: Disables all debug code that hasn't been enabled otherwise.
 // 1: Enables some lightweight debug code.
 // 2: Enables more debug code. Will impact performance.
-#define KDEBUG_LEVEL 2
+#define KDEBUG_LEVEL 1
 
 #define KDEBUG_LEVEL_2	(KDEBUG_LEVEL >= 2)
 #define KDEBUG_LEVEL_1	(KDEBUG_LEVEL >= 1)
@@ -16,7 +16,7 @@
 
 // Enables kernel ASSERT()s and various checks, locking primitives aren't
 // benaphore-style.
-#define KDEBUG							KDEBUG_LEVEL_1
+#define KDEBUG							KDEBUG_LEVEL_2
 
 // Size of the heap used by the kernel debugger.
 #define KDEBUG_HEAP						(64 * 1024)
