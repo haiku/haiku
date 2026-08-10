@@ -423,8 +423,8 @@ PageWriterRun::Init(uint32 maxPages)
 
 PageWriterRun::~PageWriterRun()
 {
-	delete fWrappers;
-	delete fTransfers;
+	delete[] fWrappers;
+	delete[] fTransfers;
 }
 
 
