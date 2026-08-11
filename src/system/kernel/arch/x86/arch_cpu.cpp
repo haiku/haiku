@@ -390,322 +390,171 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 			return;
 	}
 
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
-		strlcat(features, "fpu ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_VME)
-		strlcat(features, "vme ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DE)
-		strlcat(features, "de ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE)
-		strlcat(features, "pse ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TSC)
-		strlcat(features, "tsc ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MSR)
-		strlcat(features, "msr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAE)
-		strlcat(features, "pae ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCE)
-		strlcat(features, "mce ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CX8)
-		strlcat(features, "cx8 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_APIC)
-		strlcat(features, "apic ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SEP)
-		strlcat(features, "sep ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MTRR)
-		strlcat(features, "mtrr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PGE)
-		strlcat(features, "pge ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MCA)
-		strlcat(features, "mca ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CMOV)
-		strlcat(features, "cmov ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PAT)
-		strlcat(features, "pat ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSE36)
-		strlcat(features, "pse36 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PSN)
-		strlcat(features, "psn ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_CLFSH)
-		strlcat(features, "clfsh ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_DS)
-		strlcat(features, "ds ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_ACPI)
-		strlcat(features, "acpi ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_MMX)
-		strlcat(features, "mmx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FXSR)
-		strlcat(features, "fxsr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE)
-		strlcat(features, "sse ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SSE2)
-		strlcat(features, "sse2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_SS)
-		strlcat(features, "ss ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_HTT)
-		strlcat(features, "htt ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_TM)
-		strlcat(features, "tm ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_PBE)
-		strlcat(features, "pbe ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE3)
-		strlcat(features, "sse3 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PCLMULQDQ)
-		strlcat(features, "pclmulqdq ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DTES64)
-		strlcat(features, "dtes64 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MONITOR)
-		strlcat(features, "monitor ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DSCPL)
-		strlcat(features, "dscpl ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_VMX)
-		strlcat(features, "vmx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SMX)
-		strlcat(features, "smx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_EST)
-		strlcat(features, "est ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TM2)
-		strlcat(features, "tm2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSSE3)
-		strlcat(features, "ssse3 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CNXTID)
-		strlcat(features, "cnxtid ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_FMA)
-		strlcat(features, "fma ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_CX16)
-		strlcat(features, "cx16 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_XTPR)
-		strlcat(features, "xtpr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PDCM)
-		strlcat(features, "pdcm ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_PCID)
-		strlcat(features, "pcid ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_DCA)
-		strlcat(features, "dca ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE4_1)
-		strlcat(features, "sse4_1 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_SSE4_2)
-		strlcat(features, "sse4_2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_X2APIC)
-		strlcat(features, "x2apic ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_MOVBE)
-		strlcat(features, "movbe ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_POPCNT)
-		strlcat(features, "popcnt ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_TSCDEADLINE)
-		strlcat(features, "tscdeadline ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_AES)
-		strlcat(features, "aes ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_XSAVE)
-		strlcat(features, "xsave ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_OSXSAVE)
-		strlcat(features, "osxsave ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_AVX)
-		strlcat(features, "avx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_F16C)
-		strlcat(features, "f16c ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_RDRND)
-		strlcat(features, "rdrnd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT] & IA32_FEATURE_EXT_HYPERVISOR)
-		strlcat(features, "hypervisor ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD_ECX] & IA32_FEATURE_AMD_EXT_MWAITX)
-		strlcat(features, "mwaitx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_SYSCALL)
-		strlcat(features, "syscall ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_NX)
-		strlcat(features, "nx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_MMXEXT)
-		strlcat(features, "mmxext ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_FFXSR)
-		strlcat(features, "ffxsr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_PDPE1GB)
-		strlcat(features, "pdpe1gb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_LONG)
-		strlcat(features, "long ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOWEXT)
-		strlcat(features, "3dnowext ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_AMD] & IA32_FEATURE_AMD_EXT_3DNOW)
-		strlcat(features, "3dnow ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_DTS)
-		strlcat(features, "dts ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ITB)
-		strlcat(features, "itb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ARAT)
-		strlcat(features, "arat ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_PLN)
-		strlcat(features, "pln ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_ECMD)
-		strlcat(features, "ecmd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_PTM)
-		strlcat(features, "ptm ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP)
-		strlcat(features, "hwp ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_NOTIFY)
-		strlcat(features, "hwp_notify ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_ACTWIN)
-		strlcat(features, "hwp_actwin ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_EPP)
-		strlcat(features, "hwp_epp ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_PLR)
-		strlcat(features, "hwp_plr ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HDC)
-		strlcat(features, "hdc ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_TBMT3)
-		strlcat(features, "tbmt3 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_CAP)
-		strlcat(features, "hwp_cap ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_PECI)
-		strlcat(features, "hwp_peci ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_FLEX)
-		strlcat(features, "hwp_flex ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_FAST)
-		strlcat(features, "hwp_fast ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HW_FEEDBACK)
-		strlcat(features, "hw_feedback ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_EAX] & IA32_FEATURE_HWP_IGNIDL)
-		strlcat(features, "hwp_ignidl ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_APERFMPERF)
-		strlcat(features, "aperfmperf ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_6_ECX] & IA32_FEATURE_EPB)
-		strlcat(features, "epb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_TSC_ADJUST)
-		strlcat(features, "tsc_adjust ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SGX)
-		strlcat(features, "sgx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_BMI1)
-		strlcat(features, "bmi1 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_HLE)
-		strlcat(features, "hle ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX2)
-		strlcat(features, "avx2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SMEP)
-		strlcat(features, "smep ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_BMI2)
-		strlcat(features, "bmi2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_ERMS)
-		strlcat(features, "erms ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_INVPCID)
-		strlcat(features, "invpcid ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RTM)
-		strlcat(features, "rtm ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CQM)
-		strlcat(features, "cqm ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_MPX)
-		strlcat(features, "mpx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RDT_A)
-		strlcat(features, "rdt_a ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512F)
-		strlcat(features, "avx512f ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512DQ)
-		strlcat(features, "avx512dq ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_RDSEED)
-		strlcat(features, "rdseed ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_ADX)
-		strlcat(features, "adx ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SMAP)
-		strlcat(features, "smap ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512IFMA)
-		strlcat(features, "avx512ifma ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_PCOMMIT)
-		strlcat(features, "pcommit ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CLFLUSHOPT)
-		strlcat(features, "cflushopt ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_CLWB)
-		strlcat(features, "clwb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_INTEL_PT)
-		strlcat(features, "intel_pt ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512PF)
-		strlcat(features, "avx512pf ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512ER)
-		strlcat(features, "avx512er ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512CD)
-		strlcat(features, "avx512cd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_SHA_NI)
-		strlcat(features, "sha_ni ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512BW)
-		strlcat(features, "avx512bw ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512VI)
-		strlcat(features, "avx512vi ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI)
-		strlcat(features, "avx512vmbi ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_UMIP)
-		strlcat(features, "umip ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_PKU)
-		strlcat(features, "pku ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_OSPKE)
-		strlcat(features, "ospke ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_WAITPKG)
-		strlcat(features, "waitpkg ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI2)
-		strlcat(features, "avx512vmbi2 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_GFNI)
-		strlcat(features, "gfni ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VAES)
-		strlcat(features, "vaes ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VPCLMULQDQ)
-		strlcat(features, "vpclmulqdq ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VNNI)
-		strlcat(features, "avx512vnni ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_BITALG)
-		strlcat(features, "avx512bitalg ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VPOPCNTDQ)
-		strlcat(features, "avx512vpopcntdq ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_LA57)
-		strlcat(features, "la57 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_RDPID)
-		strlcat(features, "rdpid ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_SGX_LC)
-		strlcat(features, "sgx_lc ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_HYBRID_CPU)
-		strlcat(features, "hybrid ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
-		strlcat(features, "ibrs ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
-		strlcat(features, "stibp ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_L1D_FLUSH)
-		strlcat(features, "l1d_flush ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_ARCH_CAPABILITIES)
-		strlcat(features, "msr_arch ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_SSBD)
-		strlcat(features, "ssbd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_LASS)
-		strlcat(features, "lass ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_FRED)
-		strlcat(features, "fred ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_LKGS)
-		strlcat(features, "lkgs ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_WRMSRNS)
-		strlcat(features, "wrmsrns ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_7_1_EAX] & IA32_FEATURE_NMI_SRC)
-		strlcat(features, "nmi_src ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_AMD_HW_PSTATE)
-		strlcat(features, "hwpstate ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_INVARIANT_TSC)
-		strlcat(features, "constant_tsc ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_CPB)
-		strlcat(features, "cpb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_PROC_FEEDBACK)
-		strlcat(features, "proc_feedback ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEOPT)
-		strlcat(features, "xsaveopt ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEC)
-		strlcat(features, "xsavec ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XGETBV1)
-		strlcat(features, "xgetbv1 ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVES)
-		strlcat(features, "xsaves ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CLZERO)
-		strlcat(features, "clzero ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_IBPB)
-		strlcat(features, "ibpb ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSBD)
-		strlcat(features, "amd_ssbd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_VIRT_SSBD)
-		strlcat(features, "virt_ssbd ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSB_NO)
-		strlcat(features, "amd_ssb_no ", sizeof(features));
-	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CPPC)
-		strlcat(features, "cppc ", sizeof(features));
+#define FEATURE(TYPE, NAME, STRNAME) \
+	if (cpu->arch.feature[FEATURE_##TYPE] & IA32_FEATURE_##NAME) \
+		strlcat(features, #STRNAME " ", sizeof(features))
+
+	FEATURE(COMMON, FPU, fpu);
+	FEATURE(COMMON, VME, vme);
+	FEATURE(COMMON, DE, de);
+	FEATURE(COMMON, PSE, pse);
+	FEATURE(COMMON, TSC, tsc);
+	FEATURE(COMMON, MSR, msr);
+	FEATURE(COMMON, PAE, pae);
+	FEATURE(COMMON, MCE, mce);
+	FEATURE(COMMON, CX8, cx8);
+	FEATURE(COMMON, APIC, apic);
+	FEATURE(COMMON, SEP, sep);
+	FEATURE(COMMON, MTRR, mtrr);
+	FEATURE(COMMON, PGE, pge);
+	FEATURE(COMMON, MCA, mca);
+	FEATURE(COMMON, CMOV, cmov);
+	FEATURE(COMMON, PAT, pat);
+	FEATURE(COMMON, PSE36, pse36);
+	FEATURE(COMMON, PSN, psn);
+	FEATURE(COMMON, CLFSH, clfsh);
+	FEATURE(COMMON, DS, ds);
+	FEATURE(COMMON, ACPI, acpi);
+	FEATURE(COMMON, MMX, mmx);
+	FEATURE(COMMON, FXSR, fxsr);
+	FEATURE(COMMON, SSE, sse);
+	FEATURE(COMMON, SSE2, sse2);
+	FEATURE(COMMON, SS, ss);
+	FEATURE(COMMON, HTT, htt);
+	FEATURE(COMMON, TM, tm);
+	FEATURE(COMMON, PBE, pbe);
+	FEATURE(EXT, EXT_SSE3, sse3);
+	FEATURE(EXT, EXT_PCLMULQDQ, pclmulqdq);
+	FEATURE(EXT, EXT_DTES64, dtes64);
+	FEATURE(EXT, EXT_MONITOR, monitor);
+	FEATURE(EXT, EXT_DSCPL, dscpl);
+	FEATURE(EXT, EXT_VMX, vmx);
+	FEATURE(EXT, EXT_SMX, smx);
+	FEATURE(EXT, EXT_EST, est);
+	FEATURE(EXT, EXT_TM2, tm2);
+	FEATURE(EXT, EXT_SSSE3, ssse3);
+	FEATURE(EXT, EXT_CNXTID, cnxtid);
+	FEATURE(EXT, EXT_FMA, fma);
+	FEATURE(EXT, EXT_CX16, cx16);
+	FEATURE(EXT, EXT_XTPR, xtpr);
+	FEATURE(EXT, EXT_PDCM, pdcm);
+	FEATURE(EXT, EXT_PCID, pcid);
+	FEATURE(EXT, EXT_DCA, dca);
+	FEATURE(EXT, EXT_SSE4_1, sse4_1);
+	FEATURE(EXT, EXT_SSE4_2, sse4_2);
+	FEATURE(EXT, EXT_X2APIC, x2apic);
+	FEATURE(EXT, EXT_MOVBE, movbe);
+	FEATURE(EXT, EXT_POPCNT, popcnt);
+	FEATURE(EXT, EXT_TSCDEADLINE, tscdeadline);
+	FEATURE(EXT, EXT_AES, aes);
+	FEATURE(EXT, EXT_XSAVE, xsave);
+	FEATURE(EXT, EXT_OSXSAVE, osxsave);
+	FEATURE(EXT, EXT_AVX, avx);
+	FEATURE(EXT, EXT_F16C, f16c);
+	FEATURE(EXT, EXT_RDRND, rdrnd);
+	FEATURE(EXT, EXT_HYPERVISOR, hypervisor);
+	FEATURE(EXT_AMD_ECX, AMD_EXT_MWAITX, mwaitx);
+	FEATURE(EXT_AMD, AMD_EXT_SYSCALL, syscall);
+	FEATURE(EXT_AMD, AMD_EXT_NX, nx);
+	FEATURE(EXT_AMD, AMD_EXT_MMXEXT, mmxext);
+	FEATURE(EXT_AMD, AMD_EXT_FFXSR, ffxsr);
+	FEATURE(EXT_AMD, AMD_EXT_PDPE1GB, pdpe1gb);
+	FEATURE(EXT_AMD, AMD_EXT_LONG, long);
+	FEATURE(EXT_AMD, AMD_EXT_3DNOWEXT, 3dnowext);
+	FEATURE(EXT_AMD, AMD_EXT_3DNOW, 3dnow);
+	FEATURE(6_EAX, DTS, dts);
+	FEATURE(6_EAX, ITB, itb);
+	FEATURE(6_EAX, ARAT, arat);
+	FEATURE(6_EAX, PLN, pln);
+	FEATURE(6_EAX, ECMD, ecmd);
+	FEATURE(6_EAX, PTM, ptm);
+	FEATURE(6_EAX, HWP, hwp);
+	FEATURE(6_EAX, HWP_NOTIFY, hwp_notify);
+	FEATURE(6_EAX, HWP_ACTWIN, hwp_actwin);
+	FEATURE(6_EAX, HWP_EPP, hwp_epp);
+	FEATURE(6_EAX, HWP_PLR, hwp_plr);
+	FEATURE(6_EAX, HDC, hdc);
+	FEATURE(6_EAX, TBMT3, tbmt3);
+	FEATURE(6_EAX, HWP_CAP, hwp_cap);
+	FEATURE(6_EAX, HWP_PECI, hwp_peci);
+	FEATURE(6_EAX, HWP_FLEX, hwp_flex);
+	FEATURE(6_EAX, HWP_FAST, hwp_fast);
+	FEATURE(6_EAX, HW_FEEDBACK, hw_feedback);
+	FEATURE(6_EAX, HWP_IGNIDL, hwp_ignidl);
+	FEATURE(6_ECX, APERFMPERF, aperfmperf);
+	FEATURE(6_ECX, EPB, epb);
+	FEATURE(7_EBX, TSC_ADJUST, tsc_adjust);
+	FEATURE(7_EBX, SGX, sgx);
+	FEATURE(7_EBX, BMI1, bmi1);
+	FEATURE(7_EBX, HLE, hle);
+	FEATURE(7_EBX, AVX2, avx2);
+	FEATURE(7_EBX, SMEP, smep);
+	FEATURE(7_EBX, BMI2, bmi2);
+	FEATURE(7_EBX, ERMS, erms);
+	FEATURE(7_EBX, INVPCID, invpcid);
+	FEATURE(7_EBX, RTM, rtm);
+	FEATURE(7_EBX, CQM, cqm);
+	FEATURE(7_EBX, MPX, mpx);
+	FEATURE(7_EBX, RDT_A, rdt_a);
+	FEATURE(7_EBX, AVX512F, avx512f);
+	FEATURE(7_EBX, AVX512DQ, avx512dq);
+	FEATURE(7_EBX, RDSEED, rdseed);
+	FEATURE(7_EBX, ADX, adx);
+	FEATURE(7_EBX, SMAP, smap);
+	FEATURE(7_EBX, AVX512IFMA, avx512ifma);
+	FEATURE(7_EBX, PCOMMIT, pcommit);
+	FEATURE(7_EBX, CLFLUSHOPT, cflushopt);
+	FEATURE(7_EBX, CLWB, clwb);
+	FEATURE(7_EBX, INTEL_PT, intel_pt);
+	FEATURE(7_EBX, AVX512PF, avx512pf);
+	FEATURE(7_EBX, AVX512ER, avx512er);
+	FEATURE(7_EBX, AVX512CD, avx512cd);
+	FEATURE(7_EBX, SHA_NI, sha_ni);
+	FEATURE(7_EBX, AVX512BW, avx512bw);
+	FEATURE(7_EBX, AVX512VI, avx512vi);
+	FEATURE(7_ECX, AVX512VMBI, avx512vmbi);
+	FEATURE(7_ECX, UMIP, umip);
+	FEATURE(7_ECX, PKU, pku);
+	FEATURE(7_ECX, OSPKE, ospke);
+	FEATURE(7_ECX, WAITPKG, waitpkg);
+	FEATURE(7_ECX, AVX512VMBI2, avx512vmbi2);
+	FEATURE(7_ECX, GFNI, gfni);
+	FEATURE(7_ECX, VAES, vaes);
+	FEATURE(7_ECX, VPCLMULQDQ, vpclmulqdq);
+	FEATURE(7_ECX, AVX512_VNNI, avx512vnni);
+	FEATURE(7_ECX, AVX512_BITALG, avx512bitalg);
+	FEATURE(7_ECX, AVX512_VPOPCNTDQ, avx512vpopcntdq);
+	FEATURE(7_ECX, LA57, la57);
+	FEATURE(7_ECX, RDPID, rdpid);
+	FEATURE(7_ECX, SGX_LC, sgx_lc);
+	FEATURE(7_EDX, HYBRID_CPU, hybrid);
+	FEATURE(7_EDX, IBRS, ibrs);
+	FEATURE(7_EDX, STIBP, stibp);
+	FEATURE(7_EDX, L1D_FLUSH, l1d_flush);
+	FEATURE(7_EDX, ARCH_CAPABILITIES, msr_arch);
+	FEATURE(7_EDX, SSBD, ssbd);
+	FEATURE(7_1_EAX, LASS, lass);
+	FEATURE(7_1_EAX, FRED, fred);
+	FEATURE(7_1_EAX, LKGS, lkgs);
+	FEATURE(7_1_EAX, WRMSRNS, wrmsrns);
+	FEATURE(7_1_EAX, NMI_SRC, nmi_src);
+	FEATURE(EXT_7_EDX, AMD_HW_PSTATE, hwpstate);
+	FEATURE(EXT_7_EDX, INVARIANT_TSC, constant_tsc);
+	FEATURE(EXT_7_EDX, CPB, cpb);
+	FEATURE(EXT_7_EDX, PROC_FEEDBACK, proc_feedback);
+	FEATURE(D_1_EAX, XSAVEOPT, xsaveopt);
+	FEATURE(D_1_EAX, XSAVEC, xsavec);
+	FEATURE(D_1_EAX, XGETBV1, xgetbv1);
+	FEATURE(D_1_EAX, XSAVES, xsaves);
+	FEATURE(EXT_8_EBX, CLZERO, clzero);
+	FEATURE(EXT_8_EBX, IBPB, ibpb);
+	FEATURE(EXT_8_EBX, AMD_SSBD, amd_ssbd);
+	FEATURE(EXT_8_EBX, VIRT_SSBD, virt_ssbd);
+	FEATURE(EXT_8_EBX, AMD_SSB_NO, amd_ssb_no);
+	FEATURE(EXT_8_EBX, CPPC, cppc);
+
+#undef FEATURE
+
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
 #endif	// DUMP_FEATURE_STRING
