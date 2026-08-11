@@ -196,8 +196,15 @@ pack_irqs()
 		return;
 
 	cpu_ent* cpu = get_cpu_struct();
-	if (smallTaskCore == CoreEntry::GetCore(cpu->cpu_num))
+	CoreEntry* thisCore = CoreEntry::GetCore(cpu->cpu_num);
+	if (smallTaskCore == thisCore)
 		return;
+
+	// Avoid packing IRQs if it's not really going to change much.
+	if (thisCore->GetLoad() >= smallTaskCore->GetLoad()
+			|| (smallTaskCore->GetLoad() - thisCore->GetLoad()) < kLoadDifference) {
+		return;
+	}
 
 	SpinLocker locker(cpu->irqs_lock);
 	while (cpu->irqs.First() != NULL) {
