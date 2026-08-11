@@ -435,26 +435,6 @@ ucode_load(BootVolume& volume)
 }
 
 
-extern "C" bigtime_t
-system_time()
-{
-	uint64 tsc = rdtsc_fenced();
-	uint64 lo = (uint32)tsc;
-	uint64 hi = tsc >> 32;
-	return ((lo * gTimeConversionFactor) >> 32) + hi * gTimeConversionFactor;
-}
-
-
-extern "C" void
-spin(bigtime_t microseconds)
-{
-	bigtime_t time = system_time();
-
-	while ((system_time() - time) < microseconds)
-		asm volatile ("pause;");
-}
-
-
 extern "C" status_t
 boot_arch_cpu_init()
 {

@@ -15,12 +15,15 @@
 
 #include <kernel.h>
 #include <safemode.h>
+
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
+
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_system_info.h>
+#include <arch/x86/arch_hpet.h>
 
 #include "mmu.h"
 #include "acpi.h"
@@ -35,6 +38,7 @@
 #	define TRACE(x...) ;
 #endif
 
+
 void copy_trampoline_code(uint64 trampolineCode, uint64 trampolineStack);
 void prepare_trampoline_args(uint64 trampolineCode, uint64 trampolineStack,
 	uint32 pagedir, uint64 kernelEntry, addr_t virtKernelArgs,
@@ -42,6 +46,30 @@ void prepare_trampoline_args(uint64 trampolineCode, uint64 trampolineStack,
 uint32 get_sentinel(uint64 trampolineStack);
 
 static bool sX2APIC = false;
+
+
+static void
+hpet_spin(bigtime_t microseconds)
+{
+	// Other CPUs are booted after ExitBootServices, so we can't use spin().
+	// Use the HPET (which we conveniently don't need to calibrate) instead.
+	static hpet_regs* hpet = NULL;
+	if (hpet == NULL) {
+		platform_kernel_address_to_bootloader_address(gKernelArgs.arch_args.hpet.Get(),
+			(void**)&hpet);
+	}
+
+	uint64 originalConfig = hpet->config;
+	hpet->config |= HPET_CONF_MASK_ENABLED;
+
+	uint64 end = hpet->u0.counter64
+		+ ((microseconds * 1000000000ULL) / HPET_GET_PERIOD(hpet));
+	while (hpet->u0.counter64 < end)
+		asm volatile("pause");
+
+	hpet->config = originalConfig;
+}
+#define spin hpet_spin
 
 
 static uint32
@@ -56,6 +84,7 @@ apic_write(uint32 offset, uint32 data)
 {
 	*(volatile uint32 *)((addr_t)gKernelArgs.arch_args.apic_phys + offset) = data;
 }
+
 
 static uint32
 apic_error_status()
@@ -318,7 +347,7 @@ arch_smp_boot_other_cpus(addr_t pagedir, uint64 kernelEntry, addr_t virtKernelAr
 			spin(200);
 
 			while (!apic_interrupt_delivered())
-				asm volatile ("pause;");
+				asm volatile ("pause");
 		}
 
 		// Wait for the trampoline code to clear the final stack location.

@@ -39,6 +39,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 ] {
 			smp.cpp
 			smp_trampoline.S
 			support.S
+			timer.cpp
 			video.cpp
 			apm.cpp
 			interrupts.cpp

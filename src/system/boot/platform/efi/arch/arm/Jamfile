@@ -25,7 +25,6 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			entry.S
 			cache.S
 			relocation_func.cpp
-			arch_cpu.cpp
 			arch_dtb.cpp
 			arch_mmu.cpp
 			arch_smp.cpp

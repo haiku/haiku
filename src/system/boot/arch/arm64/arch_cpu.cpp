@@ -28,31 +28,3 @@ arch_ucode_load(BootVolume& volume)
 {
 	// Yes, we have no bananas!
 }
-
-
-extern "C" bigtime_t
-system_time()
-{
-
-	#warning Implement system_time in ARM64 bootloader!
-	//https://en.wikipedia.org/wiki/Time_Stamp_Counter
-	// read system time register:  cntpct_el0 / cntvct_el0
-	// frequency of the system timer can be discovered by reading cntfrq_el0
-	// https://wiki.osdev.org/ARMv7_Generic_Timers#CNTPCT
-
-	uint64_t ticks;
-	__asm__ volatile("mrs %0, cntpct_el0" : "=r"(ticks));
-	//conversion factor stuff
-	return ticks;
-	//return u64_mul_u64_fp32_64(ticks, ns_per_cntpct);
-}
-
-
-extern "C" void
-spin(bigtime_t microseconds)
-{
-	auto time = system_time();
-
-	while ((system_time() - time) < microseconds)
-		asm volatile ("yield;");
-}

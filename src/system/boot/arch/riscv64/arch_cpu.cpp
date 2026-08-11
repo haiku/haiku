@@ -54,20 +54,3 @@ arch_ucode_load(BootVolume& volume)
 {
 	// NOP on riscv currently
 }
-
-
-extern "C" bigtime_t
-system_time()
-{
-	// TODO: units conversion
-	return CpuTime();
-}
-
-
-extern "C" void
-spin(bigtime_t microseconds)
-{
-	bigtime_t time = system_time();
-	while ((system_time() - time) < microseconds)
-		asm volatile ("nop;");
-}
