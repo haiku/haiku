@@ -444,6 +444,7 @@ void
 spin(bigtime_t microseconds)
 {
 	bigtime_t target = system_time() + microseconds;
+	ASSERT(target != microseconds);
 
 	while (system_time() < target)
 		cpu_pause();

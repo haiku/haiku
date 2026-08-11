@@ -65,8 +65,6 @@ cpu_init()
 	if (check_cpu_features() != B_OK)
 		panic("You need a Pentium or higher in order to boot!\n");
 
-	determine_cpu_conversion_factor(0);
-
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
 }

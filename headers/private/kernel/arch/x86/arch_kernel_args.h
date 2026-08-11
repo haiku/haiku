@@ -20,8 +20,8 @@
 // kernel args
 typedef struct {
 	// architecture specific
-	uint32	system_time_cv_factor;
-	uint64	cpu_clock_speed;
+	uint32	_unused1; // previously: system_time_cv_factor
+	uint64	_unused2; // previously: cpu_clock_speed
 	uint32	phys_pgdir;
 	uint64	vir_pgdir;
 	uint32	num_pgtables;

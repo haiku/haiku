@@ -33,6 +33,7 @@
 
 #include <arch_system_info.h>
 #include <arch/x86/apic.h>
+#include <arch/x86/timer.h>
 #include <boot/kernel_args.h>
 
 #include "paging/X86PagingStructures.h"
@@ -1650,132 +1651,12 @@ detect_amdc1e_noarat()
 }
 
 
-static void
-init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
-{
-	cpu_ent* cpu = get_cpu_struct();
-	if (cpu->arch.vendor != VENDOR_INTEL)
-		return;
-
-	uint32 model = (cpu->arch.extended_model << 4) | cpu->arch.model;
-	cpuid_info cpuid;
-	get_current_cpuid(&cpuid, 0, 0);
-	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
-	if (maxBasicLeaf < IA32_CPUID_LEAF_TSC)
-		return;
-
-	get_current_cpuid(&cpuid, IA32_CPUID_LEAF_TSC, 0);
-	if (cpuid.regs.eax == 0 || cpuid.regs.ebx == 0)
-		return;
-	uint32 khz = cpuid.regs.ecx / 1000;
-	uint32 denominator = cpuid.regs.eax;
-	uint32 numerator = cpuid.regs.ebx;
-	if (khz == 0 && model == 0x5f) {
-		// CPUID_LEAF_FREQUENCY isn't supported, hardcoding
-		khz = 25000;
-	}
-
-	if (khz == 0 && maxBasicLeaf >= IA32_CPUID_LEAF_FREQUENCY) {
-		// for these CPUs the base frequency is also the tsc frequency
-		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_FREQUENCY, 0);
-		khz = cpuid.regs.eax * 1000 * denominator / numerator;
-	}
-	if (khz == 0)
-		return;
-
-	dprintf("CPU: using TSC frequency from CPUID\n");
-	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
-	// or (1000 << 32) / (tsc freq in kHz)
-	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
-	// overwrite the bootloader value
-	args->arch_args.system_time_cv_factor = *conversionFactor;
-}
-
-
-static void
-init_tsc_with_msr(kernel_args* args, uint32* conversionFactor)
-{
-	cpu_ent* cpuEnt = get_cpu_struct();
-	if (cpuEnt->arch.vendor != VENDOR_AMD)
-		return;
-
-	uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
-	if (family < 0x10)
-		return;
-	uint64 value = x86_read_msr(MSR_F10H_HWCR);
-	if ((value & HWCR_TSCFREQSEL) == 0)
-		return;
-
-	value = x86_read_msr(MSR_F10H_PSTATEDEF(0));
-	if ((value & PSTATEDEF_EN) == 0)
-		return;
-	if (family != 0x17 && family != 0x19)
-		return;
-
-	uint64 khz = 200 * 1000;
-	uint32 denominator = (value >> 8) & 0x3f;
-	if (denominator < 0x8 || denominator > 0x2c)
-		return;
-	if (denominator > 0x1a && (denominator % 2) == 1)
-		return;
-	uint32 numerator = value & 0xff;
-	if (numerator < 0x10)
-		return;
-
-	dprintf("CPU: using TSC frequency from MSR %" B_PRIu64 "\n", khz * numerator / denominator);
-	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
-	// or (1000 << 32) / (tsc freq in kHz)
-	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
-	// overwrite the bootloader value
-	args->arch_args.system_time_cv_factor = *conversionFactor;
-}
-
-
-static void
-init_tsc(kernel_args* args)
-{
-	// init the TSC -> system_time() conversion factors
-
-	// try to find the TSC frequency with CPUID
-	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
-	init_tsc_with_cpuid(args, &conversionFactor);
-	init_tsc_with_msr(args, &conversionFactor);
-	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
-
-#ifdef __x86_64__
-	// The x86_64 system_time() implementation uses 64-bit multiplication and
-	// therefore shifting is not necessary for low frequencies (it's also not
-	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
-	__x86_setup_system_time((uint64)conversionFactor << 32,
-		conversionFactorNsecs);
-#else
-	if (conversionFactorNsecs >> 32 != 0) {
-		// the TSC frequency is < 1 GHz, which forces us to shift the factor
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
-			true);
-	} else {
-		// the TSC frequency is >= 1 GHz
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
-	}
-#endif
-}
-
-
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
 	detect_cpu(cpu, false);
 	load_microcode(cpu);
 	detect_cpu(cpu);
-
-	if (cpu == 0) {
-		init_tsc(args);
-
-		if (detect_amdc1e_noarat())
-			gCpuIdleFunc = amdc1e_noarat_idle;
-		else
-			gCpuIdleFunc = halt_idle;
-	}
 
 	if (x86_check_feature(IA32_FEATURE_MCE, FEATURE_COMMON))
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_MCE);
@@ -1850,6 +1731,13 @@ arch_cpu_init(kernel_args* args)
 
 	// Initialize descriptor tables.
 	x86_descriptors_init(args);
+
+	x86_init_tsc(args);
+
+	if (detect_amdc1e_noarat())
+		gCpuIdleFunc = amdc1e_noarat_idle;
+	else
+		gCpuIdleFunc = halt_idle;
 
 	return B_OK;
 }

@@ -5,6 +5,7 @@
 
 
 #include <arch/system_info.h>
+#include <arch/x86/timer.h>
 
 #include <string.h>
 
@@ -20,7 +21,6 @@
 
 static enum cpu_vendor sCPUVendor;
 static uint32 sCPUModel;
-static int64 sCPUClockSpeed;
 
 
 struct get_cpuid_args {
@@ -98,19 +98,7 @@ arch_system_info_init(struct kernel_args *args)
 		| (cpu->arch.extended_model << 16) | (cpu->arch.type << 12)
 		| (cpu->arch.family << 8) | (cpu->arch.model << 4) | cpu->arch.stepping;
 
-	sCPUClockSpeed = args->arch_args.cpu_clock_speed;
-	if (cpu->arch.vendor == VENDOR_INTEL) {
-		cpuid_info cpuid;
-		get_current_cpuid(&cpuid, 0, 0);
-		uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
-		if (maxBasicLeaf >= 0x16) {
-			get_current_cpuid(&cpuid, 0x16, 0);
-			if (cpuid.regs.eax != 0) {
-				sCPUClockSpeed = cpuid.regs.eax * 1000000LL;
-				dprintf("found clock speed with CPUID.16h\n");
-			}
-		}
-	}
+	// gCPUClockSpeed is initialized by arch_timer.
 	return B_OK;
 }
 
@@ -136,7 +124,7 @@ arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 
 		case B_TOPOLOGY_CORE:
 			node->data.core.model = sCPUModel;
-			node->data.core.default_frequency = sCPUClockSpeed;
+			node->data.core.default_frequency = gCPUClockSpeed;
 			break;
 
 		default:
@@ -165,7 +153,7 @@ get_frequency_for(void *_frequency, int cpu)
 	if (mperf2 == mperf)
 		*frequency = 0;
 	else {
-		*frequency = (aperf2 - aperf) * sCPUClockSpeed / (mperf2 - mperf);
+		*frequency = (aperf2 - aperf) * gCPUClockSpeed / (mperf2 - mperf);
 		gCPU[cpu].arch.mperf_prev = mperf2;
 		gCPU[cpu].arch.aperf_prev = aperf2;
 		gCPU[cpu].arch.perf_timestamp = timestamp2;
@@ -180,7 +168,7 @@ arch_get_frequency(uint64 *frequency, int32 cpu)
 	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX))
 		call_single_cpu_sync(cpu, get_frequency_for, frequency);
 	else
-		*frequency = sCPUClockSpeed;
+		*frequency = gCPUClockSpeed;
 
 	return B_OK;
 }

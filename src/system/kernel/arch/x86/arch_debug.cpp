@@ -10,6 +10,7 @@
 
 
 #include <arch/debug.h>
+#include <arch/x86/timer.h>
 
 #include <x86intrin.h>
 #include <stdio.h>
@@ -1413,7 +1414,7 @@ arch_debug_init(kernel_args* args)
 {
 	// Store the TSC frequency in kHz.
 	sDebugSnoozeConversionFactor =
-		(uint64(1000) << 32) / args->arch_args.system_time_cv_factor;
+		(uint64(1000) << 32) / gSystemTimeConversionFactor;
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_MWAITX, FEATURE_EXT_AMD_ECX))
 		sDebugSnooze = debug_snooze_mwaitx;
 	if (x86_check_feature(IA32_FEATURE_WAITPKG, FEATURE_7_ECX))
@@ -1436,4 +1437,3 @@ arch_debug_init(kernel_args* args)
 
 	return B_NO_ERROR;
 }
-

@@ -7,7 +7,7 @@
 
 
 #include <arch/real_time_clock.h>
-#include <arch/cpu.h>
+#include <arch/x86/timer.h>
 #include <boot/kernel_args.h>
 
 #include <real_time_clock.h>
@@ -180,7 +180,7 @@ status_t
 arch_rtc_init(struct kernel_args *args, struct real_time_data *data)
 {
 	data->arch_data.system_time_conversion_factor
-		= args->arch_args.system_time_cv_factor;
+		= gSystemTimeConversionFactor;
 	return B_OK;
 }
 
