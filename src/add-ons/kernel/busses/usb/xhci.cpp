@@ -963,6 +963,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		panic("endpoint is not initialized!");
 		return B_NO_INIT;
 	}
+	if (isochronousData != NULL && transfer->IsPhysical())
+		return B_NOT_SUPPORTED;
 
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)
@@ -978,15 +980,28 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		if (isochronousData->packet_count == 0)
 			return B_BAD_VALUE;
 
-		// Isochronous transfers use more specifically sized packets.
-		trbSize = transfer->DataLength() / isochronousData->packet_count;
-		if (trbSize == 0 || trbSize > pipe->MaxPacketSize() || trbSize
-				!= (size_t)isochronousData->packet_descriptors[0].request_length)
+		// Each isochronous packet is a separate TD and may be shorter than the
+		// endpoint's max_burst_payload or max packet size.
+		trbSize = 0;
+		size_t totalLength = 0;
+		for (uint32 i = 0; i < isochronousData->packet_count; i++) {
+			size_t packetLength = isochronousData->packet_descriptors[i].request_length;
+			if (packetLength == 0 || packetLength > pipe->MaxPacketSize())
+				return B_BAD_VALUE;
+
+			totalLength += packetLength;
+			trbSize = max_c(trbSize, packetLength);
+		}
+		if (totalLength != transfer->FragmentLength())
 			return B_BAD_VALUE;
 	}
 
 	// Now that we know trbSize, compute the count.
-	int32 trbCount = (transfer->FragmentLength() + trbSize - 1) / trbSize;
+	int32 trbCount;
+	if (isochronousData != NULL)
+		trbCount = isochronousData->packet_count;
+	else
+		trbCount = (transfer->FragmentLength() + trbSize - 1) / trbSize;
 
 	generic_io_vec* transferVec = transfer->Vector();
 	generic_size_t transferVecOffset = 0;
@@ -1005,7 +1020,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		}
 	}
 
-	xhci_td *td = CreateDescriptor(trbCount, trbCount, trbSize);
+	xhci_td* td = CreateDescriptor(trbCount, trbCount, trbSize);
 	if (td == NULL)
 		return B_NO_MEMORY;
 
@@ -1016,8 +1031,11 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		phys_addr_t address;
 		generic_size_t trbLength;
 		if (!transfer->IsPhysical()) {
-			 address = td->buffer_addrs[i];
-			 trbLength = (remaining < trbSize) ? remaining : trbSize;
+			address = td->buffer_addrs[i];
+			if (isochronousData != NULL)
+				trbLength = isochronousData->packet_descriptors[i].request_length;
+			else
+				trbLength = (remaining < trbSize) ? remaining : trbSize;
 		} else {
 			address = transferVec->base + transferVecOffset;
 			trbLength = transferVec->length - transferVecOffset;
@@ -1037,9 +1055,12 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		// remaining maximum-size *packets* in this TD, *not* including the
 		// packets in the current TRB, and capped at 31 if there are more
 		// than 31 packets remaining in the TD. (XHCI 1.2 § 4.11.2.4 p218.)
-		int32 tdSize = (remaining + maxPacketSize - 1) / maxPacketSize;
-		if (tdSize > 31)
-			tdSize = 31;
+		int32 tdSize = 0;
+		if (isochronousData == NULL) {
+			tdSize = (remaining + maxPacketSize - 1) / maxPacketSize;
+			if (tdSize > 31)
+				tdSize = 31;
+		}
 
 		td->trbs[i].address = address;
 		td->trbs[i].status = TRB_2_IRQ(0)
@@ -1078,8 +1099,10 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 			// All reads from the microframe index register must be
 			// incremented by 1. (XHCI 1.2 § 4.14.2.1.4 p265.)
 			frame = (ReadRunReg32(XHCI_MFINDEX) + 1) >> 3;
-			td->trbs[0].flags |= TRB_3_ISO_SIA_BIT;
+			for (uint32 i = 0; i < isochronousData->packet_count; i++)
+				td->trbs[i].flags |= TRB_3_ISO_SIA_BIT;
 		} else {
+			// TODO: We likely to apply FRIDs to each TD. (XHCI 1.2 § 4.11.2.5 p219.)
 			frame = *isochronousData->starting_frame_number;
 			td->trbs[0].flags |= TRB_3_FRID(frame);
 		}
@@ -2729,7 +2752,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 			// Compute the real transferred length.
 			transferred = 0;
-			for (int32 i = 0; i < offset; i++) {
+			for (int32 i = 0; i <= offset; i++) {
 				usb_iso_packet_descriptor& descriptor = isochronousData->packet_descriptors[i];
 				if (descriptor.status == B_NO_INIT) {
 					// Assume success.
