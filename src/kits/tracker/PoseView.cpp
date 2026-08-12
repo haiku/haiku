@@ -971,7 +971,7 @@ BPoseView::Pulse()
 	}
 
 	// Do we have a TextWidget waiting for its double-click check to expire?
-	if (fTextWidgetToCheck != NULL && !IsDragging())
+	if (fTextWidgetToCheck != NULL)
 		fTextWidgetToCheck->CheckExpiration();
 }
 
@@ -7568,7 +7568,9 @@ BPoseView::MouseUp(BPoint where)
 			else
 				loc = clickedPose->Location(this);
 
-			clickedPose->MouseUp(loc, this, where, index);
+			// do not check for double-click or rename after dragging
+			if (!wasDragging)
+				clickedPose->MouseUp(loc, this, where, index);
 
 			// reselect clicked pose
 			bool shouldSelect = wasSelected && !ExtendSelection();
