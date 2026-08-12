@@ -950,7 +950,7 @@ usb_disk_update_capacity(device_lun *lun)
 	if (usb_disk_mode_sense(lun) != B_OK)
 		lun->write_protected = false;
 #else
-	lun->write_protected = (lun->device_type != B_CD);
+	lun->write_protected = (lun->device_type == B_CD);
 #endif
 
 	if (lun->io_scheduler != NULL
