@@ -4,12 +4,13 @@
  */
 
 #include <KernelExport.h>
+#include <kernel.h>
 
 #include "bios.h"
 
 
-extern "C" bigtime_t
-system_time()
+static uint64
+get_ticks()
 {
 	struct bios_regs regs;
 	regs.eax = 0x00;
@@ -18,7 +19,14 @@ system_time()
 		return 0;
 
 	const uint64 kTicksPerDay = 0x1800b0;
-	uint64 ticks = (((regs.ecx << 16) | regs.edx) + regs.eax * kTicksPerDay);
+	return (((regs.ecx << 16) | regs.edx) + regs.eax * kTicksPerDay);
+}
+
+
+extern "C" bigtime_t
+system_time()
+{
+	uint64 ticks = get_ticks();
 
 	// Convert to microseconds. Algebraically simplified version of:
 	// ticks * (1000 * 1000) / (kTicksPerDay / (24 * 60 * 60))
@@ -34,6 +42,19 @@ spin(bigtime_t microseconds)
 	regs.edx = microseconds & 0xFFFF;
 	regs.ecx = microseconds << 16;
 	call_bios(0x15, &regs);
-	if ((regs.flags & CARRY_FLAG) != 0)
-		panic("BIOS doesn't support INT 15, AH 86");
+
+	if ((regs.flags & CARRY_FLAG) != 0) {
+		// Fall back to INT 1A. (Unfortunately this has a granularity of ~54.9ms.)
+		uint64 target = get_ticks();
+		if (target == 0)
+			return;
+
+		uint64 ticks = HOWMANY(microseconds, 55 * 1000);
+		if (ticks < 2)
+			ticks = 2;
+
+		target += ticks;
+		while (get_ticks() < target)
+			asm volatile("pause");
+	}
 }
