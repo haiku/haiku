@@ -58,10 +58,12 @@ public:
 
 	inline	bool		Matches(const CPUSet& mask) const;
 	inline	CPUSet		And(const CPUSet& mask) const;
+	inline	bool		operator==(const CPUSet& other) const;
 
 	inline	bool		IsEmpty() const;
 
 	inline uint32		Bits(uint32 index) const { return fBitmap[index];}
+
 private:
 	static	const int	kArrayBits = 32;
 	static	const int	kArraySize = ROUNDUP(SMP_MAX_CPUS, kArrayBits) / kArrayBits;
@@ -196,6 +198,18 @@ CPUSet::Matches(const CPUSet& mask) const
 	}
 
 	return false;
+}
+
+
+inline bool
+CPUSet::operator==(const CPUSet& other) const
+{
+	for (int i = 0; i < kArraySize; i++) {
+		if (fBitmap[i] != other.fBitmap[i])
+			return false;
+	}
+
+	return true;
 }
 
 

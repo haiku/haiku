@@ -4026,28 +4026,43 @@ _user_get_cpu()
 
 
 status_t
-_user_get_thread_affinity(thread_id id, void* userMask, size_t size)
+_user_get_thread_affinity(thread_id id, void* userMask, size_t userMaskSize)
 {
-	if (userMask == NULL || id < B_OK)
+	const size_t maskSize = sizeof(CPUSet);
+	if (userMask == NULL || id < 0 || userMaskSize < maskSize)
 		return B_BAD_VALUE;
-
 	if (!IS_USER_ADDRESS(userMask))
 		return B_BAD_ADDRESS;
 
 	CPUSet mask;
 
-	if (id == 0)
-		id = thread_get_current_thread_id();
-	// get the thread
-	Thread* thread = Thread::GetAndLock(id);
-	if (thread == NULL)
-		return B_BAD_THREAD_ID;
-	BReference<Thread> threadReference(thread, true);
-	ThreadLocker threadLocker(thread, true);
-	memcpy(&mask, &thread->cpumask, sizeof(mask));
+	{
+		if (id == 0)
+			id = thread_get_current_thread_id();
+		Thread* thread = Thread::GetAndLock(id);
+		if (thread == NULL)
+			return B_BAD_THREAD_ID;
+		BReference<Thread> threadReference(thread, true);
+		ThreadLocker threadLocker(thread, true);
 
-	if (user_memcpy(userMask, &mask, min_c(sizeof(mask), size)) < B_OK)
+		if (thread->team == team_get_kernel_team())
+			return B_NOT_ALLOWED;
+		if (thread->team != thread_get_current_thread()->team && geteuid() != 0)
+			return B_NOT_ALLOWED;
+
+		mask = thread->cpumask;
+	}
+
+	if (mask.IsEmpty())
+		mask.SetAll();
+	mask = mask.And(gCPUEnabled);
+
+	if (user_memcpy(userMask, &mask, maskSize) < B_OK)
 		return B_BAD_ADDRESS;
+	if (userMaskSize > maskSize) {
+		if (user_memset((uint8*)userMask + maskSize, 0, userMaskSize - maskSize) != B_OK)
+			return B_BAD_ADDRESS;
+	}
 
 	return B_OK;
 }
@@ -4057,34 +4072,40 @@ _user_set_thread_affinity(thread_id id, const void* userMask, size_t size)
 {
 	if (userMask == NULL || id < B_OK || size < sizeof(CPUSet))
 		return B_BAD_VALUE;
-
 	if (!IS_USER_ADDRESS(userMask))
 		return B_BAD_ADDRESS;
 
 	CPUSet mask;
-	if (user_memcpy(&mask, userMask, min_c(sizeof(CPUSet), size)) < B_OK)
+	if (user_memcpy(&mask, userMask, sizeof(CPUSet)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	CPUSet cpus;
-	cpus.SetAll();
-	for (int i = 0; i < smp_get_num_cpus(); i++)
-		cpus.ClearBit(i);
-	if (mask.Matches(cpus))
+	CPUSet andEnabled = mask.And(gCPUEnabled);
+	if (andEnabled.IsEmpty())
 		return B_BAD_VALUE;
+
+	// if setting to all enabled CPUs, just use no mask instead
+	if (andEnabled == gCPUEnabled)
+		mask.ClearAll();
 
 	if (id == 0)
 		id = thread_get_current_thread_id();
 
-	// get the thread
 	Thread* thread = Thread::GetAndLock(id);
 	if (thread == NULL)
 		return B_BAD_THREAD_ID;
 	BReference<Thread> threadReference(thread, true);
 	ThreadLocker threadLocker(thread, true);
-	memcpy(&thread->cpumask, &mask, sizeof(mask));
 
-	// check if running on masked cpu
-	if (!thread->cpumask.GetBit(thread->cpu->cpu_num))
+	if (thread->team == team_get_kernel_team())
+		return B_NOT_ALLOWED;
+	if (thread->team != thread_get_current_thread()->team && geteuid() != 0)
+		return B_NOT_ALLOWED;
+
+	thread->cpumask = mask;
+	threadLocker.Unlock();
+
+	// check if running on masked CPU
+	if (!mask.IsEmpty() && !mask.GetBit(thread->cpu->cpu_num))
 		thread_yield();
 
 	return B_OK;
