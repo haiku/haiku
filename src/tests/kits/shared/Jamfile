@@ -8,6 +8,7 @@ UnitTestLib libsharedtest.so :
 	SharedTestAddon.cpp
 
 	CalendarViewTest.cpp
+	CpuTypeTest.cpp
 	DriverSettingsMessageAdapterTest.cpp
 	JsonEndToEndTest.cpp
 	JsonErrorHandlingTest.cpp
