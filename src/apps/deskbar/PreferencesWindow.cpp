@@ -242,8 +242,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.End();
 
-	fWindowLocation->Invoke();
-
 	BMessage windowSettings;
 	BPoint where;
 	if (_LoadSettings(&windowSettings) == B_OK
@@ -330,10 +328,8 @@ PreferencesWindow::Show()
 
 	// refresh window location from settings
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
-	if (settings != NULL) {
+	if (settings != NULL)
 		_SetWindowLocation(settings->vertical, settings->left, settings->top, settings->state);
-		fWindowLocation->Invoke();
-	}
 
 	_UpdateButtons();
 
