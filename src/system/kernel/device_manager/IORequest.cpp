@@ -85,8 +85,10 @@ IORequestChunk::~IORequestChunk()
 
 
 IOBuffer*
-IOBuffer::Create(uint32 count, bool vip)
+IOBuffer::Create(size_t count, bool vip)
 {
+	ASSERT(count < (UINT32_MAX / sizeof(generic_io_vec)));
+
 	size_t size = sizeof(IOBuffer) + sizeof(generic_io_vec) * (count - 1);
 	IOBuffer* buffer
 		= (IOBuffer*)(malloc_etc(size, vip ? HEAP_PRIORITY_VIP : 0));
@@ -115,6 +117,7 @@ void
 IOBuffer::SetVecs(generic_size_t firstVecOffset, generic_size_t lastVecSize,
 	const generic_io_vec* vecs, uint32 count, generic_size_t length, uint32 flags)
 {
+	ASSERT(count <= fCapacity);
 	memcpy(fVecs, vecs, sizeof(generic_io_vec) * count);
 
 	if (count > 0 && firstVecOffset > 0) {
@@ -281,8 +284,8 @@ IOBuffer::Dump() const
 	kprintf("  origin:     %s\n", fUser ? "user" : "kernel");
 	kprintf("  kind:       %s\n", fPhysical ? "physical" : "virtual");
 	kprintf("  length:     %" B_PRIuGENADDR "\n", fLength);
-	kprintf("  capacity:   %" B_PRIuSIZE "\n", fCapacity);
-	kprintf("  vecs:       %" B_PRIuSIZE "\n", fVecCount);
+	kprintf("  capacity:   %" B_PRIu32 "\n", fCapacity);
+	kprintf("  vecs:       %" B_PRIu32 "\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
 		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",

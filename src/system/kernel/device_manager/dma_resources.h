@@ -75,6 +75,7 @@ public:
 
 private:
 			DMABounceBuffer*	fBounceBuffer;
+			uint32				fCapacity;
 			uint32				fVecCount;
 			generic_io_vec		fVecs[1];
 };

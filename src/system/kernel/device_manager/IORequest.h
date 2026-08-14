@@ -32,7 +32,7 @@ typedef struct IOOperation io_operation;
 
 class IOBuffer : public DoublyLinkedListLinkImpl<IOBuffer> {
 public:
-	static	IOBuffer*			Create(uint32 count, bool vip);
+	static	IOBuffer*			Create(size_t count, bool vip);
 			void				Delete();
 
 			bool				IsVirtual() const { return !fPhysical; }
@@ -43,13 +43,6 @@ public:
 									generic_size_t lastVecSize,
 									const generic_io_vec* vecs, uint32 count,
 									generic_size_t length, uint32 flags);
-
-			void				SetPhysical(bool physical)
-									{ fPhysical = physical; }
-			void				SetUser(bool user) { fUser = user; }
-			void				SetLength(generic_size_t length)
-									{ fLength = length; }
-			void				SetVecCount(uint32 count) { fVecCount = count; }
 
 			generic_size_t		Length() const { return fLength; }
 
@@ -80,8 +73,8 @@ private:
 			bool				fVIP;
 			bool				fMemoryLocked;
 			generic_size_t		fLength;
-			size_t				fVecCount;
-			size_t				fCapacity;
+			uint32				fVecCount;
+			uint32				fCapacity;
 			generic_io_vec		fVecs[1];
 };
 
