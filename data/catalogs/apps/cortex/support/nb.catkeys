@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	3450110595
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Header har flagg
 32 bit HLS	MediaString		32-biters HLS
 Recording	MediaString		Opptak
@@ -46,6 +46,7 @@ Right	MediaString		Høyre
 System mixer	MediaString		Systemmikser
 Physical output	MediaString		Fysisk utgang
 Top-Back-center	MediaString		Topp-Bak-senter
+(unknown video orientation)	MediaString		(ukjent videoorientering)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Topp til bunn, fra venstre til høyre
 (unknown run mode)	MediaString		(ukjent kjøremodus)

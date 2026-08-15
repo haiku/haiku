@@ -181,7 +181,7 @@ Desktop	TrackerSettingsWindow		Skrivebord
 Nested *?+.	libtracker		Nestet *?+.
 Move	FSUtils	button label	flytt
 Group	FilePermissionsView		Gruppe
-Could not find an application to open \"%name\" (%error). 	FSUtils		Kunne ikke finne et program til å åpne \"%name\" (%error)
+Could not find an application to open \"%name\" (%error). 	FSUtils		Kunne ikke finne et program for å åpne \"%name\" (%error)
 Internal error.	libtracker		Intern feil.
 Geometric size	AttributesView		Geometrisk størrelse
 Replace	FilePanelPriv		Erstatt

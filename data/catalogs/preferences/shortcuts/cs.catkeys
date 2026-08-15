@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Shortcuts	171515608
+1	czech	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*Myší nahoru
 Application	ShortcutsWindow		Aplikace
 Option	ShortcutsSpec	Name for modifier on keyboard	Možnost
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Uložit změny před ukončením?
 Revert to saved	ShortcutsWindow		Vrátit se k uloženým
 Don't save	ShortcutsWindow		Neukládat
 *MouseDown	ShortcutsWindow		*Myší dolů
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% nemohlo uložit vaši skladu kláves.
 *Beep	ShortcutsWindow		*Pípnutí
 Save	ShortcutsWindow		Uložit
 Either	ShortcutsSpec		Jeden či druhý
 Oh no	ShortcutsWindow		Ale ne
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% nemůže uložit soubor SkladaKláves!
 Key	ShortcutsWindow		Klávesa
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*PoslatZprávu application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Vybrat
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Otevřít SaduKláves…
 File	ShortcutsWindow		Soubor
 *LaunchHandler text/html	ShortcutsWindow		*SpustitObsluhu text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% nemohlo přežvýkat váš soubor SkladyKláves!
 *MoveMouseTo 50% 50%	ShortcutsWindow		*PřesunoutMyšNa 50% 50%

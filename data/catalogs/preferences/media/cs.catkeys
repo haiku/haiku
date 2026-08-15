@@ -1,7 +1,8 @@
-1	czech	x-vnd.Haiku-Media	4055972908
+1	czech	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Nelze přidat ovladač hlasitosti na Panel: %s\n
 Restart media services	Media views		Restartovat služby médií
 Quit	Media Window		Konec
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Vypnutí %prefname% zastaví restart služeb médií. Může to způsobit trhanou či úplnou zkázu médií.
 <none>	VideoInputMenu	Used when no video input is available	<žádné>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nelze odstranit ovladač hlasitosti z Panelu: %s\n
 Video output:	Media views		Video výstup:

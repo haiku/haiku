@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BootManager	3682305202
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Sikkerhetskopiering av den gamle hovedpartisjonssektor feilet
 At least one partition must be selected!	BootManagerController		Minst én partisjon må være valgt!
 No space available!	DrivesPage	Cannot install	Ingen ledig plass!
@@ -61,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Vennligst finn filen som inneholder hovedpartisjonssektoren (MBR) som skal gjennopprettes. Dette er filen som ble laget da oppstartsbehandleren ble installert.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Vil nå gjennopprette hovedpartisjonssektoren (MBR) for %disk fra %file. Ønsker du å fortsette?
 Install	DrivesPage	Button	Installer
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		Den første partisjonen på disken starter for tidlig og gir ikke nok plass til en oppstartsmeny.\n%appname% trenger 2 KiB tilgjengelig plass før den første partisjonen.
 File:	FileSelectionPage	Text control label	Fil:
 Error reading partition table	BootManagerController	Title	Feil ved lesing av partisjonstabell
 Back	BootManagerController	Button	Tilbake

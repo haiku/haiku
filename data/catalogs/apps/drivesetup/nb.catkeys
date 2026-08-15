@@ -1,7 +1,9 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2345310783
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1303787107
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
+Register disk image…	MainWindow		Registrer diskbilde…
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
+Disk image has been added.	MainWindow		Diskbilde har blitt lagt til.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
 Device	PartitionList		Enhet
 Could not change the parameters of the selected partition.	MainWindow		Kunne ikke endre parametrene for den valgte partisjonen.
@@ -9,6 +11,7 @@ Initialize	MainWindow		Initialiser
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen \"%s\" vil bli uopprettelig tapt hvis du gjør det!
 PGP encrypted	Encryption utils		PGP-kryptert
 Delete partition	MainWindow		Slett partisjon
+Write	MainWindow		Skriv
 Removable	PartitionList		Fjernbar
 Block size	PartitionList		Blokkstørrelse
 The panel experienced a problem!	MainWindow		Panelet opplevde et problem!
@@ -19,27 +22,35 @@ Unmount	MainWindow		Avmonter
 Failed to format the partition %s!\n	MainWindow		Klarte ikke å formatere partisjonen %s!\n
 Partition size	CreateParametersPanel		Partisjonsstørrelse
 Validation of the given parameters failed.	MainWindow		Validering av parameterne mislyktes.
+Cannot init target partition.	MainWindow		Kan ikke initialisere målpartisjonen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen \"%s\"? Du vil bli spurt igjen før  endringer blir skrevet til disken.
 DriveSetup	System name		Diskoppsett
+Error:	MainWindow	in any error alert	Feil:
 Mounted at	PartitionList		Monteringspunkt
 Disk system %s not found!	MainWindow		Disksystem %s ble ikke funnet!
 Create…	MainWindow		Opprett…
+Failed to register file disk device: %s	MainWindow		Kunne ikke registrere fildiskenheten: %s
 Write changes	MainWindow		Skriv endringer
 Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
 Eject	MainWindow		Løs ut
+There is not enough free space on target device.	MainWindow		Det er ikke nok ledig plass på målenheten.
 Read only	PartitionList		Kun lesetilgang
 Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
+Creating disk image	MainWindow		Oppretter diskbilde
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returnere.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke endre parametrene til partisjonen. Ingen endringer er skrevet til disken.
 Partition %ld	DiskView		Partisjon %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Det er ingen plass på partisjonen der en underpartisjon kan opprettes.
+%s does not refer to a file disk device.	MainWindow		%s refererer ikke til en fildiskenhet.
 No disk devices have been recognized.	DiskView		Ingen disker ble gjenkjent.
 Attributes	PartitionList		Attributter
+'%s' is not a regular file.	MainWindow		'%s' er ikke en vanlig fil.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Klarte ikke å slette partisjonen. Ingen endringer er skrevet til disken.
 Change parameters…	MainWindow		Endre parametere…
 Format	InitializeParametersPanel		Formater
 Could not unmount partition	MainWindow		Kunne ikke avmontere partisjonen
+Target partition is read only.	MainWindow		Målpartisjonen er skrivebeskyttet.
 Create	CreateParametersPanel		Opprett
 File system	PartitionList		Filsystem
 Unknown (%s)	PartitionList		Ukjent (%s)
@@ -56,18 +67,26 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 MIMEs	PartitionList		MIMEr
 Shared	PartitionList		Delt
 BitLocker encrypted	Encryption utils		BitLocker-kryptert
+Cannot init target volume.	MainWindow		Kan ikke initialisere målvolumet.
 You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
 Offset: %s	Support		Offset: %s
 SafeBoot encrypted	Encryption utils		SafeBoot-kryptert
 Volume name	PartitionList		Volumnavn
+Disk image	MainWindow		Diskbilde
+Save image…	MainWindow		Lagre bilde…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
 Change	ChangeParametersPanel		Endre
 Partition name:	ChangeParametersPanel		Partisjonsnavn:
 LUKS encrypted	Encryption utils		LUKS-kryptert
 Empty space	PartitionList		Tom plass
 Cancel	AbstractParametersPanel		Avbryt
+%appname%: Save disk image	MainWindow		%appname%: Lagre diskbilde
 Format	MainWindow		Formater
 OK	MainWindow		OK
+Cannot init target file.	MainWindow		Kan ikke initialisere målfilen.
+Disk image successfully created.	MainWindow		Diskbildet ble opprettet.
+Unregister disk image	MainWindow		Avregistrer diskbildet
+The target partition is smaller than the image file.	MainWindow		Målpartisjonen er mindre en bildefilen.
 Empty space	DiskView		Tom plass
 Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
 Open with DiskProbe	MainWindow		Åpne med DiskProbe
