@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-BluetoothPrefs	1750795842
+1	czech	x-vnd.Haiku-BluetoothPrefs	530464078
 Cancel	Remote devices		Zrušit
 Laptop	Settings view		Notebook
 Only from trusted devices	Settings view		Jen od důvěryhodných zařízení
@@ -22,12 +22,14 @@ Add…	Remote devices		Přidat…
 Revert	Window		Obrátit
 Refresh local devices…	Window		Aktualizovat lokální zařízení…
 Disconnect	Remote devices		Odpojit
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Před započetím hledání se ujistěte, že je Bluetooth na hledaném zařízení aktivní.
 Defaults	Window		Původní
 From all devices	Settings view		Ze všech zařízení
 Start bluetooth services…	Window		Zapnout služby bluetooth…
 Cancel	Inquiry panel		Zrušit
 Launch now	main		Spustit nyní
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Získávání jména '%1'
 Remove	Remote devices		Odstranit
 Pick device…	Settings view		Vybrat zařízení…
 Always ask	Settings view		Vždy se dotázat

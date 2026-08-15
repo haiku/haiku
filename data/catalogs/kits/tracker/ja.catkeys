@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2681445216
+1	japanese	x-vnd.Haiku-libtracker	3033621663
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -57,6 +57,7 @@ Identify	ContainerWindow		ファイル形式を判別
 Create link	ContainerWindow		リンクの作成
 starts with	FindPanel		指定文字列で始まる
 Replace	FSUtils		置換
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		At %func \nfind_directory() failed. \nReason: %error
 ?+* follows nothing.	libtracker		?+* のうしろに何もありません。
 Include Trash	FindPanel		ごみ箱を含める
 Rectangle	AttributesView		四角
@@ -172,6 +173,7 @@ Preferences…	ContainerWindow		設定…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱にあるため、\"%document\" を開けません。
 Work Phone	Person Query Columns		勤務先の電話番号
 Select folders	FindPanel		フォルダーの選択
+OK	TrackerInitialState		OK
 Close	ContainerWindow		閉じる
 Get info	ContainerWindow		詳細情報...
 MIME Type	AttributesView		MIMEタイプ
@@ -426,6 +428,7 @@ Move here	ContainerWindow		ここに移動
 the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新しいフォルダーを作成できません。
 MIME Signature	AttributesView		MIME 署名
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列
 Add current folder	FilePanelPriv		このフォルダーを追加

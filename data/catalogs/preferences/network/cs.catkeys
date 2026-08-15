@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Network	1086926074
+1	czech	x-vnd.Haiku-Network	3044115400
 no link	IntefaceView		není spojení
 Ethernet device	InterfaceListItem		Ethernetové zařízení
 Link speed:	IntefaceView		Rychlost spojení:
@@ -29,6 +29,7 @@ Apply	IntefaceAddressView		Použít
 Disable	ServiceView		Zakázat
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Zobrazit stav sítě na panelu
+no stateful configuration	IntefaceView		žádná uvedená konfigurace
 Mode:	IntefaceAddressView		Režim:
 connected	InterfaceListItem		připojeno
 OK	NetworkWindow		OK

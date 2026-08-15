@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	60349416
+1	turkish	x-vnd.Haiku-libtracker	412525863
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Tanımla
 Create link	ContainerWindow		Bağlantı oluştur
 starts with	FindPanel		ile başlar
 Replace	FSUtils		Değiştir
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		%func içinde, find_directory()\nbaşarısız oldu.\nGerekçe: %error
 ?+* follows nothing.	libtracker		?+*, hiçbir şeyden sonra gelmiyor.
 Include Trash	FindPanel		Çöpte de ara
 Rectangle	AttributesView		Dikdörtgen
@@ -172,6 +173,7 @@ Preferences…	ContainerWindow		Tercihler…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		“%document” açılamadı; çünkü “%app” uygulaması çöpte. 
 Work Phone	Person Query Columns		İş telefonu
 Select folders	FindPanel		Klasörler seç
+OK	TrackerInitialState		Tamam
 Close	ContainerWindow		Kapat
 Get info	ContainerWindow		Bilgi al
 MIME Type	AttributesView		MIME türü
@@ -426,6 +428,7 @@ Move here	ContainerWindow		Buraya taşı
 the config folder	FSUtils		yapılandırma klasörü
 Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
 MIME Signature	AttributesView		MIME İmzası
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Hepsini toparla
 Add current folder	FilePanelPriv		Geçerli klasörü ekle

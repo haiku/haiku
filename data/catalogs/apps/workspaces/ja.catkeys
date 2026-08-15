@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Be-WORK	1851878724
+1	japanese	x-vnd.Be-WORK	825079978
 Quit	Workspaces		終了
+Send windows behind using the Option key. Move windows to front using the Control key.\n	Workspaces		オプションキーでウィンドウを後ろへ移動します。コントロールキーで手前に移動します。\n
 Show window tab	Workspaces		ウィンドウタブの表示
 Live in the Deskbar	Workspaces		Deskbar 内で実行
 Switch on mouse wheel	Workspaces		マウスホイールで切り替える

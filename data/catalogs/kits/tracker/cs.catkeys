@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	659207416
+1	czech	x-vnd.Haiku-libtracker	2681445216
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -290,6 +290,7 @@ Show volumes on Desktop	SettingsView		Zobrazit svazky na ploše
 Recent folders	ContainerWindow		Časté složky
 Desktop	Model		Plocha
 Select all	ContainerWindow		Vybrat vše
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		aplikace
 Error calculating folder size.	InfoWindow		Chyba výpočtu velikosti složky.
 Delete	FSUtils		Odstranit

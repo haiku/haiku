@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2681445216
+1	hungarian	x-vnd.Haiku-libtracker	3033621663
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Azonosítás
 Create link	ContainerWindow		Hivatkozás készítése
 starts with	FindPanel		eleje
 Replace	FSUtils		Csere
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		%func \nfind_directory() sikertelen. \nHiba oka: %error
 ?+* follows nothing.	libtracker		?+* nem követ semmit.
 Include Trash	FindPanel		A Szemetesben is
 Rectangle	AttributesView		Téglalap
@@ -172,6 +173,7 @@ Preferences…	ContainerWindow		Beállítások…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\"), mert a program (\"%app\") a Szemetesben van. 
 Work Phone	Person Query Columns		Munkahelyi telefonszám
 Select folders	FindPanel		Mappák megadása
+OK	TrackerInitialState		Rendben
 Close	ContainerWindow		Bezárás
 Get info	ContainerWindow		Információ
 MIME Type	AttributesView		MIME Típus
@@ -426,6 +428,7 @@ Move here	ContainerWindow		Mozgatás ide
 the config folder	FSUtils		a konfigurációs mappa
 Sorry, could not create a new folder.	FSUtils		Nem sikerült az új mappát létrehozni.
 MIME Signature	AttributesView		MIME azonosítója
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Átnevezés
 Clean up all	ContainerWindow		Összes rendezése
 Add current folder	FilePanelPriv		Jelenlegi mappa hozzáadása

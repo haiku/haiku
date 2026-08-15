@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2681445216
+1	swedish	x-vnd.Haiku-libtracker	3033621663
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Identifiera
 Create link	ContainerWindow		Skapa länk
 starts with	FindPanel		börjar med
 Replace	FSUtils		Ersätt
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		I %func \nfind_directory() misslyckades. \nOrsak: %error
 ?+* follows nothing.	libtracker		?+* följer ingenting.
 Include Trash	FindPanel		Inkludera papperskorgen
 Rectangle	AttributesView		Rektangel
@@ -172,6 +173,7 @@ Preferences…	ContainerWindow		Inställningar...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunde inte öppna \"%document\" för att programmet \"%app\" ligger i Papperskorgen. 
 Work Phone	Person Query Columns		Jobbtelefon
 Select folders	FindPanel		Välj mappar
+OK	TrackerInitialState		OK
 Close	ContainerWindow		Stäng
 Get info	ContainerWindow		Visa information
 MIME Type	AttributesView		MIME-typ
@@ -426,6 +428,7 @@ Move here	ContainerWindow		Flytta hit
 the config folder	FSUtils		konfigurationsmappen
 Sorry, could not create a new folder.	FSUtils		Kan inte skapa en ny mapp.
 MIME Signature	AttributesView		MIME-signatur
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Döp om
 Clean up all	ContainerWindow		Sortera om
 Add current folder	FilePanelPriv		Lägg till nuvarande katalog

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2681445216
+1	german	x-vnd.Haiku-libtracker	3033621663
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Identifizieren
 Create link	ContainerWindow		Verknüpfung erstellen
 starts with	FindPanel		beginnt mit
 Replace	FSUtils		Ersetzen
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		In %func \nfind_directory() fehlgeschlagen. \nGrund: %error
 ?+* follows nothing.	libtracker		?+* folgt nichts.
 Include Trash	FindPanel		Einschließlich Papierkorb
 Rectangle	AttributesView		Rechteck
@@ -172,6 +173,7 @@ Preferences…	ContainerWindow		Einstellungen …
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Work Phone	Person Query Columns		Telefon (geschäftlich)
 Select folders	FindPanel		Ordner wählen
+OK	TrackerInitialState		OK
 Close	ContainerWindow		Schließen
 Get info	ContainerWindow		Informationen
 MIME Type	AttributesView		MIME-Typ
@@ -426,6 +428,7 @@ Move here	ContainerWindow		Hierher verschieben
 the config folder	FSUtils		der Config-Ordner
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
 MIME Signature	AttributesView		MIME-Signatur
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Umbenennen
 Clean up all	ContainerWindow		Icons ordnen
 Add current folder	FilePanelPriv		Aktuellen Ordner hinzufügen

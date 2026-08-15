@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskUsage	3098961259
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% i {0, plural, one{# fil} other{# filer}}
 Scanning %refName%	Scanner		Skanner %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
 Size	Info Window		Størrelse
@@ -8,10 +9,15 @@ file unavailable	Pie View		fil utilgjengelig
 no supporting apps	Pie View		ingen støttende program
 Path	Info Window		Filsti
 Scan	Status View		Skann
+Rescan	Status View		Skann på nytt
 file unavailable	Status View		fil utilgjengelig
+Get info	Pie View		Få info
 DiskUsage	System name		Diskbruk
 Created	Info Window		Opprettet
 Modified	Info Window		Endret
+Abort	Status View		Avbryt
+Open with	Pie View		Åpne med
 Open	Pie View		Åpne
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fil} other{# filer}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Ledig på %refName%

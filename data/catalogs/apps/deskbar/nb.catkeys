@@ -1,14 +1,16 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	3780974715
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Skjul automatisk
 Show all	WindowMenu		Vis alle
 Edit in Tracker…	PreferencesWindow		Rediger i Tracker…
 Menu	PreferencesWindow		Meny
+Location	PreferencesWindow		Sted
 Tracker always first	PreferencesWindow		Tracker alltid først
 Hide clock	TimeView		Skjul klokke
 Large	PreferencesWindow		Stor
 <Deskbar folder is empty>	DeskbarMenu		<Skrivebord-mappen er tom>
 Recent documents	DeskbarMenu		Nylig brukte dokumenter
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
+%appname% preferences	PreferencesWindow		%appname% innstillinger
 Always on top	PreferencesWindow		Alltid øverst
 Restart system	DeskbarMenu		Start på nytt
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
@@ -28,12 +30,14 @@ Close all	WindowMenu		Lukk alle
 About this system	DeskbarMenu		Om dette systemet
 Quit application	WindowMenu		Avslutt program
 Hide application names	PreferencesWindow		Skjul programnavn
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Programmer
 Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
 Suspend	DeskbarMenu		Hvilemodus
 Shutdown…	DeskbarMenu		Avslutt…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
 Expand new applications	PreferencesWindow		Pakk ut nye programmer
+%appname% preferences…	DeskbarMenu		%appname% innstillinger…
 Recent applications:	PreferencesWindow		Nylig brukte programmer:
 Recent folders:	PreferencesWindow		Nylig brukte mapper:
 Recent folders	DeskbarMenu		Nylig brukte mapper
