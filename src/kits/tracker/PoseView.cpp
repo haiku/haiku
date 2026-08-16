@@ -1729,6 +1729,9 @@ BPoseView::AddPosesCompleted()
 		float lastItemTop = (CurrentPoseList()->CountItems() - 1) * fListElemHeight;
 		if (bounds.top > lastItemTop)
 			_inherited::ScrollTo(bounds.left, std::max(lastItemTop, 0.0f));
+
+		SortPoses();
+		Invalidate();
 	}
 }
 
