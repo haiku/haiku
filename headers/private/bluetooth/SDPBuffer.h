@@ -151,7 +151,9 @@ public:
 			case SDP_DATA_STR16:
 			case SDP_DATA_STR32:
 			{
-				BString value = ReadString();
+				size_t length = ReadStringLength();
+				char value[length];
+				ReadString(value);
 				if (fReadingStatus == B_OK)
 					message->AddString(label, value);
 			}
@@ -164,7 +166,7 @@ public:
 			case SDP_DATA_SEQ16:
 			case SDP_DATA_SEQ32:
 			{
-				size_t size = ReadSeq();
+				ssize_t size = ReadSeq();
 				char buffer[size];
 				if (fReadingStatus == B_OK && fBuffer->ReadExactly(buffer, size) == B_OK)
 					message->AddData(label, B_RAW_TYPE, buffer, size);
@@ -177,17 +179,17 @@ public:
 	template <typename T> T ReadNumber();
 
 
-	BString
-	ReadString()
+	size_t
+	ReadStringLength()
 	{
-		size_t strLength = 0;
 		status_t status;
+		size_t length = 0;
 		switch (ReadType()) {
 			case SDP_DATA_STR8:
 			{
 				uint8 size;
 				status = fBuffer->ReadExactly(&size, sizeof(uint8));
-				memcpy(&strLength, &size, sizeof(uint8));
+				length = size;
 			}
 			break;
 
@@ -196,7 +198,7 @@ public:
 				uint16 size;
 				status = fBuffer->ReadExactly(&size, sizeof(uint16));
 				size = B_BENDIAN_TO_HOST_INT16(size);
-				memcpy(&strLength, &size, sizeof(uint16));
+				length = size;
 			}
 			break;
 
@@ -205,7 +207,7 @@ public:
 				uint32 size;
 				status = fBuffer->ReadExactly(&size, sizeof(uint32));
 				size = B_BENDIAN_TO_HOST_INT32(size);
-				memcpy(&strLength, &size, sizeof(uint32));
+				length = size;
 			}
 			break;
 
@@ -216,17 +218,28 @@ public:
 
 		if (status != B_OK) {
 			fReadingStatus = status;
-			return BString("");
+			length = 0;
 		}
 
-		char buffer[strLength];
-		if (fBuffer->ReadExactly(buffer, strLength) < 0) {
+		fNextStringLength = length;
+
+		return fNextStringLength;
+	}
+
+
+	void
+	ReadString(char* str)
+	{
+		status_t status = B_OK;
+
+		if (fNextStringLength > 0)
+			status = fBuffer->ReadExactly(&str, fNextStringLength);
+
+		if (status != B_OK) {
 			fReadingStatus = status;
-			return BString("");
 		}
 
-		BString value(buffer, strLength);
-		return value;
+		fNextStringLength = 0;
 	}
 
 
@@ -480,6 +493,7 @@ private:
 	BDataIO*	fBuffer;
 	status_t	fReadingStatus;
 	uint8 		fNextType;
+	ssize_t		fNextStringLength;
 
 };
 
