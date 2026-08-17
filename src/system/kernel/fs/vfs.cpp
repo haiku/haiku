@@ -439,6 +439,7 @@ static status_t dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree,
 static inline void put_vnode(struct vnode* vnode);
 static status_t fs_unmount(char* path, dev_t mountID, uint32 flags,
 	bool kernel);
+static status_t fs_sync(dev_t device);
 static int open_vnode(struct vnode* vnode, int openMode, bool kernel);
 
 
@@ -7898,6 +7899,11 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		if (err != B_OK)
 			return B_ENTRY_NOT_FOUND;
 	}
+
+	// sync() first, so there's less to write during teardown
+	err = fs_sync(path != NULL ? pathVnode->device : mountID);
+	if (err != B_OK)
+		return err;
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
 	ReadLocker mountLocker(sMountLock);
