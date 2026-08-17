@@ -199,8 +199,7 @@ exec_command(i2c_bus_cookie cookie, i2c_op op, i2c_addr slaveAddress,
 			uint32 rxBytes = read32(bus->registers + PCH_IC_RXFLR);
 			if (rxBytes == 0) {
 				// sleep until wake up by intr handler
-				status = waiter.Wait(B_RELATIVE_TIMEOUT, 500000L);
-				if (status != B_OK)
+				if (waiter.Wait(B_RELATIVE_TIMEOUT, 500000L) != B_OK)
 					ERROR("exec_command timed out waiting for read\n");
 
 				rxBytes = read32(bus->registers + PCH_IC_RXFLR);
@@ -407,6 +406,11 @@ init_bus(device_node* node, void** bus_cookie)
 	TRACE_ALWAYS("init_bus() addr 0x%" B_PRIxPHYSADDR " size 0x%" B_PRIx64
 		" irq 0x%" B_PRIx32 "\n", bus->base_addr, bus->map_size, bus->irq);
 
+	bus->wait_read.Init(bus, "pch_i2c bus");
+	bus->wait_write.Init(bus, "pch_i2c bus");
+	bus->wait_busy.Init(bus, "pch_i2c bus");
+	mutex_init(&bus->lock, "pch_i2c");
+
 	bus->registersArea = map_physical_memory("PCHI2C memory mapped registers",
 		bus->base_addr, bus->map_size, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
@@ -490,11 +494,6 @@ init_bus(device_node* node, void** bus_cookie)
 		goto err;
 	}
 
-	bus->wait_read.Init(bus, "pch_i2c bus");
-	bus->wait_write.Init(bus, "pch_i2c bus");
-	bus->wait_busy.Init(bus, "pch_i2c bus");
-	mutex_init(&bus->lock, "pch_i2c");
-
 	*bus_cookie = bus;
 	return status;
 
@@ -515,7 +514,6 @@ uninit_bus(void* bus_cookie)
 		(interrupt_handler)pch_i2c_interrupt_handler, bus);
 	if (bus->registersArea >= 0)
 		delete_area(bus->registersArea);
-
 }
 
 
