@@ -7,26 +7,12 @@
  * Distributed under the terms of the NewOS License.
  */
 
-
-#include <debug.h>
-
-#if KDEBUG
-#define KDEBUG_STATIC static
-static status_t _mutex_lock(struct mutex* lock, void* locker);
-static void _mutex_unlock(struct mutex* lock);
-#else
-#define KDEBUG_STATIC
-#define mutex_lock		mutex_lock_inline
-#define mutex_unlock	mutex_unlock_inline
-#define mutex_trylock	mutex_trylock_inline
-#define mutex_lock_with_timeout	mutex_lock_with_timeout_inline
-#endif
-
 #include <lock.h>
 
 #include <stdlib.h>
 #include <string.h>
 
+#include <debug.h>
 #include <interrupts.h>
 #include <kernel.h>
 #include <listeners.h>
@@ -49,6 +35,15 @@ struct rw_lock_waiter {
 };
 
 #define MUTEX_FLAG_RELEASED		0x2
+
+
+#if KDEBUG
+#define KDEBUG_STATIC static
+static status_t _mutex_lock(struct mutex* lock, void* locker);
+static void _mutex_unlock(struct mutex* lock);
+#else
+#define KDEBUG_STATIC
+#endif
 
 
 int32
