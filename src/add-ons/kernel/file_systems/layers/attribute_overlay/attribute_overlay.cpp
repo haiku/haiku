@@ -1050,7 +1050,8 @@ status_t
 AttributeEntry::Read(off_t position, void *buffer, size_t *length)
 {
 	*length = (size_t)min_c((off_t)*length, fEntry->size - position);
-	memcpy(buffer, fData + position, *length);
+	if (user_memcpy(buffer, fData + position, *length) != B_OK)
+		return B_BAD_ADDRESS;
 	return B_OK;
 }
 
@@ -1067,7 +1068,9 @@ AttributeEntry::Write(off_t position, const void *buffer, size_t *length)
 		}
 	}
 
-	memcpy(fData + position, buffer, *length);
+	if (user_memcpy(fData + position, buffer, *length) != B_OK)
+		return B_BAD_ADDRESS;
+
 	notify_attribute_changed(fParent->VolumeID(), -1, fParent->FileInode(),
 		fEntry->name, B_ATTR_CHANGED);
 	return B_OK;
