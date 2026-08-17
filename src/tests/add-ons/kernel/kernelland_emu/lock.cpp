@@ -7,25 +7,12 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
-#include <debug.h>
-
-#if KDEBUG
-#define KDEBUG_STATIC static
-static status_t _mutex_lock(struct mutex* lock, void* locker);
-static void _mutex_unlock(struct mutex* lock);
-#else
-#define KDEBUG_STATIC
-#define mutex_lock		mutex_lock_inline
-#define mutex_unlock	mutex_unlock_inline
-#define mutex_trylock	mutex_trylock_inline
-#define mutex_lock_with_timeout	mutex_lock_with_timeout_inline
-#endif
-
 #include <lock.h>
 
 #include <stdlib.h>
 #include <string.h>
 
+#include <debug.h>
 #include <AutoLocker.h>
 
 // libroot
@@ -56,6 +43,14 @@ struct rw_lock_waiter {
 
 #define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
+
+#if KDEBUG
+#define KDEBUG_STATIC static
+static status_t _mutex_lock(struct mutex* lock, void* locker);
+static void _mutex_unlock(struct mutex* lock);
+#else
+#define KDEBUG_STATIC
+#endif
 
 static void _rw_lock_read_unlock_threads_locked(rw_lock* lock);
 static void _rw_lock_write_unlock_threads_locked(rw_lock* lock);
@@ -694,7 +689,6 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 static status_t
 _mutex_lock_threads_locked(mutex* lock)
 {
-
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #if KDEBUG
