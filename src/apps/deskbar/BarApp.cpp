@@ -806,6 +806,10 @@ TBarApp::Unsubscribe(const BMessenger &subscriber)
 BBitmap*
 TBarApp::FetchTeamIcon(team_id team, int32 size)
 {
+	BAutolock autolock(sSubscriberLock);
+	if (!autolock.IsLocked())
+		return NULL;
+
 	int32 teamCount = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
@@ -979,6 +983,10 @@ TBarApp::RemoveTeam(team_id team)
 void
 TBarApp::ResizeTeamIcons()
 {
+	BAutolock autolock(sSubscriberLock);
+	if (!autolock.IsLocked())
+		return;
+
 	for (int32 i = sBarTeamInfoList.CountItems() - 1; i >= 0; i--) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
 		if ((barInfo->flags & B_BACKGROUND_APP) == 0
