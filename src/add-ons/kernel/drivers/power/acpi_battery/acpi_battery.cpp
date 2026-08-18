@@ -517,8 +517,8 @@ acpi_battery_support(device_node *parent)
 
 	// check whether it's a battery device
 	const char *name;
-	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &name,
-		false) != B_OK || strcmp(name, ACPI_NAME_BATTERY)) {
+	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &name, false) != B_OK
+	    || (strcmp(name, ACPI_NAME_BATTERY) && strcmp(name, "MSHW0146"))) {
 		return 0.0;
 	}
 
