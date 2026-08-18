@@ -266,7 +266,7 @@ l2cap_receive_data(net_buffer* buffer)
 		{
 			NetBufferHeaderReader<l2cap_connectionless_header> connlessHeader(buffer);
 			const uint16 psm = le16toh(connlessHeader->psm);
-			L2capEndpoint* endpoint = gL2capEndpointManager.ForPSM(psm);
+			L2capEndpoint* endpoint = gL2capEndpointManager.GetForPSM(psm);
 			if (endpoint == NULL)
 				return ECONNRESET;
 
@@ -274,17 +274,19 @@ l2cap_receive_data(net_buffer* buffer)
 			buffer->interface_address = NULL;
 
 			status = endpoint->ReceiveData(buffer);
+			gSocketModule->release_socket(endpoint->socket);
 			break;
 		}
 
 		default:
 		{
-			L2capEndpoint* endpoint = gL2capEndpointManager.ForChannel(dcid);
+			L2capEndpoint* endpoint = gL2capEndpointManager.GetForChannel(dcid);
 			if (endpoint == NULL)
 				return ECONNRESET;
 
 			buffer->interface_address = NULL;
 			status = endpoint->ReceiveData(buffer);
+			gSocketModule->release_socket(endpoint->socket);
 			break;
 		}
 	}

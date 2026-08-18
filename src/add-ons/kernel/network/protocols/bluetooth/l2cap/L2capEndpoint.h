@@ -39,6 +39,7 @@ public:
 			status_t	Accept(net_socket** _acceptedSocket);
 
 			uint16		ChannelID() const { return fChannelID; }
+			uint16		DestinationChannelID() const { return fDestinationChannelID; }
 
 			ssize_t		ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
 			status_t	SendData(net_buffer* buffer);

@@ -17,11 +17,11 @@ public:
 
 	status_t			Bind(L2capEndpoint* endpoint, const sockaddr_l2cap& address);
 	status_t			Unbind(L2capEndpoint* endpoint);
-	L2capEndpoint*		ForPSM(uint16 psm);
+	L2capEndpoint*		GetForPSM(uint16 psm);
 
 	status_t			BindToChannel(L2capEndpoint* endpoint);
 	status_t			UnbindFromChannel(L2capEndpoint* endpoint);
-	L2capEndpoint*		ForChannel(uint16 cid);
+	L2capEndpoint*		GetForChannel(uint16 cid);
 	void				Disconnected(HciConnection* connection);
 
 private:

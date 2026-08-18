@@ -66,11 +66,13 @@ L2capEndpointManager::Unbind(L2capEndpoint* endpoint)
 
 
 L2capEndpoint*
-L2capEndpointManager::ForPSM(uint16 psm)
+L2capEndpointManager::GetForPSM(uint16 psm)
 {
 	ReadLocker _(fBoundEndpointsLock);
-	// TODO: Acquire reference?
-	return fBoundEndpoints.Find(psm);
+	L2capEndpoint* endpoint = fBoundEndpoints.Find(psm);
+	if (endpoint != NULL)
+		gSocketModule->acquire_socket(endpoint->socket);
+	return endpoint;
 }
 
 
@@ -112,11 +114,13 @@ L2capEndpointManager::UnbindFromChannel(L2capEndpoint* endpoint)
 
 
 L2capEndpoint*
-L2capEndpointManager::ForChannel(uint16 cid)
+L2capEndpointManager::GetForChannel(uint16 cid)
 {
 	ReadLocker _(fChannelEndpointsLock);
-	// TODO: Acquire reference?
-	return fChannelEndpoints.Find(cid);
+	L2capEndpoint* endpoint = fChannelEndpoints.Find(cid);
+	if (endpoint != NULL)
+		gSocketModule->acquire_socket(endpoint->socket);
+	return endpoint;
 }
 
 
@@ -137,4 +141,3 @@ L2capEndpointManager::Disconnected(HciConnection* connection)
 		gSocketModule->notify(endpoint->socket, B_SELECT_ERROR, ENOTCONN);
 	}
 }
-

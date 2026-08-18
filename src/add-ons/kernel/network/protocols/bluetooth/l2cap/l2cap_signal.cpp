@@ -46,7 +46,7 @@ l2cap_handle_connection_req(HciConnection* conn, uint8 ident, net_buffer* buffer
 	const uint16 psm = le16toh(command->psm);
 	const uint16 scid = le16toh(command->scid);
 
-	L2capEndpoint* endpoint = gL2capEndpointManager.ForPSM(psm);
+	L2capEndpoint* endpoint = gL2capEndpointManager.GetForPSM(psm);
 	if (endpoint == NULL) {
 		// Refuse connection.
 		send_l2cap_connection_rsp(conn, ident, 0, scid,
@@ -55,6 +55,7 @@ l2cap_handle_connection_req(HciConnection* conn, uint8 ident, net_buffer* buffer
 	}
 
 	endpoint->_HandleConnectionReq(conn, ident, psm, scid);
+	gSocketModule->release_socket(endpoint->socket);
 	return B_OK;
 }
 
@@ -144,7 +145,7 @@ l2cap_handle_configuration_req(HciConnection* conn, uint8 ident, net_buffer* buf
 		return ENOBUFS;
 
 	const uint16 dcid = le16toh(command->dcid);
-	L2capEndpoint* endpoint = gL2capEndpointManager.ForChannel(dcid);
+	L2capEndpoint* endpoint = gL2capEndpointManager.GetForChannel(dcid);
 	if (endpoint == NULL) {
 		ERROR("l2cap: unexpected configuration req: channel does not exist (cid=%d)\n", dcid);
 		send_l2cap_command_reject(conn, ident,
@@ -160,8 +161,9 @@ l2cap_handle_configuration_req(HciConnection* conn, uint8 ident, net_buffer* buf
 
 	if (options.rejected != NULL) {
 		// Reject without doing anything else.
-		send_l2cap_configuration_rsp(conn, ident, dcid, 0,
+		send_l2cap_configuration_rsp(conn, ident, endpoint->DestinationChannelID(), 0,
 			l2cap_configuration_rsp::RESULT_UNKNOWN_OPTION, options.rejected);
+		gSocketModule->release_socket(endpoint->socket);
 		return B_OK;
 	}
 
@@ -169,6 +171,7 @@ l2cap_handle_configuration_req(HciConnection* conn, uint8 ident, net_buffer* buf
 		options.mtu_set ? &options.mtu : NULL,
 		options.flush_timeout_set ? &options.flush_timeout : NULL,
 		options.qos_set ? &options.qos : NULL);
+	gSocketModule->release_socket(endpoint->socket);
 	return B_OK;
 }
 
@@ -218,7 +221,7 @@ l2cap_handle_disconnection_req(HciConnection* conn, uint8 ident, net_buffer* buf
 		return ENOBUFS;
 
 	const uint16 dcid = le16toh(command->dcid);
-	L2capEndpoint* endpoint = gL2capEndpointManager.ForChannel(dcid);
+	L2capEndpoint* endpoint = gL2capEndpointManager.GetForChannel(dcid);
 	if (endpoint == NULL) {
 		ERROR("l2cap: unexpected disconnection req: channel does not exist (cid=%d)\n", dcid);
 		send_l2cap_command_reject(conn, ident,
@@ -229,6 +232,7 @@ l2cap_handle_disconnection_req(HciConnection* conn, uint8 ident, net_buffer* buf
 	const uint16 scid = le16toh(command->scid);
 
 	endpoint->_HandleDisconnectionReq(ident, scid);
+	gSocketModule->release_socket(endpoint->socket);
 	return B_OK;
 }
 
@@ -474,6 +478,11 @@ l2cap_handle_signaling_command(HciConnection* connection, net_buffer* buffer)
 			ERROR("%s: invalid L2CAP signaling command packet, code=%#x, "
 				"ident=%d, length=%d, buffer size=%" B_PRIu32 "\n", __func__,
 				code, ident, length, buffer->size);
+			if (releaseIdent) {
+				btCoreData->free_command_ident(connection, ident);
+				if (endpoint != NULL)
+					gSocketModule->release_socket(endpoint->socket);
+			}
 			return EMSGSIZE;
 		}
 
@@ -535,8 +544,11 @@ l2cap_handle_signaling_command(HciConnection* connection, net_buffer* buffer)
 		}
 
 		// Only release the ident if no more signals with it are expected.
-		if (releaseIdent)
+		if (releaseIdent) {
 			btCoreData->free_command_ident(connection, ident);
+			if (endpoint != NULL)
+				gSocketModule->release_socket(endpoint->socket);
+		}
 
 		// Advance to the next command (if any.)
 		gBufferModule->remove_header(buffer, length);

@@ -162,11 +162,15 @@ L2capEndpoint::Shutdown()
 	uint8 ident = btCoreData->allocate_command_ident(fConnection, this);
 	if (ident == L2CAP_NULL_IDENT)
 		return ENOBUFS;
+	gSocketModule->acquire_socket(socket);
 
 	status = send_l2cap_disconnection_req(fConnection, ident,
 		fDestinationChannelID, fChannelID);
-	if (status != B_OK)
+	if (status != B_OK) {
+		btCoreData->free_command_ident(fConnection, ident);
+		gSocketModule->release_socket(socket);
 		return status;
+	}
 
 	fState = WAIT_FOR_DISCONNECTION_RSP;
 
@@ -325,11 +329,15 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 	uint8 ident = btCoreData->allocate_command_ident(fConnection, this);
 	if (ident == L2CAP_NULL_IDENT)
 		return ENOBUFS;
+	gSocketModule->acquire_socket(socket);
 
 	status = send_l2cap_connection_req(fConnection, ident,
 		address->l2cap_psm, fChannelID);
-	if (status != B_OK)
+	if (status != B_OK) {
+		btCoreData->free_command_ident(fConnection, ident);
+		gSocketModule->release_socket(socket);
 		return status;
+	}
 
 	fState = WAIT_FOR_CONNECTION_RSP;
 
@@ -647,10 +655,13 @@ L2capEndpoint::_SendChannelConfig()
 		// TODO: Retry later?
 		return;
 	}
+	gSocketModule->acquire_socket(socket);
 
 	status_t status = send_l2cap_configuration_req(fConnection, ident,
 		fDestinationChannelID, 0, flush_timeout, mtu, flow);
 	if (status != B_OK) {
+		btCoreData->free_command_ident(fConnection, ident);
+		gSocketModule->release_socket(socket);
 		socket->error = status;
 		return;
 	}
