@@ -16,6 +16,7 @@
 
 
 extern segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
+extern struct gdt_idt_descr gBootGDTDescriptor;
 
 
 // For use with mmu_map_physical_memory()

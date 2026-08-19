@@ -96,12 +96,7 @@ smp_start_kernel(void)
 	set_debug_idt();
 
 	// Set up gdt
-	struct gdt_idt_descr gdt_descr;
-	gdt_descr.limit = sizeof(gBootGDT) - 1;
-	gdt_descr.base = gBootGDT;
-
-	asm("lgdt	%0;"
-		: : "m" (gdt_descr));
+	asm("lgdt	%0;" : : "m" (gBootGDTDescriptor));
 
 	asm("pushl  %0; "					// push the cpu number
 		"pushl 	%1;	"					// kernel args
@@ -145,6 +140,9 @@ platform_start_kernel(void)
 	smp_boot_other_cpus(smp_start_kernel);
 
 	dprintf("kernel entry at %x\n", image->elf_header.e_entry);
+
+	// Set up gdt
+	asm("lgdt	%0;" : : "m" (gBootGDTDescriptor));
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "

@@ -70,6 +70,7 @@ struct extended_memory {
 
 
 segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
+struct gdt_idt_descr gBootGDTDescriptor;
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x1000000;		// 16 MB for the kernel
@@ -551,10 +552,7 @@ mmu_get_virtual_mapping(addr_t virtualAddress, addr_t *_physicalAddress)
 }
 
 
-/*!	Sets up the final and kernel accessible GDT and IDT tables.
-	BIOS calls won't work any longer after this function has
-	been called.
-*/
+/*!	Sets up the final and kernel accessible GDT and IDT tables. */
 extern "C" void
 mmu_init_for_kernel(void)
 {
@@ -586,12 +584,8 @@ mmu_init_for_kernel(void)
 	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
 		DT_DATA_WRITEABLE, DPL_USER);
 
-	// load the GDT
-	struct gdt_idt_descr gdtDescriptor;
-	gdtDescriptor.limit = sizeof(gBootGDT);
-	gdtDescriptor.base = gBootGDT;
-
-	asm("lgdt %0" : : "m" (gdtDescriptor));
+	gBootGDTDescriptor.limit = sizeof(gBootGDT);
+	gBootGDTDescriptor.base = gBootGDT;
 
 	TRACE("gdt at virtual address %p\n", gBootGDT);
 
