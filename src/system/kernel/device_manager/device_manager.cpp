@@ -2023,8 +2023,8 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 			} else if (!strcmp(devicePath, "power")) {
 				matches = type == PCI_data_acquisition;
 			} else if (!strcmp(devicePath, "input")) {
-				matches = type == PCI_data_acquisition
-					&& subType == PCI_data_acquisition_other;
+				matches = type == PCI_input
+					|| (type == PCI_data_acquisition && subType == PCI_data_acquisition_other);
 			}
 		} else {
 			// This driver does not support types, but still wants to its

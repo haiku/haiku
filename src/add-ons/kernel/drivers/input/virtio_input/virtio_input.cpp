@@ -289,6 +289,12 @@ virtio_input_init_device(void* _info, void** _cookie)
 	}
 	TRACE("  queue: %p\n", info->virtio_queue);
 
+	status = info->virtio->setup_interrupt(info->virtio_device, NULL, info);
+	if (status < B_OK) {
+		ERROR("interrupt setup failed (%s)\n", strerror(status));
+		return status;
+	}
+
 	status = info->virtio->queue_setup_interrupt(info->virtio_queue,
 		virtio_input_callback, info);
 	if (status < B_OK)

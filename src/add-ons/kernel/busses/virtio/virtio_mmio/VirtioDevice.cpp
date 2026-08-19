@@ -55,15 +55,22 @@ VirtioQueue::Init(uint16 requestedSize)
 	fDev->fRegs->queueNum = fQueueLen;
 	fLastUsed = 0;
 
+	// For the legacy transport, the rings must be laid out as described in
+	// the virtio 1.3 spec, section 2.7.2
+	// "Legacy Interfaces: A Note on Virtqueue Layout".
+	// This layout also satisfies the version 2 alignment requirements.
 	size_t queueMemSize = 0;
 	size_t descsOffset = queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioDesc) * fDescCount, B_PAGE_SIZE);
+	queueMemSize += sizeof(VirtioDesc) * fDescCount;
 
 	size_t availOffset = queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioAvail) + sizeof(uint16) * fQueueLen, B_PAGE_SIZE);
+	queueMemSize += sizeof(VirtioAvail) + sizeof(uint16) * fQueueLen + sizeof(uint16);
 
+	queueMemSize = ROUNDUP(queueMemSize, B_PAGE_SIZE);
 	size_t usedOffset = queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioUsed) + sizeof(VirtioUsedItem) * fQueueLen, B_PAGE_SIZE);
+	queueMemSize += sizeof(VirtioUsed) + sizeof(VirtioUsedItem) * fQueueLen + sizeof(uint16);
+
+	queueMemSize = ROUNDUP(queueMemSize, B_PAGE_SIZE);
 
 	uint8* queueMem = NULL;
 	fArea.SetTo(create_area("VirtIO Queue", (void**)&queueMem,

@@ -327,7 +327,7 @@ VirtioDevice::_DumpFeatures(const char* title, uint64 features,
 		if (feature == 0)
 			continue;
 		const char* name = virtio_get_feature_name(feature);
-		if (name == NULL)
+		if (name == NULL && get_feature_name != NULL)
 			name = get_feature_name(feature);
 		if (name != NULL) {
 			strlcat(features_string, "[", sizeof(features_string));
