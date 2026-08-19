@@ -19,9 +19,9 @@
 #include <debug.h>
 #include <debugger_keymaps.h>
 #include <lock.h>
+#include <ATKeymap.h>
 #include <util/AutoLock.h>
 
-#include "ATKeymap.h"
 #include "ps2_service.h"
 #include "keyboard_mouse_driver.h"
 #include "packet_buffer.h"
