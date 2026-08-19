@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin desklink ;
 
-UsePrivateHeaders app interface shared ;
+UsePrivateHeaders app interface locale shared ;
 
 Application desklink :
 	desklink.cpp
