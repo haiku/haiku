@@ -12,6 +12,8 @@
 #define XHCI_H
 
 
+#include <util/DoublyLinkedList.h>
+
 #include "usb_private.h"
 #include "xhci_hardware.h"
 
@@ -30,7 +32,7 @@ class XHCIRootHub;
 #define XHCI_ENDPOINT_RING_SIZE	(XHCI_MAX_TRANSFERS * 2)
 
 
-typedef struct xhci_td {
+struct xhci_td : public DoublyLinkedListLinkImpl<xhci_td> {
 	xhci_trb*	trbs;
 	phys_addr_t	trb_addr;
 	uint32		trb_count;
@@ -45,12 +47,10 @@ typedef struct xhci_td {
 	uint8		trb_completion_code;
 	int32		td_transferred;
 	int32		trb_left;
-
-	xhci_td*	next;
-} xhci_td;
+};
 
 
-typedef struct xhci_endpoint {
+struct xhci_endpoint {
 	mutex 			lock;
 
 	xhci_device*	device;
@@ -59,16 +59,16 @@ typedef struct xhci_endpoint {
 
 	uint16			max_burst_payload;
 
-	xhci_td*		td_head;
+	DoublyLinkedList<xhci_td> td_list;
 	uint8			used;
 	uint8			next;
 
 	xhci_trb*		trbs; // [XHCI_ENDPOINT_RING_SIZE]
 	phys_addr_t 	trb_addr;
-} xhci_endpoint;
+};
 
 
-typedef struct xhci_device {
+struct xhci_device {
 	uint8 slot;
 	uint8 address;
 	area_id trb_area;
@@ -84,7 +84,7 @@ typedef struct xhci_device {
 	struct xhci_device_ctx *device_ctx;
 
 	xhci_endpoint endpoints[XHCI_MAX_ENDPOINTS - 1];
-} xhci_device;
+};
 
 
 class XHCI : public BusManager {
@@ -273,7 +273,7 @@ private:
 
 			// Transfers
 			mutex				fFinishedLock;
-			xhci_td	*			fFinishedHead;
+			DoublyLinkedList<xhci_td> fFinishedList;
 			sem_id				fFinishTransfersSem;
 			thread_id			fFinishThread;
 
