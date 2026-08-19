@@ -9,11 +9,17 @@
 #include <virtio_input_driver.h>
 #include <virtio_defs.h>
 
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <ATKeymap.h>
 #include <Application.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <ObjectList.h>
+#include <Path.h>
 
 
 //#define TRACE_VIRTIO_INPUT_DEVICE
@@ -155,38 +161,82 @@ VirtioInputDevice::~VirtioInputDevice()
 status_t
 VirtioInputDevice::InitCheck()
 {
-	static input_device_ref *devices[3];
-	input_device_ref **devicesEnd = devices;
-
 	FileDescriptorCloser fd;
 
-	// TODO: dynamically scan and detect device type
+	BDirectory virtioDirectory("/dev/input/virtio");
+	status_t err = virtioDirectory.InitCheck();
+	if (err != B_OK)
+		return err;
 
-	ObjectDeleter<VirtioInputHandler> tablet(
-		new TabletHandler(this, "VirtIO tablet"));
-	fd.SetTo(open("/dev/input/virtio/0/raw", O_RDWR));
-	if (fd.IsSet()) {
-		tablet->SetFd(fd.Detach());
-		*devicesEnd++ = tablet->Ref();
-		tablet.Detach();
-	} else {
-		TRACE("Unable to detect tablet device!");
+	BObjectList<input_device_ref> devices;
+	BEntry entry;
+	// Go through all virtio input devices
+	while (virtioDirectory.GetNextEntry(&entry) == B_OK) {
+		if (!entry.IsDirectory())
+			continue;
+
+		BPath path;
+		if (entry.GetPath(&path) != B_OK)
+			continue;
+
+		BPath rawPath(path.Path(), "raw");
+
+		fd.SetTo(open(rawPath.Path(), O_RDWR));
+		if (!fd.IsSet()) {
+			TRACE("Unable to open %s\n", rawPath.Path());
+			continue;
+		}
+
+		// Query the device for its type
+		VirtioInputType type = kVirtioInputUnknown;
+		if (ioctl(fd.Get(), virtioInputGetType, &type, sizeof(VirtioInputType)) != B_OK) {
+			TRACE("virtioInputGetType failed (%s)\n", strerror(errno));
+			continue;
+		}
+
+		// Deduplicate names of devices of the same type.
+		int32 index = atoi(path.Leaf()) + 1;
+		char name[B_OS_NAME_LENGTH];
+
+		ObjectDeleter<VirtioInputHandler> handler;
+		switch (type) {
+			case kVirtioInputKeyboard:
+				TRACE("Identified %s as a keyboard\n", path.Path());
+				snprintf(name, sizeof(name), "VirtIO Keyboard %" B_PRId32, index);
+				handler.SetTo(new(std::nothrow) KeyboardHandler(this, name));
+				break;
+			case kVirtioInputTablet:
+				TRACE("Identified %s as a tablet\n", path.Path());
+				snprintf(name, sizeof(name), "VirtIO Tablet %" B_PRId32, index);
+				handler.SetTo(new(std::nothrow) TabletHandler(this, name));
+				break;
+			case kVirtioInputUnknown:
+				ERROR("Unrecognized device %s\n", path.Path());
+				break;
+		}
+
+		if (!handler.IsSet())
+			continue;
+
+		handler->SetFd(fd.Detach());
+		if (!devices.AddItem(handler->Ref()))
+			continue;
+
+		handler.Detach();
 	}
 
-	ObjectDeleter<VirtioInputHandler> keyboard(
-		new KeyboardHandler(this, "VirtIO keyboard"));
-	fd.SetTo(open("/dev/input/virtio/1/raw", O_RDWR));
-	if (fd.IsSet()) {
-		keyboard->SetFd(fd.Detach());
-		*devicesEnd++ = keyboard->Ref();
-		keyboard.Detach();
-	} else {
-		TRACE("Unable to detect keyboard device!");
-	}
+	int32 count = devices.CountItems();
+	input_device_ref** refs = new(std::nothrow) input_device_ref*[count + 1];
+	if (refs == NULL)
+		return B_NO_MEMORY;
 
-	*devicesEnd = NULL;
+	for (int32 i = 0; i < count; i++)
+		refs[i] = devices.ItemAt(i);
+	refs[count] = NULL;
 
-	RegisterDevices(devices);
+	RegisterDevices(refs);
+	delete[] refs;
+
 	return B_OK;
 }
 
@@ -223,7 +273,7 @@ VirtioInputHandler::VirtioInputHandler(VirtioInputDevice* dev, const char* name,
 	fWatcherThread(B_ERROR),
 	fRun(false)
 {
-	fRef.name = (char*)name; // NOTE: name should be constant data
+	fRef.name = strdup(name);
 	fRef.type = type;
 	fRef.cookie = this;
 }
@@ -231,7 +281,7 @@ VirtioInputHandler::VirtioInputHandler(VirtioInputDevice* dev, const char* name,
 
 VirtioInputHandler::~VirtioInputHandler()
 {
-
+	free(fRef.name);
 }
 
 

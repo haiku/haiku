@@ -131,11 +131,12 @@ enum {
 };
 
 enum {
-	kVirtioInputBtnLeft     = 0x110,
-	kVirtioInputBtnRight    = 0x111,
-	kVirtioInputBtnMiddle   = 0x112,
+	kVirtioInputBtnMisc = 0x100,
+	kVirtioInputBtnLeft = 0x110,
+	kVirtioInputBtnRight = 0x111,
+	kVirtioInputBtnMiddle = 0x112,
 	kVirtioInputBtnGearDown = 0x150,
-	kVirtioInputBtnGearUp   = 0x151,
+	kVirtioInputBtnGearUp = 0x151,
 };
 
 enum {

@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
- * Copyright 2021, Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,10 +21,10 @@
 #include <virtio_input_driver.h>
 
 #include <AutoDeleter.h>
-#include <AutoDeleterOS.h>
 #include <AutoDeleterDrivers.h>
+#include <AutoDeleterOS.h>
 #include <debug.h>
-
+#include <util/AutoLock.h>
 
 //#define TRACE_VIRTIO_INPUT
 #ifdef TRACE_VIRTIO_INPUT
@@ -77,12 +77,15 @@ public:
 struct VirtioInputDevice {
 	device_node* node {};
 
+	mutex virtioConfigLock = MUTEX_INITIALIZER("virtioConfig");
 	mutex virtioQueueLock = MUTEX_INITIALIZER("virtioQueue");
+
 	virtio_device virtioDevice {};
 	virtio_device_interface* virtio {};
 	virtio_queue virtioQueue {};
 
 	uint64 features {};
+	VirtioInputType type;
 
 	PacketQueue packetQueue;
 };
@@ -184,6 +187,56 @@ WriteInputPacket(const VirtioInputPacket &pkt)
 	}
 }
 #endif
+
+
+static status_t
+QueryConfig(VirtioInputDevice* dev, uint8 select, uint8 subsel, VirtioInputConfig* config)
+{
+	MutexLocker(dev->virtioConfigLock);
+
+	status_t status = dev->virtio->write_device_config(dev->virtioDevice,
+		offsetof(VirtioInputConfig, select), &select, sizeof(select));
+	if (status != B_OK)
+		return status;
+
+	status = dev->virtio->write_device_config(dev->virtioDevice,
+		offsetof(VirtioInputConfig, subsel), &subsel, sizeof(subsel));
+	if (status != B_OK)
+		return status;
+
+	return dev->virtio->read_device_config(dev->virtioDevice, 0, config, sizeof(*config));
+}
+
+
+static inline bool
+IsBitSet(const uint8* bitmap, uint8 size, uint16 bit)
+{
+	return (bit / 8) < size && (bitmap[bit / 8] & (1 << (bit % 8))) != 0;
+}
+
+
+static VirtioInputType
+IdentifyDevice(VirtioInputDevice* dev)
+{
+	VirtioInputConfig config = {};
+
+	// If absolute x and y are available, this is a tablet.
+	if (QueryConfig(dev, kVirtioInputCfgEvBits, kVirtioInputEvAbs, &config) == B_OK
+		&& IsBitSet(config.bitmap, config.size, kVirtioInputAbsX)
+		&& IsBitSet(config.bitmap, config.size, kVirtioInputAbsY)) {
+		return kVirtioInputTablet;
+	}
+
+	// If keys below BTN_MISC are available, this is a keyboard.
+	if (QueryConfig(dev, kVirtioInputCfgEvBits, kVirtioInputEvKey, &config) == B_OK) {
+		size_t bytes = min_c(config.size, kVirtioInputBtnMisc / 8);
+		for (size_t i = 0; i < bytes; i++)
+			if (config.bitmap[i] != 0)
+				return kVirtioInputKeyboard;
+	}
+
+	return kVirtioInputUnknown;
+}
 
 
 static void
@@ -307,14 +360,9 @@ virtio_input_init_device(void* _info, void** _cookie)
 
 	info->virtio->negotiate_features(info->virtioDevice, 0, &info->features, NULL);
 
+	info->type = IdentifyDevice(info);
+
 	status_t status = B_OK;
-/*
-	status = info->virtio->read_device_config(
-		info->virtio_device, 0, &info->config,
-		sizeof(struct virtio_blk_config));
-	if (status != B_OK)
-		return status;
-*/
 
 	info->packetQueue.Init(8);
 
@@ -440,6 +488,14 @@ virtio_input_control(void* cookie, uint32 op, void* buffer, size_t length)
 				return res;
 
 			return B_OK;
+		}
+		case virtioInputGetType:
+		{
+			TRACE("virtioInputGetType\n");
+			if (buffer == NULL || length < sizeof(VirtioInputType))
+				return B_BAD_VALUE;
+
+			return user_memcpy(buffer, &info->type, sizeof(VirtioInputType));
 		}
 	}
 
