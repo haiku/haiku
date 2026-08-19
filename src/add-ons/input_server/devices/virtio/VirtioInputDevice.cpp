@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <ATKeymap.h>
 #include <Application.h>
-#include <String.h>
 
 
 //#define TRACE_VIRTIO_INPUT_DEVICE
@@ -388,9 +388,12 @@ KeyboardHandler::PacketReceived(const VirtioInputPacket &pkt)
 #endif
 	switch (pkt.type) {
 		case kVirtioInputEvKey: {
-			if (pkt.code < 256)
-				SetBitTo(fNewState.keys[pkt.code / 8], pkt.code % 8,
-					pkt.value != 0);
+			if (pkt.code == 0 || pkt.code > B_COUNT_OF(kATKeycodeMap))
+				break;
+
+			uint32 code = kATKeycodeMap[pkt.code - 1];
+			if (code < 128)
+				SetBitTo(fNewState.keys[code / 8], code % 8, pkt.value != 0);
 			break;
 		}
 		case kVirtioInputEvSyn: {
