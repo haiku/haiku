@@ -4,6 +4,7 @@
  */
 
 
+#if defined(__i386__) || defined(__x86_64__)
 #include <cpu_type.h>
 
 #include <TestSuiteAddon.h>
@@ -127,3 +128,4 @@ public:
 
 
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(CpuTypeTests, getTestSuiteName());
+#endif

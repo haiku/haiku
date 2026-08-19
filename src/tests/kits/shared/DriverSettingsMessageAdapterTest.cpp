@@ -157,6 +157,33 @@ class DriverSettingsMessageAdapterTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST(TestPrimitivesToMessage);
 	CPPUNIT_TEST_SUITE_END();
 
+	class HexConverter : public DriverSettingsConverter {
+	public:
+		status_t ConvertFromDriverSettings(const driver_parameter& parameter,
+			const char* name, int32 index, uint32 type, BMessage& target)
+		{
+			const char* value = parameter.values[index];
+			if (value[0] == '0' && value[1] == 'x')
+				return target.AddInt32(name, (int32)strtol(value, NULL, 0));
+			return B_NOT_SUPPORTED;
+		}
+
+		status_t ConvertToDriverSettings(const BMessage& source,
+			const char* name, int32 index, uint32 type, BString& value)
+		{
+			int32 intValue;
+			if (index == 0 && source.FindInt32(name, 0, &intValue) == B_OK) {
+				BString string;
+				string.SetToFormat("0x%" B_PRIu32, intValue);
+				value << string;
+
+				return B_OK;
+			}
+			return B_NOT_SUPPORTED;
+		}
+	};
+
+
 public:
 	void TestWildcard()
 	{
@@ -212,32 +239,7 @@ public:
 
 	void TestConverter()
 	{
-		class HexConverter : public DriverSettingsConverter {
-		public:
-			status_t ConvertFromDriverSettings(const driver_parameter& parameter,
-				const char* name, int32 index, uint32 type, BMessage& target)
-			{
-				const char* value = parameter.values[index];
-				if (value[0] == '0' && value[1] == 'x')
-					return target.AddInt32(name, (int32)strtol(value, NULL, 0));
-				return B_NOT_SUPPORTED;
-			}
-
-			status_t ConvertToDriverSettings(const BMessage& source,
-				const char* name, int32 index, uint32 type, BString& value)
-			{
-				int32 intValue;
-				if (index == 0 && source.FindInt32(name, 0, &intValue) == B_OK) {
-					BString string;
-					string.SetToFormat("0x%" B_PRIu32, intValue);
-					value << string;
-
-					return B_OK;
-				}
-				return B_NOT_SUPPORTED;
-			}
-		} converter;
-
+		HexConverter converter;
 		const settings_template kTemplate[] = {
 			{B_INT32_TYPE, "test", NULL, false, &converter},
 			{}
