@@ -247,10 +247,6 @@ MediaReplicant::MouseDown(BPoint where)
 
 		BMenuItem* item;
 
-		item = new BMenuItem(B_TRANSLATE("Control physical output"), new BMessage(kMsgVolumeWhich));
-		item->SetMarked(fMixerControl->VolumeWhich());
-		menu->AddItem(item);
-
 		item = new BMenuItem(B_TRANSLATE("Beep"), new BMessage(kMsgToggleBeep));
 		if (fMixerControl != NULL)
 			item->SetMarked(fMixerControl->Beep());
@@ -290,24 +286,6 @@ MediaReplicant::MessageReceived(BMessage* message)
 			_Launch("Media Preferences", "application/x-vnd.Haiku-Media",
 				B_SYSTEM_PREFERENCES_DIRECTORY, "Media");
 			break;
-
-		case kMsgVolumeWhich:
-		{
-			if (fMixerControl == NULL)
-				break;
-
-			BMenuItem* item;
-			if (message->FindPointer("source", (void**)&item) != B_OK)
-				break;
-
-			if (!item->IsEnabled())
-				break;
-
-			item->SetMarked(!item->IsMarked());
-			fMixerControl->SetVolumeWhich(item->IsMarked()
-				? VOLUME_USE_PHYS_OUTPUT : VOLUME_USE_MIXER);
-			break;
-		}
 
 		case kMsgToggleBeep:
 		{

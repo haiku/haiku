@@ -16,7 +16,6 @@
 #include <Slider.h>
 
 
-static const uint32 kMsgVolumeWhich = 'svwh';
 static const uint32 kMsgToggleBeep = 'tdbp';
 static const uint32 kMsgToggleMute = 'tdmt';
 static const uint32 kMsgVolumeUpdate = 'vlup';
