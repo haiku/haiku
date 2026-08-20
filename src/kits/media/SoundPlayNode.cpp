@@ -153,7 +153,7 @@ SoundPlayNode::SetTimeSource(BTimeSource* timeSource)
 	BMediaNode::SetTimeSource(timeSource);
 
 	if (restart) {
-		media_timed_event event = {};
+		media_timed_event event;
 		event.event_time = TimeSource()->Now();
 		HandleStart(&event, 0, false);
 		SetRunState(B_STARTED);
