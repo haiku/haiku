@@ -2045,6 +2045,9 @@ MultiAudioNode::_StopOutputThread()
 	CALLED();
 	atomic_set(&fQuitThread, 1);
 
+	if (fThread < 0)
+		return B_OK;
+
 	wait_for_thread(fThread, NULL);
 	fThread = -1;
 
