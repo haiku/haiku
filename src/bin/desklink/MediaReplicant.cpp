@@ -509,19 +509,14 @@ void
 MediaReplicant::_Init()
 {
 	image_info info;
-	if (our_image(info) != B_OK)
-		return;
-
-	BFile file(info.name, B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return;
-
-	BResources resources(&file);
-	if (resources.InitCheck() != B_OK)
-		return;
-
-	fIcon = _LoadIcon(resources, "Speaker");
-	fMutedIcon = _LoadIcon(resources, "SpeakerMuted");
+	if (our_image(info) == B_OK) {
+		BFile file(info.name, B_READ_ONLY);
+		if (file.InitCheck() == B_OK) {
+			BResources resources(&file);
+			fIcon = _LoadIcon(resources, "SpeakerBox");
+			fMutedIcon = _LoadIcon(resources, "SpeakerBoxMuted");
+		}
+	}
 }
 
 
