@@ -70,6 +70,9 @@ private:
 			volatile int32 		fPhysicalAudioOutInputID;
 			char fPhysicalAudioOutInputName[B_MEDIA_NAME_LENGTH];
 
+			media_output 		fMixerToPhysicalAudioOut;
+			media_input 		fPhysicalAudioOutFromMixer;
+
 			BList				fMsgList;
 
 			uint32				fBeginHeader[3];
