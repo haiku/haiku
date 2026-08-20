@@ -142,7 +142,22 @@ void
 SoundPlayNode::SetTimeSource(BTimeSource* timeSource)
 {
 	CALLED();
+
+	bool restart = false;
+	if (RunState() == B_STARTED) {
+		restart = true;
+		HandleStop(NULL, 0, false);
+		SetRunState(B_STOPPED);
+	}
+
 	BMediaNode::SetTimeSource(timeSource);
+
+	if (restart) {
+		media_timed_event event = {};
+		event.event_time = TimeSource()->Now();
+		HandleStart(&event, 0, false);
+		SetRunState(B_STARTED);
+	}
 }
 
 

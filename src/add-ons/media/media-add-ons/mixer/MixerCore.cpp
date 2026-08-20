@@ -291,10 +291,13 @@ void
 MixerCore::SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency)
 {
 	ASSERT_LOCKED();
-	if (fTimeSource)
-		fTimeSource->Release();
 
-	fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
+	if (fTimeSource != ts) {
+		if (fTimeSource != NULL)
+			fTimeSource->Release();
+		fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
+	}
+
 	fDownstreamLatency = downstream_latency;
 
 	TRACE("MixerCore::SetTimingInfo, now = %lld, downstream latency %lld\n",

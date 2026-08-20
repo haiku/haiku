@@ -694,16 +694,19 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 				" node %" B_PRId32 ", timesource %" B_PRId32 " enter\n",
 				fNodeID, command->timesource_id);
 
+			if (command->timesource_id == fTimeSourceID)
+				return B_OK;
+
 			fTimeSourceID = command->timesource_id;
 
-			if (fTimeSource) {
+			if (fTimeSource != NULL) {
 				// As this node already had a timesource, to remove this node
 				// from time source control
 				fTimeSource->RemoveMe(this);
 				// Release the time source
 				fTimeSource->Release();
 				// Force next call to TimeSource() to create a new object
-				fTimeSource = 0;
+				fTimeSource = NULL;
 			}
 
 			// Create new time source object and call the SetTimeSource
