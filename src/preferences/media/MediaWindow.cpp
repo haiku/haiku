@@ -100,10 +100,13 @@ MediaWindow::SmartNode::SetTo(const dormant_node_info* info)
 
 	status_t status = B_OK;
 	media_node_id node_id;
-	if (roster->GetInstancesFor(info->addon, info->flavor_id, &node_id) == B_OK)
+	int32 instanceCount = 1;
+	if (roster->GetInstancesFor(info->addon, info->flavor_id, &node_id, &instanceCount) == B_OK
+		&& instanceCount > 0) {
 		status = roster->GetNodeFor(node_id, fNode);
-	else
+	} else {
 		status = roster->InstantiateDormantNode(*info, fNode, B_FLAVOR_IS_GLOBAL);
+	}
 
 	if (status != B_OK) {
 		fprintf(stderr, "SmartNode::SetTo error with node %" B_PRId32

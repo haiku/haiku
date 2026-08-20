@@ -398,15 +398,15 @@ AudioSettingsView::_FillChannelMenu(const dormant_node_info* nodeInfo)
 	BMediaRoster* roster = BMediaRoster::Roster();
 	media_node node;
 	media_node_id node_id;
+	int32 instanceCount = 1;
 
-	status_t err = roster->GetInstancesFor(nodeInfo->addon,
-		nodeInfo->flavor_id, &node_id);
-	if (err != B_OK) {
+	status_t err
+		= roster->GetInstancesFor(nodeInfo->addon, nodeInfo->flavor_id, &node_id, &instanceCount);
+	if (err != B_OK || instanceCount == 0)
 		err = roster->InstantiateDormantNode(*nodeInfo, &node,
 			B_FLAVOR_IS_GLOBAL);
-	} else {
+	else
 		err = roster->GetNodeFor(node_id, &node);
-	}
 
 	if (err == B_OK) {
 		int32 inputCount = 4;

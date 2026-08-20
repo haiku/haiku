@@ -110,8 +110,10 @@ NodeManager::SetDefaultNode(node_type type, const media_node* node,
 		int32 count = 1;
 		status = GetInstances(info->addon, info->flavor_id, &nodeID, &count,
 			count);
-		if (status == B_OK)
+		if (status == B_OK && count > 0)
 			status = fDefaultManager->Set(nodeID, NULL, 0, type);
+		else if (status == B_OK)
+			status = B_NAME_NOT_FOUND;
 	}
 
 	if (status == B_OK && (type == VIDEO_INPUT || type == VIDEO_OUTPUT
