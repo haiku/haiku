@@ -457,6 +457,7 @@ virtio_gpu_set_display_mode(virtio_gpu_driver_info* info, display_mode *mode)
 		sharedInfo.current_mode.virtual_width = info->displayWidth;
 		sharedInfo.current_mode.virtual_height = info->displayHeight;
 		sharedInfo.current_mode.space = B_RGB32;
+		sharedInfo.current_mode.timing = mode->timing;
 	}
 
 	return B_OK;

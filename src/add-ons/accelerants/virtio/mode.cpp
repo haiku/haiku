@@ -49,9 +49,14 @@ is_mode_supported(display_mode* mode)
 status_t
 create_mode_list(void)
 {
-	const color_space colorspace[] = {
-		(color_space)gInfo->shared_info->current_mode.space
-	};
+	display_mode& currentMode = gInfo->shared_info->current_mode;
+
+	if (currentMode.timing.h_total == 0 || currentMode.timing.v_total == 0) {
+		compute_display_timing(currentMode.virtual_width, currentMode.virtual_height, 60, false,
+			&currentMode.timing);
+	}
+
+	const color_space colorspace[] = {(color_space)currentMode.space};
 
 	if (!gInfo->shared_info->has_edid) {
 		display_mode mode = gInfo->shared_info->current_mode;
