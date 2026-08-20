@@ -213,6 +213,14 @@ buffer_exchange(int device, multi_buffer_info* info)
 
 
 status_t
+force_stop(int device)
+{
+	uint8* dummy = NULL;
+	return call_driver(device, B_MULTI_BUFFER_FORCE_STOP, dummy);
+}
+
+
+status_t
 list_mix_controls(int device, multi_mix_control_info* info)
 {
 	return call_driver(device, B_MULTI_LIST_MIX_CONTROLS, info);

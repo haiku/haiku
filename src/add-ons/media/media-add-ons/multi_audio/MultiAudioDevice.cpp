@@ -115,6 +115,13 @@ MultiAudioDevice::SetOutputFrameRate(uint32 multiAudioRate)
 
 
 status_t
+MultiAudioDevice::ForceStop()
+{
+	return force_stop(fDevice);
+}
+
+
+status_t
 MultiAudioDevice::_InitDriver()
 {
 	int num_outputs, num_inputs, num_channels;

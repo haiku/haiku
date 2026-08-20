@@ -32,6 +32,7 @@ status_t get_global_format(int device, multi_format_info* info);
 status_t set_global_format(int device, multi_format_info* info);
 status_t get_buffers(int device, multi_buffer_list* list);
 status_t buffer_exchange(int device, multi_buffer_info* info);
+status_t force_stop(int device);
 
 status_t list_mix_controls(int device, multi_mix_control_info* info);
 status_t get_mix(int device, multi_mix_value_info* info);

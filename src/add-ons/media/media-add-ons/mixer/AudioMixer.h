@@ -128,6 +128,7 @@ protected:
 
 private:
 			void				_AutoStart();
+			void				_AutoStop();
 
 			BMediaAddOn*		fAddOn;
 			MixerCore*			fCore;

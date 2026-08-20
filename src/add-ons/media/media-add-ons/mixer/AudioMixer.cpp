@@ -422,6 +422,27 @@ AudioMixer::_AutoStart()
 }
 
 
+void
+AudioMixer::_AutoStop()
+{
+	fCore->Stop();
+
+	MixerOutput* mixerOutput = fCore->Output();
+	if (mixerOutput == NULL)
+		return;
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	media_node_id outputID = roster->NodeIDFor(mixerOutput->MediaOutput().destination.port);
+	media_node output;
+	if (roster->GetNodeFor(outputID, &output) != B_OK)
+		return;
+
+	roster->StopNode(output, 0, true);
+
+	roster->ReleaseNode(output);
+}
+
+
 status_t
 AudioMixer::Connected(const media_source &producer,
 	const media_destination &where, const media_format &with_format,
@@ -502,9 +523,8 @@ AudioMixer::Disconnected(const media_source &producer,
 		TRACE("AudioMixer::Disconnected can't remove input\n");
 	}
 
-	if (fAutoStop && fCore->CountInputs() == 0) {
-		// TODO: stop the mixer and the output node
-	}
+	if (fAutoStop && fCore->CountInputs() == 0)
+		_AutoStop();
 
 	fCore->Unlock();
 	UpdateParameterWeb();
@@ -1027,6 +1047,9 @@ AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 	// frame rate and channel count.
 	fDefaultFormat.u.raw_audio.frame_rate = 96000;
 	fDefaultFormat.u.raw_audio.channel_count = 2;
+
+	if (fAutoStop)
+		_AutoStop();
 
 	fCore->RemoveOutput();
 

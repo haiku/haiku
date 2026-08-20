@@ -177,10 +177,10 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
 	fBufferLock("multi audio buffers"),
+	fActiveOutputs(0),
 	fQuitThread(0),
 	fThread(-1),
 	fDevice(device),
-	fTimeSourceStarted(false),
 	fWeb(NULL),
 	fConfig()
 {
@@ -984,6 +984,7 @@ MultiAudioNode::Connect(status_t error, const media_source& source,
 	channel->fOutput.destination = destination;
 	channel->fOutput.format = format;
 	strlcpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+	fActiveOutputs++;
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = channel->fOutput.format.u.raw_audio.buffer_size * 10000
@@ -1037,6 +1038,7 @@ MultiAudioNode::Disconnect(const media_source& what,
 		channel->fOutput.format = channel->fPreferredFormat;
 		delete channel->fBufferGroup;
 		channel->fBufferGroup = NULL;
+		fActiveOutputs--;
 	} else {
 		fprintf(stderr, "\tDisconnect() called with wrong source/destination ("
 			"%" B_PRId32 "/%" B_PRId32 "), ours is (%" B_PRId32 "/%" B_PRId32
@@ -1258,11 +1260,14 @@ MultiAudioNode::_HandleStop(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
+	SetRunState(B_STOPPED);
+
 	// flush the queue so downstreamers don't get any more
 	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
 		BTimedEventQueue::B_HANDLE_BUFFER);
 
-	//_StopOutputThread();
+	if (fActiveOutputs == 0)
+		_StopOutputThread();
 	return B_OK;
 }
 
@@ -1295,29 +1300,15 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 	switch (op.op) {
 		case B_TIMESOURCE_START:
 			PRINT(("TimeSourceOp op B_TIMESOURCE_START\n"));
-			if (RunState() != BMediaEventLooper::B_STARTED) {
-				fTimeSourceStarted = true;
-			}
+			// Do nothing.
 			break;
 		case B_TIMESOURCE_STOP:
 			PRINT(("TimeSourceOp op B_TIMESOURCE_STOP\n"));
-			if (RunState() == BMediaEventLooper::B_STARTED) {
-				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
-				EventQueue()->AddEvent(stopEvent);
-				fTimeSourceStarted = false;
-				_StopOutputThread();
-				PublishTime(0, 0, 1.0f);
-			}
+			// Do nothing.
 			break;
 		case B_TIMESOURCE_STOP_IMMEDIATELY:
 			PRINT(("TimeSourceOp op B_TIMESOURCE_STOP_IMMEDIATELY\n"));
-			if (RunState() == BMediaEventLooper::B_STARTED) {
-				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
-				EventQueue()->AddEvent(stopEvent);
-				fTimeSourceStarted = false;
-				_StopOutputThread();
-				PublishTime(0, 0, 1.0f);
-			}
+			// Do nothing.
 			break;
 		case B_TIMESOURCE_SEEK:
 			PRINT(("TimeSourceOp op B_TIMESOURCE_SEEK\n"));
@@ -2037,6 +2028,7 @@ MultiAudioNode::_StartOutputThreadIfNeeded()
 
 	PublishTime(-50, 0, 1.0f);
 
+	fQuitThread = 0;
 	fThread = spawn_thread(_OutputThreadEntry, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);
 	if (fThread < 0)
@@ -2055,6 +2047,20 @@ MultiAudioNode::_StopOutputThread()
 
 	wait_for_thread(fThread, NULL);
 	fThread = -1;
+
+	fDevice->ForceStop();
+
+	PublishTime(0, 0, 1.0f);
+
+	for (int32 i = 0; i < fInputs.CountItems(); i++) {
+		node_input* input = (node_input*)fInputs.ItemAt(i);
+		if (input->fBuffer != NULL) {
+			input->fBuffer->Recycle();
+			input->fBuffer = NULL;
+		}
+		_FillWithZeros(*input);
+	}
+
 	return B_OK;
 }
 
@@ -2080,8 +2086,6 @@ void
 MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info, node_input& input)
 {
 	//CALLED();
-	if (!fTimeSourceStarted)
-		return;
 
 	// For the first playback buffer, we might get a time of 0 or in the past. Ignore it,
 	// as otherwise we will wind up with incorrect computations from the TimeComputer.

@@ -238,6 +238,9 @@ void
 MixerCore::BufferReceived(BBuffer *buffer, bigtime_t lateness)
 {
 	ASSERT_LOCKED();
+	if (!fRunning)
+		return;
+
 	MixerInput *input;
 	int32 id = buffer->Header()->destination;
 	for (int i = 0; (input = Input(i)) != 0; i++) {

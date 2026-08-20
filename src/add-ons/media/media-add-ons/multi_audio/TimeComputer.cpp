@@ -29,6 +29,7 @@ TimeComputer::Init(float frameRate, bigtime_t realBaseTime)
 	fRealTime = realBaseTime;
 	fPerformanceTime = 0;
 	fDrift = 1;
+	fResetTimeBase = true;
 	SetFrameRate(frameRate);
 }
 

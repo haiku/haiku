@@ -34,6 +34,8 @@ public:
 	status_t			SetInputFrameRate(uint32 multiAudioRate);
 	status_t			SetOutputFrameRate(uint32 multiAudioRate);
 
+	status_t			ForceStop();
+
 private:
 	status_t			_InitDriver();
 	status_t			_GetBuffers();
