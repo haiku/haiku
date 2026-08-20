@@ -931,13 +931,12 @@ ModifiedPageQueue::~ModifiedPageQueue()
 status_t
 ModifiedPageQueue::StartWriter(const char* name)
 {
-	char threadName[B_OS_NAME_LENGTH];
-	snprintf(threadName, sizeof(threadName), "page writer: %s", name);
-
-	fPageWriterCondition.Init(threadName);
-	fUnderQuotaCondition.Init(this, "ModifiedPageQueue");
+	fPageWriterCondition.Init("pgwr");
+	fUnderQuotaCondition.Init(this, "pguq");
 	fLastAveragePageWriteDuration = 0;
 
+	char threadName[B_OS_NAME_LENGTH];
+	snprintf(threadName, sizeof(threadName), "page writer: %s", name);
 	fWriterThread = spawn_kernel_thread(&_WriterThreadEntry, threadName,
 		B_NORMAL_PRIORITY + 1, this);
 	if (fWriterThread < 0)
