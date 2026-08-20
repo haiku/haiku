@@ -343,7 +343,10 @@ PostACL(hci_id hciId, net_buffer* buffer)
 		curr_frame = next_frame;
 
 		if (curr_frame->size > device->mtu) {
-			next_frame = gBufferModule->split(curr_frame, device->mtu);
+			next_frame = curr_frame;
+			curr_frame = gBufferModule->split(next_frame, device->mtu);
+			if (curr_frame == NULL)
+				return B_NO_MEMORY;
 		} else {
 			next_frame = NULL;
 		}
