@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2026 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -15,6 +15,9 @@
 
 #include <arch/arm/arch_uart_pl011.h>
 #include <arch/generic/debug_uart_8250.h>
+
+
+void arm64_handle_acpi_fadt(acpi_fadt_arm_boot_arch armBootFlags);
 
 
 static void arch_acpi_get_uart_pl011(const uart_info &uart)
@@ -83,6 +86,14 @@ arch_handle_acpi()
 		}
 	}
 
+	acpi_fadt* fadt = (acpi_fadt*)acpi_find_table(ACPI_FADT_SIGNATURE);
+	if (fadt != NULL && fadt->header.length >= sizeof(acpi_fadt)) {
+		dprintf("discovered fadt from acpi: psci_compliant=%d, "
+				"psci_use_hvc=%d\n",
+			fadt->arm_boot_arch.psci_compliant, fadt->arm_boot_arch.psci_use_hvc);
+		arm64_handle_acpi_fadt(fadt->arm_boot_arch);
+	}
+
 	acpi_madt *madt = (acpi_madt*)acpi_find_table(ACPI_MADT_SIGNATURE);
 	if (madt != NULL) {
 		uint64 gicc_base = 0;
@@ -99,7 +110,7 @@ arch_handle_acpi()
 				platform_cpu_info* cpu = NULL;
 				arch_smp_register_cpu(&cpu);
 				if (cpu == NULL)
-					continue;
+					break;
 				cpu->id = acpi_gicc->cpu_interface_num;
 				cpu->mpidr = acpi_gicc->mpidr;
 			} else if (desc->type == ACPI_MADT_GIC_DISTRIBUTOR) {

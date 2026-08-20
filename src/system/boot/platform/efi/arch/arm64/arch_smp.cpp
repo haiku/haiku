@@ -1,7 +1,7 @@
 /*
- * Copyright 2021-2022, Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026, Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
-*/
+ */
 
 
 #include "arch_smp.h"
@@ -16,8 +16,9 @@
 #include <boot/stage2.h>
 #include <boot/menu.h>
 
-#include "mmu.h"
 #include "aarch64.h"
+#include "acpi.h"
+#include "mmu.h"
 
 extern "C" {
 #include <libfdt.h>
@@ -252,7 +253,25 @@ arm64_handle_fdt_cpu_node(const void *fdt, int node)
 
 
 void
-arm64_handle_fdt_psci_node(const void *fdt, int node)
+arm64_handle_acpi_fadt(acpi_fadt_arm_boot_arch armBootFlags)
+{
+	// A device tree takes precedence if it has the CPU info
+	if (sCpuEnableMethod != CpuEnableMethod::Unknown)
+		return;
+
+	if (!armBootFlags.psci_compliant)
+		return;
+
+	sCpuEnableMethod = CpuEnableMethod::Psci;
+	if (armBootFlags.psci_use_hvc)
+		sPsciCallFn = arm64_psci_call_hvc;
+	else
+		sPsciCallFn = arm64_psci_call_smc;
+}
+
+
+void
+arm64_handle_fdt_psci_node(const void* fdt, int node)
 {
 	const char* method = (const char*)fdt_getprop(fdt, node,
 		"method", NULL);
