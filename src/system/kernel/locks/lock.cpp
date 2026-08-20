@@ -251,6 +251,20 @@ recursive_lock_switch_from_read_lock(rw_lock* from, recursive_lock* to)
 }
 
 
+void
+recursive_lock_transfer_lock(recursive_lock* lock, thread_id thread)
+{
+	if (lock->recursion != 1)
+		panic("invalid recursion level for lock transfer!");
+
+#if !KDEBUG
+	lock->holder = thread;
+#endif
+
+	mutex_transfer_lock(&lock->lock, thread);
+}
+
+
 static int
 dump_recursive_lock_info(int argc, char** argv)
 {

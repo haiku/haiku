@@ -143,6 +143,7 @@ extern status_t recursive_lock_switch_from_read_lock(rw_lock* from,
 	recursive_lock* to);
 	// Like recursive_lock_switch_lock(), just for switching from a read-locked
 	// rw_lock.
+extern void recursive_lock_transfer_lock(recursive_lock* lock, thread_id thread);
 extern int32 recursive_lock_get_recursion(recursive_lock *lock);
 
 extern void rw_lock_init(rw_lock* lock, const char* name);
@@ -277,21 +278,8 @@ mutex_unlock_inline(mutex* lock)
 #endif
 
 
-static inline void
-recursive_lock_transfer_lock(recursive_lock* lock, thread_id thread)
-{
-	if (lock->recursion != 1)
-		panic("invalid recursion level for lock transfer!");
-
-#if KDEBUG
-	mutex_transfer_lock(&lock->lock, thread);
-#else
-	lock->holder = thread;
-#endif
-}
-
-
 extern void lock_debug_init();
+
 
 #ifdef __cplusplus
 }
