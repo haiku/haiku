@@ -386,6 +386,42 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 }
 
 
+void
+AudioMixer::_AutoStart()
+{
+	MixerOutput* mixerOutput = fCore->Output();
+	if (mixerOutput == NULL)
+		return;
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	media_node_id outputID = roster->NodeIDFor(mixerOutput->MediaOutput().destination.port);
+	media_node output;
+	if (roster->GetNodeFor(outputID, &output) != B_OK)
+		return;
+
+	bigtime_t startLatency = 10000;
+	roster->GetStartLatencyFor(output, &startLatency);
+	status_t status = roster->StartNode(output, startLatency);
+	if (status == B_OK) {
+		// We need to wait for the node to actually start. Otherwise, a stale
+		// TimeSource could confuse the just-connected node.
+		bigtime_t performanceTime, realTime;
+		float drift;
+		bigtime_t timeout = system_time() + 1 * 1000 * 1000;
+		while (TimeSource()->GetTime(&performanceTime, &realTime, &drift) != B_OK
+			|| (realTime + 1 * 1000 * 1000) <= system_time()) {
+			snooze(100);
+			if (system_time() >= timeout)
+				break;
+		}
+	}
+
+	roster->ReleaseNode(output);
+
+	fCore->Start();
+}
+
+
 status_t
 AudioMixer::Connected(const media_source &producer,
 	const media_destination &where, const media_format &with_format,
@@ -432,35 +468,8 @@ AudioMixer::Connected(const media_source &producer,
 
 	fCore->Settings()->LoadConnectionSettings(input);
 
-	if (fAutoStop && fCore->CountInputs() == 1) {
-		// Start our destination node.
-		BMediaRoster* roster = BMediaRoster::Roster();
-		media_node_id outputID = roster->NodeIDFor(
-			fCore->Output()->MediaOutput().destination.port);
-		media_node output;
-		roster->GetNodeFor(outputID, &output);
-
-		bigtime_t startLatency = 10000;
-		roster->GetStartLatencyFor(output,
-			&startLatency);
-		status_t status = roster->StartNode(output, 0 + startLatency);
-		if (status == B_OK) {
-			// We need to wait for the node to actually start. Otherwise, a stale
-			// TimeSource could confuse the just-connected node.
-			bigtime_t performanceTime, realTime;
-			float drift;
-			bigtime_t timeout = system_time() + 1 * 1000 * 1000;
-			while (TimeSource()->GetTime(&performanceTime, &realTime, &drift) != B_OK
-					|| (realTime + 1 * 1000 * 1000) <= system_time()) {
-				snooze(100);
-				if (system_time() >= timeout)
-					break;
-			}
-		}
-
-		roster->ReleaseNode(output);
-		fCore->Start();
-	}
+	if (fAutoStop && fCore->CountInputs() == 1)
+		_AutoStart();
 
 	fCore->Unlock();
 
@@ -989,6 +998,8 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	fCore->SetOutputBufferGroup(fBufferGroup);
 
 	fCore->Settings()->LoadConnectionSettings(fCore->Output());
+	if (fAutoStop && fCore->CountInputs() > 0)
+		_AutoStart();
 
 	fCore->Unlock();
 	UpdateParameterWeb();

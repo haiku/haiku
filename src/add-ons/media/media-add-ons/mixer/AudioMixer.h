@@ -127,6 +127,8 @@ protected:
 									bool realTimeEvent = false);
 
 private:
+			void				_AutoStart();
+
 			BMediaAddOn*		fAddOn;
 			MixerCore*			fCore;
 			BParameterWeb*		fWeb;
