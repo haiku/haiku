@@ -12,7 +12,11 @@
 #define DESKLINK_H
 
 
-extern const char *kAppSignature;
+#include <image.h>
+
+
+extern const char* kAppSignature;
+extern status_t our_image(image_info& image);
 
 
 #endif	// DESKLINK_H

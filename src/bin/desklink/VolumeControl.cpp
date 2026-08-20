@@ -20,10 +20,12 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Dragger.h>
+#include <IconUtils.h>
 #include <MediaRoster.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
+#include <Resources.h>
 
 #include <AppMisc.h>
 
@@ -36,6 +38,10 @@
 #define B_TRANSLATION_CONTEXT "VolumeControl"
 
 
+static const char* kSpeakerWithCancellationStroke = "\xF0\x9F\x94\x87";
+static const char* kSpeakerWithOneSoundWave = "\xF0\x9F\x94\x89";
+static const char* kSpeakerWithThreeSoundWaves = "\xF0\x9F\x94\x8A";
+
 static const uint32 kMsgReconnectVolume = 'rcms';
 
 
@@ -43,10 +49,12 @@ VolumeControl::VolumeControl()
 	:
 	BSlider("VolumeControl", B_TRANSLATE("Volume"),
 		new BMessage(kMsgVolumeChanged), 0, 1, B_HORIZONTAL),
-	fMixerControl(new MixerControl()),
+	fMixerControl(NULL),
 	fSnapping(false),
 	fConnectRetries(0)
 {
+	_Init();
+
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	SetBarThickness(ceilf((fontHeight.ascent + fontHeight.descent) * 0.7));
@@ -66,7 +74,7 @@ VolumeControl::VolumeControl(BMessage* archive)
 	fSnapping(false),
 	fConnectRetries(0)
 {
-	fMixerControl = new MixerControl();
+	_Init();
 
 	BMessage message(B_QUIT_REQUESTED);
 	archive->SendReply(&message);
@@ -124,8 +132,9 @@ VolumeControl::AttachedToWindow()
 		SetDrawingMode(B_OP_ALPHA);
 		SetFlags(Flags() | B_TRANSPARENT_BACKGROUND);
 		SetViewColor(B_TRANSPARENT_COLOR);
-	} else
+	} else {
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	}
 
 	BMediaRoster* roster = BMediaRoster::Roster();
 	roster->StartWatching(BMessenger(this), B_MEDIA_SERVER_STARTED);
@@ -188,22 +197,11 @@ VolumeControl::MouseDown(BPoint where)
 	if (Looper()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons) != B_OK)
 		buttons = 0;
 
-	BPoint whereScreen;
-	if (Looper()->CurrentMessage()->FindPoint("screen_where", &whereScreen) != B_OK)
-		whereScreen = ConvertToScreen(where);
-
-	if (_IsReplicant() && (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		BPopUpMenu* menu = new BPopUpMenu("", false, false);
-		menu->SetFont(be_plain_font);
-
-		BMenuItem* item = new BMenuItem(B_TRANSLATE("Mute"), new BMessage(kMsgToggleMute));
-		item->SetMarked(fMixerControl->IsMuted());
-		menu->AddItem(item);
-
-		menu->SetTargetForItems(this);
-		menu->Go(whereScreen, true, false, true);
-
-		return; // do not invoke
+	if (IsEnabled()) {
+		if (BRect(B_ORIGIN, BControlLook::ComposeIconSize(B_MINI_ICON)).Contains(where)) {
+			Looper()->PostMessage(kMsgToggleMute, this);
+			return; // do not invoke
+		}
 	}
 
 	if (!IsEnabled() || !Bounds().Contains(where)) {
@@ -313,10 +311,10 @@ VolumeControl::MessageReceived(BMessage* message)
 		}
 
 		case B_MEDIA_NEW_PARAMETER_VALUE:
-			if (IsTracking())
-				break;
+			if (!IsTracking())
+				SetValue((int32)fMixerControl->Volume());
 
-			SetValue((int32)fMixerControl->Volume());
+			Invalidate();
 			break;
 
 		case B_MEDIA_SERVER_STARTED:
@@ -345,21 +343,11 @@ VolumeControl::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgToggleMute:
-		{
 			if (fMixerControl == NULL)
 				break;
 
-			BMenuItem* item;
-			if (message->FindPointer("source", (void**)&item) != B_OK)
-				break;
-
-			if (!item->IsEnabled())
-				break;
-
-			item->SetMarked(!item->IsMarked());
-			fMixerControl->SetMuted(item->IsMarked());
+			fMixerControl->SetMuted(!fMixerControl->IsMuted());
 			break;
-		}
 
 		case kMsgReconnectVolume:
 			_ConnectVolume();
@@ -398,8 +386,21 @@ VolumeControl::DrawBar()
 
 	uint32 flags = be_control_look->Flags(this);
 	rgb_color base = LowColor();
-	rgb_color rightFillColor = make_color(255, 109, 38, 255);
-	rgb_color leftFillColor = make_color(116, 224, 0, 255);
+	rgb_color rightFillColor;
+	rgb_color leftFillColor;
+
+	bool isMuted = false;
+	if (fMixerControl != NULL && fMixerControl->IsConnected())
+		isMuted = fMixerControl->IsMuted();
+
+	if (isMuted) {
+		// draw shades of gray when muted
+		rightFillColor = make_color(127, 127, 127, 255); // 50% gray
+		leftFillColor = make_color(191, 191, 191, 255); // 75% gray
+	} else {
+		rightFillColor = make_color(255, 109, 38, 255); // orange
+		leftFillColor = make_color(116, 224, 0, 255); // green
+	}
 
 	int32 min, max;
 	GetLimits(&min, &max);
@@ -407,6 +408,50 @@ VolumeControl::DrawBar()
 
 	be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
 		rightFillColor, position, flags, Orientation());
+}
+
+
+void
+VolumeControl::DrawText()
+{
+	BRect bounds(Bounds());
+	BView* view = OffscreenView();
+	rgb_color base = view->LowColor();
+	rgb_color textColor = view->HighColor();
+	uint32 flags = be_control_look->Flags(this);
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	float iconWidth = 0.0f;
+
+	bool isMuted = false;
+	if (fMixerControl != NULL && fMixerControl->IsConnected())
+		isMuted = fMixerControl->IsMuted();
+
+	BString iconString;
+	if (isMuted)
+		iconString << kSpeakerWithCancellationStroke;
+	else if (Value() <= 0)
+		iconString << kSpeakerWithOneSoundWave;
+	else
+		iconString << kSpeakerWithThreeSoundWaves;
+
+	iconWidth = BControlLook::ComposeIconSize(B_MINI_ICON).Width()
+		+ be_control_look->DefaultLabelSpacing();
+	BPoint labelLoc = BPoint(0, ceilf(fontHeight.ascent));
+	be_control_look->DrawLabel(view, iconString, base, flags, labelLoc, &textColor);
+
+	if (Label() != NULL) {
+		BPoint labelLoc = BPoint(iconWidth, ceilf(fontHeight.ascent));
+		be_control_look->DrawLabel(view, Label(), base, flags, labelLoc, &textColor);
+	}
+
+	if (fText != NULL) {
+		float stringWidth = StringWidth(fText);
+		BPoint labelLoc = BPoint(bounds.right - stringWidth, ceilf(fontHeight.ascent));
+		be_control_look->DrawLabel(view, fText, base, flags, labelLoc, &textColor);
+	}
 }
 
 
@@ -483,4 +528,11 @@ bool
 VolumeControl::_IsReplicant() const
 {
 	return dynamic_cast<VolumeWindow*>(Window()) == NULL;
+}
+
+
+void
+VolumeControl::_Init()
+{
+	fMixerControl = new MixerControl();
 }

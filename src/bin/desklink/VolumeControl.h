@@ -26,6 +26,7 @@ static const uint32 kMsgVolumeChanged = 'vlcg';
 class BMenu;
 class MixerControl;
 
+
 class VolumeControl : public BSlider {
 public:
 							VolumeControl();
@@ -48,6 +49,8 @@ protected:
 	virtual status_t		Invoke(BMessage* message = NULL);
 
 	virtual void			DrawBar();
+	virtual void			DrawText();
+
 	virtual const char*		UpdateText() const;
 
 private:
@@ -55,9 +58,12 @@ private:
 			void			_ConnectVolume();
 			bool			_IsReplicant() const;
 			float			_PointForValue(int32 value) const;
+			void			_Init();
 
 			mutable BString	fText;
+
 			MixerControl*	fMixerControl;
+
 			int32			fOriginalValue;
 
 			bool			fSnapping;

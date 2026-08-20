@@ -146,20 +146,6 @@ private:
 };
 
 
-status_t
-our_image(image_info& image)
-{
-	int32 cookie = 0;
-	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
-		if ((char*)our_image >= (char*)image.text
-			&& (char*)our_image <= (char*)image.text + image.text_size)
-			return B_OK;
-	}
-
-	return B_ERROR;
-}
-
-
 //	#pragma mark -
 
 
@@ -535,6 +521,7 @@ MediaReplicant::_LoadIcon(BResources& resources, const char* name)
 		delete icon;
 		return NULL;
 	}
+
 	return icon;
 }
 
