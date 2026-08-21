@@ -25,6 +25,10 @@ public:
 		panic("SendBroadcastIci unimplemented");
 	}
 
+	virtual status_t PerCpuInit() {
+		return B_OK;
+	}
+
 	static InterruptController* Get() {
 		return sInstance;
 	}

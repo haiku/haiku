@@ -1,15 +1,15 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2026 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <boot/stage2.h>
-#include <kernel.h>
-#include <debug.h>
 #include <interrupts.h>
 
 #include <timer.h>
 #include <arch/timer.h>
-#include <arch/cpu.h>
+
+#include "arch_timer.h"
+#include "soc.h"
 
 
 static uint64 sTimerTicksUS;
@@ -57,6 +57,21 @@ arch_init_timer(kernel_args *args)
 
 	WRITE_SPECIALREG(CNTV_CTL_EL0, TIMER_DISABLED);
 	install_io_interrupt_handler(TIMER_IRQ, &arch_timer_interrupt, NULL, 0);
+
+	return B_OK;
+}
+
+
+status_t
+arm64_timer_per_cpu_init()
+{
+	InterruptController* ic = InterruptController::Get();
+
+	if (ic == NULL)
+		return B_ERROR;
+
+	WRITE_SPECIALREG(CNTV_CTL_EL0, TIMER_DISABLED);
+	ic->EnableInterrupt(TIMER_IRQ);
 
 	return B_OK;
 }

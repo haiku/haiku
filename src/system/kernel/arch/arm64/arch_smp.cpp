@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2026 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <KernelExport.h>
@@ -10,6 +10,7 @@
 #include <interrupts.h>
 #include <smp.h>
 
+#include "arch_timer.h"
 #include "soc.h"
 
 
@@ -23,6 +24,17 @@ arch_smp_init(kernel_args *args)
 status_t
 arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
+	InterruptController* ic = InterruptController::Get();
+	if (ic == NULL)
+		return B_ERROR;
+
+	status_t err = ic->PerCpuInit();
+	if (err < B_OK)
+		return err;
+	err = arm64_timer_per_cpu_init();
+	if (err < B_OK)
+		return err;
+
 	return B_OK;
 }
 

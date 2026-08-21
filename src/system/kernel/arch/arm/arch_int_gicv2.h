@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCH_ARM_GICV2_H
@@ -17,11 +17,8 @@ public:
 	void HandleInterrupt();
 	void SendMulticastIci(CPUSet& cpuSet);
 	void SendBroadcastIci();
+	status_t PerCpuInit();
 private:
-	void _PerCpuInit();
-	void _EnableInterrupt(int32 irq);
-	void _DisableInterrupt(int32 irq);
-
 	volatile uint32_t *fGicdRegs;
 	volatile uint32_t *fGiccRegs;
 };
