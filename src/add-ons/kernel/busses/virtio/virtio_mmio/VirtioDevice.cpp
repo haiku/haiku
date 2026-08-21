@@ -1,18 +1,16 @@
 /*
- * Copyright 2021, Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "VirtioDevice.h"
 
-#include <malloc.h>
 #include <string.h>
 #include <new>
 
 #include <KernelExport.h>
 #include <kernel.h>
-#include <debug.h>
 
 
 static inline void
@@ -26,13 +24,14 @@ SetLowHi(vuint32 &low, vuint32 &hi, uint64 val)
 // #pragma mark - VirtioQueue
 
 
-VirtioQueue::VirtioQueue(VirtioDevice *dev, int32 id)
+VirtioQueue::VirtioQueue(VirtioDevice* dev, int32 id)
 	:
 	fDev(dev),
 	fId(id),
 	fAllocatedDescs(0),
 	fQueueHandler(NULL),
-	fQueueHandlerCookie(NULL)
+	fQueueHandlerCookie(NULL),
+	fLock(B_SPINLOCK_INITIALIZER)
 {
 }
 
@@ -151,6 +150,8 @@ VirtioQueue::Enqueue(const physical_entry* vector,
 	size_t readVectorCount, size_t writtenVectorCount,
 	void* cookie)
 {
+	InterruptsSpinLocker locker(fLock);
+
 	int32 firstDesc = -1, lastDesc = -1;
 	size_t count = readVectorCount + writtenVectorCount;
 
@@ -195,7 +196,12 @@ VirtioQueue::Enqueue(const physical_entry* vector,
 	int32_t idx = fAvail->idx & (fQueueLen - 1);
 	fCookies[firstDesc] = cookie;
 	fAvail->ring[idx] = firstDesc;
+
+	memory_write_barrier();
 	fAvail->idx++;
+	locker.Unlock();
+
+	memory_write_barrier();
 	fDev->fRegs->queueNotify = fId;
 
 	return B_OK;
@@ -205,9 +211,12 @@ VirtioQueue::Enqueue(const physical_entry* vector,
 bool
 VirtioQueue::Dequeue(void** _cookie, uint32* _usedLength)
 {
+	InterruptsSpinLocker locker(fLock);
+
 	if (fUsed->idx == fLastUsed)
 		return false;
 
+	memory_read_barrier();
 	int32_t desc = fUsed->ring[fLastUsed & (fQueueLen - 1)].id;
 
 	if (_cookie != NULL)

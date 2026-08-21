@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _VIRTIODEVICE_H_
@@ -60,6 +60,9 @@ struct VirtioQueue {
 	);
 
 	bool Dequeue(void** _cookie, uint32* _usedLength);
+
+private:
+	spinlock fLock;
 };
 
 
