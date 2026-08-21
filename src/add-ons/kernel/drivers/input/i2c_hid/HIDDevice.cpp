@@ -44,8 +44,6 @@ HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
 		fI2C(i2c),
 		fI2CCookie(i2cCookie)
 {
-	_Reset();
-
 	// fetch HID descriptor
 	fStatus = _FetchBuffer((uint8*)&fDescriptorAddress,
 		sizeof(fDescriptorAddress), &fDescriptor, sizeof(fDescriptor));
@@ -53,6 +51,19 @@ HIDDevice::HIDDevice(uint16 descriptorAddress, i2c_device_interface* i2c,
 		ERROR("failed to fetch HID descriptor\n");
 		return;
 	}
+
+#if 0
+	// _Reset needs fDescriptor to be able to send a reset command to the device, so we can do it
+	// only now after fetching the HID descriptor.
+	// But resetting here does not work: the HID report cannot be fetched after a report.
+	// For now, let's assume the BIOS has set up the device in a reasonable state and we don't need
+	// to do a reset.
+	fStatus = _Reset();
+	if (fStatus != B_OK) {
+		ERROR("failed to execute reset command\n");
+		return;
+	}
+#endif
 
 	// fetch HID Report descriptor
 
@@ -208,15 +219,6 @@ HIDDevice::Open(ProtocolHandler *handler, uint32 flags)
 {
 	atomic_add(&fOpenCount, 1);
 
-#if 0
-	// Supposedly the host should reset the device when connecting
-	// to it, but it seems Open() is already too late for that
-	// (we already fetched the feature report). For now, keep
-	// the device as it was initialized by the BIOS until we
-	// decide of a proper place to do this reset.
-	_Reset();
-#endif
-
 	return B_OK;
 }
 
@@ -224,6 +226,8 @@ HIDDevice::Open(ProtocolHandler *handler, uint32 flags)
 status_t
 HIDDevice::Close(ProtocolHandler *handler)
 {
+	// TODO what's the use for fOpenCount? It's not referenced anywhere and this function powers
+	// the device off in any case.
 	atomic_add(&fOpenCount, -1);
 	_SetPower(I2C_HID_POWER_OFF);
 
