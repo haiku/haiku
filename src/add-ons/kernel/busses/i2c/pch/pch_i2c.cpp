@@ -190,11 +190,11 @@ exec_command(i2c_bus_cookie cookie, i2c_op op, i2c_addr slaveAddress,
 
 		// here read the data if needed
 		while (IS_READ_OP(op) && (txLimit == 0 || i == dataLength)) {
-			write32(bus->registers + PCH_IC_INTR_MASK,
-				PCH_IC_INTR_STAT_RX_FULL);
-
 			ConditionVariableEntry waiter;
 			bus->wait_read.Add(&waiter);
+
+			write32(bus->registers + PCH_IC_INTR_MASK,
+				PCH_IC_INTR_STAT_RX_FULL);
 
 			uint32 rxBytes = read32(bus->registers + PCH_IC_RXFLR);
 			if (rxBytes == 0) {
