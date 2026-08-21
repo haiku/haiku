@@ -205,8 +205,6 @@ VirtioQueue::Enqueue(const physical_entry* vector,
 bool
 VirtioQueue::Dequeue(void** _cookie, uint32* _usedLength)
 {
-	fDev->fRegs->queueSel = fId;
-
 	if (fUsed->idx == fLastUsed)
 		return false;
 
