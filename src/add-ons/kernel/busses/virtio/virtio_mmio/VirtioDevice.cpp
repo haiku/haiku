@@ -269,23 +269,23 @@ VirtioIrqHandler::Handle(void* data)
 	// TRACE("VirtioIrqHandler::Handle(%p)\n", data);
 	VirtioDevice* dev = (VirtioDevice*)data;
 
-	if ((kVirtioIntQueue & dev->fRegs->interruptStatus) != 0) {
+	uint32 status = dev->fRegs->interruptStatus;
+	if (status == 0)
+		return B_UNHANDLED_INTERRUPT;
+
+	dev->fRegs->interruptAck = status;
+
+	if ((kVirtioIntQueue & status) != 0) {
 		for (int32 i = 0; i < dev->fQueueCnt; i++) {
 			VirtioQueue* queue = dev->fQueues[i].Get();
-			if (queue->fUsed->idx != queue->fLastUsed
-				&& queue->fQueueHandler != NULL) {
-				queue->fQueueHandler(dev->fConfigHandlerCookie,
-					queue->fQueueHandlerCookie);
-				}
+			if (queue->fQueueHandler != NULL)
+				queue->fQueueHandler(dev->fConfigHandlerCookie, queue->fQueueHandlerCookie);
 		}
-		dev->fRegs->interruptAck = kVirtioIntQueue;
 	}
 
-	if ((kVirtioIntConfig & dev->fRegs->interruptStatus) != 0) {
+	if ((kVirtioIntConfig & status) != 0) {
 		if (dev->fConfigHandler != NULL)
 			dev->fConfigHandler(dev->fConfigHandlerCookie);
-
-		dev->fRegs->interruptAck = kVirtioIntConfig;
 	}
 
 	return B_HANDLED_INTERRUPT;
