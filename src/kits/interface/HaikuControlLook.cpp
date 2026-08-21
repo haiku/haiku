@@ -1861,16 +1861,26 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect,
 		fillGradient.AddColor(tint_color(base, 0.85), 0);
 		fillGradient.AddColor(base, 255);
 	} else {
-		edgeLightColor = tint_color(base, 0.80);
-		edgeShadowColor = tint_color(base, 1.03);
-		frameLightColor = tint_color(base, 1.30);
-		frameShadowColor = tint_color(base, 1.30);
-		bevelLightColor = tint_color(base, 1.10);
-		bevelShadowColor = tint_color(base, 1.17);
-		fillGradient.AddColor(tint_color(base, 1.12), 0);
-		fillGradient.AddColor(tint_color(base, 1.08), 255);
+		if (base.IsLight()) {
+			edgeLightColor = tint_color(base, 0.80);
+			edgeShadowColor = tint_color(base, 1.03);
+			frameLightColor = tint_color(base, 1.30);
+			frameShadowColor = tint_color(base, 1.30);
+			bevelLightColor = tint_color(base, 1.10);
+			bevelShadowColor = tint_color(base, 1.17);
+			fillGradient.AddColor(tint_color(base, 1.12), 0);
+			fillGradient.AddColor(tint_color(base, 1.08), 255);
+		} else {
+			edgeLightColor = tint_color(base, 1.20);
+			edgeShadowColor = tint_color(base, 0.95);
+			frameLightColor = tint_color(base, 1.08);
+			frameShadowColor = tint_color(base, 0.94);
+			bevelLightColor = tint_color(base, 1.04);
+			bevelShadowColor = tint_color(base, 0.92);
+			fillGradient.AddColor(tint_color(base, 0.89), 0);
+			fillGradient.AddColor(tint_color(base, 0.85), 255);
+		}
 	}
-
 	BRect background = rect;
 	bool isVertical;
 	switch (side) {
