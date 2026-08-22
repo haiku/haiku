@@ -263,11 +263,16 @@ pch_i2c_scan_parse_callback(ACPI_RESOURCE *res, void *context)
 {
 	struct pch_i2c_crs* crs = (struct pch_i2c_crs*)context;
 
-	if (res->Type == ACPI_RESOURCE_TYPE_SERIAL_BUS &&
-	    res->Data.CommonSerialBus.Type == ACPI_RESOURCE_SERIAL_TYPE_I2C) {
-		crs->i2c_addr = B_LENDIAN_TO_HOST_INT16(
-			res->Data.I2cSerialBus.SlaveAddress);
-		return AE_CTRL_TERMINATE;
+	TRACE("scan_parse_callback: res type %x\n", res->Type);
+
+	if (res->Type == ACPI_RESOURCE_TYPE_SERIAL_BUS) {
+		TRACE("scan_parse_callback:     serial bus type %x\n", res->Data.CommonSerialBus.Type);
+		if (res->Data.CommonSerialBus.Type == ACPI_RESOURCE_SERIAL_TYPE_I2C) {
+			crs->i2c_addr = B_LENDIAN_TO_HOST_INT16(
+				res->Data.I2cSerialBus.SlaveAddress);
+			crs->bus_speed = res->Data.I2cSerialBus.ConnectionSpeed;
+			return AE_CTRL_TERMINATE;
+		}
 	} else if (res->Type == ACPI_RESOURCE_TYPE_IRQ) {
 		crs->irq = res->Data.Irq.Interrupts[0];
 		crs->irq_triggering = res->Data.Irq.Triggering;
@@ -320,7 +325,7 @@ pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 		return B_OK;
 
 	// Attach devices for I2C resources
-	struct pch_i2c_crs crs;
+	struct pch_i2c_crs crs = { .i2c_addr = UINT16_MAX };
 	status = gACPI->walk_resources(object, (ACPI_STRING)"_CRS",
 		pch_i2c_scan_parse_callback, &crs);
 	if (status != B_OK) {
@@ -328,7 +333,12 @@ pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 		return status;
 	}
 
-	TRACE("pch_i2c_scan_bus_callback deviceAddress %x\n", crs.i2c_addr);
+	if (crs.i2c_addr == UINT16_MAX) {
+		ERROR("Could not find i2c address in device resources");
+		return B_BAD_DATA;
+	}
+
+	TRACE("pch_i2c_scan_bus_callback deviceAddress %x speed %x\n", crs.i2c_addr, crs.bus_speed);
 
 	acpi_data buffer;
 	buffer.pointer = NULL;

@@ -71,6 +71,7 @@ struct pch_i2c_crs {
     uint8	irq_triggering;
 	uint8	irq_polarity;
 	uint8	irq_shareable;
+	uint8	bus_speed;
 
 	uint32	addr_bas;
 	uint32	addr_len;
