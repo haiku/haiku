@@ -507,12 +507,13 @@ DevicesView::_ShowDisableDriverAlert(const BPath& settingsPath, const BString& r
 							 "in the device list as the system will not be able to identify "
 							 "it without its driver.\n\n"
 							 "To re-enable the driver, find the device in the "
-							 "Devices application and click \"Enable driver\". If the "
+							 "%devices% application and click \"Enable driver\". If the "
 							 "device is no longer visible, remove the corresponding "
 							 "blocked entry from the packages settings file:\n")
 			  << settingsPath.Path() << "\n\n"
 			  << B_TRANSLATE("Blocked entry:\n")
 			  << relativePath;
+	alertText.ReplaceFirst("%devices%", B_TRANSLATE_SYSTEM_NAME("Devices"));
 
 	BAlert* alert = new BAlert(B_TRANSLATE("Driver disabled"), alertText, B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
@@ -645,7 +646,7 @@ DevicesView::MessageReceived(BMessage *msg)
 			status_t error = rosterPrivate.ShutDown(true, false, false);
 			if (error != B_OK) {
 				BString errorMsg;
-				errorMsg << B_TRANSLATE("ShutDown failed with error: ") << strerror(error);
+				errorMsg << B_TRANSLATE("Shutdown failed with error: ") << strerror(error);
 				BAlert* errorAlert = new BAlert(B_TRANSLATE("Error"), errorMsg.String(),
 					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 				errorAlert->Go();
