@@ -200,7 +200,9 @@ exec_command(i2c_bus_cookie cookie, i2c_op op, i2c_addr slaveAddress,
 			if (rxBytes == 0) {
 				// sleep until wake up by intr handler
 				if (waiter.Wait(B_RELATIVE_TIMEOUT, 500000L) != B_OK)
-					ERROR("exec_command timed out waiting for read\n");
+					ERROR("exec_command timed out waiting for read. Raw intr stat %08x TX ABORT SOURCE %08x\n",
+						read32(bus->registers + PCH_IC_RAW_INTR_STAT),
+						read32(bus->registers + PCH_IC_TX_ABRT_SOURCE));
 
 				rxBytes = read32(bus->registers + PCH_IC_RXFLR);
 				if (rxBytes == 0) {
