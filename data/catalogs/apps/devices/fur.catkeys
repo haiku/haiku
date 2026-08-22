@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Devices	2994036512
+1	friulian	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlôr di cifradure
 Devices	System name		Dispositîfs
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Gjenere informazions di sisteme
 Class info	DevicePCI		Informazions classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Computer
-ACPI thermal zone	DeviceACPI		Zone termiche ACPI
 Communications	DeviceSCSI		Comunicazions
+ACPI thermal zone	DeviceACPI		Zone termiche ACPI
 Mass storage controller	Device		Controlôr memorie di masse
-Connection	DevicesView		Conession
 Printer	DeviceSCSI		Stampadore
-Driver used	DevicesView		Driver doprât
+Connection	DevicesView		Conession
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Scansionadôr
 Memory controller	Device		Controlôr de memorie
-Device paths	DevicesView		Percors dispositîf
 Unknown device	DevicesView		Dispositîf no cognossût
 ACPI node '%1'	DeviceACPI		Grop ACPI '%1'
 Name	PropertyList		Non
@@ -32,20 +30,18 @@ Input device controller	Device		Controlôr dispositîfs di input
 PCI bus	DevicesView		Bus PCI
 Changer	DeviceSCSI		Modificadôr
 Serial bus controller	Device		Controlôr bus seriâl
-unknown	DevicesView		no cognossût
 Refresh devices	DevicesView		Inzorne dispositîfs
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Percors dal dispositîf
 Unknown device	Device		Dispositîf no cognossût
+Device paths	Device		Percors dal dispositîf
 Wireless controller	Device		Controlôr dispositîfs cence fîi
 Generic system peripheral	Device		Periferiche gjeneriche di sisteme
 Value	PropertyList		Valôr
 Devices	DevicesView		Dispositîfs
-none	DevicesView		nissun
 Device name	DeviceACPI		Non dal dispositîf
-unknown	DevicePCI		no cognossût
 Optical drive	DeviceSCSI		Unitât otiche
+unknown	DevicePCI		no cognossût
 Display controller	Device		Controlôr dal visôr
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <no cognossût>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Letôr di schedis
 Bridge	Device		Puint
 ACPI button '%1'	DeviceACPI		Boton ACPI '%1'
 Attributes	PropertyList		Atribûts
-Disk drive	DeviceSCSI		Unitât disc
 Worm	DeviceSCSI		Worm
+Disk drive	DeviceSCSI		Unitât disc
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Fabricant
 Bridge	DeviceSCSI		Puint

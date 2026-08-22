@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	2994036512
+1	catalan; valencian	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Devices	System name		Dispositius
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Genera la informació del sistema
 Class info	DevicePCI		Informació de la classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Ordinador
-ACPI thermal zone	DeviceACPI		Zona tèrmica ACPI
 Communications	DeviceSCSI		Comunicacions
+ACPI thermal zone	DeviceACPI		Zona tèrmica ACPI
 Mass storage controller	Device		Controlador d'emmagatzematge massiu
-Connection	DevicesView		Connexió
 Printer	DeviceSCSI		Impressora
-Driver used	DevicesView		Controlador usat
+Connection	DevicesView		Connexió
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Escànner
 Memory controller	Device		Controlador de la memòria
-Device paths	DevicesView		Camins del dispositiu
 Unknown device	DevicesView		El dispositiu és desconegut
 ACPI node '%1'	DeviceACPI		Node d'ACPI %1
 Name	PropertyList		Nom
@@ -32,20 +30,18 @@ Input device controller	Device		Controlador de dispositiu d'entrada
 PCI bus	DevicesView		Bus PCI
 Changer	DeviceSCSI		Canviador
 Serial bus controller	Device		Controlador del bus de sèrie
-unknown	DevicesView		desconegut
 Refresh devices	DevicesView		Actualitza la llista de dispositius
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
-Device paths	Device		Camins als dispositius
 Unknown device	Device		El dispositiu és desconegut
+Device paths	Device		Camins als dispositius
 Wireless controller	Device		Controlador de xarxa sense fil
 Generic system peripheral	Device		Perifèric genèric del sistema
 Value	PropertyList		Valor
 Devices	DevicesView		Dispositius
-none	DevicesView		cap
 Device name	DeviceACPI		Nom del dispositiu
-unknown	DevicePCI		desconegut
 Optical drive	DeviceSCSI		Unitat òptica
+unknown	DevicePCI		desconegut
 Display controller	Device		Controlador de la pantalla
 Bus	DevicesView		BUS
 ACPI <unknown>	DeviceACPI		ACPI <desconegut>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Lector de targetes
 Bridge	Device		Pont
 ACPI button '%1'	DeviceACPI		Botó ACPI %1
 Attributes	PropertyList		Atributs
-Disk drive	DeviceSCSI		Unitat de disc
 Worm	DeviceSCSI		Cuc
+Disk drive	DeviceSCSI		Unitat de disc
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Fabricant
 Bridge	DeviceSCSI		Pont

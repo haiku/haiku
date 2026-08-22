@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	542483980
+1	russian	x-vnd.Haiku-Devices	1230536917
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрования
 Devices	System name		Устройства
@@ -10,13 +10,11 @@ USB bus	Device		Шина USB
 Computer	DevicesView		Компьютер
 Communications	DeviceSCSI		Устройства связи
 Mass storage controller	Device		Контроллер накопителей
-Connection	DevicesView		подключению
 Printer	DeviceSCSI		Принтер
-Driver used	DevicesView		Текущий драйвер
+Connection	DevicesView		подключению
 Manufacturer	Device		Производитель
 Scanner	DeviceSCSI		Сканер
 Memory controller	Device		Контроллер памяти
-Device paths	DevicesView		Путь к устройству
 Unknown device	DevicesView		Неизвестное устройство
 ACPI node '%1'	DeviceACPI		ACPI нода «%1»
 Name	PropertyList		Название
@@ -32,8 +30,8 @@ Serial bus controller	Device		Контроллер последовательн�
 Refresh devices	DevicesView		Обновить список устройств
 Category	DevicesView		категориям
 RBC	DeviceSCSI		RBC
-Device paths	Device		Путь к устройству
 Unknown device	Device		Неизвестное устройство
+Device paths	Device		Путь к устройству
 Wireless controller	Device		Беспроводной контроллер
 Generic system peripheral	Device		Общая системная периферия
 Value	PropertyList		Значение

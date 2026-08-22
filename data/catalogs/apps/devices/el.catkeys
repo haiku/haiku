@@ -10,8 +10,8 @@ USB bus	Device		Θύρα USB
 Computer	DevicesView		Υπολογιστής
 Communications	DeviceSCSI		Επικοινωνίες
 Mass storage controller	Device		Ελεγκτής μαζικής αποθήκευσης
-Connection	DevicesView		Σύνδεση
 Printer	DeviceSCSI		Εκτυπωτής
+Connection	DevicesView		Σύνδεση
 Manufacturer	Device		Κατασκευαστής
 Scanner	DeviceSCSI		Σαρωτής
 Memory controller	Device		Ελεγκτής μνήμης
@@ -30,8 +30,8 @@ Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
 Refresh devices	DevicesView		Ανανέωση συσκευών
 Category	DevicesView		Κατηγορία
 RBC	DeviceSCSI		RBC
-Device paths	Device		Διαδρομές συσκευών
 Unknown device	Device		Άγνωστη συσκευή
+Device paths	Device		Διαδρομές συσκευών
 Wireless controller	Device		Ελεγκτής ασύρματων τηλεπικοινωνιών
 Generic system peripheral	Device		Τυπική περιφερειακή συσκευή συστήματος
 Value	PropertyList		Τιμή

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Devices	2994036512
+1	czech	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		Sběrnice ACPI
 Encryption controller	Device		Řadič šifrování
 Devices	System name		Zařízení
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Generovat systémové informace
 Class info	DevicePCI		Informace o třídě
 USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
-ACPI thermal zone	DeviceACPI		ACPI teplotky
 Communications	DeviceSCSI		Komunikace
+ACPI thermal zone	DeviceACPI		ACPI teplotky
 Mass storage controller	Device		Řadič velkokapacitního úložiště
-Connection	DevicesView		Připojení
 Printer	DeviceSCSI		Tiskárna
-Driver used	DevicesView		Použitý ovladač
+Connection	DevicesView		Připojení
 Manufacturer	Device		Výrobce
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Kontroler paměti
-Device paths	DevicesView		Cesty zařízení
 Unknown device	DevicesView		Neznámé zařízení
 ACPI node '%1'	DeviceACPI		Uzel ACPI '%1'
 Name	PropertyList		Název
@@ -32,20 +30,18 @@ Input device controller	Device		Kontroler vstupních zařízení
 PCI bus	DevicesView		Sběrnice PCI
 Changer	DeviceSCSI		Měnič
 Serial bus controller	Device		Řadič sériové sběrnice
-unknown	DevicesView		neznámo
 Refresh devices	DevicesView		Obnovit zařízení
 Category	DevicesView		Kategorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Cesty zařízení
 Unknown device	Device		Neznámé zařízení
+Device paths	Device		Cesty zařízení
 Wireless controller	Device		Řadič bezdrátových sítí
 Generic system peripheral	Device		Periferie generického systému
 Value	PropertyList		Hodnota
 Devices	DevicesView		Zařízení
-none	DevicesView		žádná
 Device name	DeviceACPI		Název zařízení
-unknown	DevicePCI		neznámo
 Optical drive	DeviceSCSI		Optická jednotka
+unknown	DevicePCI		neznámo
 Display controller	Device		Kontroler obrazovky
 Bus	DevicesView		Sběrnice
 ACPI <unknown>	DeviceACPI		ACPI <neznámé>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Čtečka karet
 Bridge	Device		Most
 ACPI button '%1'	DeviceACPI		ACPI tlačítko '%1'
 Attributes	PropertyList		Atributy
-Disk drive	DeviceSCSI		Disková jednotka
 Worm	DeviceSCSI		Jednou zapisovatelný
+Disk drive	DeviceSCSI		Disková jednotka
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Výrobce
 Bridge	DeviceSCSI		Most

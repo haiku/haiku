@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	2178066083
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	1936288118
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringskontroller
 Devices	System name		Maskinvare
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Generer systeminformasjon
 Class info	DevicePCI		Klasseinformasjon
 USB bus	Device		USB bus
 Computer	DevicesView		Datamaskin
-ACPI thermal zone	DeviceACPI		ACPI termisk sone
 Communications	DeviceSCSI		Kommunikasjon
+ACPI thermal zone	DeviceACPI		ACPI termisk sone
 Mass storage controller	Device		Masselagringskontroller
-Connection	DevicesView		Tilkobling
 Printer	DeviceSCSI		Skriver
-Driver used	DevicesView		Driver som er brukt
+Connection	DevicesView		Tilkobling
 Manufacturer	Device		Produsent
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Minnekontroller
-Device paths	DevicesView		Enhetsstier
 Unknown device	DevicesView		Ukjent enhet
 ACPI node '%1'	DeviceACPI		ACPI-node '%1'
 Name	PropertyList		Navn
@@ -31,20 +29,18 @@ Input device controller	Device		Input-enhetskontroller
 PCI bus	DevicesView		PCI-buss
 Changer	DeviceSCSI		Skifter
 Serial bus controller	Device		Seriebusskontroller
-unknown	DevicesView		ukjent
 Refresh devices	DevicesView		Oppdater enheter
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-Device paths	Device		Enhetsti
 Unknown device	Device		Ukjent enhet
+Device paths	Device		Enhetsti
 Wireless controller	Device		Trådløs-kontroller
 Generic system peripheral	Device		Generisk ekstern enhet
 Value	PropertyList		Verdi
 Devices	DevicesView		Maskinvare
-none	DevicesView		ingen
 Device name	DeviceACPI		Enhetsnavn
-unknown	DevicePCI		ukjent
 Optical drive	DeviceSCSI		Optisk stasjon
+unknown	DevicePCI		ukjent
 Display controller	Device		Skjermkontroller
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <ukjent>
@@ -67,8 +63,8 @@ Card reader	DeviceSCSI		Kortleser
 Bridge	Device		Bro
 ACPI button '%1'	DeviceACPI		ACPI-knapp '%1'
 Attributes	PropertyList		Egenskaper
-Disk drive	DeviceSCSI		Diskstasjon
 Worm	DeviceSCSI		Worm
+Disk drive	DeviceSCSI		Diskstasjon
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Produsent
 Bridge	DeviceSCSI		Bro

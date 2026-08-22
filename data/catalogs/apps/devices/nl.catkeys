@@ -10,8 +10,8 @@ USB bus	Device		USB-bus
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Communicaties
 Mass storage controller	Device		Massa-opslagcontroller
-Connection	DevicesView		Verbinding
 Printer	DeviceSCSI		Printer
+Connection	DevicesView		Verbinding
 Manufacturer	Device		Fabrikant
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Geheugencontroller
@@ -30,8 +30,8 @@ Serial bus controller	Device		Seriële-bus-controller
 Refresh devices	DevicesView		Apparaten her-initialiseren
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Apparaatpaden
 Unknown device	Device		Onbekend apparaat
+Device paths	Device		Apparaatpaden
 Wireless controller	Device		Draadloze controller
 Generic system peripheral	Device		Generiek systeem-randapparaat
 Value	PropertyList		Waarde

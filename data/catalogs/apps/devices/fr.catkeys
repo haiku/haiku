@@ -10,8 +10,8 @@ USB bus	Device		Bus USB
 Computer	DevicesView		Ordinateur
 Communications	DeviceSCSI		Communications
 Mass storage controller	Device		Contrôleur de mémoire de masse
-Connection	DevicesView		Connexion
 Printer	DeviceSCSI		Imprimante
+Connection	DevicesView		Connexion
 Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Contrôleur mémoire
@@ -30,8 +30,8 @@ Serial bus controller	Device		Contrôleur de bus série
 Refresh devices	DevicesView		Rafraichir les périphériques
 Category	DevicesView		Catégorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Chemin des périphériques
 Unknown device	Device		Périphérique inconnu
+Device paths	Device		Chemin des périphériques
 Wireless controller	Device		Contrôleur sans fils
 Generic system peripheral	Device		Périphérique système générique
 Value	PropertyList		Valeur

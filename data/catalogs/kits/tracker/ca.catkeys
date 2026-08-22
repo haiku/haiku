@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2866679106
+1	catalan; valencian	x-vnd.Haiku-libtracker	3033621663
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -428,6 +428,7 @@ Move here	ContainerWindow		Mou aquí
 the config folder	FSUtils		la carpeta de configuració
 Sorry, could not create a new folder.	FSUtils		Disculpeu, no s'ha pogut preparar una carpeta nova.
 MIME Signature	AttributesView		Signatura de MIME
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Canvia'n el nom
 Clean up all	ContainerWindow		Neteja-ho tot
 Add current folder	FilePanelPriv		Afegeix la carpeta actual

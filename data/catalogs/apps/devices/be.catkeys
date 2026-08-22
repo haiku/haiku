@@ -8,8 +8,8 @@ Class info	DevicePCI		Інфа класа
 Computer	DevicesView		Кампутар
 Communications	DeviceSCSI		Камунікацыі
 Mass storage controller	Device		Кантролер прылад захавання даных
-Connection	DevicesView		Спалучэнне
 Printer	DeviceSCSI		Друкарка
+Connection	DevicesView		Спалучэнне
 Manufacturer	Device		Вытворца
 Scanner	DeviceSCSI		Сканэр
 Memory controller	Device		Кантролер памяці
@@ -28,8 +28,8 @@ Serial bus controller	Device		Кантролер серыйнай шыны
 Refresh devices	DevicesView		Абнавіць прылады
 Category	DevicesView		Катэгорыя
 RBC	DeviceSCSI		RBC
-Device paths	Device		Пуці прыладаў
 Unknown device	Device		Невядомая прылада
+Device paths	Device		Пуці прыладаў
 Wireless controller	Device		Бесшнуравы кантролер
 Generic system peripheral	Device		Агульная перыферыя
 Value	PropertyList		Велічыня

@@ -10,8 +10,8 @@ USB bus	Device		USB 匯流排
 Computer	DevicesView		電腦
 Communications	DeviceSCSI		通訊
 Mass storage controller	Device		大容量儲存控制器
-Connection	DevicesView		連接
 Printer	DeviceSCSI		印表機
+Connection	DevicesView		連接
 Manufacturer	Device		製造商
 Scanner	DeviceSCSI		掃描器
 Memory controller	Device		記憶體控制器
@@ -30,8 +30,8 @@ Serial bus controller	Device		序列匯流排控制器
 Refresh devices	DevicesView		重新整理裝置
 Category	DevicesView		類別
 RBC	DeviceSCSI		RBC
-Device paths	Device		設備路徑
 Unknown device	Device		未知設備
+Device paths	Device		設備路徑
 Wireless controller	Device		無線控制器
 Generic system peripheral	Device		通用系統週邊
 Value	PropertyList		值

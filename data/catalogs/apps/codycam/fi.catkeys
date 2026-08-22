@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	2786669505
+1	finnish	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		odotettiin kohdehakemistoa
 reply: '%s'\n	SftpClient		vastaus: ’%s’\n
 PASS <suppressed>  (real password sent)	FtpClient		SALASANA <salattu>  (oikea salasana lähetetty)
@@ -50,6 +50,7 @@ server address expected	CodyCam		odotettiin palvelinosoitetta
 Cannot start the video window	CodyCam		Videoikkunan käynnistäminen epäonnistui
 reply: %d, %d\n	FtpClient		vastaus: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Aikalähteen asettaminen videoikkunaan epäonnistui
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Videolähdettä ei löytynyt.\nTarvitset webbikameran sovelluksen %appname% käyttöön.
 Every 15 minutes	CodyCam		Joka 15. minuutti
 Every 24 hours	CodyCam		Joka 24. tunti
 Image Format Menu	CodyCam		Kuvamuotovalikko
