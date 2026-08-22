@@ -8,8 +8,8 @@ Class info	DevicePCI		Klasės savybės
 Computer	DevicesView		Kompiuteris
 Communications	DeviceSCSI		Ryšio įrenginiai
 Mass storage controller	Device		Kaupiklių valdiklis
-Connection	DevicesView		ryšį
 Printer	DeviceSCSI		Spausdintuvas
+Connection	DevicesView		ryšį
 Manufacturer	Device		Gamintojas
 Scanner	DeviceSCSI		Skeneris
 Memory controller	Device		Atminties valdiklis
@@ -28,8 +28,8 @@ Serial bus controller	Device		Nuosekliosios magistralės valdiklis
 Refresh devices	DevicesView		Atnaujinti įrenginių sąrašą
 Category	DevicesView		kategoriją
 RBC	DeviceSCSI		RBC
-Device paths	Device		Įrenginio kelias
 Unknown device	Device		Nežinomas įrenginys
+Device paths	Device		Įrenginio kelias
 Wireless controller	Device		Bevielio tinklo valdiklis
 Generic system peripheral	Device		Bendro pobūdžio periferiniai įrenginiai
 Value	PropertyList		Reikšmė

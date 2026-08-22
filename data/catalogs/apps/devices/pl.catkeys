@@ -10,8 +10,8 @@ USB bus	Device		Szyna USB
 Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikacja
 Mass storage controller	Device		Kontroler pamięci masowej
-Connection	DevicesView		Połączenie
 Printer	DeviceSCSI		Drukarka
+Connection	DevicesView		Połączenie
 Manufacturer	Device		Producent
 Scanner	DeviceSCSI		Skaner
 Memory controller	Device		Kontroler pamięci
@@ -30,8 +30,8 @@ Serial bus controller	Device		Kontroler magistrali szeregowej
 Refresh devices	DevicesView		Odśwież urządzenia
 Category	DevicesView		Kategoria
 RBC	DeviceSCSI		RBC
-Device paths	Device		Ścieżki urządzeń
 Unknown device	Device		Nieznane urządzenie
+Device paths	Device		Ścieżki urządzeń
 Wireless controller	Device		Kontroler łączy bezprzewodowych
 Generic system peripheral	Device		Generyczne urządzenie peryferyjne
 Value	PropertyList		Wartość

@@ -10,8 +10,8 @@ USB bus	Device		USB 버스
 Computer	DevicesView		컴퓨터
 Communications	DeviceSCSI		통신
 Mass storage controller	Device		대용량 저장 장치 컨트롤러
-Connection	DevicesView		연결
 Printer	DeviceSCSI		프린터
+Connection	DevicesView		연결
 Manufacturer	Device		제조사
 Scanner	DeviceSCSI		스캐너
 Memory controller	Device		메모리 제어기
@@ -30,8 +30,8 @@ Serial bus controller	Device		시리얼 버스 컨트롤러
 Refresh devices	DevicesView		장치 새로고침
 Category	DevicesView		종류
 RBC	DeviceSCSI		RBC
-Device paths	Device		장치 경로
 Unknown device	Device		알 수 없는 장치
+Device paths	Device		장치 경로
 Wireless controller	Device		무선 컨트롤러
 Generic system peripheral	Device		일반 시스템 주변 기기
 Value	PropertyList		값

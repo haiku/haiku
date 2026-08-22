@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Devices	2994036512
+1	hungarian	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Devices	System name		Eszközök
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Rendszerinformáció létrehozása
 Class info	DevicePCI		Osztály-információk
 USB bus	Device		USB busz
 Computer	DevicesView		Számítógép
-ACPI thermal zone	DeviceACPI		ACPI hő-zóna
 Communications	DeviceSCSI		Kommunikáció
+ACPI thermal zone	DeviceACPI		ACPI hő-zóna
 Mass storage controller	Device		Háttértároló vezérlő
-Connection	DevicesView		Csatlakozás
 Printer	DeviceSCSI		Nyomtató
-Driver used	DevicesView		Használ eszközvezérlő
+Connection	DevicesView		Csatlakozás
 Manufacturer	Device		Gyártó
 Scanner	DeviceSCSI		Lapolvasó
 Memory controller	Device		Memóriavezérlő
-Device paths	DevicesView		Eszköz útvonala
 Unknown device	DevicesView		Ismeretlen eszköz
 ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
 Name	PropertyList		Név
@@ -32,20 +30,18 @@ Input device controller	Device		Beviteli eszköz vezérlő
 PCI bus	DevicesView		PCI port
 Changer	DeviceSCSI		Cserélő
 Serial bus controller	Device		Soros busz vezérlő
-unknown	DevicesView		ismeretlen
 Refresh devices	DevicesView		Eszközök frissítése
 Category	DevicesView		Kategória
 RBC	DeviceSCSI		RBC
-Device paths	Device		Útvonal
 Unknown device	Device		Ismeretlen eszköz
+Device paths	Device		Útvonal
 Wireless controller	Device		Vezeték nélküli vezérlő
 Generic system peripheral	Device		Általános rendszer periféria
 Value	PropertyList		Érték
 Devices	DevicesView		Eszközök
-none	DevicesView		nincs
 Device name	DeviceACPI		Eszköznév
-unknown	DevicePCI		ismeretlen
 Optical drive	DeviceSCSI		Optikai eszköz
+unknown	DevicePCI		ismeretlen
 Display controller	Device		Kijelző vezérlő
 Bus	DevicesView		Busz
 ACPI <unknown>	DeviceACPI		ACPI <ismeretlen>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Kártyaolvasó
 Bridge	Device		Híd
 ACPI button '%1'	DeviceACPI		ACPI gomb '%1'
 Attributes	PropertyList		Jellemzők
-Disk drive	DeviceSCSI		Lemez-eszköz
 Worm	DeviceSCSI		Féreg
+Disk drive	DeviceSCSI		Lemez-eszköz
 CD-ROM	DeviceSCSI		CD meghajtó
 Manufacturer	DevicePCI		Gyártó
 Bridge	DeviceSCSI		Híd

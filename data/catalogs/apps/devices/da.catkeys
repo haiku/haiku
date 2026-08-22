@@ -10,8 +10,8 @@ USB bus	Device		USB-bus
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Kommunikation
 Mass storage controller	Device		Lagringsstyreenhed
-Connection	DevicesView		Forbindelse
 Printer	DeviceSCSI		Printer
+Connection	DevicesView		Forbindelse
 Manufacturer	Device		Producent
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Hukommelsesstyreenhed
@@ -30,8 +30,8 @@ Serial bus controller	Device		Styreenhed for seriel bus
 Refresh devices	DevicesView		Genopfrisk enheder
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-Device paths	Device		Enhedsstier
 Unknown device	Device		Ukendt enhed
+Device paths	Device		Enhedsstier
 Wireless controller	Device		Trådløs styreenhed
 Generic system peripheral	Device		Almen systemenhed
 Value	PropertyList		Værdi

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	2994036512
+1	german	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Devices	System name		Geräte
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Systeminformationen erstellen
 Class info	DevicePCI		Klassen-Info
 USB bus	Device		USB-Bus
 Computer	DevicesView		Computer
-ACPI thermal zone	DeviceACPI		ACPI Temperaturzone
 Communications	DeviceSCSI		Kommunikation
+ACPI thermal zone	DeviceACPI		ACPI Temperaturzone
 Mass storage controller	Device		Massenspeicher-Controller
-Connection	DevicesView		Verbindung
 Printer	DeviceSCSI		Drucker
-Driver used	DevicesView		Benutzter Treiber
+Connection	DevicesView		Verbindung
 Manufacturer	Device		Hersteller
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Speichercontroller
-Device paths	DevicesView		Gerät-Pfade
 Unknown device	DevicesView		Unbekanntes Gerät
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
 Name	PropertyList		Name
@@ -32,20 +30,18 @@ Input device controller	Device		Eingabegeräte-Kontroller
 PCI bus	DevicesView		PCI-Bus
 Changer	DeviceSCSI		Wechsler
 Serial bus controller	Device		Serieller Bus-Controller
-unknown	DevicesView		unbekannt
 Refresh devices	DevicesView		Geräte aktualisieren
 Category	DevicesView		Kategorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Gerätepfade
 Unknown device	Device		Unbekanntes Gerät
+Device paths	Device		Gerätepfade
 Wireless controller	Device		Funknetzwerk-Controller
 Generic system peripheral	Device		Peripheriegeräte
 Value	PropertyList		Wert
 Devices	DevicesView		Geräte
-none	DevicesView		keine
 Device name	DeviceACPI		Gerätename
-unknown	DevicePCI		unbekannt
 Optical drive	DeviceSCSI		Optisches Laufwerk
+unknown	DevicePCI		unbekannt
 Display controller	Device		Anzeige-Controller
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unbekannt>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Kartenleser
 Bridge	Device		Schnittstellen
 ACPI button '%1'	DeviceACPI		ACPI Button '%1'
 Attributes	PropertyList		Attribute
-Disk drive	DeviceSCSI		Laufwerk
 Worm	DeviceSCSI		WORM
+Disk drive	DeviceSCSI		Laufwerk
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Hersteller
 Bridge	DeviceSCSI		Schnittstellen

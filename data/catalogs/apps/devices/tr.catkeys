@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	2994036512
+1	turkish	x-vnd.Haiku-Devices	2752258547
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
@@ -8,16 +8,14 @@ Generate system information	DevicesView		Sistem bilgisi üret
 Class info	DevicePCI		Sınıf bilgisi
 USB bus	Device		USB veri yolu
 Computer	DevicesView		Bilgisayar
-ACPI thermal zone	DeviceACPI		ACPI termal bölgesi
 Communications	DeviceSCSI		İletişim
+ACPI thermal zone	DeviceACPI		ACPI termal bölgesi
 Mass storage controller	Device		Yığın depolama denetleyicisi
-Connection	DevicesView		Bağlantı
 Printer	DeviceSCSI		Yazıcı
-Driver used	DevicesView		Kullanılan sürücü
+Connection	DevicesView		Bağlantı
 Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
-Device paths	DevicesView		Aygıt yolları
 Unknown device	DevicesView		Bilinmeyen aygıt
 ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
 Name	PropertyList		Ad
@@ -32,20 +30,18 @@ Input device controller	Device		Giriş aygıtı denetleyicisi
 PCI bus	DevicesView		PCI veri yolu
 Changer	DeviceSCSI		Değiştirici
 Serial bus controller	Device		Seri veri yolu denetleyicisi
-unknown	DevicesView		bilinmeyen
 Refresh devices	DevicesView		Aygıtları yenile
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-Device paths	Device		Aygıt yolları
 Unknown device	Device		Bilinmeyen aygıt
+Device paths	Device		Aygıt yolları
 Wireless controller	Device		Kablosuz denetleyicisi
 Generic system peripheral	Device		Genel sistem çevre birimi
 Value	PropertyList		Değer
 Devices	DevicesView		Aygıtlar
-none	DevicesView		yok
 Device name	DeviceACPI		Aygıt adı
-unknown	DevicePCI		bilinmeyen
 Optical drive	DeviceSCSI		Optik sürücü
+unknown	DevicePCI		bilinmeyen
 Display controller	Device		Görüntü denetleyicisi
 Bus	DevicesView		Veri yolu
 ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
@@ -69,8 +65,8 @@ Card reader	DeviceSCSI		Kart okuyucusu
 Bridge	Device		Köprü
 ACPI button '%1'	DeviceACPI		ACPI düğmesi “%1”
 Attributes	PropertyList		Öznitelikler
-Disk drive	DeviceSCSI		Disk sürücüsü
 Worm	DeviceSCSI		Solucan
+Disk drive	DeviceSCSI		Disk sürücüsü
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Üretici
 Bridge	DeviceSCSI		Köprü

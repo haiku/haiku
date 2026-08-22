@@ -1,14 +1,16 @@
-1	finnish	x-vnd.Be-TSKB	3780974715
+1	finnish	x-vnd.Be-TSKB	152797572
 Auto-hide	PreferencesWindow		Piilota automaattisesti
 Show all	WindowMenu		Näytä kaikki
 Edit in Tracker…	PreferencesWindow		Muokkaa Seuraajassa…
 Menu	PreferencesWindow		Valikko
+Location	PreferencesWindow		Sijainti
 Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
 Hide clock	TimeView		Piilota kello
 Large	PreferencesWindow		Suuri
 <Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
 Recent documents	DeskbarMenu		Äskettäiset asiakirjat
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
+%appname% preferences	PreferencesWindow		%appname% -asetukset
 Always on top	PreferencesWindow		Aina päällimmäisenä
 Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
 Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:

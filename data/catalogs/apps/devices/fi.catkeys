@@ -10,8 +10,8 @@ USB bus	Device		USB-väylä
 Computer	DevicesView		Tietokone
 Communications	DeviceSCSI		Viestinnät
 Mass storage controller	Device		Massamuistilaiteohjain
-Connection	DevicesView		Yhteys
 Printer	DeviceSCSI		Tulostin
+Connection	DevicesView		Yhteys
 Manufacturer	Device		Valmistaja
 Scanner	DeviceSCSI		Skanneri
 Memory controller	Device		Muistiohjain
@@ -30,8 +30,8 @@ Serial bus controller	Device		Sarjaväyläohjain
 Refresh devices	DevicesView		Verestä laitteita
 Category	DevicesView		Luokka
 RBC	DeviceSCSI		RBC
-Device paths	Device		Laitepolut
 Unknown device	Device		Tuntematon laite
+Device paths	Device		Laitepolut
 Wireless controller	Device		Langaton ohjain
 Generic system peripheral	Device		Yleinen järjestelmän oheislaite
 Value	PropertyList		Arvo

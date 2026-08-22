@@ -8,8 +8,8 @@ Class info	DevicePCI		Info kelas
 Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikasi
 Mass storage controller	Device		Pengontrol penyimpanan massal
-Connection	DevicesView		Koneksi
 Printer	DeviceSCSI		Pencetak
+Connection	DevicesView		Koneksi
 Manufacturer	Device		Pabrikan
 Scanner	DeviceSCSI		Pemindai
 Memory controller	Device		Pengendali memori
@@ -28,8 +28,8 @@ Serial bus controller	Device		Pengontrol serial bus
 Refresh devices	DevicesView		Segarkan perangkat
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-Device paths	Device		Jalur perangkat
 Unknown device	Device		Perangkat tak dikenal
+Device paths	Device		Jalur perangkat
 Wireless controller	Device		Pengontrol nirkabel
 Generic system peripheral	Device		Periferal sistem generik
 Value	PropertyList		Nilai

@@ -10,8 +10,8 @@ USB bus	Device		Magistrală USB
 Computer	DevicesView		Calculator
 Communications	DeviceSCSI		Comunicații
 Mass storage controller	Device		Controlor de stocare în masă
-Connection	DevicesView		Conexiune
 Printer	DeviceSCSI		Imprimantă
+Connection	DevicesView		Conexiune
 Manufacturer	Device		Producător
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlor de memorie
@@ -30,8 +30,8 @@ Serial bus controller	Device		Controlor de magistrală serială
 Refresh devices	DevicesView		Reîmprospătează dispozitivele
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-Device paths	Device		Căi de dispozitiv
 Unknown device	Device		Dispozitiv necunoscut
+Device paths	Device		Căi de dispozitiv
 Wireless controller	Device		Controlor fără fir
 Generic system peripheral	Device		Periferice generice de sistem
 Value	PropertyList		Valoare

@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	2467534740
+1	finnish	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Ryhmät
+Temp	DataSource		Lämpö
 Block cache memory	DataSource		Lohkovälimuisti
 Media nodes	DataSource		Mediasolmut
 Network send	DataSource		Verkkolähetys
@@ -9,8 +10,10 @@ ActivityMonitor	System name		Aktiviteettivalvonta
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Päivitä aikaväli:
 Settings…	ActivityWindow		Asetukset...
+Unknown thermal sensor	SystemInfoHandler		Tuntematon lämpöanturi
 Block cache	DataSource		Lohkovälimuisti
 Memory	DataSource		Muisti
+No thermal sensor	SystemInfoHandler		Ei lämpöanturia
 CPU speed	DataSource		Prosessorinopeus
 CPU usage	DataSource		Suoritinkäyttö
 Raw clipboard	DataSource		Raakadataleikepöytä
@@ -23,6 +26,7 @@ Page faults	DataSource		Sivuvirheet
 Add graph	ActivityWindow		Lisää kuvaaja
 Swap	DataSource		Vaihda
 %s faults/s	DataSource		%s vikaa/s
+Temperature	DataSource		Lämpötila
 Semaphores	DataSource		Opastimet
 TX	DataSource	Shorter version for Sending	Läh.
 %lld ms	SettingsWindow		%lld ms

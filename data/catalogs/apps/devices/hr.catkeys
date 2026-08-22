@@ -7,8 +7,8 @@ Generate system information	DevicesView		Generiraj informacije sustava
 Computer	DevicesView		Računalo
 Communications	DeviceSCSI		Komunikacije
 Mass storage controller	Device		Upravljač masovne pohrane
-Connection	DevicesView		Veza
 Printer	DeviceSCSI		Pisač
+Connection	DevicesView		Veza
 Manufacturer	Device		Proizvođač
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Mrežni upravljač
@@ -25,8 +25,8 @@ PCI bus	DevicesView		PCI bus
 Refresh devices	DevicesView		Osvježi uređaje
 Category	DevicesView		Kategorija
 RBC	DeviceSCSI		RBC
-Device paths	Device		Putanje uređaja
 Unknown device	Device		Nepoznati uređaj
+Device paths	Device		Putanje uređaja
 Wireless controller	Device		Bežični kontroler
 Value	PropertyList		Vrijednost
 Devices	DevicesView		Uređaji

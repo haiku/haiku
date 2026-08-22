@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Expander	2040688293
+1	finnish	x-vnd.Haiku-Expander	2545978302
 Destination	ExpanderWindow		Kohde
 Other	ExpanderPreferences		Muut
 Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
@@ -12,6 +12,7 @@ Close	ExpanderMenu		Sulje
 Create	ExpanderWindow		Luo
 Creating listing for '%s'…	ExpanderWindow		Luodaan luettelo kohteelle ’%s’…
 Show contents	ExpanderMenu		Näytä sisällöt
+%appname% settings	ExpanderPreferences		%appname% -asetukset
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Haluatko varmasti pysäyttää tämän arkiston laajentamisen? Laajennetut kohteet eivät ole ehkä valmiita.
 Settings	ExpanderMenu		Asetukset
 Expand	ExpanderWindow		Laajenna
