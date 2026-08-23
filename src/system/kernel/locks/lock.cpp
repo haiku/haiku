@@ -903,7 +903,10 @@ mutex_destroy(mutex* lock)
 	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
-	if (lock->holder != -1 && thread_get_current_thread_id() != lock->holder) {
+	// Never-used statically initialized mutexes will have holder set to 0, because
+	// MUTEX_INITIALIZER needs to be the same for both KDEBUG and non-KDEBUG kernels.
+	if (lock->holder != 0 && lock->holder != -1
+			&& thread_get_current_thread_id() != lock->holder) {
 		panic("mutex_destroy(): the lock (%p) is held by %" B_PRId32 ", not "
 			"by the caller @! bt %" B_PRId32, lock, lock->holder, lock->holder);
 		if (_mutex_lock(lock, &locker) != B_OK)
@@ -925,7 +928,7 @@ mutex_destroy(mutex* lock)
 	lock->name = NULL;
 	lock->flags = 0;
 #if KDEBUG
-	lock->holder = 0;
+	lock->holder = INT16_MIN;
 #else
 	lock->count = INT16_MIN;
 #endif
@@ -1020,13 +1023,13 @@ _mutex_lock(mutex* lock, void* _locker)
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #if KDEBUG
-	if (lock->holder < 0) {
+	if (lock->holder == 0 || lock->holder == -1) {
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
 	} else if (lock->holder == thread_get_current_thread_id()) {
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
-	} else if (lock->holder == 0) {
+	} else if (lock->holder < -1) {
 		panic("_mutex_lock(): using uninitialized lock %p", lock);
 	}
 #else

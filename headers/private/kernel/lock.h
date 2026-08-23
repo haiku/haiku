@@ -97,16 +97,10 @@ typedef struct rw_lock {
 
 
 // static initializers
-#if KDEBUG
-#	define MUTEX_INITIALIZER(name) \
-	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0 }
-#	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), 0 }
-#else
-#	define MUTEX_INITIALIZER(name) \
+#define MUTEX_INITIALIZER(name) \
 	{ name, NULL, B_SPINLOCK_INITIALIZER, 0, 0 }
-#	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
-#endif
-
+#define RECURSIVE_LOCK_INITIALIZER(name) \
+	{ MUTEX_INITIALIZER(name), -1, 0 }
 #define RW_LOCK_INITIALIZER(name) \
 	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0, 0, 0, 0, 0 }
 
