@@ -62,7 +62,7 @@ OMAP3InterruptController::HandleInterrupt()
 		irqnr &= 0x7f; /* ACTIVEIRQ */
 
 		if (irqnr) {
-			io_interrupt_handler(irqnr, true);
+			io_interrupt_handler(irqnr, B_LEVEL_TRIGGERED);
 			handledIRQ = true;
 		}
 	} while(irqnr);

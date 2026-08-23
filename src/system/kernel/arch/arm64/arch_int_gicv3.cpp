@@ -349,7 +349,7 @@ GICv3InterruptController::HandleInterrupt()
 	if (irq == ICI_IRQ)
 		smp_intercpu_interrupt_handler(smp_get_current_cpu());
 	else
-		io_interrupt_handler(irq, true /* level-sensitive interrupt */);
+		io_interrupt_handler(irq, B_LEVEL_TRIGGERED);
 
 	gic_write_eoir(irq);
 

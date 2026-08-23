@@ -86,13 +86,16 @@ pic_is_spurious_interrupt(int32 num)
 }
 
 
-static bool
-pic_is_level_triggered_interrupt(int32 num)
+static interrupt_trigger_mode
+pic_get_interrupt_trigger(int32 num)
 {
 	if (num < 0 || num > PIC_NUM_INTS)
-		return false;
+		return B_EDGE_TRIGGERED;
 
-	return (sLevelTriggeredInterrupts & (1 << num)) != 0;
+	if ((sLevelTriggeredInterrupts & (1 << num)) != 0)
+		return B_LEVEL_TRIGGERED;
+	else
+		return B_EDGE_TRIGGERED;
 }
 
 
@@ -154,14 +157,15 @@ pic_disable_io_interrupt(int32 num)
 
 
 static void
-pic_configure_io_interrupt(int32 num, uint32 config)
+pic_configure_io_interrupt(int32 num, interrupt_trigger_mode mode,
+	interrupt_trigger_polarity polarity)
 {
 	uint8 value;
 	int32 localBit;
 	if (num < 0 || num > PIC_NUM_INTS || num == 2)
 		return;
 
-	TRACE(("pic_configure_io_interrupt: irq %ld; config 0x%08lx\n", num, config));
+	TRACE(("pic_configure_io_interrupt: irq %ld; config 0x%08lx\n", num, mode));
 
 	if (num < PIC_SLAVE_INT_BASE) {
 		value = in8(PIC_MASTER_TRIGGER_MODE);
@@ -171,7 +175,7 @@ pic_configure_io_interrupt(int32 num, uint32 config)
 		localBit = num - PIC_SLAVE_INT_BASE;
 	}
 
-	if (config & B_LEVEL_TRIGGERED)
+	if (mode == B_LEVEL_TRIGGERED)
 		value |= 1 << localBit;
 	else
 		value &= ~(1 << localBit);
@@ -195,7 +199,7 @@ pic_init()
 		&pic_disable_io_interrupt,
 		&pic_configure_io_interrupt,
 		&pic_is_spurious_interrupt,
-		&pic_is_level_triggered_interrupt,
+		&pic_get_interrupt_trigger,
 		&pic_end_of_interrupt,
 		NULL
 	};

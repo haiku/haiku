@@ -271,7 +271,7 @@ STrap(iframe* frame)
 		}
 		case causeInterrupt + sExternInt: {
 			uint64 irq = gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete;
-			io_interrupt_handler(irq, true);
+			io_interrupt_handler(irq, B_LEVEL_TRIGGERED);
 			gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete = irq;
 			AfterInterrupt();
 			return;

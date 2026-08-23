@@ -104,7 +104,7 @@ MsiInterruptCtrlDW::InterruptReceivedInt()
 	for (int i = 0; i < 32; i++) {
 		if (((1 << i) & status) != 0) {
 //			dprintf("MSI IRQ: %d (%ld)\n", i, fStartMsiIrq + i);
-			io_interrupt_handler(fMsiStartIrq + i, false);
+			io_interrupt_handler(fMsiStartIrq + i, B_EDGE_TRIGGERED);
 			fDbiRegs->msiIntr[0].status = (1 << i);
 		}
 	}

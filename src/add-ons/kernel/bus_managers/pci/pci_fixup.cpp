@@ -181,7 +181,7 @@ ati_fixup_ixp(PCI *pci, uint8 domain, uint8 bus, uint8 device, uint8 function,
 
 	dprintf("ati_fixup_ixp: found IXP chipset, forcing IRQ 0 as level triggered.\n");
 	// XXX: maybe use pic_*() ?
-	arch_int_configure_io_interrupt(0, B_LEVEL_TRIGGERED);
+	arch_int_configure_io_interrupt(0, B_LEVEL_TRIGGERED, B_LOW_ACTIVE_POLARITY);
 
 #endif
 }

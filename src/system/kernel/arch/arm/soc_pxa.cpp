@@ -37,7 +37,7 @@ PXAInterruptController::HandleInterrupt()
 {
 	for (int i=0; i < 32; i++) {
 		if (fRegBase[PXA_ICIP] & (1 << i))
-			io_interrupt_handler(i, true);
+			io_interrupt_handler(i, B_LEVEL_TRIGGERED);
 	}
 }
 

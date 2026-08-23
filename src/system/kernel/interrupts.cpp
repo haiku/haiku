@@ -262,7 +262,7 @@ update_int_load(int i)
 	vector (IRQ).
 */
 int
-io_interrupt_handler(int vector, bool levelTriggered)
+io_interrupt_handler(int vector, interrupt_trigger_mode triggerMode)
 {
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler* io;
@@ -302,7 +302,7 @@ io_interrupt_handler(int vector, bool levelTriggered)
 		if (status != B_UNHANDLED_INTERRUPT)
 			io->handled_count++;
 #endif
-		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
+		if (triggerMode == B_LEVEL_TRIGGERED && status != B_UNHANDLED_INTERRUPT)
 			break;
 
 		if (status == B_HANDLED_INTERRUPT || status == B_INVOKE_SCHEDULER)
@@ -371,7 +371,7 @@ io_interrupt_handler(int vector, bool levelTriggered)
 
 	update_int_load(vector);
 
-	if (levelTriggered)
+	if (triggerMode == B_LEVEL_TRIGGERED)
 		return status;
 
 	// edge triggered return value

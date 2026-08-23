@@ -238,7 +238,7 @@ void
 x86_hardware_interrupt(struct iframe* frame)
 {
 	int32 vector = frame->vector - ARCH_INTERRUPT_BASE;
-	bool levelTriggered = false;
+	interrupt_trigger_mode interruptType = B_EDGE_TRIGGERED;
 	Thread* thread = thread_get_current_thread();
 
 	if (sCurrentPIC->is_spurious_interrupt(vector)) {
@@ -246,18 +246,18 @@ x86_hardware_interrupt(struct iframe* frame)
 		return;
 	}
 
-	levelTriggered = sCurrentPIC->is_level_triggered_interrupt(vector);
+	interruptType = sCurrentPIC->get_interrupt_trigger_type(vector);
 
-	if (!levelTriggered) {
+	if (interruptType != B_LEVEL_TRIGGERED) {
 		// if it's not handled by the current pic then it's an apic generated
 		// interrupt like local interrupts, msi or ipi.
 		if (!sCurrentPIC->end_of_interrupt(vector))
 			apic_end_of_interrupt();
 	}
 
-	io_interrupt_handler(vector, levelTriggered);
+	io_interrupt_handler(vector, interruptType);
 
-	if (levelTriggered) {
+	if (interruptType == B_LEVEL_TRIGGERED) {
 		if (!sCurrentPIC->end_of_interrupt(vector))
 			apic_end_of_interrupt();
 	}
@@ -406,9 +406,10 @@ arch_int_disable_io_interrupt(int32 irq)
 
 
 void
-arch_int_configure_io_interrupt(int32 irq, uint32 config)
+arch_int_configure_io_interrupt(int32 irq, interrupt_trigger_mode config,
+	interrupt_trigger_polarity polarity)
 {
-	sCurrentPIC->configure_io_interrupt(irq, config);
+	sCurrentPIC->configure_io_interrupt(irq, config, polarity);
 }
 
 

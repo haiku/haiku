@@ -126,7 +126,7 @@ void GICv2InterruptController::HandleInterrupt()
 	} else if (irqnr == ICI_IRQ) {
 		smp_intercpu_interrupt_handler(smp_get_current_cpu());
 	} else {
-		io_interrupt_handler(irqnr, true /* level-sensitive interrupt */);
+		io_interrupt_handler(irqnr, B_LEVEL_TRIGGERED);
 	}
 
 	fGiccRegs[GICC_REG_EOIR] = iar;

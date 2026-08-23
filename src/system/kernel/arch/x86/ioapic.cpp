@@ -10,6 +10,8 @@
 
 #include "acpi_irq_routing_table.h"
 
+#include <utility>
+
 #include <ACPI.h>
 #include <AutoDeleter.h>
 #include <safemode.h>
@@ -194,13 +196,14 @@ ioapic_write_64(struct ioapic& ioapic, uint8 registerSelect, uint64 value,
 
 static void
 ioapic_configure_pin(struct ioapic& ioapic, uint8 pin, uint8 vector,
-	uint8 triggerPolarity, uint16 deliveryMode)
+	interrupt_trigger_mode triggerMode, interrupt_trigger_polarity triggerPolarity,
+	uint16 deliveryMode)
 {
 	uint64 entry = ioapic_read_64(ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(IO_APIC_TRIGGER_MODE_MASK | IO_APIC_PIN_POLARITY_MASK
 		| IO_APIC_INTERRUPT_VECTOR_MASK | IO_APIC_DELIVERY_MODE_MASK);
 
-	if (triggerPolarity & B_LEVEL_TRIGGERED) {
+	if (triggerMode == B_LEVEL_TRIGGERED) {
 		entry |= IO_APIC_TRIGGER_MODE_LEVEL;
 		ioapic.level_triggered_mask |= ((uint64)1 << pin);
 	} else {
@@ -208,7 +211,7 @@ ioapic_configure_pin(struct ioapic& ioapic, uint8 pin, uint8 vector,
 		ioapic.level_triggered_mask &= ~((uint64)1 << pin);
 	}
 
-	if (triggerPolarity & B_LOW_ACTIVE_POLARITY)
+	if (triggerPolarity == B_LOW_ACTIVE_POLARITY)
 		entry |= IO_APIC_PIN_POLARITY_LOW_ACTIVE;
 	else
 		entry |= IO_APIC_PIN_POLARITY_HIGH_ACTIVE;
@@ -227,15 +230,18 @@ ioapic_is_spurious_interrupt(int32 gsi)
 }
 
 
-static bool
-ioapic_is_level_triggered_interrupt(int32 gsi)
+static interrupt_trigger_mode
+ioapic_get_interrupt_trigger(int32 gsi)
 {
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
-		return false;
+		return B_EDGE_TRIGGERED;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	return (ioapic->level_triggered_mask & ((uint64)1 << pin)) != 0;
+	if ((ioapic->level_triggered_mask & ((uint64)1 << pin)) != 0)
+		return B_LEVEL_TRIGGERED;
+	else
+		return B_EDGE_TRIGGERED;
 }
 
 
@@ -318,7 +324,8 @@ ioapic_disable_io_interrupt(int32 gsi)
 
 
 static void
-ioapic_configure_io_interrupt(int32 gsi, uint32 config)
+ioapic_configure_io_interrupt(int32 gsi, interrupt_trigger_mode mode,
+	interrupt_trigger_polarity polarity)
 {
 	struct ioapic* ioapic = find_ioapic(gsi);
 	if (ioapic == NULL)
@@ -326,12 +333,10 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 	InterruptsSpinLocker _(ioapic->registers_lock);
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE("ioapic_configure_io_interrupt: gsi %" B_PRId32
-		" -> io-apic %u pin %u; config 0x%08" B_PRIx32 "\n", gsi,
-		ioapic->number, pin, config);
+	TRACE("ioapic_configure_io_interrupt: gsi %" B_PRId32 " -> io-apic %u pin %u; mode 0x%08"
+		B_PRIx32 "\n", gsi, ioapic->number, pin, mode);
 
-	ioapic_configure_pin(*ioapic, pin, gsi, config,
-		IO_APIC_DELIVERY_MODE_FIXED);
+	ioapic_configure_pin(*ioapic, pin, gsi, mode, polarity, IO_APIC_DELIVERY_MODE_FIXED);
 }
 
 
@@ -424,8 +429,8 @@ static int32
 ioapic_source_override_handler(void* data)
 {
 	int32 vector = (addr_t)data;
-	bool levelTriggered = ioapic_is_level_triggered_interrupt(vector);
-	return io_interrupt_handler(vector, levelTriggered);
+	interrupt_trigger_mode triggerMode = ioapic_get_interrupt_trigger(vector);
+	return io_interrupt_handler(vector, triggerMode);
 }
 
 
@@ -510,37 +515,38 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 }
 
 
-static inline uint32
+static inline std::pair<interrupt_trigger_mode, interrupt_trigger_polarity>
 acpi_madt_convert_inti_flags(uint16 flags)
 {
-	uint32 config = 0;
+	interrupt_trigger_mode mode;
+	interrupt_trigger_polarity polarity;
 	switch (flags & ACPI_MADT_POLARITY_MASK) {
 		case ACPI_MADT_POLARITY_ACTIVE_LOW:
-			config = B_LOW_ACTIVE_POLARITY;
+			polarity = B_LOW_ACTIVE_POLARITY;
 			break;
 		default:
 			dprintf("invalid polarity in inti flags\n");
 			// fall through and assume active high
 		case ACPI_MADT_POLARITY_ACTIVE_HIGH:
 		case ACPI_MADT_POLARITY_CONFORMS:
-			config = B_HIGH_ACTIVE_POLARITY;
+			polarity = B_HIGH_ACTIVE_POLARITY;
 			break;
 	}
 
 	switch (flags & ACPI_MADT_TRIGGER_MASK) {
 		case ACPI_MADT_TRIGGER_LEVEL:
-			config |= B_LEVEL_TRIGGERED;
+			mode = B_LEVEL_TRIGGERED;
 			break;
 		default:
 			dprintf("invalid trigger mode in inti flags\n");
 			// fall through and assume edge triggered
 		case ACPI_MADT_TRIGGER_CONFORMS:
 		case ACPI_MADT_TRIGGER_EDGE:
-			config |= B_EDGE_TRIGGERED;
+			mode = B_EDGE_TRIGGERED;
 			break;
 	}
 
-	return config;
+	return { mode, polarity };
 }
 
 
@@ -576,8 +582,8 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				}
 
 				// configure non-standard polarity/trigger modes
-				uint32 config = acpi_madt_convert_inti_flags(info->IntiFlags);
-				ioapic_configure_io_interrupt(info->GlobalIrq, config);
+				auto [mode, polarity] = acpi_madt_convert_inti_flags(info->IntiFlags);
+				ioapic_configure_io_interrupt(info->GlobalIrq, mode, polarity);
 				break;
 			}
 
@@ -594,8 +600,8 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 					break;
 
 				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
-				uint32 config = acpi_madt_convert_inti_flags(info->IntiFlags);
-				ioapic_configure_pin(*ioapic, pin, info->GlobalIrq, config,
+				auto [config, polarity] = acpi_madt_convert_inti_flags(info->IntiFlags);
+				ioapic_configure_pin(*ioapic, pin, info->GlobalIrq, config, polarity,
 					IO_APIC_DELIVERY_MODE_NMI);
 				break;
 			}
@@ -693,7 +699,7 @@ ioapic_init(kernel_args* args)
 		&ioapic_disable_io_interrupt,
 		&ioapic_configure_io_interrupt,
 		&ioapic_is_spurious_interrupt,
-		&ioapic_is_level_triggered_interrupt,
+		&ioapic_get_interrupt_trigger,
 		&ioapic_end_of_interrupt,
 		&ioapic_assign_interrupt_to_cpu,
 	};
@@ -852,6 +858,6 @@ ioapic_routing_init()
 	// configure IO-APIC interrupts from PCI routing table
 	for (int i = 0; i < table.Count(); i++) {
 		irq_routing_entry& entry = table.ElementAt(i);
-		ioapic_configure_io_interrupt(entry.irq, entry.polarity | entry.trigger_mode);
+		ioapic_configure_io_interrupt(entry.irq, entry.trigger_mode, entry.polarity);
 	}
 }

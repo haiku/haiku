@@ -8,29 +8,29 @@
 
 #include <ACPI.h>
 
-
+#include "private/kernel/interrupts.h"
 #include "util/Vector.h"
 
 
 struct irq_routing_entry {
 	// ACPI specifics
-	uint64		device_address;
-	uint8		pin;
+	uint64						device_address;
+	uint8						pin;
 
-	acpi_handle	source;
-	uint32		source_index;
-	bool		needs_configuration;
+	acpi_handle					source;
+	uint32						source_index;
+	bool						needs_configuration;
 
 	// PCI bus_manager connection
-	uint8		pci_bus;
-	uint8		pci_device;
-	uint32		pci_function_mask;
+	uint8						pci_bus;
+	uint8						pci_device;
+	uint32						pci_function_mask;
 
 	// Distilled configuration info
-	uint8		irq;			// Global System Interrupt (GSI)
-	uint8		bios_irq;		// BIOS assigned original IRQ
-	uint8		polarity;		// B_{HIGH|LOW}_ACTIVE_POLARITY
-	uint8		trigger_mode;	// B_{LEVEL|EDGE}_TRIGGERED
+	uint8						irq;			// Global System Interrupt (GSI)
+	uint8						bios_irq;		// BIOS assigned original IRQ
+	interrupt_trigger_polarity	polarity;
+	interrupt_trigger_mode		trigger_mode;
 };
 
 
@@ -40,12 +40,10 @@ typedef Vector<irq_routing_entry> IRQRoutingTable;
 struct irq_descriptor {
 	irq_descriptor();
 
-	uint8			irq;
-	bool			shareable;
-	// B_LOW_ACTIVE_POLARITY or B_HIGH_ACTIVE_POLARITY
-	uint8			polarity;
-	// B_LEVEL_TRIGGERED or B_EDGE_TRIGGERED
-	uint8			trigger_mode;
+	uint8						irq;
+	bool						shareable;
+	interrupt_trigger_polarity	polarity;
+	interrupt_trigger_mode		trigger_mode;
 };
 
 

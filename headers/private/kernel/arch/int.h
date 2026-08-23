@@ -9,11 +9,20 @@
 #define KERNEL_ARCH_INT_H
 
 
-// config flags for arch_int_configure_io_interrupt()
-#define B_EDGE_TRIGGERED		1
-#define B_LEVEL_TRIGGERED		2
-#define B_LOW_ACTIVE_POLARITY	4
-#define B_HIGH_ACTIVE_POLARITY	8
+typedef enum interrupt_trigger_mode {
+	B_EDGE_TRIGGERED = 1,
+	B_LEVEL_TRIGGERED = 2
+} interrupt_trigger_mode;
+
+typedef enum interrupt_trigger_polarity {
+	// For B_EDGE_TRIGGERED interrupts
+	B_FALLING_EDGE_POLARITY = 1,
+	B_RISING_EDGE_POLARITY = 2,
+
+	// For B_LEVEL_TRIGGERED interrupts
+	B_LOW_ACTIVE_POLARITY = 1,
+	B_HIGH_ACTIVE_POLARITY = 2,
+} interrupt_trigger_polarity;
 
 
 #ifdef __cplusplus
@@ -32,7 +41,8 @@ int arch_int_disable_interrupts(void);
 void arch_int_restore_interrupts(int oldState);
 void arch_int_enable_io_interrupt(int32 irq);
 void arch_int_disable_io_interrupt(int32 irq);
-void arch_int_configure_io_interrupt(int32 irq, uint32 config);
+void arch_int_configure_io_interrupt(int32 irq, interrupt_trigger_mode mode,
+	interrupt_trigger_polarity polarity);
 bool arch_int_are_interrupts_enabled(void);
 int32 arch_int_assign_to_cpu(int32 irq, int32 cpu);
 

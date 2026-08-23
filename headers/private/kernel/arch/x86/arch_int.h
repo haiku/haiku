@@ -6,6 +6,8 @@
 #ifndef _KERNEL_ARCH_x86_INT_H
 #define _KERNEL_ARCH_x86_INT_H
 
+#include <interrupts.h>
+
 
 #define ARCH_INTERRUPT_BASE	0x20
 #define NUM_IO_VECTORS		(256 - ARCH_INTERRUPT_BASE)
@@ -68,14 +70,15 @@ arch_int_are_interrupts_enabled_inline(void)
 #ifdef __cplusplus
 
 typedef struct interrupt_controller_s {
-	const char *name;
-	void	(*enable_io_interrupt)(int32 num);
-	void	(*disable_io_interrupt)(int32 num);
-	void	(*configure_io_interrupt)(int32 num, uint32 config);
-	bool	(*is_spurious_interrupt)(int32 num);
-	bool	(*is_level_triggered_interrupt)(int32 num);
-	bool	(*end_of_interrupt)(int32 num);
-	void	(*assign_interrupt_to_cpu)(int32 num, int32 cpu);
+	const char *		name;
+	void					(*enable_io_interrupt)(int32 num);
+	void					(*disable_io_interrupt)(int32 num);
+	void					(*configure_io_interrupt)(int32 num, interrupt_trigger_mode mode,
+								interrupt_trigger_polarity polarity);
+	bool					(*is_spurious_interrupt)(int32 num);
+	interrupt_trigger_mode	(*get_interrupt_trigger_type)(int32 num);
+	bool					(*end_of_interrupt)(int32 num);
+	void					(*assign_interrupt_to_cpu)(int32 num, int32 cpu);
 } interrupt_controller;
 
 
