@@ -99,6 +99,19 @@ Stream::_ChooseAlternate()
 				case 8: case 16: case 18: case 20: case 24: case 32:
 					break;
 			}
+
+			switch(format->fSubframeSize) {
+				case 1: case 2: case 4:
+					// The USB-Audio 1.0 specification also allows 3 bytes per subframe, but the
+					// multi-audio resampler will write 4 bytes in that case, overwriting things
+					// in the neighboring bytes.
+					// It can be allowed after https://dev.haiku-os.org/ticket/20267 is resolved.
+					break;
+				default:
+					TRACE(ERR, "Ignore alternate %d - subframe size %d is not supported.\n", i,
+						format->fSubframeSize);
+					continue;
+			}
 		}
 
 		uint16 chxRes = format->fNumChannels * 100 + format->fBitResolution;
