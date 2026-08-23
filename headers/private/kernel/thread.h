@@ -105,8 +105,7 @@ static thread_id thread_get_current_thread_id(void);
 static inline thread_id
 thread_get_current_thread_id(void)
 {
-	Thread *thread = thread_get_current_thread();
-	return thread ? thread->id : 0;
+	return thread_get_current_thread()->id;
 }
 
 static inline bool

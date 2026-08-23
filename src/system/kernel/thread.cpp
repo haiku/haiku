@@ -2845,8 +2845,7 @@ thread_init(kernel_args *args)
 		char name[64];
 
 		sprintf(name, "idle thread %" B_PRIu32, i + 1);
-		thread = new(&sIdleThreads[i]) Thread(name,
-			i == 0 ? team_get_kernel_team_id() : -1, &gCPU[i]);
+		thread = new(&sIdleThreads[i]) Thread(name, thread->id, &gCPU[i]);
 		if (thread == NULL || thread->Init(true) != B_OK) {
 			panic("error creating idle thread struct\n");
 			return B_NO_MEMORY;
@@ -2966,6 +2965,7 @@ thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 	// so that get_current_cpu and friends will work, which is crucial for
 	// a lot of low level routines
 	sIdleThreads[cpuNum].cpu = &gCPU[cpuNum];
+	sIdleThreads[cpuNum].id = (cpuNum == 0) ? B_SYSTEM_TEAM : -1;
 	arch_thread_set_current_thread(&sIdleThreads[cpuNum]);
 	return B_OK;
 }
