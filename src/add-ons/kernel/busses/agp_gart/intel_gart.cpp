@@ -205,6 +205,7 @@ const struct supported_device {
 	{0x3ec4, 0x3e9b, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3e10, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ec4, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
+	{0x3e20, 0x3e9b, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ed0, 0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 	{0x3ed0, 0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 
