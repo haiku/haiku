@@ -2840,12 +2840,12 @@ thread_init(kernel_args *args)
 
 	// create an idle thread for each cpu
 	for (uint32 i = 0; i < args->num_cpus; i++) {
-		Thread *thread;
 		area_info info;
 		char name[64];
 
 		sprintf(name, "idle thread %" B_PRIu32, i + 1);
-		thread = new(&sIdleThreads[i]) Thread(name, thread->id, &gCPU[i]);
+		Thread *thread = &sIdleThreads[i];
+		new(&sIdleThreads[i]) Thread(name, thread->id, &gCPU[i]);
 		if (thread == NULL || thread->Init(true) != B_OK) {
 			panic("error creating idle thread struct\n");
 			return B_NO_MEMORY;
