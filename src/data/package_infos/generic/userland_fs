@@ -12,9 +12,9 @@ copyrights		"2007-2026 Haiku, Inc."
 licenses		MIT
 
 provides {
-	userland_fs=%HAIKU_VERSION%
+	userland_fs=%HAIKU_VERSION% compat>=R1~beta1
 }
 
 requires {
-	haiku
+	haiku >= R1~beta1
 }

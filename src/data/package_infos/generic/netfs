@@ -16,6 +16,6 @@ provides {
 }
 
 requires {
-	userland_fs
+	userland_fs >= R1~beta1
 }
 

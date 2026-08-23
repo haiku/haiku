@@ -15,7 +15,7 @@ provides {
 }
 
 requires {
-	haiku
+	haiku >= R1~beta1
 
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ffmpeg_ENABLED

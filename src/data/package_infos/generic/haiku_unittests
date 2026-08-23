@@ -15,5 +15,5 @@ provides {
 }
 
 requires {
-	haiku
+	haiku >= R1~beta1
 }
