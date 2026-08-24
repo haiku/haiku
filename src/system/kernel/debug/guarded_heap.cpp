@@ -341,8 +341,8 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment,
 		return (void*)chunk->allocation_base;
 	}
 
-	chunk->team = (gKernelStartup ? 0 : team_get_current_team_id());
-	chunk->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
+	chunk->team = (gKernelStartup ? B_SYSTEM_TEAM : team_get_current_team_id());
+	chunk->thread = thread_get_current_thread_id();
 
 	// Reserve, allocate, and map pages.
 	size_t mapPages = neededPages - guardPages;
