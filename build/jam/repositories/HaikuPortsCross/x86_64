@@ -98,7 +98,7 @@ BootstrapPackageRepository HaikuPortsCross
 	m4_bootstrap
 	make_bootstrap
 	ncurses6_bootstrap
-	python_bootstrap
+	python3.10_bootstrap
 	sed_bootstrap
 	texinfo_bootstrap
 	zlib_bootstrap

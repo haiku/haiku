@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Usage: bootstrap_client.py <address>[:port] <command> ...
 #
@@ -35,15 +35,15 @@ try:
 	controlConnection.connect((address, port))
 	stdioConnection.connect((address, port))
 	stderrConnection.connect((address, port))
-except socket.error, msg:
-	sys.exit('Failed to connect to %s port %d: %s' % (address, port, msg[1]))
+except socket.error as msg:
+    sys.exit('Failed to connect to %s port %d: %s' % (address, port, msg))
 
 # send command length and command
-controlConnection.send("%08d" % len(commandToRun))
-controlConnection.send(commandToRun)
+controlConnection.send(b"%08d" % len(commandToRun.encode()))
+controlConnection.send(commandToRun.encode())
 
 # I/O loop. We quit when all sockets have been closed.
-exitCode = ''
+exitCode = b''
 connections = [controlConnection, stdioConnection, stderrConnection, sys.stdin]
 
 while connections and (len(connections) > 1 or not sys.stdin in connections):
@@ -53,7 +53,7 @@ while connections and (len(connections) > 1 or not sys.stdin in connections):
 	if sys.stdin in readable:
 		data = sys.stdin.readline(bufferSize)
 		if data:
-			stdioConnection.send(data)
+			stdioConnection.send(data.encode())
 		else:
 			connections.remove(sys.stdin)
 			stdioConnection.shutdown(socket.SHUT_WR)
@@ -61,14 +61,14 @@ while connections and (len(connections) > 1 or not sys.stdin in connections):
 	if stdioConnection in readable:
 		data = stdioConnection.recv(bufferSize)
 		if data:
-			sys.stdout.write(data)
+			sys.stdout.buffer.write(data)
 		else:
 			connections.remove(stdioConnection)
 		
 	if stderrConnection in readable:
 		data = stderrConnection.recv(bufferSize)
 		if data:
-			sys.stderr.write(data)
+			sys.stderr.buffer.write(data)
 		else:
 			connections.remove(stderrConnection)
 		

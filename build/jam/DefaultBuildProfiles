@@ -229,7 +229,7 @@ rule DefineDefaultBuildProfiles
 				make
 				ncurses6
 				noto
-				python
+				python3.10
 				sed
 				texinfo
 				!gcc2 @{ gawk grep }@
