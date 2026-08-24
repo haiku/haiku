@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
+ * Copyright 2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -590,6 +591,8 @@ notify_queue(void* cookie, uint16 queue)
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
 	if (queue >= bus->queue_count)
 		return;
+
+	memory_write_barrier();
 	if (bus->virtio1) {
 		volatile uint16* notifyAddr = (volatile uint16*)(bus->notifyAddr + bus->notifyOffsets[queue]);
 		*notifyAddr = queue;

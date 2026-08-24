@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, 2018, Jérôme Duval, jerome.duval@gmail.com.
+ * Copyright 2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -145,7 +146,8 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 	fStatus(B_OK),
 	fIndirectMaxSize(0),
 	fCallback(NULL),
-	fCookie(NULL)
+	fCookie(NULL),
+	fLock(B_SPINLOCK_INITIALIZER)
 {
 	fDescriptors = new(std::nothrow) TransferDescriptor*[fRingSize];
 	if (fDescriptors == NULL) {
@@ -212,6 +214,8 @@ VirtioQueue::SetupInterrupt(virtio_callback_func handler, void *cookie)
 void
 VirtioQueue::DisableInterrupt()
 {
+	InterruptsSpinLocker locker(fLock);
+
 	if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
 		fRing.avail->flags |= VRING_AVAIL_F_NO_INTERRUPT;
 }
@@ -220,6 +224,8 @@ VirtioQueue::DisableInterrupt()
 void
 VirtioQueue::EnableInterrupt()
 {
+	InterruptsSpinLocker locker(fLock);
+
 	if ((fDevice->Features() & VIRTIO_FEATURE_RING_EVENT_IDX) == 0)
 		fRing.avail->flags &= ~VRING_AVAIL_F_NO_INTERRUPT;
 }
@@ -251,10 +257,12 @@ bool
 VirtioQueue::Dequeue(void** _cookie, uint32* _usedLength)
 {
 	TRACE("Dequeue() fRingUsedIndex: %u\n", fRingUsedIndex);
+	InterruptsSpinLocker locker(fLock);
 
 	if (fRingUsedIndex == fRing.used->idx)
 		return false;
 
+	memory_read_barrier();
 	uint16 usedIndex = fRingUsedIndex++ & (fRingSize - 1);
 	TRACE("Dequeue() usedIndex: %u\n", usedIndex);
 	struct vring_used_elem *element = &fRing.used->ring[usedIndex];
@@ -297,6 +305,8 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 	size_t writtenVectorCount, void *cookie)
 {
 	CALLED();
+	InterruptsSpinLocker locker(fLock);
+
 	size_t count = readVectorCount + writtenVectorCount;
 	if (count < 1)
 		return B_BAD_VALUE;
@@ -320,6 +330,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 
 	UpdateAvailable(insertIndex);
 
+	locker.Unlock();
 	NotifyHost();
 
 	return B_OK;
@@ -332,6 +343,8 @@ VirtioQueue::QueueRequestIndirect(const physical_entry* vector,
 	void *cookie)
 {
 	CALLED();
+	InterruptsSpinLocker locker(fLock);
+
 	size_t count = readVectorCount + writtenVectorCount;
 	if (count > fRingFree || count > fIndirectMaxSize)
 		return B_BUSY;
@@ -351,6 +364,7 @@ VirtioQueue::QueueRequestIndirect(const physical_entry* vector,
 
 	UpdateAvailable(insertIndex);
 
+	locker.Unlock();
 	NotifyHost();
 
 	return B_OK;
@@ -363,6 +377,7 @@ VirtioQueue::UpdateAvailable(uint16 index)
 	CALLED();
 	uint16 available = fRing.avail->idx & (fRingSize - 1);
 	fRing.avail->ring[available] = index;
+	memory_write_barrier();
 	fRing.avail->idx++;
 }
 

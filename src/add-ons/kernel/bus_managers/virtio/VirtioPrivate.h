@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VIRTIO_PRIVATE_H
@@ -165,6 +166,7 @@ private:
 			virtio_callback_func fCallback;
 			void*				fCookie;
 
+			spinlock			fLock;
 };
 
 #endif // VIRTIO_PRIVATE_H
