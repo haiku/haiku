@@ -43,14 +43,9 @@ public:
 		recursive_lock_unlock(&fLock);
 	}
 
-	thread_id LockingThread(void) const
-	{
-		return RECURSIVE_LOCK_HOLDER(&fLock);
-	}
-
 	bool IsLocked(void) const
 	{
-		return RECURSIVE_LOCK_HOLDER(&fLock) == find_thread(NULL);
+		return CountLocks() > 0;
 	}
 
 	int32 CountLocks(void) const

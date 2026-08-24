@@ -218,7 +218,7 @@ Stack::Explore()
 {
 	recursive_lock* dmLock = device_manager_get_lock();
 	if (find_thread(NULL) != fExploreThread
-			&& RECURSIVE_LOCK_HOLDER(dmLock) == find_thread(NULL)) {
+			&& recursive_lock_get_recursion(dmLock) > 0) {
 		// This should only happen during the initial device scan, during which
 		// we should be able to acquire the explore lock immediately (since the
 		// explore thread will be waiting on the device manager lock as below),

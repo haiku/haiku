@@ -46,10 +46,12 @@ struct rw_lock_waiter {
 
 #if KDEBUG
 #define KDEBUG_STATIC static
+#define RECURSIVE_LOCK_HOLDER(recursiveLock)	((recursiveLock)->lock.holder)
 static status_t _mutex_lock(struct mutex* lock, void* locker);
 static void _mutex_unlock(struct mutex* lock);
 #else
 #define KDEBUG_STATIC
+#define RECURSIVE_LOCK_HOLDER(recursiveLock)	((recursiveLock)->holder)
 #endif
 
 static void _rw_lock_read_unlock_threads_locked(rw_lock* lock);
