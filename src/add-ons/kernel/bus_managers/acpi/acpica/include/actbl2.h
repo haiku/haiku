@@ -4,117 +4,9 @@
  *
  *****************************************************************************/
 
-/******************************************************************************
- *
- * 1. Copyright Notice
- *
- * Some or all of this work - Copyright (c) 1999 - 2025, Intel Corp.
+/*
+ * Copyright (C) 2000 - 2026, Intel Corp.
  * All rights reserved.
- *
- * 2. License
- *
- * 2.1. This is your license from Intel Corp. under its intellectual property
- * rights. You may have additional license terms from the party that provided
- * you this software, covering your right to use that party's intellectual
- * property rights.
- *
- * 2.2. Intel grants, free of charge, to any person ("Licensee") obtaining a
- * copy of the source code appearing in this file ("Covered Code") an
- * irrevocable, perpetual, worldwide license under Intel's copyrights in the
- * base code distributed originally by Intel ("Original Intel Code") to copy,
- * make derivatives, distribute, use and display any portion of the Covered
- * Code in any form, with the right to sublicense such rights; and
- *
- * 2.3. Intel grants Licensee a non-exclusive and non-transferable patent
- * license (with the right to sublicense), under only those claims of Intel
- * patents that are infringed by the Original Intel Code, to make, use, sell,
- * offer to sell, and import the Covered Code and derivative works thereof
- * solely to the minimum extent necessary to exercise the above copyright
- * license, and in no event shall the patent license extend to any additions
- * to or modifications of the Original Intel Code. No other license or right
- * is granted directly or by implication, estoppel or otherwise;
- *
- * The above copyright and patent license is granted only if the following
- * conditions are met:
- *
- * 3. Conditions
- *
- * 3.1. Redistribution of Source with Rights to Further Distribute Source.
- * Redistribution of source code of any substantial portion of the Covered
- * Code or modification with rights to further distribute source must include
- * the above Copyright Notice, the above License, this list of Conditions,
- * and the following Disclaimer and Export Compliance provision. In addition,
- * Licensee must cause all Covered Code to which Licensee contributes to
- * contain a file documenting the changes Licensee made to create that Covered
- * Code and the date of any change. Licensee must include in that file the
- * documentation of any changes made by any predecessor Licensee. Licensee
- * must include a prominent statement that the modification is derived,
- * directly or indirectly, from Original Intel Code.
- *
- * 3.2. Redistribution of Source with no Rights to Further Distribute Source.
- * Redistribution of source code of any substantial portion of the Covered
- * Code or modification without rights to further distribute source must
- * include the following Disclaimer and Export Compliance provision in the
- * documentation and/or other materials provided with distribution. In
- * addition, Licensee may not authorize further sublicense of source of any
- * portion of the Covered Code, and must include terms to the effect that the
- * license from Licensee to its licensee is limited to the intellectual
- * property embodied in the software Licensee provides to its licensee, and
- * not to intellectual property embodied in modifications its licensee may
- * make.
- *
- * 3.3. Redistribution of Executable. Redistribution in executable form of any
- * substantial portion of the Covered Code or modification must reproduce the
- * above Copyright Notice, and the following Disclaimer and Export Compliance
- * provision in the documentation and/or other materials provided with the
- * distribution.
- *
- * 3.4. Intel retains all right, title, and interest in and to the Original
- * Intel Code.
- *
- * 3.5. Neither the name Intel nor any other trademark owned or controlled by
- * Intel shall be used in advertising or otherwise to promote the sale, use or
- * other dealings in products derived from or relating to the Covered Code
- * without prior written authorization from Intel.
- *
- * 4. Disclaimer and Export Compliance
- *
- * 4.1. INTEL MAKES NO WARRANTY OF ANY KIND REGARDING ANY SOFTWARE PROVIDED
- * HERE. ANY SOFTWARE ORIGINATING FROM INTEL OR DERIVED FROM INTEL SOFTWARE
- * IS PROVIDED "AS IS," AND INTEL WILL NOT PROVIDE ANY SUPPORT, ASSISTANCE,
- * INSTALLATION, TRAINING OR OTHER SERVICES. INTEL WILL NOT PROVIDE ANY
- * UPDATES, ENHANCEMENTS OR EXTENSIONS. INTEL SPECIFICALLY DISCLAIMS ANY
- * IMPLIED WARRANTIES OF MERCHANTABILITY, NONINFRINGEMENT AND FITNESS FOR A
- * PARTICULAR PURPOSE.
- *
- * 4.2. IN NO EVENT SHALL INTEL HAVE ANY LIABILITY TO LICENSEE, ITS LICENSEES
- * OR ANY OTHER THIRD PARTY, FOR ANY LOST PROFITS, LOST DATA, LOSS OF USE OR
- * COSTS OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, OR FOR ANY INDIRECT,
- * SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THIS AGREEMENT, UNDER ANY
- * CAUSE OF ACTION OR THEORY OF LIABILITY, AND IRRESPECTIVE OF WHETHER INTEL
- * HAS ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. THESE LIMITATIONS
- * SHALL APPLY NOTWITHSTANDING THE FAILURE OF THE ESSENTIAL PURPOSE OF ANY
- * LIMITED REMEDY.
- *
- * 4.3. Licensee shall not export, either directly or indirectly, any of this
- * software or system incorporating such software without first obtaining any
- * required license or other approval from the U. S. Department of Commerce or
- * any other agency or department of the United States Government. In the
- * event Licensee exports any such software from the United States or
- * re-exports any such software from a foreign destination, Licensee shall
- * ensure that the distribution and export/re-export of the software is in
- * compliance with all laws, regulations, orders, or other restrictions of the
- * U.S. Export Administration Regulations. Licensee agrees that neither it nor
- * any of its subsidiaries will export/re-export any technical data, process,
- * software, or service, directly or indirectly, to any country for which the
- * United States government or any agency thereof requires an export license,
- * other governmental approval, or letter of assurance, without first obtaining
- * such license, approval or letter.
- *
- *****************************************************************************
- *
- * Alternatively, you may choose to be licensed under the terms of the
- * following license:
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -131,23 +23,23 @@
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
+ * Alternatively, this software may be distributed under the terms of the
+ * GNU General Public License ("GPL") version 2 as published by the Free
+ * Software Foundation.
+ *
+ * NO WARRANTY
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Alternatively, you may choose to be licensed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
- * Software Foundation.
- *
- *****************************************************************************/
+ * HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGES.
+ */
 
 #ifndef __ACTBL2_H__
 #define __ACTBL2_H__
@@ -175,7 +67,9 @@
 #define ACPI_SIG_CDAT           "CDAT"      /* Coherent Device Attribute Table */
 #define ACPI_SIG_ERDT           "ERDT"      /* Enhanced Resource Director Technology */
 #define ACPI_SIG_IORT           "IORT"      /* IO Remapping Table */
+#define ACPI_SIG_IOVT           "IOVT"      /* I/O Virtualization Table */
 #define ACPI_SIG_IVRS           "IVRS"      /* I/O Virtualization Reporting Structure */
+#define ACPI_SIG_KEYP           "KEYP"      /* Key Programming Interface for IDE */
 #define ACPI_SIG_LPIT           "LPIT"      /* Low Power Idle Table */
 #define ACPI_SIG_MADT           "APIC"      /* Multiple APIC Description Table */
 #define ACPI_SIG_MCFG           "MCFG"      /* PCI Memory Mapped Configuration table */
@@ -201,6 +95,7 @@
 #define ACPI_SIG_SDEI           "SDEI"      /* Software Delegated Exception Interface Table */
 #define ACPI_SIG_SDEV           "SDEV"      /* Secure Devices table */
 #define ACPI_SIG_SVKL           "SVKL"      /* Storage Volume Key Location Table */
+#define ACPI_SIG_SWFT           "SWFT"      /* SoundWire File Table */
 #define ACPI_SIG_TDEL           "TDEL"      /* TD Event Log Table */
 
 
@@ -916,6 +811,7 @@ enum AcpiIortNodeType
     ACPI_IORT_NODE_SMMU_V3              = 0x04,
     ACPI_IORT_NODE_PMCG                 = 0x05,
     ACPI_IORT_NODE_RMR                  = 0x06,
+    ACPI_IORT_NODE_IWB                  = 0x07,
 };
 
 
@@ -1118,6 +1014,92 @@ typedef struct acpi_iort_rmr_desc {
     UINT32 Reserved;
 
 } ACPI_IORT_RMR_DESC;
+
+typedef struct acpi_iort_iwb {
+    UINT64 BaseAddress;
+    UINT16 IwbIndex;           /* Unique IWB identifier matching with the IWB GSI namespace. */
+    char   DeviceName[];       /* Path of the IWB namespace object */
+
+} ACPI_IORT_IWB;
+
+
+/*******************************************************************************
+ *
+ * IOVT - I/O Virtualization Table
+ *
+ * Conforms to "LoongArch I/O Virtualization Table",
+ *        Version 0.1, October 2024
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_iovt
+{
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT16                  IommuCount;
+    UINT16                  IommuOffset;
+    UINT8                   Reserved[8];
+
+} ACPI_TABLE_IOVT;
+
+/* IOVT subtable header */
+
+typedef struct acpi_iovt_header
+{
+    UINT16                  Type;
+    UINT16                  Length;
+
+} ACPI_IOVT_HEADER;
+
+/* Values for Type field above */
+
+enum AcpiIovtIommuType
+{
+    ACPI_IOVT_IOMMU_V1         = 0x00,
+    ACPI_IOVT_IOMMU_RESERVED   = 0x01     /* 1 and greater are reserved */
+};
+
+/* IOVT subtables */
+
+typedef struct acpi_iovt_iommu
+{
+    ACPI_IOVT_HEADER        Header;
+    UINT32                  Flags;
+    UINT16                  Segment;
+    UINT16                  PhyWidth;            /* Physical Address Width */
+    UINT16                  VirtWidth;           /* Virtual Address Width */
+    UINT16                  MaxPageLevel;
+    UINT64                  PageSize;
+    UINT32                  DeviceId;
+    UINT64                  BaseAddress;
+    UINT32                  AddressSpaceSize;
+    UINT8                   InterruptType;
+    UINT8                   Reserved[3];
+    UINT32                  GsiNumber;
+    UINT32                  ProximityDomain;
+    UINT32                  MaxDeviceNum;
+    UINT32                  DeviceEntryNum;
+    UINT32                  DeviceEntryOffset;
+
+} ACPI_IOVT_IOMMU;
+
+typedef struct acpi_iovt_device_entry
+{
+    UINT8                   Type;
+    UINT8                   Length;
+    UINT8                   Flags;
+    UINT8                   Reserved[3];
+    UINT16                  DeviceId;
+
+} ACPI_IOVT_DEVICE_ENTRY;
+
+enum AcpiIovtDeviceEntryType
+{
+    ACPI_IOVT_DEVICE_ENTRY_SINGLE     = 0x00,
+    ACPI_IOVT_DEVICE_ENTRY_START      = 0x01,
+    ACPI_IOVT_DEVICE_ENTRY_END        = 0x02,
+    ACPI_IOVT_DEVICE_ENTRY_RESERVED   = 0x03     /* 3 and greater are reserved */
+};
+
 
 /*******************************************************************************
  *
@@ -1353,6 +1335,65 @@ typedef struct acpi_ivrs_memory
 
 } ACPI_IVRS_MEMORY;
 
+/*******************************************************************************
+ *
+ * KEYP - Key Programming Interface for Root Complex Integrity and Data
+ *        Encryption (IDE)
+ *        Version 1
+ *
+ * Conforms to "Key Programming Interface for Root Complex Integrity and Data
+ * Encryption (IDE)" document. See under ACPI-Related Documents.
+ *
+ ******************************************************************************/
+typedef struct acpi_table_keyp {
+    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
+    UINT32                  Reserved;
+} ACPI_TABLE_KEYP;
+
+/* KEYP common subtable header */
+
+typedef struct acpi_keyp_common_header {
+    UINT8                   Type;
+    UINT8                   Reserved;
+    UINT16                  Length;
+} ACPI_KEYP_COMMON_HEADER;
+
+/* Values for Type field above */
+
+enum AcpiKeypType
+{
+    ACPI_KEYP_TYPE_CONFIG_UNIT      = 0,
+};
+
+/* Root Port Information Structure */
+
+typedef struct acpi_keyp_rp_info {
+    UINT16                  Segment;
+    UINT8                   Bus;
+    UINT8                   Devfn;
+} ACPI_KEYP_RP_INFO;
+
+/* Key Configuration Unit Structure */
+
+typedef struct acpi_keyp_config_unit {
+    ACPI_KEYP_COMMON_HEADER           Header;
+    UINT8                             ProtocolType;
+    UINT8                             Version;
+    UINT8                             RootPortCount;
+    UINT8                             Flags;
+    UINT64                            RegisterBaseAddress;
+    ACPI_KEYP_RP_INFO                 RpInfo[];
+} ACPI_KEYP_CONFIG_UNIT;
+
+enum AcpiKeypProtocolType
+{
+    ACPI_KEYP_PROTO_TYPE_INVALID    = 0,
+    ACPI_KEYP_PROTO_TYPE_PCIE,
+    ACPI_KEYP_PROTO_TYPE_CXL,
+    ACPI_KEYP_PROTO_TYPE_RESERVED
+};
+
+#define ACPI_KEYP_F_TVM_USABLE      (1)
 
 /*******************************************************************************
  *
@@ -1469,7 +1510,10 @@ enum AcpiMadtType
     ACPI_MADT_TYPE_IMSIC                    = 25,
     ACPI_MADT_TYPE_APLIC                    = 26,
     ACPI_MADT_TYPE_PLIC                     = 27,
-    ACPI_MADT_TYPE_RESERVED                 = 28,   /* 28 to 0x7F are reserved */
+    ACPI_MADT_TYPE_GICV5_IRS                = 28,
+    ACPI_MADT_TYPE_GICV5_ITS                = 29,
+    ACPI_MADT_TYPE_GICV5_ITS_TRANSLATE      = 30,
+    ACPI_MADT_TYPE_RESERVED                 = 31,   /* 31 to 0x7F are reserved */
     ACPI_MADT_TYPE_OEM_RESERVED             = 0x80  /* 0x80 to 0xFF are reserved for OEM use */
 };
 
@@ -1625,7 +1669,7 @@ typedef struct acpi_madt_local_x2apic_nmi
 } ACPI_MADT_LOCAL_X2APIC_NMI;
 
 
-/* 11: Generic Interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 + ACPI 6.5 changes) */
+/* 11: Generic Interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 + ACPI 6.5 + ACPI 6.7 changes) */
 
 typedef struct acpi_madt_generic_interrupt
 {
@@ -1647,6 +1691,8 @@ typedef struct acpi_madt_generic_interrupt
     UINT8                   Reserved2[1];
     UINT16                  SpeInterrupt;       /* ACPI 6.3 */
     UINT16                  TrbeInterrupt;      /* ACPI 6.5 */
+    UINT16                  Iaffid;             /* ACPI 6.7 */
+    UINT32                  IrsId;
 
 } ACPI_MADT_GENERIC_INTERRUPT;
 
@@ -1672,7 +1718,7 @@ typedef struct acpi_madt_generic_distributor
 
 } ACPI_MADT_GENERIC_DISTRIBUTOR;
 
-/* Values for Version field above */
+/* Values for Version field above and Version field in acpi_madt_gicv5_irs */
 
 enum AcpiMadtGicVersion
 {
@@ -1681,7 +1727,8 @@ enum AcpiMadtGicVersion
     ACPI_MADT_GIC_VERSION_V2            = 2,
     ACPI_MADT_GIC_VERSION_V3            = 3,
     ACPI_MADT_GIC_VERSION_V4            = 4,
-    ACPI_MADT_GIC_VERSION_RESERVED      = 5     /* 5 and greater are reserved */
+    ACPI_MADT_GIC_VERSION_V5            = 5,
+    ACPI_MADT_GIC_VERSION_RESERVED      = 6     /* 6 and greater are reserved */
 };
 
 
@@ -1733,7 +1780,7 @@ typedef struct acpi_madt_generic_translator
 
 #define ACPI_MADT_ITS_NON_COHERENT      (1)
 
-/* 16: Multiprocessor wakeup (ACPI 6.4) */
+/* 16: Multiprocessor wakeup (ACPI 6.6) */
 
 typedef struct acpi_madt_multiproc_wakeup
 {
@@ -1741,6 +1788,7 @@ typedef struct acpi_madt_multiproc_wakeup
     UINT16                  MailboxVersion;
     UINT32                  Reserved;           /* reserved - must be zero */
     UINT64                  BaseAddress;
+    UINT64                  ResetVector;
 
 } ACPI_MADT_MULTIPROC_WAKEUP;
 
@@ -1759,6 +1807,7 @@ typedef struct acpi_madt_multiproc_wakeup_mailbox
 } ACPI_MADT_MULTIPROC_WAKEUP_MAILBOX;
 
 #define ACPI_MP_WAKE_COMMAND_WAKEUP    1
+#define ACPI_MP_WAKE_COMMAND_TEST      2
 
 /* 17: CPU Core Interrupt Controller (ACPI 6.5) */
 
@@ -1950,6 +1999,46 @@ typedef struct acpi_madt_plic {
     UINT64                  BaseAddr;
     UINT32                  GsiBase;
 } ACPI_MADT_PLIC;
+
+/* 28: Arm GICv5 IRS (ACPI 6.7) */
+typedef struct acpi_madt_gicv5_irs {
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT8                   Version;
+    UINT8                   Reserved;
+    UINT32                  IrsId;
+    UINT32                  Flags;
+    UINT32                  Reserved2;
+    UINT64                  ConfigBaseAddress;
+    UINT64                  SetlpiBaseAddress;
+} ACPI_MADT_GICV5_IRS;
+
+#define ACPI_MADT_IRS_NON_COHERENT      (1)
+
+
+/* 29: Arm GICv5 ITS Config Frame (ACPI 6.7) */
+typedef struct acpi_madt_gicv5_translator
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT8                   Flags;
+    UINT8                   Reserved;           /* reserved - must be zero */
+    UINT32                  TranslatorId;
+    UINT64                  BaseAddress;
+
+} ACPI_MADT_GICv5_ITS;
+
+#define ACPI_MADT_GICV5_ITS_NON_COHERENT      (1)
+
+/* 30: Arm GICv5 ITS Translate Frame (ACPI 6.7) */
+typedef struct acpi_madt_gicv5_translate_frame
+{
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Reserved;           /* reserved - must be zero */
+    UINT32                  LinkedTranslatorId;
+    UINT32                  TranslateFrameId;
+    UINT32                  Reserved2;
+    UINT64                  BaseAddress;
+
+} ACPI_MADT_GICv5_ITS_TRANSLATE;
 
 
 /* 80: OEM data */
@@ -3355,6 +3444,15 @@ typedef struct acpi_pptt_cache
 
 typedef struct acpi_pptt_cache_v1
 {
+    ACPI_SUBTABLE_HEADER    Header;
+    UINT16                  Reserved;
+    UINT32                  Flags;
+    UINT32                  NextLevelOfCache;
+    UINT32                  Size;
+    UINT32                  NumberOfSets;
+    UINT8                   Associativity;
+    UINT8                   Attributes;
+    UINT16                  LineSize;
     UINT32                  CacheId;
 
 } ACPI_PPTT_CACHE_V1;
@@ -3628,6 +3726,8 @@ typedef struct acpi_ras2_patrol_scrub_param {
     UINT32                      Flags;
     UINT32                      ScrubParamsOut;
     UINT32                      ScrubParamsIn;
+    UINT32                      ExtScrubParams;
+    UINT8                       ScrubRateDesc[256];
 
 } ACPI_RAS2_PATROL_SCRUB_PARAM;
 
@@ -4094,6 +4194,29 @@ enum acpi_svkl_format
     ACPI_SVKL_FORMAT_RESERVED   = 1 /* 1 and greater are reserved */
 };
 
+/*******************************************************************************
+ *
+ * SWFT - SoundWire File Table
+ *        as described in Discovery and Configuration (DisCo) Specification
+ *        for SoundWire®
+ *        Version 1
+ *
+ ******************************************************************************/
+
+typedef struct acpi_table_swft
+{
+    ACPI_TABLE_HEADER       Header; /* Common ACPI table header */
+
+} ACPI_TABLE_SWFT;
+
+typedef struct acpi_swft_file
+{
+    UINT16                  VendorID;
+    UINT32                  FileID;
+    UINT16                  FileVersion;
+    UINT32                  FileLength;
+    UINT8                   FileData[];
+} ACPI_SWFT_FILE;
 
 /*******************************************************************************
  *
