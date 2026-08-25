@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Haiku, Inc. All Rights Reserved.
+ * Copyright 2022-2026 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include "VMSAv8TranslationMap.h"
@@ -140,17 +140,20 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 	ASSERT(!fIsKernel);
 	ASSERT(fRefcount == 0);
 
-	ThreadCPUPinner pinner(thread_get_current_thread());
-	InterruptsSpinLocker locker(sAsidLock);
+	{
+		ThreadCPUPinner pinner(thread_get_current_thread());
+		InterruptsSpinLocker locker(sAsidLock);
+
+		if (fASID != -1) {
+			sAsidMapping[fASID] = NULL;
+			free_asid(fASID);
+			fASID = -1;
+		}
+	}
 
 	vm_page_reservation reservation = {};
 	FreeTable(fPageTable, 0, fInitialLevel, &reservation);
 	vm_page_unreserve_pages(&reservation);
-
-	if (fASID != -1) {
-		sAsidMapping[fASID] = NULL;
-		free_asid(fASID);
-	}
 }
 
 
