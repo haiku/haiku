@@ -490,7 +490,7 @@ get_next_entry(uint32 objectType, const char *base, char *result,
 	ACPI_BUFFER buffer;
 	ACPI_STATUS status;
 
-	TRACE("get_next_entry %ld, %s\n", objectType, base);
+	// TRACE("get_next_entry %" B_PRId32 ", %s\n", objectType, base);
 
 	if (base == NULL || !strcmp(base, "\\")) {
 		parent = ACPI_ROOT_OBJECT;
@@ -535,7 +535,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 	uint32 counter[2] = {index, 0};
 	char *buffer = NULL;
 
-	TRACE("get_device %s, index %ld\n", hid, index);
+	TRACE("get_device %s, index %" B_PRId32 "\n", hid, index);
 	status = AcpiGetDevices((ACPI_STRING)hid, (ACPI_WALK_CALLBACK)&get_device_by_hid_callback,
 		counter, (void**)&buffer);
 	if (status != AE_OK || buffer == NULL)
@@ -591,7 +591,7 @@ get_device_addr(const char *path, uint32 *addr)
 {
 	ACPI_HANDLE handle;
 
-	TRACE("get_device_adr: path %s, hid %s\n", path, hid);
+	TRACE("get_device_adr: path %s\n", path);
 	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK)
 		return B_ENTRY_NOT_FOUND;
 

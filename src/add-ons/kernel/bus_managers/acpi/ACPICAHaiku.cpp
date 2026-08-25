@@ -653,7 +653,7 @@ ACPI_STATUS
 AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 {
 	ACPI_STATUS result = AE_OK;
-	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u",
+	DEBUG_FUNCTION_VF("sem: %" PRId32 "; count: %" PRIu32 "; timeout: %u",
 		handle, (uint32)units, timeout);
 
 	if (timeout == ACPI_WAIT_FOREVER) {
@@ -676,7 +676,7 @@ AcpiOsWaitSemaphore(ACPI_SEMAPHORE handle, UINT32 units, UINT16 timeout)
 				break;
 		}
 	}
-	DEBUG_FUNCTION_VF("sem: %ld; count: %lu; timeout: %u result: %lu",
+	DEBUG_FUNCTION_VF("sem: %" PRId32 "; count: %" PRIu32 "; timeout: %u result: %" PRIu32,
 		handle, (uint32)units, timeout, (uint32)result);
 	return result;
 }
@@ -698,7 +698,7 @@ ACPI_STATUS
 AcpiOsSignalSemaphore(ACPI_SEMAPHORE handle, UINT32 units)
 {
 	status_t result;
-	DEBUG_FUNCTION_VF("sem: %ld; count: %lu", handle, (uint32)units);
+	DEBUG_FUNCTION_VF("sem: %" PRId32 "; count: %" PRIu32, handle, (uint32)units);
 	// We can be called from interrupt handler, so don't reschedule
 	result = release_sem_etc(handle, units, B_DO_NOT_RESCHEDULE);
 	return result == B_OK ? AE_OK : AE_BAD_PARAMETER;
@@ -1351,7 +1351,7 @@ AcpiOsAcquireMutex(ACPI_MUTEX handle, UINT16 timeout)
 				break;
 		}
 	}
-	DEBUG_FUNCTION_VF("mutex: %p; timeout: %u result: %lu",
+	DEBUG_FUNCTION_VF("mutex: %p; timeout: %u result: %" PRIu32,
 		handle, timeout, (uint32)result);
 	return result;
 }

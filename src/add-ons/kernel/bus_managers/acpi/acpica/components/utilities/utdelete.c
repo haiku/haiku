@@ -200,7 +200,7 @@ AcpiUtDeleteInternalObj (
     case ACPI_TYPE_EVENT:
 
         ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS,
-            "***** Event %p, OS Semaphore %p\n",
+            "***** Event %p, OS Semaphore %d\n",
             Object, Object->Event.OsSemaphore));
 
         (void) AcpiOsDeleteSemaphore (Object->Event.OsSemaphore);
