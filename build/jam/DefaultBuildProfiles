@@ -219,13 +219,17 @@ rule DefineDefaultBuildProfiles
 			AddHaikuImageSystemPackages
 				binutils
 				bison
+				ca_root_certificates
 				expat
+				findutils
 				flex
 				gcc
 				grep
 				haikuporter
 				less
 				libedit
+				libffi
+				m4
 				make
 				ncurses6
 				noto
@@ -236,7 +240,9 @@ rule DefineDefaultBuildProfiles
 				gcc2 @{ grep_x86@secondary_x86 mawk }@
 				;
 
-			AddHaikuImageDisabledPackages
+			# These devel packages must be active, so haikuporter can resolve
+			# them when building ports on the bootstrap system.
+			AddHaikuImageSystemPackages
 				freetype_devel
 				libedit_devel
 				ncurses6_devel

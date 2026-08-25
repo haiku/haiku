@@ -35,6 +35,7 @@ AddFilesToPackage add-ons kernel busses usb :
 	<usb>ehci
 	;
 AddFilesToPackage add-ons kernel busses virtio :
+	virtio_mmio@riscv64,arm,arm64
 	virtio_pci
 	;
 AddFilesToPackage add-ons kernel console :
@@ -91,6 +92,12 @@ AddNewDriversToPackage disk virtual :
 	remote_disk
 	virtio_block@arm,arm64,riscv64
 	;
+AddNewDriversToPackage graphics :
+	virtio_gpu
+	;
+AddNewDriversToPackage input :
+	virtio_input
+	;
 AddNewDriversToPackage power :
 	acpi_battery@x86
 	;
@@ -109,7 +116,6 @@ AddDriversToPackage :
 	console
 	dprintf
 	null
-	random
 	<driver>pty
 	;
 AddDriversToPackage audio hmulti
@@ -241,6 +247,7 @@ AddFilesToPackage data Terminal Themes : $(terminalThemes) ;
 # add-ons
 AddFilesToPackage add-ons accelerants :
 	framebuffer.accelerant
+	virtio_gpu.accelerant
 	$(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
@@ -265,6 +272,7 @@ AddFilesToPackage add-ons input_server devices :
 	<input>keyboard
 	<input>mouse
 	<input>tablet
+	<input>virtio
 	<input>wacom
 	;
 AddFilesToPackage add-ons input_server filters :
@@ -296,7 +304,7 @@ AddFilesToPackage add-ons disk_systems :
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64
+	acpi@x86,x86_64,arm64
 	ahci
 	ata
 	ata_adapter
@@ -318,6 +326,7 @@ AddBootModuleSymlinksToPackage
 	<pci>designware@riscv64
 	<pci>ecam@riscv64,arm,arm64
 	<pci>x86@x86,x86_64
+	fdt@riscv64,arm,arm64
 	remote_disk
 	scsi
 	scsi_cd
@@ -331,6 +340,7 @@ AddBootModuleSymlinksToPackage
 	<usb>ehci
 	virtio
 	virtio_pci
+	virtio_mmio@arm,arm64,riscv64
 	virtio_block@arm,arm64,riscv64
 	virtio_scsi
 	$(SYSTEM_ADD_ONS_DRIVERS_NET)

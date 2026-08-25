@@ -25,6 +25,16 @@ AddPackageFilesToHaikuImage system packages :
 	nameFromMetaInfo
 	;
 
+if $(HAIKU_BUILD_TYPE) = bootstrap {
+	# activate the development package, so haikuporter can resolve haiku_devel
+	# when building ports on the bootstrap system
+	AddPackageFilesToHaikuImage system packages :
+		haiku_devel.hpkg
+		:
+		nameFromMetaInfo
+		;
+}
+
 if $(HAIKU_BUILD_TYPE) = test {
 	AddPackageFilesToHaikuImage system packages : haiku_unittests.hpkg ;
 }
