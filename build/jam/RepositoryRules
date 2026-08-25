@@ -506,6 +506,11 @@ rule BootstrapPackageRepository repository : architecture
 
 		previousPackageFile = $(packageFile) ;
 	}
+
+	# Serialize against bootstrap packages, as haikuporter is run in
+	# the same build environment.
+	Depends <HaikuPorts-repository-source-packages>packages
+		: $(previousPackageFile) ;
 }
 
 
