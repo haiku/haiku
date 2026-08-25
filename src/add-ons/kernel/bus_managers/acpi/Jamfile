@@ -135,6 +135,7 @@ local resources_src =
 	rsaddr.c
 	rscalc.c
 	rscreate.c
+	rsdumpinfo.c
 	rsinfo.c
 	rsio.c
 	rsirq.c
@@ -185,6 +186,7 @@ local utilities_src =
 	utosi.c
 	utownerid.c
 	utpredef.c
+	utresdecode.c
 	utresrc.c
 	utstate.c
 	utstring.c
