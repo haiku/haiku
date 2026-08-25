@@ -499,6 +499,18 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (node->ModuleName() != NULL)
 				driverPath = node->ModuleName();
 
+			if (driverPath == NULL || strncmp(driverPath, "drivers/", 8) != 0) {
+				NodeList::ConstIterator iterator = node->Children().GetIterator();
+				while (iterator.HasNext()) {
+					device_node* child = iterator.Next();
+					if (child->ModuleName() != NULL
+						&& strncmp(child->ModuleName(), "drivers/", 8) == 0) {
+						driverPath = child->ModuleName();
+						break;
+					}
+				}
+			}
+
 			if (driverPath == NULL || driverPath[0] == '\0')
 				return B_ENTRY_NOT_FOUND;
 
