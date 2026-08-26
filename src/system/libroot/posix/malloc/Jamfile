@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src system libroot posix malloc ;
 
 HaikuSubInclude debug ;
-#HaikuSubInclude hoard2 ;
 HaikuSubInclude openbsd ;
