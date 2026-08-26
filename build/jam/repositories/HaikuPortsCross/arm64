@@ -2,6 +2,7 @@ BootstrapPackageRepository HaikuPortsCross
 	: arm64
 	:
 	# architecture "any" packages
+	ca_root_certificates-2026_07_16-1
 	haikuporter-0-1
 	noto-20170202-7
 	:
