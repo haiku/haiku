@@ -22,9 +22,12 @@
 #include <MenuItem.h>
 #include <Shape.h>
 #include <String.h>
+#include <UnicodeChar.h>
 #include <Window.h>
 
 #include <MenuPrivate.h>
+
+#include <binary_compatibility/Support.h>
 
 #include "utf8_functions.h"
 
@@ -61,7 +64,7 @@ static const char* kDeleteShortcutUTF8 = "\xe2\x8c\xa6"; /* B_DELETE U+2326 */
 using BPrivate::MenuPrivate;
 
 
-BMenuItem::BMenuItem(const char* label, BMessage* message, char shortcut, uint32 modifiers)
+BMenuItem::BMenuItem(const char* label, BMessage* message, uint32 shortcut, uint32 modifiers)
 {
 	_InitData();
 	if (label != NULL)
@@ -69,8 +72,8 @@ BMenuItem::BMenuItem(const char* label, BMessage* message, char shortcut, uint32
 
 	SetMessage(message);
 
-	fShortcutChar = shortcut;
-	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
+	fShortcut = shortcut;
+	fModifiers = (fShortcut != 0 ? modifiers : 0);
 }
 
 
@@ -106,9 +109,9 @@ BMenuItem::BMenuItem(BMessage* data)
 		SetTrigger(userTrigger);
 
 	if (data->HasInt32("_shortcut")) {
-		int32 shortcut, mods;
-
-		data->FindInt32("_shortcut", &shortcut);
+		uint32 shortcut;
+		int32 mods;
+		data->FindInt32("_shortcut", (int32*)&shortcut);
 		data->FindInt32("_mods", &mods);
 
 		SetShortcut(shortcut, mods);
@@ -159,8 +162,8 @@ BMenuItem::Archive(BMessage* data, bool deep) const
 	if (status == B_OK && fUserTrigger)
 		status = data->AddInt32("_user_trig", fUserTrigger);
 
-	if (status == B_OK && fShortcutChar != 0) {
-		status = data->AddInt32("_shortcut", fShortcutChar);
+	if (status == B_OK && fShortcut != 0) {
+		status = data->AddInt32("_shortcut", fShortcut);
 		if (status == B_OK)
 			status = data->AddInt32("_mods", fModifiers);
 	}
@@ -270,18 +273,16 @@ BMenuItem::SetTrigger(char trigger)
 
 
 void
-BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
+BMenuItem::SetShortcut(uint32 shortcut, uint32 modifiers)
 {
-	if (fShortcutChar != 0 && fWindow != NULL)
-		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
+	if (fShortcut != 0 && fWindow != NULL)
+		fWindow->RemoveShortcut(fShortcut, fModifiers);
 
-	uint32 key = (uint32)shortcut;
+	if (shortcut != 0 && fWindow != NULL)
+		fWindow->_AddShortcut(&shortcut, &modifiers, this);
 
-	if (key != 0 && fWindow != NULL)
-		fWindow->_AddShortcut(&key, &modifiers, this);
-
-	fShortcutChar = (char)key;
-	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
+	fShortcut = shortcut;
+	fModifiers = (fShortcut != 0 ? modifiers : 0);
 
 	if (fSuper != NULL) {
 		fSuper->InvalidateLayout();
@@ -328,13 +329,13 @@ BMenuItem::Trigger() const
 }
 
 
-char
+uint32
 BMenuItem::Shortcut(uint32* modifiers) const
 {
-	if (modifiers)
+	if (modifiers != NULL)
 		*modifiers = fModifiers;
 
-	return fShortcutChar;
+	return fShortcut;
 }
 
 
@@ -471,7 +472,7 @@ BMenuItem::Draw()
 	}
 
 	if (layout == B_ITEMS_IN_COLUMN) {
-		if (fShortcutChar != 0)
+		if (fShortcut != 0)
 			_DrawShortcutSymbol(privateAccessor.HasSubmenus());
 
 		if (Submenu() != NULL)
@@ -537,7 +538,7 @@ BMenuItem::_InitData()
 	fTriggerIndex = -1;
 	fUserTrigger = 0;
 	fTrigger = 0;
-	fShortcutChar = 0;
+	fShortcut = 0;
 	fMark = false;
 	fEnabled = true;
 	fSelected = false;
@@ -568,14 +569,14 @@ BMenuItem::Install(BWindow* window)
 
 	fWindow = window;
 
-	uint32 key = (uint32)fShortcutChar;
+	uint32 shortcut = fShortcut;
 	uint32 modifiers = fModifiers;
 
-	if (fShortcutChar != 0 && fWindow != NULL)
-		fWindow->_AddShortcut(&key, &modifiers, this);
+	if (shortcut != 0 && fWindow != NULL)
+		fWindow->_AddShortcut(&shortcut, &modifiers, this);
 
-	fShortcutChar = (char)key;
-	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
+	fShortcut = shortcut;
+	fModifiers = (fShortcut != 0 ? modifiers : 0);
 
 	if (!Messenger().IsValid())
 		SetTarget(fWindow);
@@ -630,8 +631,8 @@ BMenuItem::Uninstall()
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	if (fShortcutChar != 0 && fWindow != NULL)
-		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
+	if (fShortcut != 0 && fWindow != NULL)
+		fWindow->RemoveShortcut(fShortcut, fModifiers);
 
 	fWindow = NULL;
 }
@@ -760,11 +761,19 @@ BMenuItem::_DrawShortcutSymbol(bool submenus)
 		where.x -= fBounds.Height() / 2;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
-	if ((fShortcutChar <= B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
-		|| fShortcutChar == B_DELETE) {
-		_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
-	} else
-		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
+	if ((fShortcut <= B_SPACE && kUTF8ControlMap[fShortcut]) || fShortcut == B_DELETE) {
+		// ASCII control character
+		_DrawControlChar((char)fShortcut, where + BPoint(0, ascent));
+	} else if (fShortcut >= B_SPACE && fShortcut < B_DELETE) {
+		// ASCII printable character
+		fSuper->DrawChar((char)fShortcut, where + BPoint(0, ascent));
+	} else {
+		// convert Unicode code point to UTF-8 character string
+		char string[4];
+		char* stringPtr = string;
+		BUnicodeChar::ToUTF8(fShortcut, &stringPtr);
+		fSuper->DrawString(string, where + BPoint(0, ascent));
+	}
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
 	where.x -= 4;
@@ -824,15 +833,15 @@ BMenuItem::_DrawSubmenuSymbol()
 
 
 void
-BMenuItem::_DrawControlChar(char shortcut, BPoint where)
+BMenuItem::_DrawControlChar(int32 shortcut, BPoint where)
 {
 	// TODO: If needed, take another font for the control characters
 	//	(or have font overlays in the app_server!)
 	const char* symbol = " ";
 	if (shortcut == B_DELETE)
 		symbol = kDeleteShortcutUTF8;
-	else if (kUTF8ControlMap[(int)fShortcutChar])
-		symbol = kUTF8ControlMap[(int)fShortcutChar];
+	else if (kUTF8ControlMap[fShortcut])
+		symbol = kUTF8ControlMap[fShortcut];
 
 	fSuper->DrawString(symbol, where);
 }
@@ -843,4 +852,30 @@ BMenuItem::SetAutomaticTrigger(int32 index, uint32 trigger)
 {
 	fTriggerIndex = index;
 	fTrigger = trigger;
+}
+
+
+//	#pragma mark - ABI compatibility
+
+
+void
+BMenuItem::_OldSetShortcut(char shortcut, uint32 modifiers)
+{
+	SetShortcut(shortcut, modifiers);
+}
+
+
+extern "C" void
+B_IF_GCC_2(SetShortcut__9BMenuItemcUl, _ZN9BMenuItem11SetShortcutEcj)(
+	BMenuItem* menuItem, char shortcut, uint32 modifiers)
+{
+	menuItem->SetShortcut(shortcut, modifiers);
+}
+
+
+extern "C" void
+B_IF_GCC_2(__9BMenuItemPCcP8BMessagecUl, _ZN9BMenuItemC2EPKcP8BMessagecj)(
+	void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+{
+	new(memory) BMenuItem(label, message, shortcut, modifiers);
 }

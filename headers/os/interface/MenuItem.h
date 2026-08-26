@@ -22,7 +22,7 @@ namespace BPrivate {
 class BMenuItem : public BArchivable, public BInvoker {
 public:
 								BMenuItem(const char* label, BMessage* message,
-									char shortcut = 0, uint32 modifiers = 0);
+									uint32 shortcut = 0, uint32 modifiers = 0);
 								BMenuItem(BMenu* menu, BMessage* message = NULL);
 								BMenuItem(BMessage* data);
 	virtual						~BMenuItem();
@@ -35,17 +35,20 @@ public:
 	virtual	void				SetEnabled(bool enable);
 	virtual	void				SetMarked(bool mark);
 	virtual	void				SetTrigger(char trigger);
-	virtual	void				SetShortcut(char shortcut, uint32 modifiers);
+			void				SetShortcut(uint32 shortcut, uint32 modifiers);
 
 			const char*			Label() const;
 			bool				IsEnabled() const;
 			bool				IsMarked() const;
 			char				Trigger() const;
-			char				Shortcut(uint32* _modifiers = NULL) const;
+			uint32				Shortcut(uint32* _modifiers = NULL) const;
 
 			BMenu*				Submenu() const;
 			BMenu*				Menu() const;
 			BRect				Frame() const;
+
+private:
+	virtual	void				_OldSetShortcut(char shortcut, uint32 modifiers);
 
 protected:
 	virtual	void				GetContentSize(float* _width, float* _height);
@@ -92,7 +95,7 @@ private:
 			void				_DrawMarkSymbol();
 			void				_DrawShortcutSymbol(bool);
 			void				_DrawSubmenuSymbol();
-			void				_DrawControlChar(char shortcut, BPoint where);
+			void				_DrawControlChar(int32 shortcut, BPoint where);
 
 private:
 			char*				fLabel;
@@ -104,13 +107,14 @@ private:
 			float				fCachedWidth;
 			int16				fTriggerIndex;
 			char				fUserTrigger;
-			char				fShortcutChar;
+			char				_unused;
 			bool				fMark;
 			bool				fEnabled;
 			bool				fSelected;
 			uint32				fTrigger;
+			uint32				fShortcut;
 
-			uint32				_reserved[3];
+			uint32				_reserved[2];
 };
 
 // BSeparatorItem now has its own declaration file, but for source

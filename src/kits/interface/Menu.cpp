@@ -2708,7 +2708,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 		float height;
 		item->GetContentSize(&width, &height);
 
-		if (item->fModifiers && item->fShortcutChar) {
+		if (item->fModifiers != 0 && item->fShortcut != 0) {
 			width += font.Size();
 			if ((item->fModifiers & B_COMMAND_KEY) != 0)
 				command = true;

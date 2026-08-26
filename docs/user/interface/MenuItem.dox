@@ -1,13 +1,13 @@
 /*
- * Copyright 2014-2025 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/MenuItem.h	 hrev46969
- *		src/kits/interface/MenuItem.cpp	 hrev46969
+ *		headers/os/interface/MenuItem.h	 hrev60032
+ *		src/kits/interface/MenuItem.cpp	 hrev60032
  */
 
 
@@ -33,9 +33,16 @@
 
 	\sa SetLabel()
 
-	A menu item, unless it represents a submenu, can have a keyboard
-	shortcut which is a printable character used in combination with
-	the \key{Command} key and possibly other modifiers to invoke the item.
+	A menu item can have a keyboard shortcut which is a printable character
+	used in combination with the \key{Command} key and possibly \key{Option}
+	\key{Control} or \key{Shift} to invoke the item.
+
+	In addition to printable characters you may print a select number of
+	non-printable characters such as \c B_ENTER, \c B_ESCAPE and other keys on
+	the keyboard that do not produce printable characters. See Keyboard Special
+	Topic for a full list. You may also specify multi-byte Unicode code points
+	to internationalize your application.
+
 	The shortcut is displayed right of the item's label.
 
 	\sa SetShortcut()
@@ -73,17 +80,34 @@
 /*!
 	\fn BMenuItem::BMenuItem(const char* label, BMessage* message,
 		char shortcut, uint32 modifiers)
-	\brief Creates a new BMenuItem object with the specified \a label
-	       and \a message.
+	\brief Creates a new BMenuItem object with the specified ASCII \c char
+	       \a shortcut, \a label, \a message and \a modifiers.
 
 	\param label The text \a label that is displayed.
-	\param message The BMessage that is sent when the item is selected.
-	\param shortcut The \a shortcut characters to activate the menu item.
+	\param message The \a message that is sent when the item is selected.
+	\param shortcut The ASCII \c char that activates the menu item.
 	\param modifiers The modifier keys to activate the menu item.
 	       \c B_COMMAND_KEY is assumed, to remove \c B_COMMAND_KEY you
 	       must specify \c B_NO_COMMAND_KEY.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMenuItem::BMenuItem(uint32 shortcut, const char* label,
+		BMessage* message, uint32 modifiers)
+	\brief Creates a new BMenuItem object with the specified Unicode code
+	       point \a shortcut, \a label, \a message and \a modifiers.
+
+	\param shortcut The Unicode code point that activates the menu item.
+	\param label The text \a label that is displayed.
+	\param message The \a message that is sent when the item is selected.
+	\param modifiers The modifier keys to activate the menu item.
+	       \c B_COMMAND_KEY is assumed, to remove \c B_COMMAND_KEY you
+	       must specify \c B_NO_COMMAND_KEY.
+
+	\since Haiku R1
 */
 
 
@@ -96,7 +120,7 @@
 	makes the menu item a submenu.
 
 	\param menu The \a menu to assign to the item.
-	\param message The BMessage that is sent when the item is selected.
+	\param message The \a message that is sent when the item is selected.
 
 	\since BeOS R3
 */
@@ -221,18 +245,31 @@
 
 /*!
 	\fn void BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
-	\brief Set the keyboard shortcut of the menu item.
+	\brief Set the keyboard shortcut of the menu item as an ASCII \c char.
+
+	\deprecated The \c char version of this method from BeOS R3 is deprecated,
+	            use the \c uint32 version instead.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
+	\brief Set the keyboard shortcut of the menu item as an ASCII \c char.
 
 	Setting a shortcut invalidates the attached menu.
 
 	This method will override the existing shortcut set to the window.
 
-	\param shortcut The ASCII shortcut character to set.
+	\param shortcut The ASCII \c char shortcut to set.
 	\param modifiers A bitmap mask of modifier keys used to activate
 	       the shortcut. \c B_COMMAND_KEY is assumed, to remove
 	       \c B_COMMAND_KEY you must specify \c B_NO_COMMAND_KEY.
 
-	\since BeOS R3
+	\note The \c char version of this method from BeOS R3 is deprecated.
+
+	\since Haiku R1
 */
 
 
@@ -277,15 +314,19 @@
 
 
 /*!
-	\fn char BMenuItem::Shortcut(uint32* modifiers) const
+	\fn uint32 BMenuItem::Shortcut(uint32* modifiers) const
 	\brief Returns the currently set shortcut and fills out \a modifiers
 	       with a bitmap of the modifier keys required to invoke the item.
 
-	\param modifiers A pointer to a uint32 to fill out.
+	\param modifiers A pointer to a uint32 to fill out with \a modifiers.
 
-	\return The shortcut character assigned to the menu item as a char.
+	\return The shortcut character assigned to the menu item as an
+	        ASCII \c char or multi-byte Unicode code point.
 
-	\since BeOS R3
+	\deprecated The version of this method that returns a \c char from
+	            BeOS R3 is deprecated.
+
+	\since Haiku R1
 */
 
 
