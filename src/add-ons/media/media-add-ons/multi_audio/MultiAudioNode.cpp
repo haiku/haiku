@@ -2061,7 +2061,8 @@ MultiAudioNode::_StopOutputThread()
 			input->fBuffer->Recycle();
 			input->fBuffer = NULL;
 		}
-		_FillWithZeros(*input);
+		if (fDevice->BufferList().playback_buffers[0][input->fChannelId].base != NULL)
+			_FillWithZeros(*input);
 	}
 
 	return B_OK;
