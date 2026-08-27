@@ -13,6 +13,8 @@
 #include "RNDISDevice.h"
 #include "Driver.h"
 
+#include <drivers/usb/USB_misc.h>
+
 
 const uint32 OID_GEN_MAXIMUM_FRAME_SIZE = 0x00010106;
 const uint32 OID_GEN_LINK_SPEED = 0x00010107;
@@ -592,6 +594,24 @@ RNDISDevice::_RNDISInitialize()
 }
 
 
+static bool
+descriptor_is_rndis(usb_interface_descriptor* descriptor)
+{
+	// Look for both Microsoft and USB standard definitions of RNDIS
+	if (descriptor->interface_class == USB_COMMUNICATION_WIRELESS_DEVICE_CLASS
+		&& descriptor->interface_subclass == 0x01
+		&& descriptor->interface_protocol == 0x03)
+		return true;
+
+	if (descriptor->interface_class == USB_MISCELLANEOUS_CLASS
+		&& descriptor->interface_subclass == B_USB_MISC_RNDIS_SUBCLASS
+		&& descriptor->interface_protocol == B_USB_RNDIS_ETHERNET_PROTOCOL)
+		return true;
+
+	return false;
+}
+
+
 status_t
 RNDISDevice::_SetupDevice()
 {
@@ -617,10 +637,8 @@ RNDISDevice::_SetupDevice()
 		for (size_t j = 0; j < config->interface_count && !found; j++) {
 			const usb_interface_info *interface = config->interface[j].active;
 			usb_interface_descriptor *descriptor = interface->descr;
-			if (descriptor->interface_class != USB_COMMUNICATION_WIRELESS_DEVICE_CLASS
-				|| descriptor->interface_subclass != 0x01
-				|| descriptor->interface_protocol != 0x03
-				|| interface->generic_count == 0) {
+
+			if (!descriptor_is_rndis(descriptor) || interface->generic_count == 0) {
 				continue;
 			}
 
@@ -669,10 +687,7 @@ RNDISDevice::_SetupDevice()
 	// check that the indicated control interface fits our needs
 	usb_interface_info *interface = config->interface[controlIndex].active;
 	usb_interface_descriptor *descriptor = interface->descr;
-	if ((descriptor->interface_class != 0xE0
-		|| descriptor->interface_subclass != 0x01
-		|| descriptor->interface_protocol != 0x03)
-		|| interface->endpoint_count == 0) {
+	if (!descriptor_is_rndis(descriptor)) {
 		TRACE_ALWAYS("control interface invalid\n");
 		return B_ERROR;
 	}

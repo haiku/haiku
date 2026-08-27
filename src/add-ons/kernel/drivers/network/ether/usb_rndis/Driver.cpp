@@ -11,6 +11,9 @@
 #include "Driver.h"
 #include "RNDISDevice.h"
 
+#include <drivers/usb/USB_misc.h>
+
+
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 static const char *sDeviceBaseName = "net/usb_rndis/";
 RNDISDevice *gRNDISDevices[MAX_DEVICES];
@@ -111,10 +114,18 @@ init_driver()
 	};
 
 	static usb_support_descriptor supportDescriptors[] = {
+		/* RNDIS subclass/protocol as specified by Microsoft */
 		{
 			.dev_class = USB_COMMUNICATION_WIRELESS_DEVICE_CLASS,
-			.dev_subclass = 0x01, /* RNDIS subclass/protocol as specified by Microsoft */
+			.dev_subclass = 0x01,
 			.dev_protocol = 0x03,
+			0, 0 /* no specific vendor or device */
+		},
+		/* RNDIS subclass/protocol as specified by https://www.usb.org/defined-class-codes */
+		{
+			.dev_class = USB_MISCELLANEOUS_CLASS,
+			.dev_subclass = B_USB_MISC_RNDIS_SUBCLASS,
+			.dev_protocol = B_USB_RNDIS_ETHERNET_PROTOCOL,
 			0, 0 /* no specific vendor or device */
 		}
 	};
