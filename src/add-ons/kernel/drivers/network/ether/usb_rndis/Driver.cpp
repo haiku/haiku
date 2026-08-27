@@ -127,6 +127,14 @@ init_driver()
 			.dev_subclass = B_USB_MISC_RNDIS_SUBCLASS,
 			.dev_protocol = B_USB_RNDIS_ETHERNET_PROTOCOL,
 			0, 0 /* no specific vendor or device */
+		},
+		/* Other somewhat less standard devices: */
+		{
+			.dev_class = USB_COMMUNICATION_DEVICE_CLASS,
+			.dev_subclass = 0,
+			.dev_protocol = 0,
+			.vendor = 0x04e8,	/* Samsung */
+			.product = 0x6864,	/* GT-I9070 */
 		}
 	};
 

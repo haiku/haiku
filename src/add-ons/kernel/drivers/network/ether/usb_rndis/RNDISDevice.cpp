@@ -608,6 +608,12 @@ descriptor_is_rndis(usb_interface_descriptor* descriptor)
 		&& descriptor->interface_protocol == B_USB_RNDIS_ETHERNET_PROTOCOL)
 		return true;
 
+	// Also check for RNDIS as implemented on some old (Android 4.x) Samsung phones:
+	if (descriptor->interface_class == USB_COMMUNICATION_DEVICE_CLASS
+		&& descriptor->interface_subclass == B_USB_MISC_MULTIPLEXED_SUBCLASS
+		&& descriptor->interface_protocol == 0xff)
+		return true;
+
 	return false;
 }
 
