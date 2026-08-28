@@ -936,7 +936,7 @@ arch_debug_contains_call(Thread* thread, const char* symbol, addr_t start,
 	\return The number of return addresses written to the given array.
 */
 int32
-arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
 	// Keep skipping normal stack frames until we've skipped the iframes we're

@@ -1408,14 +1408,14 @@ profiling_do_sample()
 		+ debugInfo.profile.sample_count;
 	if (debugInfo.profile.variable_stack_depth) {
 		// variable sample count per hit
-		*returnAddresses = arch_debug_get_stack_trace(returnAddresses + 1,
+		*returnAddresses = arch_get_stack_trace(returnAddresses + 1,
 			stackDepth - 1, skipIFrames, 0, flags);
 
 		debugInfo.profile.sample_count += *returnAddresses + 1;
 	} else {
 		// fixed sample count per hit
 		if (stackDepth > 1 || !debugInfo.profile.profile_kernel) {
-			int32 count = arch_debug_get_stack_trace(returnAddresses,
+			int32 count = arch_get_stack_trace(returnAddresses,
 				stackDepth, skipIFrames, 0, flags);
 
 			for (int32 i = count; i < stackDepth; i++)

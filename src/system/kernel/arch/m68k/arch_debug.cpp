@@ -270,7 +270,7 @@ arch_debug_contains_call(Thread *thread, const char *symbol,
 
 
 int32
-arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, uint32 flags)
 {
 	struct iframe_stack *frameStack;

@@ -33,11 +33,9 @@ using BKernel::Thread;
 extern "C" {
 #endif
 
-#define arch_debug_get_caller() __builtin_return_address(0)
-
 status_t arch_debug_init(kernel_args *args);
-void arch_debug_stack_trace(void);
-int32 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+void arch_debug_stack_trace();
+int32 arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		int32 skipIframes, int32 skipFrames, uint32 flags);
 void* arch_debug_get_interrupt_pc(bool* _isSyscall);
 bool arch_debug_contains_call(Thread *thread, const char *symbol,

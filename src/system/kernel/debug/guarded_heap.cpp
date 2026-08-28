@@ -329,7 +329,7 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment,
 	}
 
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
-	allocatingChunk->stack_trace_depth = arch_debug_get_stack_trace(
+	allocatingChunk->stack_trace_depth = arch_get_stack_trace(
 		allocatingChunk->stack_trace, GUARDED_HEAP_STACK_TRACE_DEPTH,
 		0, 3, STACK_TRACE_KERNEL);
 #endif
@@ -483,7 +483,7 @@ guarded_heap_free(guarded_heap& heap, void* address, uint32 flags)
 	chunk->team = (gKernelStartup ? 0 : team_get_current_team_id());
 	chunk->thread = (gKernelStartup ? 0 : thread_get_current_thread_id());
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
-	chunk->stack_trace_depth = arch_debug_get_stack_trace(
+	chunk->stack_trace_depth = arch_get_stack_trace(
 		chunk->stack_trace, GUARDED_HEAP_STACK_TRACE_DEPTH,
 		0, 3, STACK_TRACE_KERNEL);
 #endif

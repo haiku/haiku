@@ -1429,7 +1429,7 @@ SystemProfiler::_DoSample()
 		flags |= STACK_TRACE_KERNEL;
 		skipIFrames = 1;
 	}
-	int32 count = arch_debug_get_stack_trace(cpuData.buffer, fStackDepth,
+	int32 count = arch_get_stack_trace(cpuData.buffer, fStackDepth,
 		skipIFrames, 0, flags);
 
 	InterruptsSpinLocker locker(fLock);

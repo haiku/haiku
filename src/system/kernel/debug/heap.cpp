@@ -295,7 +295,7 @@ get_caller()
 	// this makes certain assumptions about how the code for the functions
 	// ends up in the kernel object.
 	addr_t returnAddresses[5];
-	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 0, 1,
+	int32 depth = arch_get_stack_trace(returnAddresses, 5, 0, 1,
 		STACK_TRACE_KERNEL);
 	for (int32 i = 0; i < depth; i++) {
 		if (returnAddresses[i] < (addr_t)&get_caller)
