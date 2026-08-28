@@ -2019,6 +2019,7 @@ struct CallingMatchArgs {
 	Thread* thread;
 	const char* pattern;
 	addr_t start, end;
+	bool case_insensitive, images;
 };
 
 
@@ -2033,12 +2034,19 @@ calling_match(void* _args, addr_t ip)
 	if (!IS_KERNEL_ADDRESS(ip))
 		return false;
 
+	const char* image;
 	const char* symbol;
 	if (elf_debug_lookup_symbol_address(ip,
-			NULL, &symbol, NULL, NULL) != B_OK)
+			NULL, &symbol, &image, NULL) != B_OK)
 		return false;
 
-	return strstr(symbol, args->pattern) != NULL;
+	const char* search = symbol;
+	if (args->images)
+		search = image;
+
+	if (args->case_insensitive)
+		return strcasestr(search, args->pattern) != NULL;
+	return strstr(search, args->pattern) != NULL;
 }
 
 
@@ -2066,17 +2074,39 @@ dump_thread_list(int argc, char **argv)
 				kprintf("ignoring invalid semaphore argument.\n");
 		}
 	} else if (!strcmp(argv[0], "calling")) {
+		argv++;
+		argc--;
+		if (argc == 0) {
+			kprintf("calling: Not enough arguments.\n");
+			return -1;
+		}
+
 		calling = (CallingMatchArgs*)alloca(sizeof(CallingMatchArgs));
 		memset(calling, 0, sizeof(CallingMatchArgs));
 
-		if (argc < 2) {
-			kprintf("Need to give a symbol name or start and end arguments.\n");
-			return 0;
-		} else if (argc == 3) {
-			calling->start = parse_expression(argv[1]);
-			calling->end = parse_expression(argv[2]);
+		while (argv[0][0] == '-') {
+			if (strcmp(argv[0], "-i") == 0)
+				calling->case_insensitive = true;
+			else if (strcmp(argv[0], "-m") == 0)
+				calling->images = true;
+			else {
+				kprintf("calling: unknown argument %s\n", argv[0]);
+				return -1;
+			}
+			argv++;
+			argc--;
+		}
+
+		if (argc != 1 && argc != 2) {
+			kprintf("calling: Need to give a symbol name or start and end arguments.\n");
+			return -1;
+		}
+
+		if (argc == 2) {
+			calling->start = parse_expression(argv[0]);
+			calling->end = parse_expression(argv[1]);
 		} else
-			calling->pattern = argv[1];
+			calling->pattern = argv[0];
 	} else if (argc > 1) {
 		team = strtoul(argv[1], NULL, 0);
 		if (team == 0)
@@ -2948,7 +2978,9 @@ thread_init(kernel_args *args)
 		"  <name>     - The thread's name.\n", 0);
 	add_debugger_command_etc("calling", &dump_thread_list,
 		"Show all threads that have a specific address in their call chain",
-		"{ <symbol-pattern> | <start> <end> }\n", 0);
+		" { [ -i ] [ -m ] <symbol-pattern> | <start> <end> }\n"
+		"  -i         - Case-insensitive search.\n"
+		"  -m         - Search image names instead of symbol names.\n", 0);
 	add_debugger_command_etc("unreal", &make_thread_unreal,
 		"Set realtime priority threads to normal priority",
 		"[ <id> ]\n"
