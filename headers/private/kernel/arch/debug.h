@@ -38,8 +38,8 @@ void arch_debug_stack_trace();
 int32 arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		int32 skipIframes, int32 skipFrames, uint32 flags);
 void* arch_debug_get_interrupt_pc(bool* _isSyscall);
-bool arch_debug_contains_call(Thread *thread, const char *symbol,
-		addr_t start, addr_t end);
+bool arch_debug_walk_stack(Thread* thread,
+		bool (*callback)(void*, addr_t), void* context);
 void arch_debug_save_registers(struct arch_debug_registers* registers);
 void arch_debug_unset_current_thread(void);
 void arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
