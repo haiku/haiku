@@ -53,7 +53,7 @@ Object::WaitForIdle()
 	while (CountReferences() != 1 && retries--)
 		snooze(100);
 	if (retries <= 0)
-		panic("USB object did not become idle!");
+		panic("USB object did not become idle! @! calling -m usb");
 }
 
 
