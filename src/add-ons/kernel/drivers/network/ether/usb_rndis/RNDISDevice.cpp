@@ -737,8 +737,19 @@ RNDISDevice::_GetOID(uint32 oid, void* buffer, size_t length)
 
 	acquire_sem(fNotifyControlSem);
 
-	uint8 response[length + 24];
+	uint8 response[length + 24] = {0};
 	result = _ReadResponse(response, length + 24);
+	if (result != B_OK) {
+		TRACE_ALWAYS("GetOID read response failed: %s\n", strerror(result));
+		return result;
+	}
+
+	uint32 responseCode = *(uint32*)response;
+	if (responseCode != REMOTE_NDIS_QUERY_CMPLT) {
+		TRACE_ALWAYS("GetOID unexpected response code: %08x\n", responseCode);
+		return B_BAD_DATA;
+	}
+
 	memcpy(buffer, &response[24], length);
 	return result;
 }
