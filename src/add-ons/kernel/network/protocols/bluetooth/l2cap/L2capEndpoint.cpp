@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Errors.h>
 #include <NetBufferUtilities.h>
 
 #include "L2capEndpointManager.h"
@@ -404,7 +405,11 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		flags |= MSG_DONTWAIT;
 
 	timeout -= system_time();
-	return gStackModule->fifo_dequeue_buffer(&fReceiveQueue, flags, timeout, _buffer);
+	locker.Unlock();
+	ssize_t bytes = gStackModule->fifo_dequeue_buffer(&fReceiveQueue, flags, timeout, _buffer);
+	if (bytes == B_WOULD_BLOCK && fState == CLOSED)
+		return ENOTCONN;
+	return bytes;
 }
 
 
