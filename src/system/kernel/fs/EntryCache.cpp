@@ -220,9 +220,9 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 	if (move) {
 		const int32 oldGeneration = atomic_get_and_set(&entry->generation,
 			fCurrentGeneration);
-		if (oldGeneration == fCurrentGeneration || entry->index < 0) {
-			// The entry is already in the current generation or is being moved to
-			// it by another thread.
+		if (oldGeneration == fCurrentGeneration || oldGeneration == -1 || entry->index < 0) {
+			// The entry is already in the current generation, hasn't yet been added
+			// to any generation, or is being moved by another thread.
 			return true;
 		}
 
@@ -230,6 +230,7 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry, bool move)
 		fGenerations[oldGeneration].entries[entry->index] = NULL;
 		entry->index = kEntryNotInArray;
 	} else {
+		// set the generation (no need for atomics)
 		entry->generation = fCurrentGeneration;
 	}
 
