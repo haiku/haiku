@@ -126,6 +126,33 @@ TLiveMixin::UpdateWindowMenu(BMenu* menu)
 }
 
 
+void
+TLiveMixin::UpdateDropContextMenu(BMenu* menu)
+{
+	if (menu == NULL)
+		return;
+
+	if (menu->Window()->LockLooper()) {
+		int32 itemCount = menu->CountItems();
+		for (int32 index = 0; index < itemCount; index++) {
+			BMenuItem* item = menu->ItemAt(index);
+			if (item == NULL || item->Message() == NULL)
+				continue;
+
+			switch (item->Message()->what) {
+				// Create link here/Create relative link here
+				case kCreateLink:
+				case kCreateRelativeLink:
+					fWindow->Shortcuts()->UpdateCreateLinkHereItem(item);
+					break;
+			}
+		}
+
+		menu->Window()->UnlockLooper();
+	}
+}
+
+
 //	#pragma mark - TLiveMenu
 
 
@@ -306,4 +333,28 @@ void
 TLiveWindowPopUpMenu::Update()
 {
 	UpdateWindowMenu(this);
+}
+
+
+//	#pragma mark - TLiveDropContextPopUpMenu
+
+
+TLiveDropContextPopUpMenu::TLiveDropContextPopUpMenu(const char* label,
+	const BContainerWindow* window, bool radioMode, bool labelFromMarked, menu_layout layout)
+	:
+	TLivePopUpMenu(label, radioMode, labelFromMarked, layout),
+	TLiveMixin(window)
+{
+}
+
+
+TLiveDropContextPopUpMenu::~TLiveDropContextPopUpMenu()
+{
+}
+
+
+void
+TLiveDropContextPopUpMenu::Update()
+{
+	UpdateDropContextMenu(this);
 }

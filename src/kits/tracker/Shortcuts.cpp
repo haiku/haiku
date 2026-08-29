@@ -1022,7 +1022,7 @@ TShortcuts::UpdateCreateLinkHereItem(BMenuItem* item)
 	item->Message()->what = CreateLinkHereCommand();
 
 	if (fInWindow) {
-		item->SetEnabled(HasSelection());
+		item->SetEnabled(TargetIsReadOnly() == false);
 		item->SetTarget(fContainerWindow);
 	}
 }
