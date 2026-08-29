@@ -25,6 +25,7 @@ struct TLiveMixin {
 
 	virtual	void			UpdateFileMenu(BMenu* menu);
 	virtual	void			UpdateWindowMenu(BMenu* menu);
+	virtual	void			UpdateDropContextMenu(BMenu* menu);
 
 private:
 	const BContainerWindow*	fWindow;
@@ -107,6 +108,19 @@ public:
 								bool radioMode = true, bool labelFromMarked = true,
 								menu_layout layout = B_ITEMS_IN_COLUMN);
 	virtual					~TLiveWindowPopUpMenu();
+
+protected:
+	virtual	void			Update();
+};
+
+
+class TLiveDropContextPopUpMenu : public TLivePopUpMenu, public TLiveMixin {
+public:
+							TLiveDropContextPopUpMenu(const char* label,
+								const BContainerWindow* window,
+								bool radioMode = true, bool labelFromMarked = true,
+								menu_layout layout = B_ITEMS_IN_COLUMN);
+	virtual					~TLiveDropContextPopUpMenu();
 
 protected:
 	virtual	void			Update();

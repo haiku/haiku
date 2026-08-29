@@ -647,7 +647,7 @@ BContainerWindow::AddContextMenus()
 	fWindowContextMenu = new TLiveWindowPopUpMenu("WindowContext", this, false, false);
 	AddWindowContextMenu(fWindowContextMenu);
 
-	fDropContextMenu = new BPopUpMenu("DropContext", false, false);
+	fDropContextMenu = new TLiveDropContextPopUpMenu("DropContext", this, false, false);
 	AddDropContextMenu(fDropContextMenu);
 
 	fDragContextMenu = new BPopUpNavMenu("DragContext");
@@ -2410,8 +2410,8 @@ BContainerWindow::ShowDropContextMenu(BPoint where, BPoseView* source)
 	PoseView()->ConvertToScreen(&global);
 	PoseView()->CommitActivePose();
 
-	Shortcuts()->UpdateCreateLinkHereItem(
-		fDropContextMenu->FindItem(Shortcuts()->CreateLinkHereCommand()));
+	// Drop context menu is static; always look for kCreateLink, never kCreateRelativeLink.
+	Shortcuts()->UpdateCreateLinkHereItem(fDropContextMenu->FindItem(kCreateLink));
 
 	BMenuItem* item;
 
