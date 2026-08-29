@@ -71,6 +71,7 @@ public:
 			void				SetOutputBufferGroup(BBufferGroup* group);
 			void				SetTimingInfo(BTimeSource* timeSource,
 									bigtime_t downstreamLatency);
+			BTimeSource*		TimeSource() const { return fTimeSource; }
 			void				EnableOutput(bool enabled);
 
 			bool				Start();

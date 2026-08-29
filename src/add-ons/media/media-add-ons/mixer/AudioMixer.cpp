@@ -298,7 +298,11 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 		return;
 	}
 
-	if (buffer->Header()->time_source != TimeSource()->ID()) {
+	// Since we change our TimeSource in Connect(), it's possible for
+	// buffer events to come in before "change timesource" message. So
+	// we check against the core's TimeSource here.
+	if (fCore->TimeSource() == NULL
+			|| buffer->Header()->time_source != fCore->TimeSource()->ID()) {
 		buffer->Recycle();
 		return;
 	}
