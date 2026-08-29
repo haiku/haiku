@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2681445216
+1	czech	x-vnd.Haiku-libtracker	798058031
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -138,7 +138,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Číslo s plovoucí řádovou čárkou
 Cancel	ContainerWindow		Zrušit
 Attributes	ContainerWindow		Atributy
-Error deleting items	FSUtils		Chyba při odstraňování položek
 Cut	ContainerWindow		Vyjmout
 Disks	Model		Disky
 Create a Query template	FindPanel		Vytvořit šablonu Dotazu

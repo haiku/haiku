@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	412525863
+1	turkish	x-vnd.Haiku-libtracker	2824105974
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -139,7 +139,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Kayan noktalı değer
 Cancel	ContainerWindow		Vazgeç
 Attributes	ContainerWindow		Öznitelikler
-Error deleting items	FSUtils		Ögeler silinirken hata
 Cut	ContainerWindow		Kes
 Disks	Model		Diskler
 Create a Query template	FindPanel		Bir sorgu şablonu oluştur

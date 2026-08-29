@@ -1,10 +1,12 @@
-1	swedish	x-vnd.Haiku-Devices	2752258547
+1	swedish	x-vnd.Haiku-Devices	3091506374
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
 USB bus	DevicesView		USB-buss
 Processor	Device		Processor
 Generate system information	DevicesView		Generera systeminformation
+Disable driver	DevicesView		Inaktivera drivrutinen
+Reboot needed	DevicesView		Omstart krävs
 Class info	DevicePCI		Klass information
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
@@ -13,10 +15,13 @@ ACPI thermal zone	DeviceACPI		ACPI-termisk zon
 Mass storage controller	Device		Lagringskontroller
 Printer	DeviceSCSI		Skrivare
 Connection	DevicesView		Anslutning
+Failed to write to the settings file.	DevicesView		Det gick inte att skriva till inställningsfilen.
+Enable driver	DevicesView		Aktivera drivrutin
 Manufacturer	Device		Tillverkare
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Minneskontroller
 Unknown device	DevicesView		Okänd enhet
+ShutDown failed with error: 	DevicesView		Avstängningen misslyckades med felet: 
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 Name	PropertyList		Namn
 Manufacturer	DeviceSCSI		Tillverkare
@@ -27,9 +32,11 @@ Satellite communications controller	Device		Styrenhet för satellitkommunikation
 Device class	DeviceSCSI		Enhetsklass
 Device	Device		Enhet
 Input device controller	Device		Indataenhetskontroller
+OK	DevicesView		OK
 PCI bus	DevicesView		PCI-buss
 Changer	DeviceSCSI		Växlare
 Serial bus controller	Device		Seriell kontroller
+Restart computer	DevicesView		Starta om datorn
 Refresh devices	DevicesView		Uppdatera enheter
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
@@ -56,17 +63,24 @@ Order by:	DevicesView		Sortera efter:
 Intelligent controller	Device		Intelligent styrenhet
 ACPI processor namespace '%2'	DeviceACPI		ACPI-processornamnområde ”%2”
 Multimedia controller	Device		Multimediakontroller
+The driver path is not in a package volume: 	DevicesView		Drivrutinssökvägen finns inte i en paketvolym: 
+none	Device		ingen
+Blocked entry:\n	DevicesView		Blockerad åtkomst:\n
 Quit	DevicesView		Avsluta
+Disabling critical system drivers is not allowed.	DevicesView		Det är inte tillåtet att inaktivera kritiska systemdrivrutiner.
+Driver disabled	DevicesView		Drivrutin inaktiverad
 ISA bus	Device		ISA-buss
 ISA bus	DevicesView		ISA-buss
 Basic information	PropertyList		Grundläggande information
 Processor	DeviceSCSI		Processor
 Card reader	DeviceSCSI		Kortläsare
+Disabling non-packaged drivers is not supported.	DevicesView		Det går inte att inaktivera drivrutiner som inte ingår i ett paket.
 Bridge	Device		Brygga
 ACPI button '%1'	DeviceACPI		ACPI-knapp ”%1”
 Attributes	PropertyList		Attribut
 Worm	DeviceSCSI		Mask
 Disk drive	DeviceSCSI		Disk-enhet
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Drivrutinen har inaktiverats. En omstart krävs för att ändringen ska träda i kraft.\n\nEfter omstarten kanske enheten inte längre visas i enhetslistan, eftersom systemet inte kan identifiera den utan drivrutinen.\n\nFör att återaktivera drivrutinen letar du upp enheten i programmet Enheter och klickar på \”Aktivera drivrutin\”. Om enheten inte längre syns tar du bort motsvarande blockerad post från paketets inställningsfil:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Tillverkare
 Bridge	DeviceSCSI		Brygga
@@ -78,6 +92,7 @@ Docking station	Device		Dockningsstation
 Array	DeviceSCSI		Matris
 Unclassified device	Device		Oklassificerad enhet
 Manufacturer	DeviceACPI		Tillverkare
+Error	DevicesView		Fel
 ACPI controller	Device		ACPI-kontroller
 Network controller	Device		Nätverkskontroller
 Driver used	Device		Drivrutin använd

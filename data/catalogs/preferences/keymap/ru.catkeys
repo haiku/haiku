@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	83366860
+1	russian	x-vnd.Haiku-Keymap	2616657510
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Japanese	KeymapNames		Японская
 US	KeymapNames		США
@@ -41,13 +41,11 @@ Belarusian (Mac)	KeymapNames		Беларуская (Mac)
 Croatian	KeymapNames		Хорватская
 PAGE ↑	Keyboard Layout View		PgUp
 Set modifier keys	Modifier keys window		Назначить клавиши-модификаторы
-Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium международная
 Right Command	Keyboard Layout View		Правый Command
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавиша Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PgDn
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
 Spanish	KeymapNames		Испанская
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Украинская (Mac)
@@ -59,7 +57,6 @@ Acute trigger	Keymap window		Аксант эгю
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
 Italian	KeymapNames		Итальянская
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan международная
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 French (NF Z71-300)	KeymapNames		Французский (NF Z71-300)
 Modifier keys	Modifier keys window		Клавиши-модификаторы
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 международная
@@ -127,7 +124,6 @@ Quit	Keymap window		Выйти
 Polish (Typewriter)	KeymapNames		Польская (машинопись)
 French (Mac)	KeymapNames		Французская (Mac)
 User:	Keymap window		Пользовательские:
-Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium расширенная международная
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавиша Alt/Opt
 SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Эстонская
@@ -146,7 +142,6 @@ Defaults	Keymap window		По умолчанию
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Системные:
 ThinkPad International	KeyboardLayoutNames		ThinkPad муждународная
-Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum расширенная (US)
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU

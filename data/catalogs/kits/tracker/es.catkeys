@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	3881286823
+1	spanish; castilian	x-vnd.Haiku-libtracker	1997899638
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Número de coma flotante
 Cancel	ContainerWindow		Cancelar
 Attributes	ContainerWindow		Atributos
-Error deleting items	FSUtils		Error eliminando elementos
 Cut	ContainerWindow		Cortar
 Disks	Model		Discos
 Create a Query template	FindPanel		Crear una plantilla de consulta

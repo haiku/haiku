@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	3204555560
+1	thai	x-vnd.Haiku-libtracker	1321168375
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -121,7 +121,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		เลขทศนิยม
 Cancel	ContainerWindow		ยกเลิก
 Attributes	ContainerWindow		คุณลักษณะ
-Error deleting items	FSUtils		เกิดข้อผิดพลาดในการลบรายการ
 Cut	ContainerWindow		ตัด
 Disks	Model		ดิสก์
 Create a Query template	FindPanel		สร้างแม่แบบ Query

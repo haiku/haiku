@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	938998836
+1	dutch; flemish	x-vnd.Haiku-libtracker	3350578947
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -128,7 +128,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Decimaal getal
 Cancel	ContainerWindow		Annuleren
 Attributes	ContainerWindow		Eigenschappen
-Error deleting items	FSUtils		Fout bij het verwijderen van items
 Cut	ContainerWindow		Knippen
 Disks	Model		Schijven
 Create a Query template	FindPanel		Maak een Zoekopdracht-sjabloon

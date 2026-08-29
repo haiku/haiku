@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	2078485505
+1	croatian	x-vnd.Haiku-libtracker	195098320
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Open with…	ContainerWindow		Otvori pomoću...
@@ -92,7 +92,6 @@ Increase size	ContainerWindow		Povećaj veličinu
 URL	Bookmark Query Columns		URL
 Cancel	ContainerWindow		Odustani
 Attributes	ContainerWindow		Atributi
-Error deleting items	FSUtils		Greška pri brisanju stavki
 Cut	ContainerWindow		Izreži
 Disks	Model		Diskovi
 Size	FindPanel		Veličina

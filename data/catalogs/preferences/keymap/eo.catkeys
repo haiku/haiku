@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Keymap	4232645682
+1	esperanto	x-vnd.Haiku-Keymap	2470969036
 Key	Modifier keys window	As in a computer keyboard key	Klavo
 Japanese	KeymapNames		Japana
 US	KeymapNames		Usona
@@ -37,12 +37,10 @@ Belarusian (Mac)	KeymapNames		Belorusa (por Mac)
 Croatian	KeymapNames		Kroatia
 PAGE ↑	Keyboard Layout View		PAĜO ↑
 Set modifier keys	Modifier keys window		Atribui modifajn klavojn
-Apple Aluminium International	KeyboardLayoutNames		Internacia por Apple Aluminium
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Komandklavo (Win/Cmd)
 PG ↓	Keyboard Layout View	Very short for 'page down'	PAĜO ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Usona)
 Spanish	KeymapNames		Hispana
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		HEJMO
 COMMAND	Keyboard Layout View		KOMANDKLAVO
 Ukrainian (Mac)	KeymapNames		Ukrainia (por Mac)
@@ -53,7 +51,6 @@ Acute trigger	Keymap window		Dekstra korno (akuto)
 ThinkPad T400s International	KeyboardLayoutNames		Internacia por ThinkPad T400s
 Italian	KeymapNames		Itala
 Kinesis Ergo Elan International	KeyboardLayoutNames		Internacia de Kinesis Ergo Elan
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (Usona)
 French (NF Z71-300)	KeymapNames		Franca (por NF Z71-300)
 Modifier keys	Modifier keys window		Modifaj klavoj
 ThinkPad X1 International	KeyboardLayoutNames		Internacia por ThinkPad X1
@@ -116,7 +113,6 @@ Quit	Keymap window		Ĉesi
 Polish (Typewriter)	KeymapNames		Pola (Tajpilo)
 French (Mac)	KeymapNames		Franca (por Mac)
 User:	Keymap window		Uzulaj:
-Apple Aluminium Extended International	KeyboardLayoutNames		Internacia etendita por Apple Aluminium
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alternativklavo/Opciklavo (Alt/Opt)
 SHIFT	Keyboard Layout View		MAJUSKIGLKLAVO
 Estonian	KeymapNames		Estona
@@ -134,7 +130,6 @@ Defaults	Keymap window		Defaŭltoj
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistemaj:
 ThinkPad International	KeyboardLayoutNames		Internacia por ThinkPad
-Apple Aluminum Extended (US)	KeyboardLayoutNames		Etendita por Apple Aluminum (US)
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
 NUM LOCK	Keyboard Layout View		NOMBRA BASKULO
 MENU	Keyboard Layout View		MENUO

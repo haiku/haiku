@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	3881286823
+1	italian	x-vnd.Haiku-libtracker	1997899638
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Numero in virgola mobile
 Cancel	ContainerWindow		Annulla
 Attributes	ContainerWindow		Attributi
-Error deleting items	FSUtils		Errore durante l'eliminazione degli elementi
 Cut	ContainerWindow		Taglia
 Disks	Model		Dischi
 Create a Query template	FindPanel		Crea un modello di interrogazione

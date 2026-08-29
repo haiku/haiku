@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2182427753
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	299040568
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		Υπερσύνδεσμος
 Floating point number	AttributesView		Αριθμός με κινητή υποδιαστολή
 Cancel	ContainerWindow		Άκυρο
 Attributes	ContainerWindow		Ιδιότητες
-Error deleting items	FSUtils		Σφάλμα κατα τη διαγραφή στοιχείων
 Cut	ContainerWindow		Αποκοπή
 Disks	Model		Δίσκοι
 Create a Query template	FindPanel		Δημιουργία ενός προτύπου Ερωτημάτος

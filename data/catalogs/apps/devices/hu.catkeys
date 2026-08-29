@@ -1,10 +1,12 @@
-1	hungarian	x-vnd.Haiku-Devices	2752258547
+1	hungarian	x-vnd.Haiku-Devices	3091506374
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Devices	System name		Eszközök
 USB bus	DevicesView		USB busz
 Processor	Device		Processzor
 Generate system information	DevicesView		Rendszerinformáció létrehozása
+Disable driver	DevicesView		Vezérlő letiltása
+Reboot needed	DevicesView		Újraindítás szükséges
 Class info	DevicePCI		Osztály-információk
 USB bus	Device		USB busz
 Computer	DevicesView		Számítógép
@@ -13,10 +15,13 @@ ACPI thermal zone	DeviceACPI		ACPI hő-zóna
 Mass storage controller	Device		Háttértároló vezérlő
 Printer	DeviceSCSI		Nyomtató
 Connection	DevicesView		Csatlakozás
+Failed to write to the settings file.	DevicesView		Nem tudom elmenteni a beállításokat.
+Enable driver	DevicesView		Vezérlő engedélyezése
 Manufacturer	Device		Gyártó
 Scanner	DeviceSCSI		Lapolvasó
 Memory controller	Device		Memóriavezérlő
 Unknown device	DevicesView		Ismeretlen eszköz
+ShutDown failed with error: 	DevicesView		Sikertelen leállítás: 
 ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
 Name	PropertyList		Név
 Manufacturer	DeviceSCSI		Gyártó
@@ -27,9 +32,11 @@ Satellite communications controller	Device		Műholdas kommunikációs vezérlő
 Device class	DeviceSCSI		Eszközosztály
 Device	Device		Eszközök
 Input device controller	Device		Beviteli eszköz vezérlő
+OK	DevicesView		Rendben
 PCI bus	DevicesView		PCI port
 Changer	DeviceSCSI		Cserélő
 Serial bus controller	Device		Soros busz vezérlő
+Restart computer	DevicesView		Számítógép újraindítása
 Refresh devices	DevicesView		Eszközök frissítése
 Category	DevicesView		Kategória
 RBC	DeviceSCSI		RBC
@@ -56,17 +63,24 @@ Order by:	DevicesView		Rendezés alapja:
 Intelligent controller	Device		Intelligens vezérlő
 ACPI processor namespace '%2'	DeviceACPI		ACPI feldolgozó névtér '%2'
 Multimedia controller	Device		Multimedia vezérlő
+The driver path is not in a package volume: 	DevicesView		A vezérlő útvonala nem található a csomagban: 
+none	Device		nincs
+Blocked entry:\n	DevicesView		Blokkolt bejegyzés:\n
 Quit	DevicesView		Kilépés
+Disabling critical system drivers is not allowed.	DevicesView		A kritikus rendszer-vezérlők letiltása nem engedélyezett.
+Driver disabled	DevicesView		Vezérlő letiltva
 ISA bus	Device		ISA port
 ISA bus	DevicesView		ISA port
 Basic information	PropertyList		Alapvető információk
 Processor	DeviceSCSI		Processzor
 Card reader	DeviceSCSI		Kártyaolvasó
+Disabling non-packaged drivers is not supported.	DevicesView		Nem csomagolt vezérlők letiltása nem lehetséges.
 Bridge	Device		Híd
 ACPI button '%1'	DeviceACPI		ACPI gomb '%1'
 Attributes	PropertyList		Jellemzők
 Worm	DeviceSCSI		Féreg
 Disk drive	DeviceSCSI		Lemez-eszköz
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		A vezérlő letiltva. A módosítás érvényesítéséhez újraindítás szükséges.\n\nÚjraindítás után ez az eszköz nem fog megjelenni az eszköz-listában, mivel a rendszer nem tudja azonosítani a vezérlő nélkül.\n\nAhhoz, hogy újra engedélyezzük a vezérlőt, az Eszközök alkalmazásban keresd meg az eszközt és kattints az \"Vezérlő engedélyezése\" lehetőségre. Ha az eszköz már nem látható, akkor töröld a blokkoló bejegyzést a csomag beállítás-fájljából.\n
 CD-ROM	DeviceSCSI		CD meghajtó
 Manufacturer	DevicePCI		Gyártó
 Bridge	DeviceSCSI		Híd
@@ -78,6 +92,7 @@ Docking station	Device		Dokkolóállomás
 Array	DeviceSCSI		Tömb
 Unclassified device	Device		Besorolatlan eszköz
 Manufacturer	DeviceACPI		Gyártó
+Error	DevicesView		Hiba
 ACPI controller	Device		ACPI vezérlő
 Network controller	Device		Hálózati vezérlő
 Driver used	Device		Vezérlőprogram

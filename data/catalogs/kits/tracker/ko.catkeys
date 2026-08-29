@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	575697134
+1	korean	x-vnd.Haiku-libtracker	2987277245
 Created	ContainerWindow		생성일
 Icon	AttributesView		아이콘
 Open and make preferred	OpenWithWindow		열고 연결 프로그램으로 지정
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		단정도 부동소수점 실수
 Cancel	ContainerWindow		취소
 Attributes	ContainerWindow		속성
-Error deleting items	FSUtils		아이템 제거 중 오류 발생
 Cut	ContainerWindow		잘라내기
 Disks	Model		디스크
 Create a Query template	FindPanel		쿼리 템플릿 만들기

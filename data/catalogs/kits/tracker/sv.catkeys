@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3033621663
+1	swedish	x-vnd.Haiku-libtracker	1150234478
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -139,7 +139,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Floating point -nummer
 Cancel	ContainerWindow		Avbryt
 Attributes	ContainerWindow		Attribut
-Error deleting items	FSUtils		Fel vid borttagning av objekt
 Cut	ContainerWindow		Klipp ut
 Disks	Model		Volymer
 Create a Query template	FindPanel		Skapa en sökmall

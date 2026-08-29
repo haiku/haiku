@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2681445216
+1	friulian	x-vnd.Haiku-libtracker	798058031
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -138,7 +138,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Numar in virgule mobile
 Cancel	ContainerWindow		Anule
 Attributes	ContainerWindow		Atribûts
-Error deleting items	FSUtils		Erôr tal eliminâ i elements
 Cut	ContainerWindow		Taie
 Disks	Model		Discs
 Create a Query template	FindPanel		Cree un model di interogazion

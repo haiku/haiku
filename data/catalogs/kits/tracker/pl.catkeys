@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1069940378
+1	polish	x-vnd.Haiku-libtracker	3481520489
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -135,7 +135,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Liczba zmiennoprzecinkowa
 Cancel	ContainerWindow		Anuluj
 Attributes	ContainerWindow		Atrybuty
-Error deleting items	FSUtils		Błąd przy usuwaniu plików
 Cut	ContainerWindow		Wytnij
 Disks	Model		Dyski
 Create a Query template	FindPanel		Stwórz szablon Zapytania

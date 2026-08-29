@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3854472567
+1	esperanto	x-vnd.Haiku-libtracker	1971085382
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -125,7 +125,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Glitpunkta nombro
 Cancel	ContainerWindow		Nuligi
 Attributes	ContainerWindow		Atributoj
-Error deleting items	FSUtils		Eraris forigante elementojn
 Cut	ContainerWindow		Tondi
 Disks	Model		Diskoj
 Create a Query template	FindPanel		Krei serĉmendan ŝablonon

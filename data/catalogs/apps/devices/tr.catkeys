@@ -1,10 +1,12 @@
-1	turkish	x-vnd.Haiku-Devices	2752258547
+1	turkish	x-vnd.Haiku-Devices	3091506374
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
 USB bus	DevicesView		USB veri yolu
 Processor	Device		İşlemci
 Generate system information	DevicesView		Sistem bilgisi üret
+Disable driver	DevicesView		Sürücüyü devre dışı bırak
+Reboot needed	DevicesView		Yeniden başlatma gerekiyor
 Class info	DevicePCI		Sınıf bilgisi
 USB bus	Device		USB veri yolu
 Computer	DevicesView		Bilgisayar
@@ -13,10 +15,13 @@ ACPI thermal zone	DeviceACPI		ACPI termal bölgesi
 Mass storage controller	Device		Yığın depolama denetleyicisi
 Printer	DeviceSCSI		Yazıcı
 Connection	DevicesView		Bağlantı
+Failed to write to the settings file.	DevicesView		Ayarlar dosyasına yazılamadı.
+Enable driver	DevicesView		Sürücüyü etkinleştir
 Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
 Unknown device	DevicesView		Bilinmeyen aygıt
+ShutDown failed with error: 	DevicesView		Kapatma şu hataylı başarısız oldu: 
 ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
 Name	PropertyList		Ad
 Manufacturer	DeviceSCSI		Üretici
@@ -27,9 +32,11 @@ Satellite communications controller	Device		Uydu iletişimi denetleyicisi
 Device class	DeviceSCSI		Aygıt sınıfı
 Device	Device		Aygıt
 Input device controller	Device		Giriş aygıtı denetleyicisi
+OK	DevicesView		Tamam
 PCI bus	DevicesView		PCI veri yolu
 Changer	DeviceSCSI		Değiştirici
 Serial bus controller	Device		Seri veri yolu denetleyicisi
+Restart computer	DevicesView		Bilgisayarı yeniden başlat
 Refresh devices	DevicesView		Aygıtları yenile
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
@@ -56,17 +63,24 @@ Order by:	DevicesView		Sıralama:
 Intelligent controller	Device		Akıllı denetleyici
 ACPI processor namespace '%2'	DeviceACPI		ACPI işlemci ad alanı “%2”
 Multimedia controller	Device		Çoklu ortam denetleyici
+The driver path is not in a package volume: 	DevicesView		Sürücü yolu bir paket bölümünde değil: 
+none	Device		yok
+Blocked entry:\n	DevicesView		Engellenen girdi:\n
 Quit	DevicesView		Çık
+Disabling critical system drivers is not allowed.	DevicesView		Kritik sistem sürücülerinin devre dışı bırakılmasına izin verilmez.
+Driver disabled	DevicesView		Sürücü devre dışı
 ISA bus	Device		ISA veri yolu
 ISA bus	DevicesView		ISA veri yolu
 Basic information	PropertyList		Temel bilgiler
 Processor	DeviceSCSI		İşlemci
 Card reader	DeviceSCSI		Kart okuyucusu
+Disabling non-packaged drivers is not supported.	DevicesView		Paketlenmemiş sürücüleri devre dışı bırakma desteklenmiyor.
 Bridge	Device		Köprü
 ACPI button '%1'	DeviceACPI		ACPI düğmesi “%1”
 Attributes	PropertyList		Öznitelikler
 Worm	DeviceSCSI		Solucan
 Disk drive	DeviceSCSI		Disk sürücüsü
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Sürücü devre dışı bırakıldı. Değişikliğin etkili olması için yeniden başlatma gereklidir.\n\nYeniden başlatmanın ardından, sistem, sürücüsü olmadan aygıtı tanımlayamayacağı için bu aygıt artık aygıt listesinde görünmeyebilir.\n\nSürücüyü yeniden etkinleştirmek için Aygıtlar uygulamasında aygıtı bulun ve “Sürücüyü etkinleştir” seçeneğine tıklayın. Aygıt artık görünmüyorsa paket ayarları dosyasından ilgili engellenmiş girdiyi kaldırın:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Üretici
 Bridge	DeviceSCSI		Köprü
@@ -78,6 +92,7 @@ Docking station	Device		Takma istasyonu
 Array	DeviceSCSI		Diziliş
 Unclassified device	Device		Sınıflandırılmamış aygıt
 Manufacturer	DeviceACPI		Üretici
+Error	DevicesView		Hata
 ACPI controller	Device		ACPI denetleyicisi
 Network controller	Device		Ağ denetleyicisi
 Driver used	Device		Kullanılan sürücü

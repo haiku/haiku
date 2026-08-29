@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3033621663
+1	japanese	x-vnd.Haiku-libtracker	1150234478
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -139,7 +139,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		浮動小数点数
 Cancel	ContainerWindow		中止
 Attributes	ContainerWindow		属性
-Error deleting items	FSUtils		ファイル削除中にエラーが発生しました
 Cut	ContainerWindow		切り取り
 Disks	Model		ディスク
 Create a Query template	FindPanel		クエリテンプレートの作成

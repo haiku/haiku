@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2681445216
+1	russian	x-vnd.Haiku-libtracker	798058031
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -138,7 +138,6 @@ URL	Bookmark Query Columns		Cсылка (URL)
 Floating point number	AttributesView		Число с плавающей точкой
 Cancel	ContainerWindow		Отменить
 Attributes	ContainerWindow		Атрибуты
-Error deleting items	FSUtils		Ошибка при удалении файлов
 Cut	ContainerWindow		Вырезать
 Disks	Model		Диски
 Create a Query template	FindPanel		Создать шаблон запроса

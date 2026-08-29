@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3682179492
+1	danish	x-vnd.Haiku-libtracker	1798792307
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -129,7 +129,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Flydende kommatal
 Cancel	ContainerWindow		Afbryd
 Attributes	ContainerWindow		Attributter
-Error deleting items	FSUtils		Fejl ved sletning af elementer
 Cut	ContainerWindow		Klip
 Disks	Model		Diske
 Create a Query template	FindPanel		Opret en forespørgselsskabelon

@@ -1,10 +1,12 @@
-1	japanese	x-vnd.Haiku-Devices	2752258547
+1	japanese	x-vnd.Haiku-Devices	3091506374
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Devices	System name		デバイス
 USB bus	DevicesView		USB バス
 Processor	Device		プロセッサ
 Generate system information	DevicesView		システム情報の作成
+Disable driver	DevicesView		ドライバーを無効化
+Reboot needed	DevicesView		再起動が必要です
 Class info	DevicePCI		クラス情報
 USB bus	Device		USB バス
 Computer	DevicesView		コンピューター
@@ -13,10 +15,13 @@ ACPI thermal zone	DeviceACPI		ACPI サーマルゾーン
 Mass storage controller	Device		大容量記憶域コントローラー
 Printer	DeviceSCSI		プリンター
 Connection	DevicesView		接続順
+Failed to write to the settings file.	DevicesView		設定ファイルの書き込みに失敗しました。
+Enable driver	DevicesView		ドライバーの有効化
 Manufacturer	Device		製造元
 Scanner	DeviceSCSI		スキャナー
 Memory controller	Device		メモリコントローラー
 Unknown device	DevicesView		不明なデバイス
+ShutDown failed with error: 	DevicesView		次のエラーによりシャットダウンに失敗しました: 
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
@@ -27,9 +32,11 @@ Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス
 Device	Device		デバイス
 Input device controller	Device		入力デバイスコントローラー
+OK	DevicesView		OK
 PCI bus	DevicesView		PCI バス
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
+Restart computer	DevicesView		コンピューターを再起動する
 Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
@@ -56,17 +63,24 @@ Order by:	DevicesView		並び順:
 Intelligent controller	Device		インテリジェントコントローラー
 ACPI processor namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
 Multimedia controller	Device		マルチメディアコントローラー
+The driver path is not in a package volume: 	DevicesView		ドライバーパスが次のパッケージボリューム内にありません: 
+none	Device		無し
+Blocked entry:\n	DevicesView		ブロックされた項目:\n
 Quit	DevicesView		終了
+Disabling critical system drivers is not allowed.	DevicesView		重要なシステムドライバーは無効化できません。
+Driver disabled	DevicesView		無効化されたドライバー
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
 Basic information	PropertyList		基本情報
 Processor	DeviceSCSI		プロセッサ
 Card reader	DeviceSCSI		カードリーダー
+Disabling non-packaged drivers is not supported.	DevicesView		パッケージ化されていないドライバーの無効化はサポートされていません。
 Bridge	Device		ブリッジ
 ACPI button '%1'	DeviceACPI		ACPI ボタン '%1'
 Attributes	PropertyList		属性
 Worm	DeviceSCSI		Worm
 Disk drive	DeviceSCSI		ディスクドライブ
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		ドライバーは無効化されました。変更を有効にするには再起動が必要となります。\n\n再起動後、ドライバーが無いのでシステムが認識できないため、このデバイスはデバイスリストに表示されません。\n\nドライバーを最有効化するには、デバイスアプリケーション内でデバイスを見つけて、 \"ドライバーの有効化\"をクリックします。デバイスがすでに見えない場合は、次のパッケージ設定ファイルから対応するブロックされた項目を削除してください:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元
 Bridge	DeviceSCSI		ブリッジ
@@ -78,6 +92,7 @@ Docking station	Device		ドッキングステーション
 Array	DeviceSCSI		アレイ
 Unclassified device	Device		未分類のデバイス
 Manufacturer	DeviceACPI		製造元
+Error	DevicesView		エラー
 ACPI controller	Device		ACPI コントローラー
 Network controller	Device		ネットワークコントローラー
 Driver used	Device		使用ドライバー

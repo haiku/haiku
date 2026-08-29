@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2931446599
+1	english	x-vnd.Haiku-libtracker	1048059414
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		浮点数
 Cancel	ContainerWindow		取消
 Attributes	ContainerWindow		属性
-Error deleting items	FSUtils		删除项目错误
 Cut	ContainerWindow		剪切
 Disks	Model		磁盘
 Create a Query template	FindPanel		创建查询模板

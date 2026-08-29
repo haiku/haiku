@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3881286823
+1	romanian	x-vnd.Haiku-libtracker	1997899638
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Număr cu virgulă mobilă
 Cancel	ContainerWindow		Anulează
 Attributes	ContainerWindow		Atribute
-Error deleting items	FSUtils		Eroare la ștergerea elementelor
 Cut	ContainerWindow		Taie
 Disks	Model		Discuri
 Create a Query template	FindPanel		Creează un șablon de interogare

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	83366860
+1	catalan; valencian	x-vnd.Haiku-Keymap	2616657510
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -41,13 +41,11 @@ Belarusian (Mac)	KeymapNames		Bielorús (Mac)
 Croatian	KeymapNames		Croat
 PAGE ↑	Keyboard Layout View		PÀGINA ↑
 Set modifier keys	Modifier keys window		Configura les tecles modificadores
-Apple Aluminium International	KeyboardLayoutNames		Apple Alumini Internacional
 Right Command	Keyboard Layout View		Botó d'ordre de la dreta
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PÀG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
 Spanish	KeymapNames		Espanyol
-Apple Aluminum	KeyboardLayoutNames		Apple d'alumini
 HOME	Keyboard Layout View		INICI
 COMMAND	Keyboard Layout View		ORDRE
 Ukrainian (Mac)	KeymapNames		Ucraïnès (Mac)
@@ -59,7 +57,6 @@ Acute trigger	Keymap window		Accent agut
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Italian	KeymapNames		Italià
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Internacional
-Apple Aluminum (US)	KeyboardLayoutNames		Apple d'alumini (US)
 French (NF Z71-300)	KeymapNames		Francès (NF Z71-300)
 Modifier keys	Modifier keys window		Tecles modificadores
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
@@ -127,7 +124,6 @@ Quit	Keymap window		Surt
 Polish (Typewriter)	KeymapNames		Polonès (màquina d'escriure)
 French (Mac)	KeymapNames		Francès (Mac)
 User:	Keymap window		Usuari:
-Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended Internacional
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tecla Alt/Opció
 SHIFT	Keyboard Layout View		MAJÚSCULES
 Estonian	KeymapNames		Estonià
@@ -146,7 +142,6 @@ Defaults	Keymap window		Valors predeterminats
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistema:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Internacional
-Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Canvia les tecles de drecera
 NUM LOCK	Keyboard Layout View		BLOCATGE NÚM.
 MENU	Keyboard Layout View		MENÚ

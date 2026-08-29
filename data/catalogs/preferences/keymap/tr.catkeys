@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	83366860
+1	turkish	x-vnd.Haiku-Keymap	2616657510
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -41,13 +41,11 @@ Belarusian (Mac)	KeymapNames		Beyaz Rusça (Mac)
 Croatian	KeymapNames		Hırvatça
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Değiştiren düğmeleri ayarla
-Apple Aluminium International	KeyboardLayoutNames		Apple Alüminyum Uluslararası
 Right Command	Keyboard Layout View		Sağ Komut
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Komut düğmesi
 PG ↓	Keyboard Layout View	Very short for 'page down'	SF ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
 Spanish	KeymapNames		İspanyolca
-Apple Aluminum	KeyboardLayoutNames		Apple Alüminyum
 HOME	Keyboard Layout View		BAŞ
 COMMAND	Keyboard Layout View		KOMUT
 Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
@@ -59,7 +57,6 @@ Acute trigger	Keymap window		Aksan tetikleyicisi
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Uluslararası
 Italian	KeymapNames		İtalyanca
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Uluslararası
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Alüminyum (US)
 French (NF Z71-300)	KeymapNames		Fransızca (NF Z71-300)
 Modifier keys	Modifier keys window		Değiştiren düğmeler
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Uluslararası
@@ -127,7 +124,6 @@ Quit	Keymap window		Çık
 Polish (Typewriter)	KeymapNames		Lehçe (Daktilo)
 French (Mac)	KeymapNames		Fransızca (Mac)
 User:	Keymap window		Kullanıcı:
-Apple Aluminium Extended International	KeyboardLayoutNames		Apple Alüminyum Genişletilmiş Uluslararası
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Seçenek düğmesi
 SHIFT	Keyboard Layout View		ÜST KARAKTER
 Estonian	KeymapNames		Estonca
@@ -146,7 +142,6 @@ Defaults	Keymap window		Saptanmışlar
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Uluslararası
-Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Alüminyum Genişletilmiş (US)
 Switch shortcut keys	Keymap window		Kestirme düğmelerini değiştir
 NUM LOCK	Keyboard Layout View		SAYI KİLİDİ
 MENU	Keyboard Layout View		MENÜ

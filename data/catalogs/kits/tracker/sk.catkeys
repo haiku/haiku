@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3263107732
+1	slovak	x-vnd.Haiku-libtracker	1379720547
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Open with…	ContainerWindow		Otvoriť pomocou…
@@ -106,7 +106,6 @@ Increase size	ContainerWindow		Veľkosť zväčšenia
 URL	Bookmark Query Columns		URL
 Cancel	ContainerWindow		Zrušiť
 Attributes	ContainerWindow		Atribúty
-Error deleting items	FSUtils		Chyba pri mazaní položiek
 Cut	ContainerWindow		Vystrihnúť
 Disks	Model		Disky
 Create a Query template	FindPanel		Vytvoriť šablónu Požiadavky

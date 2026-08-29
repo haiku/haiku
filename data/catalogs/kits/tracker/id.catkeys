@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	1825486754
+1	indonesian	x-vnd.Haiku-libtracker	4237066865
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Angka floating point
 Cancel	ContainerWindow		Batal
 Attributes	ContainerWindow		Atribut
-Error deleting items	FSUtils		Ada galat dalam menghapus item
 Cut	ContainerWindow		Potong
 Disks	Model		Diska
 Create a Query template	FindPanel		Membuat template pencarian

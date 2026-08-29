@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3367089065
+1	lithuanian	x-vnd.Haiku-libtracker	1483701880
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Open with…	ContainerWindow		Atverti naudojant…
@@ -91,7 +91,6 @@ Increase size	ContainerWindow		Padidinti
 \nShould this be fixed?	FSUtils		\nAr pašalinti šį nesklandumą?
 Cancel	ContainerWindow		Atsisakyti
 Attributes	ContainerWindow		Požymiai
-Error deleting items	FSUtils		Klaida šalinant objektus
 Cut	ContainerWindow		Iškirpti
 Disks	Model		Tomai
 Create a Query template	FindPanel		Sukurti užklausos šabloną

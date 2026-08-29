@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Keymap	1712484807
+1	lithuanian	x-vnd.Haiku-Keymap	4245775457
 Key	Modifier keys window	As in a computer keyboard key	Klavišas
 Japanese	KeymapNames		Japonų
 US	KeymapNames		JAV
@@ -38,12 +38,10 @@ Belarusian (Mac)	KeymapNames		Baltarusių („Mac“)
 Croatian	KeymapNames		Kroatų
 PAGE ↑	Keyboard Layout View		PSL↑
 Set modifier keys	Modifier keys window		Nustatyti valdymo klavišus
-Apple Aluminium International	KeyboardLayoutNames		„Apple Aluminium“ tarptautinė
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd klavišas
 PG ↓	Keyboard Layout View	Very short for 'page down'	PSL↓
 ThinkPad X1 (US)	KeyboardLayoutNames		„ThinkPad X1“ (JAV)
 Spanish	KeymapNames		Ispanų
-Apple Aluminum	KeyboardLayoutNames		„Apple Aluminium“
 HOME	Keyboard Layout View		PRAD
 COMMAND	Keyboard Layout View		KOMANDA
 Ukrainian (Mac)	KeymapNames		Ukrainiečių („Mac“)
@@ -54,7 +52,6 @@ Acute trigger	Keymap window		Dešininis kirtis (akūtas)
 ThinkPad T400s International	KeyboardLayoutNames		„ThinkPad T400s“ tarptautinė
 Italian	KeymapNames		Italų
 Kinesis Ergo Elan International	KeyboardLayoutNames		„Kinesis Ergo Elan“ tarptautinė
-Apple Aluminum (US)	KeyboardLayoutNames		„Apple Aluminum“ (JAV)
 French (NF Z71-300)	KeymapNames		Prancūzų (NF Z71-300)
 Modifier keys	Modifier keys window		Valdymo klavišai
 ThinkPad X1 International	KeyboardLayoutNames		„ThinkPad X1“ tarptautinė
@@ -118,7 +115,6 @@ Quit	Keymap window		Baigti darbą
 Polish (Typewriter)	KeymapNames		Lenkų (rašomosios mašinėlės)
 French (Mac)	KeymapNames		Prancūzų („Mac“)
 User:	Keymap window		Naudotojo išdėstymai:
-Apple Aluminium Extended International	KeyboardLayoutNames		„Apple Aluminium“ viso dydžio tarptautinė
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt klavišas
 SHIFT	Keyboard Layout View		LYG2
 Estonian	KeymapNames		Estų
@@ -136,7 +132,6 @@ Defaults	Keymap window		Numatytai
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistemos išdėstymai:
 ThinkPad International	KeyboardLayoutNames		„ThinkPad“ tarptautinė
-Apple Aluminum Extended (US)	KeyboardLayoutNames		„Apple Aluminum“ viso dydžio (JAV)
 Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
 NUM LOCK	Keyboard Layout View		SKAITM
 MENU	Keyboard Layout View		MENIU

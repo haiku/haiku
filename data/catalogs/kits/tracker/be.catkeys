@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	138565383
+1	belarusian	x-vnd.Haiku-libtracker	2550145494
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Open with…	ContainerWindow		Адкрыць з дапамогай…
@@ -91,7 +91,6 @@ Increase size	ContainerWindow		Павялічыць памер
 \nShould this be fixed?	FSUtils		\nЦі трэба гэта паправіць?
 Cancel	ContainerWindow		Адмена
 Attributes	ContainerWindow		Атрыбуты
-Error deleting items	FSUtils		Памылка пры выдаленні элементаў
 Cut	ContainerWindow		Выразаць
 Disks	Model		Дыскі
 Create a Query template	FindPanel		Стварыць шаблон Запыту

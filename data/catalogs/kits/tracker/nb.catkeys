@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	3881286823
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1997899638
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Floating point-nummer
 Cancel	ContainerWindow		Avbryt
 Attributes	ContainerWindow		Attributter
-Error deleting items	FSUtils		Feil ved sletting av elementer
 Cut	ContainerWindow		Klipp ut
 Disks	Model		Disker
 Create a Query template	FindPanel		Lag en søkemal

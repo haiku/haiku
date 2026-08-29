@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3881286823
+1	finnish	x-vnd.Haiku-libtracker	1997899638
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -137,7 +137,6 @@ URL	Bookmark Query Columns		Verkko-osoite
 Floating point number	AttributesView		Liukulukunumero
 Cancel	ContainerWindow		Peru
 Attributes	ContainerWindow		Attribuutit
-Error deleting items	FSUtils		Virhe poistettaessa kohteita
 Cut	ContainerWindow		Leikkaa
 Disks	Model		Levyt
 Create a Query template	FindPanel		Luo kyselymallinne

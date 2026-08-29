@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3033621663
+1	hungarian	x-vnd.Haiku-libtracker	1150234478
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -139,7 +139,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Lebegőpontos szám
 Cancel	ContainerWindow		Mégse
 Attributes	ContainerWindow		Jellemzők
-Error deleting items	FSUtils		Hiba történt az elemek törlése közben
 Cut	ContainerWindow		Kivágás
 Disks	Model		Lemezek
 Create a Query template	FindPanel		Keresési sablon készítése

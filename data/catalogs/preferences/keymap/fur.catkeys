@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Keymap	83366860
+1	friulian	x-vnd.Haiku-Keymap	2616657510
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
@@ -41,13 +41,11 @@ Belarusian (Mac)	KeymapNames		Bielorùs (Mac)
 Croatian	KeymapNames		Cravuat
 PAGE ↑	Keyboard Layout View		PAGJINE ↑
 Set modifier keys	Modifier keys window		Stabilìs i tascj modificadôrs
-Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internazionâl
 Right Command	Keyboard Layout View		Comant di diestre
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tast Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PAGJ
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
 Spanish	KeymapNames		Spagnûl
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 HOME	Keyboard Layout View		INIZI
 COMMAND	Keyboard Layout View		COMANT
 Ukrainian (Mac)	KeymapNames		Ucrain (Mac)
@@ -59,7 +57,6 @@ Acute trigger	Keymap window		Acent acût
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internazionâl
 Italian	KeymapNames		Talian
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Internazionâl
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
 Modifier keys	Modifier keys window		Tascj modificadôrs
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internazionâl
@@ -127,7 +124,6 @@ Quit	Keymap window		Jes
 Polish (Typewriter)	KeymapNames		Polac (Machine di scrivi)
 French (Mac)	KeymapNames		Francês (Mac)
 User:	Keymap window		Utent:
-Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Estese Internazionâl
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Tast Alt/Opt
 SHIFT	Keyboard Layout View		MAIUSC
 Estonian	KeymapNames		Eston
@@ -146,7 +142,6 @@ Defaults	Keymap window		Predefinîts
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sisteme:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Internazionâl
-Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Estese (US)
 Switch shortcut keys	Keymap window		Scambie tascj di scurte
 NUM LOCK	Keyboard Layout View		BLOC NUM
 MENU	Keyboard Layout View		MENÙ

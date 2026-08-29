@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2681445216
+1	ukrainian	x-vnd.Haiku-libtracker	798058031
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -138,7 +138,6 @@ URL	Bookmark Query Columns		URL
 Floating point number	AttributesView		Число з рухомою комою
 Cancel	ContainerWindow		Скасувати
 Attributes	ContainerWindow		Атрибути
-Error deleting items	FSUtils		Помилка при видаленні елементів
 Cut	ContainerWindow		Вирізати
 Disks	Model		Диски
 Create a Query template	FindPanel		Створення шаблону запиту
