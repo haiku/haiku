@@ -1087,6 +1087,7 @@ AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 		_AutoStop();
 
 	fCore->RemoveOutput();
+	fCore->SetTimingInfo(NULL, 0);
 
 	// destroy buffer group
 	delete fBufferGroup;
@@ -1094,6 +1095,7 @@ AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 	fCore->SetOutputBufferGroup(0);
 
 	fCore->Unlock();
+	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS);
 	UpdateParameterWeb();
 }
 
