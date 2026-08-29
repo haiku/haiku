@@ -981,7 +981,7 @@ net_stack_module_info gNetStackModule = {
 
 	is_syscall,
 	is_restarted_syscall,
-	store_syscall_restart_timeout,
+	set_syscall_restart_timeout,
 	restore_syscall_restart_timeout,
 
 	create_ancillary_data_container,

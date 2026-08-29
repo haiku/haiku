@@ -332,16 +332,6 @@ static const int kTimestampFactor = 1000;
 	// conversion factor between usec system time and msec tcp time
 
 
-static inline bigtime_t
-absolute_timeout(bigtime_t timeout)
-{
-	if (timeout == 0 || timeout == B_INFINITE_TIMEOUT)
-		return timeout;
-
-	return timeout + system_time();
-}
-
-
 static inline status_t
 posix_error(status_t error)
 {
@@ -566,7 +556,7 @@ TCPEndpoint::Close()
 	if ((socket->options & SO_LINGER) != 0) {
 		TRACE("Close(): Lingering for %i secs", socket->linger);
 
-		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
+		bigtime_t maximum = system_time() + (socket->linger * 1000000LL);
 
 		while (fSendQueue.Used() > 0) {
 			status = _WaitForCondition(fSendCondition, locker, maximum);
@@ -681,8 +671,7 @@ TCPEndpoint::Connect(const sockaddr* address)
 		return EINPROGRESS;
 	}
 
-	bigtime_t absoluteTimeout = absolute_timeout(timeout);
-	gStackModule->store_syscall_restart_timeout(absoluteTimeout);
+	bigtime_t absoluteTimeout = gStackModule->set_syscall_restart_timeout(timeout);
 
 	status = _WaitForEstablished(locker, absoluteTimeout);
 	TRACE("  Connect(): Connection complete: %s (timeout was %" B_PRIdBIGTIME
@@ -700,11 +689,11 @@ TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 	T(APICall(this, "accept"));
 
 	status_t status;
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	bigtime_t timeout;
 	if (gStackModule->is_restarted_syscall())
 		timeout = gStackModule->restore_syscall_restart_timeout();
 	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+		timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 
 	do {
 		locker.Unlock();
@@ -840,11 +829,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
-		timeout = absolute_timeout(socket->send.timeout);
 		if (gStackModule->is_restarted_syscall())
 			timeout = gStackModule->restore_syscall_restart_timeout();
 		else
-			gStackModule->store_syscall_restart_timeout(timeout);
+			timeout = gStackModule->set_syscall_restart_timeout(socket->send.timeout);
 	}
 
 	while (left > 0) {
@@ -962,11 +950,10 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
-		timeout = absolute_timeout(socket->receive.timeout);
 		if (gStackModule->is_restarted_syscall())
 			timeout = gStackModule->restore_syscall_restart_timeout();
 		else
-			gStackModule->store_syscall_restart_timeout(timeout);
+			timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 	}
 
 	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {

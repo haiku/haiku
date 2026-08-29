@@ -28,16 +28,6 @@ static l2cap_qos sDefaultQOS = {
 };
 
 
-static inline bigtime_t
-absolute_timeout(bigtime_t timeout)
-{
-	if (timeout == 0 || timeout == B_INFINITE_TIMEOUT)
-		return timeout;
-
-	return timeout + system_time();
-}
-
-
 static inline status_t
 posix_error(status_t error)
 {
@@ -143,11 +133,11 @@ L2capEndpoint::Shutdown()
 	}
 
 	status_t status;
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	bigtime_t timeout;
 	if (gStackModule->is_restarted_syscall())
 		timeout = gStackModule->restore_syscall_restart_timeout();
 	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+		timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 
 	// FIXME: If we are currently waiting for a connection or configuration,
 	// we need to wait for that command to return (and free its ident on timeout.)
@@ -284,7 +274,7 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 	MutexLocker _(fLock);
 
 	status_t status;
-	bigtime_t timeout = absolute_timeout(socket->send.timeout);
+	bigtime_t timeout;
 	if (gStackModule->is_restarted_syscall()) {
 		timeout = gStackModule->restore_syscall_restart_timeout();
 
@@ -295,7 +285,7 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 		}
 		return (fState == OPEN) ? B_OK : ECONNREFUSED;
 	} else {
-		gStackModule->store_syscall_restart_timeout(timeout);
+		timeout = gStackModule->set_syscall_restart_timeout(socket->send.timeout);
 	}
 
 	if (fState == LISTEN)
@@ -358,11 +348,11 @@ L2capEndpoint::Accept(net_socket** _acceptedSocket)
 	MutexLocker locker(fLock);
 
 	status_t status;
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	bigtime_t timeout;
 	if (gStackModule->is_restarted_syscall())
 		timeout = gStackModule->restore_syscall_restart_timeout();
 	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+		timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 
 	do {
 		locker.Unlock();
@@ -394,11 +384,10 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
-		timeout = absolute_timeout(socket->receive.timeout);
 		if (gStackModule->is_restarted_syscall())
 			timeout = gStackModule->restore_syscall_restart_timeout();
 		else
-			gStackModule->store_syscall_restart_timeout(timeout);
+			timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 	}
 
 	if (fState == CLOSED)

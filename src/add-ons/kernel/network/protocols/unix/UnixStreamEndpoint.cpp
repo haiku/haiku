@@ -348,11 +348,11 @@ UnixStreamEndpoint::Accept(net_socket** _acceptedSocket)
 	TRACE("[%" B_PRId32 "] %p->UnixStreamEndpoint::Accept()\n", find_thread(NULL),
 		this);
 
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	bigtime_t timeout;
 	if (gStackModule->is_restarted_syscall())
 		timeout = gStackModule->restore_syscall_restart_timeout();
 	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+		timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 
 	UnixStreamEndpointLocker locker(this);
 
@@ -393,11 +393,10 @@ UnixStreamEndpoint::Send(const iovec* vecs, size_t vecCount,
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
-		timeout = absolute_timeout(socket->send.timeout);
 		if (gStackModule->is_restarted_syscall())
 			timeout = gStackModule->restore_syscall_restart_timeout();
 		else
-			gStackModule->store_syscall_restart_timeout(timeout);
+			timeout = gStackModule->set_syscall_restart_timeout(socket->send.timeout);
 	}
 
 	UnixStreamEndpointLocker locker(this);
@@ -488,11 +487,10 @@ UnixStreamEndpoint::Receive(const iovec* vecs, size_t vecCount,
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
-		timeout = absolute_timeout(socket->receive.timeout);
 		if (gStackModule->is_restarted_syscall())
 			timeout = gStackModule->restore_syscall_restart_timeout();
 		else
-			gStackModule->store_syscall_restart_timeout(timeout);
+			timeout = gStackModule->set_syscall_restart_timeout(socket->receive.timeout);
 	}
 
 	UnixStreamEndpointLocker locker(this);

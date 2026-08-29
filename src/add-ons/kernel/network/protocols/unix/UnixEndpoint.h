@@ -92,15 +92,4 @@ private:
 };
 
 
-static inline bigtime_t
-absolute_timeout(bigtime_t timeout)
-{
-	if (timeout == 0 || timeout == B_INFINITE_TIMEOUT)
-		return timeout;
-
-// TODO: Make overflow safe!
-	return timeout + system_time();
-}
-
-
 #endif	// UNIX_ENDPOINT_H

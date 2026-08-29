@@ -165,7 +165,7 @@ struct net_stack_module_info {
 	// syscall restart
 	bool		(*is_syscall)(void);
 	bool		(*is_restarted_syscall)(void);
-	void		(*store_syscall_restart_timeout)(bigtime_t timeout);
+	bigtime_t	(*set_syscall_restart_timeout)(bigtime_t relativeTimeout);
 	bigtime_t	(*restore_syscall_restart_timeout)(void);
 
 	// ancillary data
