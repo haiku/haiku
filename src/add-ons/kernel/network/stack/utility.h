@@ -55,7 +55,7 @@ status_t	notify_socket(net_socket* socket, uint8 event, int32 value);
 status_t	init_fifo(net_fifo* fifo, const char *name, size_t maxBytes);
 void		uninit_fifo(net_fifo* fifo);
 status_t	fifo_enqueue_buffer(net_fifo* fifo, struct net_buffer* buffer);
-ssize_t		fifo_dequeue_buffer(net_fifo* fifo, uint32 flags, bigtime_t timeout,
+ssize_t		fifo_dequeue_buffer(net_fifo* fifo, uint32 flags, bigtime_t absoluteTimeout,
 				struct net_buffer** _buffer);
 status_t	clear_fifo(net_fifo* fifo);
 status_t	fifo_socket_enqueue_buffer(net_fifo* fifo, net_socket* socket,

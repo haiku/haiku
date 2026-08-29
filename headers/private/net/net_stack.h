@@ -148,7 +148,7 @@ struct net_stack_module_info {
 	void		(*uninit_fifo)(net_fifo* fifo);
 	status_t	(*fifo_enqueue_buffer)(net_fifo* fifo, net_buffer* buffer);
 	ssize_t		(*fifo_dequeue_buffer)(net_fifo* fifo, uint32 flags,
-					bigtime_t timeout, net_buffer** _buffer);
+					bigtime_t absoluteTimeout, net_buffer** _buffer);
 	status_t	(*clear_fifo)(net_fifo* fifo);
 	status_t	(*fifo_socket_enqueue_buffer)(net_fifo* fifo,
 					net_socket* socket, uint8 event, net_buffer* buffer);

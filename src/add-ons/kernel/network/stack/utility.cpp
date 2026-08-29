@@ -264,7 +264,7 @@ fifo_dequeue_buffer(net_fifo* fifo, uint32 flags, bigtime_t timeout,
 
 		// we need to wait until a new buffer becomes available
 		status = acquire_sem_etc(fifo->notify, 1,
-			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, timeout);
+			B_CAN_INTERRUPT | B_ABSOLUTE_TIMEOUT, timeout);
 		if (status < B_OK)
 			return status;
 

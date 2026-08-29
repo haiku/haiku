@@ -225,7 +225,7 @@ ppp_receive_data(net_device *_device, net_buffer **_buffer)
 		return B_FILE_ERROR;
 
 	TRACE("%s: trying fifo_dequeue_buffer\n", __func__);
-	status_t status = sStackModule->fifo_dequeue_buffer(&(device->ppp_fifo), 0, 10000000, _buffer);
+	status_t status = sStackModule->fifo_dequeue_buffer(&(device->ppp_fifo), 0, system_time() + 10000000, _buffer);
 
 	if (status < B_OK) {
 		TRACE("sorry! can not fifo_dequeue_buffer!\n");
