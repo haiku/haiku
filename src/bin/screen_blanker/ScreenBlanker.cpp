@@ -112,8 +112,13 @@ ScreenBlanker::_TurnOnScreen()
 void
 ScreenBlanker::_SetDPMSMode(uint32 mode)
 {
+	// called with B_DPMS_OFF, B_DPMS_SUSPEND or B_DPSM_STAND_BY
+	// depending on screen DPMS capabilities
 	BScreen screen;
-	screen.SetDPMS(mode);
+	if (screen.SetDPMS(mode) != B_OK) {
+		fprintf(stderr, "Failed to set DPMS mode %u: keep running screen saver\n", mode);
+		return;
+	}
 
 	if (fWindow->Lock()) {
 		fSaverRunner->Suspend();

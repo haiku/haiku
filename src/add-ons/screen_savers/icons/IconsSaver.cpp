@@ -18,6 +18,7 @@
 #include <Catalog.h>
 #include <DefaultSettingsView.h>
 #include <MimeType.h>
+#include <Screen.h>
 
 #include "IconDisplay.h"
 #include "VectorIcon.h"
@@ -37,9 +38,6 @@ static const int32 kMaxIconWidthPercentage = 20;
 	// same here
 static const int32 kMinIconCount = 20;
 static const int32 kMaxIconCount = 384;
-
-
-const rgb_color kBackgroundColor = ui_color(B_DESKTOP_COLOR);
 
 
 BScreenSaver* instantiate_screen_saver(BMessage* msg, image_id image)
@@ -90,8 +88,10 @@ IconsSaver::StartSaver(BView* view, bool /*preview*/)
 	if (fBackView == NULL)
 		return B_NO_MEMORY;
 
-	fBackView->SetViewColor(kBackgroundColor);
-	fBackView->SetHighColor(kBackgroundColor);
+	BScreen screen(view->Window());
+	rgb_color backgroundColor = screen.DesktopColor(current_workspace());
+	fBackView->SetViewColor(backgroundColor);
+	fBackView->SetHighColor(backgroundColor);
 
 	fBackBitmap->AddChild(fBackView);
 	if (fBackBitmap->Lock()) {
