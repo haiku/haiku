@@ -460,8 +460,13 @@ BTestShell::PrintResults() {
 				     iFailure != fResultsCollector.failures().end();
 				     ++iFailure)
 				{
-					if (!(*iFailure)->isError())
+					if (!(*iFailure)->isError()) {
 						cout << "    " << (*iFailure)->toString() << endl;
+						if ((*iFailure)->sourceLine().isValid()) {
+							cout << "        in " << (*iFailure)->sourceLine().fileName()
+								<< ":" << (*iFailure)->sourceLine().lineNumber() << endl;
+						}
+					}
 				}
 			}
 			if (fResultsCollector.testErrors() > 0) {
@@ -470,8 +475,13 @@ BTestShell::PrintResults() {
 				     iFailure != fResultsCollector.failures().end();
 				     ++iFailure)
 				{
-					if ((*iFailure)->isError())
+					if ((*iFailure)->isError()) {
 						cout << "    " << (*iFailure)->toString() << endl;
+						if ((*iFailure)->sourceLine().isValid()) {
+							cout << "        in " << (*iFailure)->sourceLine().fileName()
+								<< ":" << (*iFailure)->sourceLine().lineNumber() << endl;
+						}
+					}
 				}
 			}
 
