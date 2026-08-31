@@ -60,7 +60,6 @@
 #include <sys/cdefs.h>
 #include <Drivers.h>
 #include <interrupts.h>
-#include <machine/specialreg.h>
 #include <kernel/lock.h>
 #include <SupportDefs.h>
 #include <stdlib.h>
@@ -285,6 +284,8 @@ typedef struct globaldata	os_cpu_t;
 #define os_curcpu_gdt()		mdcpu->gd_gdt
 #define os_curcpu_idt()		r_idt_arr[mycpuid].rd_base
 #elif defined(__HAIKU__)
+#define OS_MAXCPUS		haiku_smp_get_num_cpus()
+
 /*
  * On NetBSD/DragonFlyBSD each CPU has a unique structure. NVMM
  * uses the unique pointers to those structures as a way to check
@@ -399,7 +400,7 @@ void		os_vmobj_rel(os_vmobj_t *);
 
 int		os_vmobj_map(os_vmmap_t *, vaddr_t *, vsize_t, os_vmobj_t *,
 		    voff_t, bool, bool, bool, int, int);
-void		os_vmobj_unmap(os_vmmap_t *map, vaddr_t, vaddr_t, bool);
+void		os_vmobj_unmap(os_vmmap_t *map, vaddr_t, vaddr_t);
 
 void *		os_pagemem_zalloc(size_t);
 void		os_pagemem_free(void *, size_t);
@@ -411,6 +412,8 @@ void		os_pa_free(paddr_t);
 
 int		os_contigpa_zalloc(paddr_t *, vaddr_t *, size_t);
 void		os_contigpa_free(paddr_t, vaddr_t, size_t);
+
+time_t		os_time(void);
 
 #ifndef __HAIKU__
 static inline bool

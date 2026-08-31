@@ -7,17 +7,14 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs nvmm driver include ] : true ;
 
 UsePrivateKernelHeaders ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) h_io_assist ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) h_mem_assist ] ;
-
 SimpleTest libnvmm_io_assist :
 	h_io_assist.c
 	h_io_assist_asm.S
-	: libnvmm.so
+	: libnvmm.so libbsd.so
 ;
 
 SimpleTest libnvmm_mem_assist :
 	h_mem_assist.c
 	h_mem_assist_asm.S
-	: libnvmm.so
+	: libnvmm.so libbsd.so
 ;

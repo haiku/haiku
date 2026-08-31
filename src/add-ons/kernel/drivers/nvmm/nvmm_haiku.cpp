@@ -12,7 +12,7 @@ extern "C" {
 #include "nvmm.h"
 #include "nvmm_internal.h"
 #include "nvmm_os.h"
-#include "x86/nvmm_x86.h"
+#include "x86/nvmm_x86_internal.h"
 }
 
 #include <drivers/KernelExport.h>
@@ -36,6 +36,13 @@ extern "C" {
 #include <paging/nested/X86VMTranslationMapRVI.h>
 
 
+extern "C" time_t
+os_time()
+{
+	return time(NULL);
+}
+
+
 extern "C" void
 x86_get_cpuid2(uint32_t eax, uint32_t ecx, cpuid_desc_t *descriptors)
 {
@@ -49,13 +56,6 @@ x86_get_cpuid2(uint32_t eax, uint32_t ecx, cpuid_desc_t *descriptors)
 	descriptors->ebx = info.regs.ebx;
 	descriptors->ecx = info.regs.ecx;
 	descriptors->edx = info.regs.edx;
-}
-
-
-extern "C" void
-x86_get_cpuid(uint32_t eax, cpuid_desc_t *descriptors)
-{
-	x86_get_cpuid2(eax, 0, descriptors);
 }
 
 
@@ -240,7 +240,7 @@ os_mtx_lock(os_mtx_t *lock)
 
 
 extern "C" void
-x86_curthread_restore_dbregs(uint64_t *drs)
+x86_curthread_restore_dbregs()
 {
 	// TODO: If necessary, restore kernel debug registers from arch_team_debug_info
 }
@@ -615,8 +615,7 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 
 //! the range [start, end-1] will be unmapped
 extern "C" void
-os_vmobj_unmap(os_vmmap_t *map, vaddr_t start, vaddr_t end,
-	bool wired __unused)
+os_vmobj_unmap(os_vmmap_t *map, vaddr_t start, vaddr_t end)
 {
 	VMAddressSpace* addressSpace = address_space_for(map);
 	addressSpace->WriteLock();

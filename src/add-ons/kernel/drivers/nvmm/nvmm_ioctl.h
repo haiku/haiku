@@ -87,11 +87,6 @@ struct nvmm_ioc_vcpu_getstate {
 	nvmm_cpuid_t cpuid;
 };
 
-struct nvmm_ioc_vcpu_inject {
-	nvmm_machid_t machid;
-	nvmm_cpuid_t cpuid;
-};
-
 struct nvmm_ioc_vcpu_run {
 	/* input */
 	nvmm_machid_t machid;
@@ -155,7 +150,7 @@ struct nvmm_ioc_ctl {
 #define NVMM_IOC_VCPU_CONFIGURE		_IOW ('N',  6, struct nvmm_ioc_vcpu_configure)
 #define NVMM_IOC_VCPU_SETSTATE		_IOW ('N',  7, struct nvmm_ioc_vcpu_setstate)
 #define NVMM_IOC_VCPU_GETSTATE		_IOW ('N',  8, struct nvmm_ioc_vcpu_getstate)
-#define NVMM_IOC_VCPU_INJECT		_IOW ('N',  9, struct nvmm_ioc_vcpu_inject)
+					/* 9: was NVMM_IOC_VCPU_INJECT */
 #define NVMM_IOC_VCPU_RUN		_IOWR('N', 10, struct nvmm_ioc_vcpu_run)
 #define NVMM_IOC_GPA_MAP		_IOW ('N', 11, struct nvmm_ioc_gpa_map)
 #define NVMM_IOC_GPA_UNMAP		_IOW ('N', 12, struct nvmm_ioc_gpa_unmap)

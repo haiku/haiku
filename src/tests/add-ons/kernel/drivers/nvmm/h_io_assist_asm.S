@@ -38,6 +38,7 @@
 	.globl	test10_begin, test10_end
 	.globl	test11_begin, test11_end
 	.globl	test12_begin, test12_end
+	.globl	test13_begin, test13_end
 	.text
 	.code64
 
@@ -214,3 +215,23 @@ test12_begin:
 
 	TEST_END
 test12_end:
+
+	.align	64
+test13_begin:
+	movabsq	$0xdeadbeef00001000,%rdi
+	movabsq	$0xfeedface00000001,%rcx
+	movq	$123,%rdx
+
+	/* addr32 rep insb must update EDI/ECX and zero-extend both. */
+	.byte	0x67
+	rep insb
+
+	cmpq	$0x1001,%rdi
+	jne	.L13_failure
+	testq	%rcx,%rcx
+	jne	.L13_failure
+	TEST_END
+.L13_failure:
+	movb	$'X',0x1000
+	TEST_END
+test13_end:

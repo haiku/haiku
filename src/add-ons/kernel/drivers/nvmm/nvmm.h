@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -66,6 +66,13 @@ typedef uint32_t	nvmm_cpuid_t;
 #endif
 #endif /* __x86_64__ */
 
+/*
+ * History:
+ *
+ *  - Version 1: initial version.
+ *  - Version 2: map the comm page in the kernel and not in userland.
+ *  - Version 3: add comm_size to nvmm_capability.
+ */
 #define NVMM_KERN_VERSION		3
 
 struct nvmm_capability {

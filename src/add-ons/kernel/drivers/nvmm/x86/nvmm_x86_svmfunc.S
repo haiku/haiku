@@ -45,7 +45,7 @@
 #endif
 
 #define ASM_NVMM
-#include "nvmm_x86.h"
+#include "nvmm_x86_internal.h"
 
 	.text
 

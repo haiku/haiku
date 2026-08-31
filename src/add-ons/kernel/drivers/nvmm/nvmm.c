@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -26,20 +26,12 @@
  * SUCH DAMAGE.
  */
 
-#if defined(__NetBSD__) || defined(__DragonFly__)
-#include <sys/param.h>
-#include <sys/systm.h>
-
-#include <sys/kernel.h>
-#include <sys/mman.h>
-#endif
-
 #include "nvmm.h"
 #include "nvmm_internal.h"
 #include "nvmm_ioctl.h"
 
 static struct nvmm_machine machines[NVMM_MAX_MACHINES];
-volatile unsigned int nmachines __cacheline_aligned;
+volatile unsigned int nvmm_nmachines __cacheline_aligned;
 
 static const struct nvmm_impl *nvmm_impl_list[] = {
 #if defined(__x86_64__)
@@ -49,10 +41,10 @@ static const struct nvmm_impl *nvmm_impl_list[] = {
 };
 
 const struct nvmm_impl *nvmm_impl __read_mostly = NULL;
-
 struct nvmm_owner nvmm_root_owner;
 
 /* -------------------------------------------------------------------------- */
+
 static int
 nvmm_machine_alloc(struct nvmm_machine **ret)
 {
@@ -69,13 +61,9 @@ nvmm_machine_alloc(struct nvmm_machine **ret)
 		}
 
 		mach->present = true;
-#if defined(__HAIKU__)
-		time(&mach->time);
-#else
-		mach->time = time_second;
-#endif
+		mach->time = os_time();
 		*ret = mach;
-		os_atomic_inc_uint(&nmachines);
+		os_atomic_inc_uint(&nvmm_nmachines);
 		return 0;
 	}
 
@@ -88,7 +76,7 @@ nvmm_machine_free(struct nvmm_machine *mach)
 	OS_ASSERT(os_rwl_wheld(&mach->lock));
 	OS_ASSERT(mach->present);
 	mach->present = false;
-	os_atomic_dec_uint(&nmachines);
+	os_atomic_dec_uint(&nvmm_nmachines);
 }
 
 static int
@@ -112,7 +100,7 @@ nvmm_machine_get(struct nvmm_owner *owner, nvmm_machid_t machid,
 		return ENOENT;
 	}
 	if (__predict_false(mach->owner != owner &&
-			    owner != &nvmm_root_owner)) {
+	    owner != &nvmm_root_owner)) {
 		os_rwl_unlock(&mach->lock);
 		return EPERM;
 	}
@@ -162,7 +150,7 @@ nvmm_vcpu_free(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	vcpu->present = false;
 	if (vcpu->comm != NULL) {
 		os_vmobj_unmap(os_kernel_map, (vaddr_t)vcpu->comm,
-		    (vaddr_t)vcpu->comm + NVMM_COMM_PAGE_SIZE, true);
+		    (vaddr_t)vcpu->comm + NVMM_COMM_PAGE_SIZE);
 		/*
 		 * Require userland to unmap the comm page from its address
 		 * space, because os_curproc_map at this point (fd close)
@@ -196,51 +184,6 @@ static void
 nvmm_vcpu_put(struct nvmm_cpu *vcpu)
 {
 	os_mtx_unlock(&vcpu->lock);
-}
-
-/* -------------------------------------------------------------------------- */
-
-void
-nvmm_kill_machines(struct nvmm_owner *owner)
-{
-	struct nvmm_machine *mach;
-	struct nvmm_cpu *vcpu;
-	size_t i, j;
-	int error;
-
-	for (i = 0; i < NVMM_MAX_MACHINES; i++) {
-		mach = &machines[i];
-
-		os_rwl_wlock(&mach->lock);
-		if (!mach->present || mach->owner != owner) {
-			os_rwl_unlock(&mach->lock);
-			continue;
-		}
-
-		/* Kill it. */
-		for (j = 0; j < NVMM_MAX_VCPUS; j++) {
-			error = nvmm_vcpu_get(mach, j, &vcpu);
-			if (error)
-				continue;
-			(*nvmm_impl->vcpu_destroy)(mach, vcpu);
-			nvmm_vcpu_free(mach, vcpu);
-			nvmm_vcpu_put(vcpu);
-			os_atomic_dec_uint(&mach->ncpus);
-		}
-		(*nvmm_impl->machine_destroy)(mach);
-		os_vmspace_destroy(mach->vm);
-
-		/* Drop the kernel vmobj refs. */
-		for (j = 0; j < NVMM_MAX_HMAPPINGS; j++) {
-			if (!mach->hmap[j].present)
-				continue;
-			os_vmobj_rel(mach->hmap[j].vmobj);
-		}
-
-		nvmm_machine_free(mach);
-
-		os_rwl_unlock(&mach->lock);
-	}
 }
 
 /* -------------------------------------------------------------------------- */
@@ -294,18 +237,12 @@ nvmm_machine_create(struct nvmm_owner *owner,
 	return 0;
 }
 
-static int
-nvmm_machine_destroy(struct nvmm_owner *owner,
-    struct nvmm_ioc_machine_destroy *args)
+static void
+nvmm_do_machine_destroy(struct nvmm_machine *mach)
 {
-	struct nvmm_machine *mach;
 	struct nvmm_cpu *vcpu;
 	int error;
 	size_t i;
-
-	error = nvmm_machine_get(owner, args->machid, &mach, true);
-	if (error)
-		return error;
 
 	for (i = 0; i < NVMM_MAX_VCPUS; i++) {
 		error = nvmm_vcpu_get(mach, i, &vcpu);
@@ -323,6 +260,9 @@ nvmm_machine_destroy(struct nvmm_owner *owner,
 	/* Free the machine vmspace. */
 	os_vmspace_destroy(mach->vm);
 
+	/* Free the comm vmobj. */
+	os_vmobj_rel(mach->commvmobj);
+
 	/* Drop the kernel vmobj refs. */
 	for (i = 0; i < NVMM_MAX_HMAPPINGS; i++) {
 		if (!mach->hmap[i].present)
@@ -331,6 +271,21 @@ nvmm_machine_destroy(struct nvmm_owner *owner,
 	}
 
 	nvmm_machine_free(mach);
+}
+
+static int
+nvmm_machine_destroy(struct nvmm_owner *owner,
+    struct nvmm_ioc_machine_destroy *args)
+{
+	struct nvmm_machine *mach;
+	int error;
+
+	error = nvmm_machine_get(owner, args->machid, &mach, true);
+	if (error)
+		return error;
+
+	nvmm_do_machine_destroy(mach);
+
 	nvmm_machine_put(mach);
 
 	return 0;
@@ -417,7 +372,6 @@ nvmm_vcpu_create(struct nvmm_owner *owner, struct nvmm_ioc_vcpu_create *args)
 	    args->cpuid * NVMM_COMM_PAGE_SIZE, false /* !wired */,
 	    false /* !fixed */, true /* shared */, PROT_READ | PROT_WRITE,
 	    PROT_READ | PROT_WRITE);
-
 	if (error) {
 		nvmm_vcpu_free(mach, vcpu);
 		nvmm_vcpu_put(vcpu);
@@ -558,29 +512,6 @@ out:
 }
 
 static int
-nvmm_vcpu_inject(struct nvmm_owner *owner, struct nvmm_ioc_vcpu_inject *args)
-{
-	struct nvmm_machine *mach;
-	struct nvmm_cpu *vcpu;
-	int error;
-
-	error = nvmm_machine_get(owner, args->machid, &mach, false);
-	if (error)
-		return error;
-
-	error = nvmm_vcpu_get(mach, args->cpuid, &vcpu);
-	if (error)
-		goto out;
-
-	error = (*nvmm_impl->vcpu_inject)(vcpu);
-	nvmm_vcpu_put(vcpu);
-
-out:
-	nvmm_machine_put(mach);
-	return error;
-}
-
-static int
 nvmm_do_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     struct nvmm_vcpu_exit *exit)
 {
@@ -588,12 +519,6 @@ nvmm_do_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	int ret;
 
 	while (1) {
-		/* Got a signal? Or pending resched? Leave. */
-		if (__predict_false(os_return_needed())) {
-			exit->reason = NVMM_VCPU_EXIT_NONE;
-			return 0;
-		}
-
 		/* Run the VCPU. */
 		ret = (*nvmm_impl->vcpu_run)(mach, vcpu, exit);
 		if (__predict_false(ret != 0)) {
@@ -609,6 +534,12 @@ nvmm_do_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		}
 		if (os_vmspace_fault(vm, exit->u.mem.gpa, exit->u.mem.prot)) {
 			break;
+		}
+
+		/* Got a signal? Or pending resched? Leave. */
+		if (__predict_false(os_return_needed())) {
+			exit->reason = NVMM_VCPU_EXIT_NONE;
+			return 0;
 		}
 	}
 
@@ -726,8 +657,17 @@ nvmm_hmapping_alloc(struct nvmm_machine *mach)
 	return NULL;
 }
 
+static void
+nvmm_hmapping_free(struct nvmm_hmapping *hmapping)
+{
+	os_vmobj_rel(hmapping->vmobj);
+
+	hmapping->present = false;
+	hmapping->vmobj = NULL;
+}
+
 static int
-nvmm_hmapping_free(struct nvmm_machine *mach, uintptr_t hva, size_t size)
+nvmm_hmapping_unmap(struct nvmm_machine *mach, uintptr_t hva, size_t size)
 {
 	struct nvmm_hmapping *hmapping;
 	size_t i;
@@ -740,12 +680,9 @@ nvmm_hmapping_free(struct nvmm_machine *mach, uintptr_t hva, size_t size)
 		}
 
 		os_vmobj_unmap(os_curproc_map, hmapping->hva,
-		    hmapping->hva + hmapping->size, false);
-		os_vmobj_rel(hmapping->vmobj);
+		    hmapping->hva + hmapping->size);
 
-		hmapping->vmobj = NULL;
-		hmapping->present = false;
-
+		nvmm_hmapping_free(hmapping);
 		return 0;
 	}
 
@@ -783,6 +720,9 @@ nvmm_hva_map(struct nvmm_owner *owner, struct nvmm_ioc_hva_map *args)
 	error = os_vmobj_map(os_curproc_map, &uva, hmapping->size,
 	    hmapping->vmobj, 0, false /* !wired */, true /* fixed */,
 	    true /* shared */, PROT_READ | PROT_WRITE, PROT_READ | PROT_WRITE);
+	if (error) {
+		nvmm_hmapping_free(hmapping);
+	}
 
 out:
 	nvmm_machine_put(mach);
@@ -799,7 +739,7 @@ nvmm_hva_unmap(struct nvmm_owner *owner, struct nvmm_ioc_hva_unmap *args)
 	if (error)
 		return error;
 
-	error = nvmm_hmapping_free(mach, args->hva, args->size);
+	error = nvmm_hmapping_unmap(mach, args->hva, args->size);
 
 	nvmm_machine_put(mach);
 	return error;
@@ -812,6 +752,7 @@ nvmm_gpa_map(struct nvmm_owner *owner, struct nvmm_ioc_gpa_map *args)
 {
 	struct nvmm_machine *mach;
 	os_vmobj_t *vmobj;
+	os_vmmap_t *vmmap;
 	gpaddr_t gpa;
 	gpaddr_t gpa_end;
 	size_t off;
@@ -862,18 +803,11 @@ nvmm_gpa_map(struct nvmm_owner *owner, struct nvmm_ioc_gpa_map *args)
 		goto out;
 	}
 
-#if defined(__HAIKU__)
-	os_vmmap_t *vm_map = os_vmspace_get_vmmap(mach->vm);
 	/* Map the vmobj into the machine address space, as pageable. */
-	error = os_vmobj_map(vm_map, &gpa, args->size, vmobj, off,
+	vmmap = os_vmspace_get_vmmap(mach->vm);
+	error = os_vmobj_map(vmmap, &gpa, args->size, vmobj, off,
 	    false /* !wired */, true /* fixed */, false /* !shared */,
 	    args->prot, PROT_READ | PROT_WRITE | PROT_EXEC);
-#else
-	/* Map the vmobj into the machine address space, as pageable. */
-	error = os_vmobj_map(&mach->vm->vm_map, &gpa, args->size, vmobj, off,
-	    false /* !wired */, true /* fixed */, false /* !shared */,
-	    args->prot, PROT_READ | PROT_WRITE | PROT_EXEC);
-#endif
 
 out:
 	nvmm_machine_put(mach);
@@ -884,6 +818,7 @@ static int
 nvmm_gpa_unmap(struct nvmm_owner *owner, struct nvmm_ioc_gpa_unmap *args)
 {
 	struct nvmm_machine *mach;
+	os_vmmap_t *vmmap;
 	gpaddr_t gpa;
 	gpaddr_t gpa_end;
 	int error;
@@ -911,19 +846,14 @@ nvmm_gpa_unmap(struct nvmm_owner *owner, struct nvmm_ioc_gpa_unmap *args)
 		error = EINVAL;
 		goto out;
 	}
-	if (gpa_end >= mach->gpa_end) {
+	if (gpa_end > mach->gpa_end) {
 		error = EINVAL;
 		goto out;
 	}
 
-#if defined(__HAIKU__)
-	os_vmmap_t *vm_map = os_vmspace_get_vmmap(mach->vm);
 	/* Unmap the memory from the machine. */
-	os_vmobj_unmap(vm_map, gpa, gpa + args->size, false);
-#else
-	/* Unmap the memory from the machine. */
-	os_vmobj_unmap(&mach->vm->vm_map, gpa, gpa + args->size, false);
-#endif
+	vmmap = os_vmspace_get_vmmap(mach->vm);
+	os_vmobj_unmap(vmmap, gpa, gpa + args->size);
 
 out:
 	nvmm_machine_put(mach);
@@ -1061,8 +991,6 @@ nvmm_ioctl(struct nvmm_owner *owner, unsigned long cmd, void *data)
 		return nvmm_vcpu_setstate(owner, data);
 	case NVMM_IOC_VCPU_GETSTATE:
 		return nvmm_vcpu_getstate(owner, data);
-	case NVMM_IOC_VCPU_INJECT:
-		return nvmm_vcpu_inject(owner, data);
 	case NVMM_IOC_VCPU_RUN:
 		return nvmm_vcpu_run(owner, data);
 	case NVMM_IOC_GPA_MAP:
@@ -1077,5 +1005,29 @@ nvmm_ioctl(struct nvmm_owner *owner, unsigned long cmd, void *data)
 		return nvmm_ctl(owner, data);
 	default:
 		return EINVAL;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+
+void
+nvmm_kill_machines(struct nvmm_owner *owner)
+{
+	struct nvmm_machine *mach;
+	size_t i;
+
+	for (i = 0; i < NVMM_MAX_MACHINES; i++) {
+		mach = &machines[i];
+
+		os_rwl_wlock(&mach->lock);
+
+		if (!mach->present || mach->owner != owner) {
+			os_rwl_unlock(&mach->lock);
+			continue;
+		}
+
+		nvmm_do_machine_destroy(mach);
+
+		os_rwl_unlock(&mach->lock);
 	}
 }

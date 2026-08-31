@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -32,40 +32,16 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/mman.h>
-#if defined(__HAIKU__)
-#include <machine/specialreg.h>
-#else
 #include <err.h>
-#include <machine/segments.h>
-#include <machine/psl.h>
-#endif
+#include <errno.h>
 
 #include <nvmm.h>
 
-#ifdef __NetBSD__
-
-#include <machine/pte.h>
-#define PAGE_SIZE 4096
-
-#elif defined(__DragonFly__) /* DragonFly */
-
-#include <machine/pmap.h>
-#define PTE_P		X86_PG_V	/* 0x001: P (Valid) */
-#define PTE_W		X86_PG_RW	/* 0x002: R/W (Read/Write) */
-#define PSL_MBO		PSL_RESERVED_DEFAULT	/* 0x00000002 */
-#define SDT_SYS386BSY	SDT_SYSBSY	/* 11: system 64-bit TSS busy */
-
-#elif defined(__HAIKU__)
-
-#include "../haiku_defs.h"
-
-#endif /* __NetBSD__ */
+#include "h_os.h"
 
 static uint8_t mmiobuf[PAGE_SIZE];
 static uint8_t *instbuf;
+static uint8_t *rambuf;
 
 /* -------------------------------------------------------------------------- */
 
@@ -75,13 +51,14 @@ mem_callback(struct nvmm_mem *mem)
 	size_t off;
 
 	if (mem->gpa < 0x1000 || mem->gpa + mem->size > 0x1000 + PAGE_SIZE) {
-		printf("Out of page\n");
-		exit(-1);
+		err(-1, "out of page: gpa = %p, size = %zu",
+		    (void *)mem->gpa, mem->size);
 	}
 
 	off = mem->gpa - 0x1000;
 
-	printf("-> gpa = %p\n", (void *)mem->gpa);
+	printf("-> gpa = %p, size = %zu (%s)\n", (void *)mem->gpa, mem->size,
+	    mem->write ? "write" : "read");
 
 	if (mem->write) {
 		memcpy(mmiobuf + off, mem->data, mem->size);
@@ -93,17 +70,15 @@ mem_callback(struct nvmm_mem *mem)
 static int
 handle_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
-	int ret;
-
-	ret = nvmm_assist_mem(mach, vcpu);
-	if (ret == -1) {
-		err(errno, "nvmm_assist_mem");
+	if (nvmm_assist_mem(mach, vcpu) == -1) {
+		warn("nvmm_assist_mem");
+		return -1;
 	}
 
 	return 0;
 }
 
-static void
+static int
 run_machine(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
 	struct nvmm_vcpu_exit *exit = vcpu->exit;
@@ -118,21 +93,24 @@ run_machine(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 
 		case NVMM_VCPU_EXIT_RDMSR:
 			/* Stop here. */
-			return;
+			return 0;
 
 		case NVMM_VCPU_EXIT_MEMORY:
-			handle_memory(mach, vcpu);
+			if (handle_memory(mach, vcpu) == -1)
+				return -1;
 			break;
 
 		case NVMM_VCPU_EXIT_SHUTDOWN:
 			printf("Shutting down!\n");
-			return;
+			return 0;
 
 		default:
 			printf("Invalid VMEXIT: 0x%lx\n", exit->reason);
-			return;
+			return -1;
 		}
 	}
+
+	return -1;
 }
 
 static struct nvmm_assist_callbacks callbacks = {
@@ -150,7 +128,7 @@ struct test {
 	uint64_t off;
 };
 
-static void
+static int
 run_test(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
     const struct test *test)
 {
@@ -162,15 +140,20 @@ run_test(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	memset(mmiobuf, 0, PAGE_SIZE);
 	memcpy(instbuf, test->code_begin, size);
 
-	run_machine(mach, vcpu);
+	if (run_machine(mach, vcpu) == -1) {
+		printf("*** Test '%s' failed, run_machine() error\n",
+		    test->name);
+		return 1;
+	}
 
 	res = (uint64_t *)(mmiobuf + test->off);
 	if (*res == test->wanted) {
 		printf("Test '%s' passed\n", test->name);
+		return 0;
 	} else {
-		printf("Test '%s' failed, wanted 0x%lx, got 0x%lx\n", test->name,
-		    test->wanted, *res);
-		errx(-1, "run_test failed");
+		printf("*** Test '%s' failed, wanted 0x%lx, got 0x%lx\n",
+		    test->name, test->wanted, *res);
+		return 1;
 	}
 }
 
@@ -192,6 +175,11 @@ extern uint8_t test13_begin, test13_end;
 extern uint8_t test14_begin, test14_end;
 extern uint8_t test_64bit_15_begin, test_64bit_15_end;
 extern uint8_t test_64bit_16_begin, test_64bit_16_end;
+extern uint8_t test_64bit_17_begin, test_64bit_17_end;
+extern uint8_t test_64bit_18_begin, test_64bit_18_end;
+extern uint8_t test_64bit_19_begin, test_64bit_19_end;
+extern uint8_t test_64bit_20_begin, test_64bit_20_end;
+extern uint8_t test_64bit_21_begin, test_64bit_21_end;
 
 static const struct test tests64[] = {
 	{ "64bit test1 - MOV", &test1_begin, &test1_end, 0x3004, 0 },
@@ -209,8 +197,12 @@ static const struct test tests64[] = {
 	{ "64bit test13 - SUB", &test13_begin, &test13_end, 0x0000000F0000A0FF, 0 },
 	{ "64bit test14 - TEST", &test14_begin, &test14_end, 0x00000001, 0 },
 	{ "64bit test15 - XCHG", &test_64bit_15_begin, &test_64bit_15_end, 0x123456, 0 },
-	{ "64bit test16 - XCHG", &test_64bit_16_begin, &test_64bit_16_end,
-	  0x123456, 0 },
+	{ "64bit test16 - XCHG", &test_64bit_16_begin, &test_64bit_16_end, 0x123456, 0 },
+	{ "64bit test17 - REP", &test_64bit_17_begin, &test_64bit_17_end, 0x4, 0 },
+	{ "64bit test18 - Sign Extension", &test_64bit_18_begin, &test_64bit_18_end, 0x00000001, 0 },
+	{ "64bit test19 - BT", &test_64bit_19_begin, &test_64bit_19_end, 0x00000001, 0 },
+	{ "64bit test20 - addr32 REP/STOS", &test_64bit_20_begin, &test_64bit_20_end, 0x00000000, 8 },
+	{ "64bit test21 - addr32 MOVS", &test_64bit_21_begin, &test_64bit_21_end, 0x00000001, 8 },
 	{ NULL, NULL, NULL, -1, 0 }
 };
 
@@ -262,19 +254,7 @@ reset_machine64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 	state->crs[NVMM_X64_CR_CR4] = CR4_PAE;
 	state->msrs[NVMM_X64_MSR_EFER] = EFER_LME | EFER_SCE | EFER_LMA;
 
-	/* Stolen from x86/pmap.c */
-#define	PATENTRY(n, type)	(type << ((n) * 8))
-#define	PAT_UC		0x0ULL
-#define	PAT_WC		0x1ULL
-#define	PAT_WT		0x4ULL
-#define	PAT_WP		0x5ULL
-#define	PAT_WB		0x6ULL
-#define	PAT_UCMINUS	0x7ULL
-	state->msrs[NVMM_X64_MSR_PAT] =
-	    PATENTRY(0, PAT_WB) | PATENTRY(1, PAT_WT) |
-	    PATENTRY(2, PAT_UCMINUS) | PATENTRY(3, PAT_UC) |
-	    PATENTRY(4, PAT_WB) | PATENTRY(5, PAT_WT) |
-	    PATENTRY(6, PAT_UCMINUS) | PATENTRY(7, PAT_UC);
+	state->msrs[NVMM_X64_MSR_PAT] = MSR_PAT_VALUE;
 
 	/* Page tables. */
 	state->crs[NVMM_X64_CR_CR3] = 0x3000;
@@ -283,6 +263,54 @@ reset_machine64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 
 	if (nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_ALL) == -1)
 		err(errno, "nvmm_vcpu_setstate");
+}
+
+static int
+run_test64_insn_lastpage(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+{
+	struct nvmm_x64_state *state = vcpu->state;
+	struct nvmm_vcpu_exit *exit = vcpu->exit;
+	/* movb $0x5a,(%rax) */
+	static const uint8_t insn[] = { 0xc6, 0x00, 0x5a };
+	size_t off = PAGE_SIZE - sizeof(insn);
+	int ret;
+
+	reset_machine64(mach, vcpu);
+	memset(instbuf, 0, PAGE_SIZE);
+	memcpy(instbuf + off, insn, sizeof(insn));
+	memset(mmiobuf, 0, PAGE_SIZE);
+
+	state->gprs[NVMM_X64_GPR_RIP] = 0x2000 + off;
+	state->gprs[NVMM_X64_GPR_RAX] = 0x1000;
+	if (nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_GPRS) == -1)
+		err(errno, "nvmm_vcpu_setstate");
+
+	if (nvmm_vcpu_run(mach, vcpu) == -1)
+		err(errno, "nvmm_vcpu_run");
+	if (exit->reason != NVMM_VCPU_EXIT_MEMORY ||
+	    exit->u.mem.gpa != 0x1000) {
+		printf("*** Test '64bit MMIO instruction at page end' failed: "
+		    "unexpected VMEXIT 0x%lx, gpa %p\n", exit->reason,
+		    (void *)exit->u.mem.gpa);
+		return 1;
+	}
+
+	/* Force nvmm_assist_mem() to fetch the instruction from guest memory. */
+	exit->u.mem.inst_len = 0;
+	ret = nvmm_assist_mem(mach, vcpu);
+	if (ret == -1) {
+		printf("*** Test '64bit MMIO instruction at page end' failed\n");
+		return 1;
+	}
+
+	if (mmiobuf[0] != 0x5a) {
+		printf("*** Test '64bit MMIO instruction at page end' failed: "
+		    "wanted 0x5a, got 0x%x\n", mmiobuf[0]);
+		return 1;
+	}
+
+	printf("Test '64bit MMIO instruction at page end' passed\n");
+	return 0;
 }
 
 static void
@@ -366,12 +394,13 @@ map_pages64(struct nvmm_machine *mach)
  * 0x5000: L2
  * 0x6000: L1
  */
-static void
+static int
 test_vm64(void)
 {
 	struct nvmm_machine mach;
 	struct nvmm_vcpu vcpu;
 	size_t i;
+	int nfail;
 
 	if (nvmm_machine_create(&mach) == -1)
 		err(errno, "nvmm_machine_create");
@@ -380,15 +409,263 @@ test_vm64(void)
 	nvmm_vcpu_configure(&mach, &vcpu, NVMM_VCPU_CONF_CALLBACKS, &callbacks);
 	map_pages64(&mach);
 
+	nfail = 0;
 	for (i = 0; tests64[i].name != NULL; i++) {
 		reset_machine64(&mach, &vcpu);
-		run_test(&mach, &vcpu, &tests64[i]);
+		nfail += run_test(&mach, &vcpu, &tests64[i]);
 	}
+	printf("\n");
+	nfail += run_test64_insn_lastpage(&mach, &vcpu);
 
 	if (nvmm_vcpu_destroy(&mach, &vcpu) == -1)
 		err(errno, "nvmm_vcpu_destroy");
 	if (nvmm_machine_destroy(&mach) == -1)
 		err(errno, "nvmm_machine_destroy");
+
+	return nfail;
+}
+
+/* -------------------------------------------------------------------------- */
+
+extern uint8_t test_32bit_1_begin, test_32bit_1_end;
+
+#define TEST32_MMIO_GPA		0x1000
+#define TEST32_SRC_OFF		0x000
+#define TEST32_DST_OFF		0x008
+#define TEST32_VALUE		0x12345678U
+#define TEST32_SENTINEL		0x87654321U
+
+static void
+reset_machine32(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+{
+	struct nvmm_x64_state *state = vcpu->state;
+	size_t i;
+
+	if (nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_ALL) == -1)
+		err(errno, "nvmm_vcpu_getstate");
+
+	memset(state, 0, sizeof(*state));
+
+	/* Default. */
+	state->gprs[NVMM_X64_GPR_RFLAGS] = PSL_MBO;
+	init_seg(&state->segs[NVMM_X64_SEG_CS], SDT_MEMERA,
+	    GSEL(GCODE_SEL, SEL_KPL));
+	init_seg(&state->segs[NVMM_X64_SEG_SS], SDT_MEMRWA,
+	    GSEL(GDATA_SEL, SEL_KPL));
+	init_seg(&state->segs[NVMM_X64_SEG_DS], SDT_MEMRWA,
+	    GSEL(GDATA_SEL, SEL_KPL));
+	init_seg(&state->segs[NVMM_X64_SEG_ES], SDT_MEMRWA,
+	    GSEL(GDATA_SEL, SEL_KPL));
+	init_seg(&state->segs[NVMM_X64_SEG_FS], SDT_MEMRWA,
+	    GSEL(GDATA_SEL, SEL_KPL));
+	init_seg(&state->segs[NVMM_X64_SEG_GS], SDT_MEMRWA,
+	    GSEL(GDATA_SEL, SEL_KPL));
+
+	for (i = NVMM_X64_SEG_ES; i <= NVMM_X64_SEG_GS; i++) {
+		state->segs[i].attrib.l = 0;
+		state->segs[i].attrib.def = 1;
+		state->segs[i].attrib.g = 1;
+		state->segs[i].limit = 0xFFFFFFFF;
+	}
+
+	/* Blank. */
+	init_seg(&state->segs[NVMM_X64_SEG_GDT], 0, 0);
+	init_seg(&state->segs[NVMM_X64_SEG_IDT], 0, 0);
+	/* Make an unhandled native fault deterministically triple fault. */
+	state->segs[NVMM_X64_SEG_IDT].limit = 0;
+	init_seg(&state->segs[NVMM_X64_SEG_LDT], SDT_SYSLDT, 0);
+	init_seg(&state->segs[NVMM_X64_SEG_TR], SDT_SYS386BSY, 0);
+
+	/* 32bit protected mode, without paging. */
+	state->crs[NVMM_X64_CR_CR0] =
+	    CR0_PE|CR0_NE|CR0_TS|CR0_MP|CR0_WP|CR0_AM;
+	state->gprs[NVMM_X64_GPR_RIP] = 0x2000;
+
+	if (nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_ALL) == -1)
+		err(errno, "nvmm_vcpu_setstate");
+}
+
+static void
+set_es_limit32(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu, int type,
+    uint32_t limit)
+{
+	struct nvmm_x64_state *state = vcpu->state;
+
+	if (nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_SEGS) == -1)
+		err(errno, "nvmm_vcpu_getstate");
+
+	state->segs[NVMM_X64_SEG_ES].attrib.type = type;
+	state->segs[NVMM_X64_SEG_ES].attrib.g = 1;
+	state->segs[NVMM_X64_SEG_ES].limit = limit;
+
+	if (nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_SEGS) == -1)
+		err(errno, "nvmm_vcpu_setstate");
+}
+
+static void
+map_pages32(struct nvmm_machine *mach, bool with_rambuf)
+{
+	int ret;
+
+	instbuf = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_WRITE,
+	    MAP_ANON|MAP_PRIVATE, -1, 0);
+	if (instbuf == MAP_FAILED)
+		err(errno, "mmap");
+
+	if (nvmm_hva_map(mach, (uintptr_t)instbuf, PAGE_SIZE) == -1)
+		err(errno, "nvmm_hva_map");
+	ret = nvmm_gpa_map(mach, (uintptr_t)instbuf, 0x2000, PAGE_SIZE,
+	    PROT_READ|PROT_EXEC);
+	if (ret == -1)
+		err(errno, "nvmm_gpa_map");
+
+	if (with_rambuf) {
+		rambuf = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_WRITE,
+		    MAP_ANON|MAP_PRIVATE, -1, 0);
+		if (rambuf == MAP_FAILED)
+			err(errno, "mmap");
+
+		if (nvmm_hva_map(mach, (uintptr_t)rambuf, PAGE_SIZE) == -1)
+			err(errno, "nvmm_hva_map");
+		ret = nvmm_gpa_map(mach, (uintptr_t)rambuf, TEST32_MMIO_GPA,
+		    PAGE_SIZE, PROT_READ|PROT_WRITE);
+		if (ret == -1)
+			err(errno, "nvmm_gpa_map");
+	}
+}
+
+static void
+init_data32(uint8_t *buf)
+{
+	uint32_t val;
+
+	memset(buf, 0, PAGE_SIZE);
+	val = TEST32_VALUE;
+	memcpy(buf + TEST32_SRC_OFF, &val, sizeof(val));
+	val = TEST32_SENTINEL;
+	memcpy(buf + TEST32_DST_OFF, &val, sizeof(val));
+}
+
+static uint32_t
+read_dst32(const uint8_t *buf)
+{
+	uint32_t val;
+
+	memcpy(&val, buf + TEST32_DST_OFF, sizeof(val));
+	return val;
+}
+
+static int
+run_test32_segment_limit(const char *test_name, int type, uint32_t limit)
+{
+	struct nvmm_machine mach;
+	struct nvmm_vcpu vcpu;
+	struct nvmm_vcpu_exit *exit;
+	size_t size;
+	int ret;
+
+	if (nvmm_machine_create(&mach) == -1)
+		err(errno, "nvmm_machine_create");
+	map_pages32(&mach, true);
+
+	size = (size_t)&test_32bit_1_end - (size_t)&test_32bit_1_begin;
+	memcpy(instbuf, &test_32bit_1_begin, size);
+
+	/*
+	 * First, check the native behavior: let the CPU enforce the limit on
+	 * ordinary guest RAM. It should raise a #GP that gets turned into a
+	 * triple-fault which we should see as an NVMM_VCPU_EXIT_SHUTDOWN.
+	 */
+
+	if (nvmm_vcpu_create(&mach, 0, &vcpu) == -1)
+		err(errno, "nvmm_vcpu_create");
+	nvmm_vcpu_configure(&mach, &vcpu, NVMM_VCPU_CONF_CALLBACKS, &callbacks);
+
+	reset_machine32(&mach, &vcpu);
+	set_es_limit32(&mach, &vcpu, type, limit);
+	init_data32(rambuf);
+
+	do {
+		if (nvmm_vcpu_run(&mach, &vcpu) == -1)
+			err(errno, "nvmm_vcpu_run");
+		exit = vcpu.exit;
+	} while (exit->reason == NVMM_VCPU_EXIT_NONE);
+
+	if (exit->reason != NVMM_VCPU_EXIT_SHUTDOWN)
+		errx(-1, "native 32bit MOVS did not fault on the ES limit");
+	if (read_dst32(rambuf) != TEST32_SENTINEL)
+		errx(-1, "native 32bit MOVS wrote past the ES limit");
+
+	/*
+	 * Now, recreate the vCPU but without its rambuf mapping so that the
+	 * access is an MMIO access, re-run it, and compare against native
+	 * behavior.
+	 */
+
+	if (nvmm_vcpu_destroy(&mach, &vcpu) == -1)
+		err(errno, "nvmm_vcpu_destroy");
+	if (nvmm_gpa_unmap(&mach, (uintptr_t)rambuf, TEST32_MMIO_GPA,
+	    PAGE_SIZE) == -1)
+		err(errno, "nvmm_gpa_unmap");
+	if (nvmm_vcpu_create(&mach, 0, &vcpu) == -1)
+		err(errno, "nvmm_vcpu_create");
+	nvmm_vcpu_configure(&mach, &vcpu, NVMM_VCPU_CONF_CALLBACKS, &callbacks);
+
+	reset_machine32(&mach, &vcpu);
+	set_es_limit32(&mach, &vcpu, type, limit);
+	init_data32(mmiobuf);
+
+	do {
+		if (nvmm_vcpu_run(&mach, &vcpu) == -1)
+			err(errno, "nvmm_vcpu_run");
+		exit = vcpu.exit;
+	} while (exit->reason == NVMM_VCPU_EXIT_NONE);
+
+	if (exit->reason != NVMM_VCPU_EXIT_MEMORY ||
+	    exit->u.mem.gpa != TEST32_MMIO_GPA)
+		errx(-1, "32bit MOVS did not exit on the expected MMIO access");
+
+	ret = nvmm_assist_mem(&mach, &vcpu);
+	if (ret != -1) {
+		printf("*** Test '%s' failed, emulated 32bit MOVS "
+		    "ignored the native ES limit\n", test_name);
+		return 1;
+	}
+	if (read_dst32(mmiobuf) != TEST32_SENTINEL) {
+		printf("*** Test '%s' failed, emulated 32bit MOVS "
+		    "wrote past the ES limit\n", test_name);
+		return 1;
+	}
+
+	printf("Test '%s' passed\n", test_name);
+
+	if (nvmm_vcpu_destroy(&mach, &vcpu) == -1)
+		err(errno, "nvmm_vcpu_destroy");
+	if (nvmm_machine_destroy(&mach) == -1)
+		err(errno, "nvmm_machine_destroy");
+
+	return 0;
+}
+
+static int
+test_vm32_segment_limit(void)
+{
+	int nfail = 0;
+
+	/* Expand-up: ES stops immediately before the MMIO page. */
+	nfail += run_test32_segment_limit(
+	    "32bit test1 - MOVS segment limit native/MMIO",
+	    SDT_MEMRWA, TEST32_MMIO_GPA - 1);
+
+	/*
+	 * Expand-down: the limit is inverted, ES only starts immediately
+	 * after the MMIO page.
+	 */
+	nfail += run_test32_segment_limit(
+	    "32bit test2 - MOVS expand-down segment limit native/MMIO",
+	    SDT_MEMRWDA, TEST32_MMIO_GPA + PAGE_SIZE - 1);
+
+	return nfail;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -399,6 +676,7 @@ extern uint8_t test_16bit_3_begin, test_16bit_3_end;
 extern uint8_t test_16bit_4_begin, test_16bit_4_end;
 extern uint8_t test_16bit_5_begin, test_16bit_5_end;
 extern uint8_t test_16bit_6_begin, test_16bit_6_end;
+extern uint8_t test_16bit_7_begin, test_16bit_7_end;
 
 static const struct test tests16[] = {
 	{ "16bit test1 - MOV single", &test_16bit_1_begin, &test_16bit_1_end,
@@ -413,6 +691,8 @@ static const struct test tests16[] = {
 	  0x12, 0x1234 - 0x1000 },
 	{ "16bit test6 - XCHG", &test_16bit_6_begin, &test_16bit_6_end,
 	  0x1234, 0x1234 - 0x1000 },
+	{ "16bit test7 - BT", &test_16bit_7_begin, &test_16bit_7_end,
+	  0x0001, 0x1234 - 0x1000 },
 	{ NULL, NULL, NULL, -1, -1 }
 };
 
@@ -454,12 +734,13 @@ map_pages16(struct nvmm_machine *mach)
  * 0x1000: MMIO address, unmapped
  * 0x2000: Instructions, mapped
  */
-static void
+static int
 test_vm16(void)
 {
 	struct nvmm_machine mach;
 	struct nvmm_vcpu vcpu;
 	size_t i;
+	int nfail;
 
 	if (nvmm_machine_create(&mach) == -1)
 		err(errno, "nvmm_machine_create");
@@ -468,24 +749,42 @@ test_vm16(void)
 	nvmm_vcpu_configure(&mach, &vcpu, NVMM_VCPU_CONF_CALLBACKS, &callbacks);
 	map_pages16(&mach);
 
+	nfail = 0;
 	for (i = 0; tests16[i].name != NULL; i++) {
 		reset_machine16(&mach, &vcpu);
-		run_test(&mach, &vcpu, &tests16[i]);
+		nfail += run_test(&mach, &vcpu, &tests16[i]);
 	}
 
 	if (nvmm_vcpu_destroy(&mach, &vcpu) == -1)
 		err(errno, "nvmm_vcpu_destroy");
 	if (nvmm_machine_destroy(&mach) == -1)
 		err(errno, "nvmm_machine_destroy");
+
+	return nfail;
 }
 
 /* -------------------------------------------------------------------------- */
 
-int main(int argc, char *argv[])
+int main(int argc __unused, char *argv[] __unused)
 {
+	int nfail;
+
 	if (nvmm_init() == -1)
 		err(errno, "nvmm_init");
-	test_vm64();
-	test_vm16();
-	return 0;
+
+	nfail = 0;
+	nfail += test_vm64();
+	printf("\n");
+	nfail += test_vm32_segment_limit();
+	printf("\n");
+	nfail += test_vm16();
+	printf("\n");
+
+	if (nfail == 0) {
+		printf("All tests passed.\n");
+	} else {
+		printf("*** %d tests failed.\n", nfail);
+	}
+
+	return (nfail == 0 ? 0 : -1);
 }

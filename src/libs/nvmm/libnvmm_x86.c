@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -96,6 +96,14 @@ nvmm_vcpu_dump(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 /* -------------------------------------------------------------------------- */
 
 /*
+ * x86 CR0/CR4/MSR_EFER bits in use.
+ */
+#define CR0_PG		__BIT(31)
+#define CR4_PSE		__BIT(4)
+#define CR4_PAE		__BIT(5)
+#define EFER_LMA	__BIT(10)
+
+/*
  * x86 page size.
  */
 #define PAGE_SIZE	0x1000
@@ -120,11 +128,14 @@ nvmm_vcpu_dump(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 #define PTE_LGPAT	0x0000000000001000	/* PAT on Large Pages */
 #define PTE_NX		0x8000000000000000	/* No Execute */
 
-#define PTE_4KFRAME	0x000ffffffffff000
-#define PTE_2MFRAME	0x000fffffffe00000
-#define PTE_1GFRAME	0x000fffffc0000000
+#define PTE_FRAME	0x000ffffffffff000
 
-#define PTE_FRAME	PTE_4KFRAME
+#define PTE_READ(_p_)	__atomic_load_n((_p_), __ATOMIC_RELAXED)
+
+/*
+ * TODO: set the PTE_A and PTE_D bits when emulating guest-initiated page
+ * table walks.
+ */
 
 /* -------------------------------------------------------------------------- */
 
@@ -161,7 +172,7 @@ x86_gva_to_gpa_32bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L2gpa, &L2hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_32bit_t *)L2hva;
-	pte = pdir[pte32_l2idx(gva)];
+	pte = PTE_READ(&pdir[pte32_l2idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -181,15 +192,13 @@ x86_gva_to_gpa_32bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L1gpa, &L1hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_32bit_t *)L1hva;
-	pte = pdir[pte32_l1idx(gva)];
+	pte = PTE_READ(&pdir[pte32_l1idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
 		*prot &= ~NVMM_PROT_USER;
 	if ((pte & PTE_W) == 0)
 		*prot &= ~NVMM_PROT_WRITE;
-	if (pte & PTE_PS)
-		return -1;
 
 	*gpa = (pte & PTE_FRAME);
 	return 0;
@@ -205,7 +214,7 @@ x86_gva_to_gpa_32bit(struct nvmm_machine *mach, uint64_t cr3,
 #define	PTE32_PAE_L2_MASK	0x3fe00000
 #define	PTE32_PAE_L1_MASK	0x001ff000
 
-#define	PTE32_PAE_L3_FRAME	(PTE32_PAE_L3_MASK)
+#define	PTE32_PAE_L3_FRAME	(0x000fffff00000000|PTE32_PAE_L3_MASK)
 #define	PTE32_PAE_L2_FRAME	(PTE32_PAE_L3_FRAME|PTE32_PAE_L2_MASK)
 #define	PTE32_PAE_L1_FRAME	(PTE32_PAE_L2_FRAME|PTE32_PAE_L1_MASK)
 
@@ -234,7 +243,7 @@ x86_gva_to_gpa_32bit_pae(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L3gpa, &L3hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_32bit_pae_t *)L3hva;
-	pte = pdir[pte32_pae_l3idx(gva)];
+	pte = PTE_READ(&pdir[pte32_pae_l3idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if (pte & PTE_NX)
@@ -247,7 +256,7 @@ x86_gva_to_gpa_32bit_pae(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L2gpa, &L2hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_32bit_pae_t *)L2hva;
-	pte = pdir[pte32_pae_l2idx(gva)];
+	pte = PTE_READ(&pdir[pte32_pae_l2idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -267,7 +276,7 @@ x86_gva_to_gpa_32bit_pae(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L1gpa, &L1hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_32bit_pae_t *)L1hva;
-	pte = pdir[pte32_pae_l1idx(gva)];
+	pte = PTE_READ(&pdir[pte32_pae_l1idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -276,8 +285,6 @@ x86_gva_to_gpa_32bit_pae(struct nvmm_machine *mach, uint64_t cr3,
 		*prot &= ~NVMM_PROT_WRITE;
 	if (pte & PTE_NX)
 		*prot &= ~NVMM_PROT_EXEC;
-	if (pte & PTE_PS)
-		return -1;
 
 	*gpa = (pte & PTE_FRAME);
 	return 0;
@@ -337,7 +344,7 @@ x86_gva_to_gpa_64bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L4gpa, &L4hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_64bit_t *)L4hva;
-	pte = pdir[pte64_l4idx(gva)];
+	pte = PTE_READ(&pdir[pte64_l4idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -354,7 +361,7 @@ x86_gva_to_gpa_64bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L3gpa, &L3hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_64bit_t *)L3hva;
-	pte = pdir[pte64_l3idx(gva)];
+	pte = PTE_READ(&pdir[pte64_l3idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -374,7 +381,7 @@ x86_gva_to_gpa_64bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L2gpa, &L2hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_64bit_t *)L2hva;
-	pte = pdir[pte64_l2idx(gva)];
+	pte = PTE_READ(&pdir[pte64_l2idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -394,7 +401,7 @@ x86_gva_to_gpa_64bit(struct nvmm_machine *mach, uint64_t cr3,
 	if (nvmm_gpa_to_hva(mach, L1gpa, &L1hva, &pageprot) == -1)
 		return -1;
 	pdir = (pte_64bit_t *)L1hva;
-	pte = pdir[pte64_l1idx(gva)];
+	pte = PTE_READ(&pdir[pte64_l1idx(gva)]);
 	if ((pte & PTE_P) == 0)
 		return -1;
 	if ((pte & PTE_U) == 0)
@@ -403,8 +410,6 @@ x86_gva_to_gpa_64bit(struct nvmm_machine *mach, uint64_t cr3,
 		*prot &= ~NVMM_PROT_WRITE;
 	if (pte & PTE_NX)
 		*prot &= ~NVMM_PROT_EXEC;
-	if (pte & PTE_PS)
-		return -1;
 
 	*gpa = (pte & PTE_FRAME);
 	return 0;
@@ -479,10 +484,20 @@ nvmm_gva_to_gpa(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		return -1;	\
 	} while (0);
 
-static inline bool
-is_long_mode(struct nvmm_x64_state *state)
+static inline uint64_t
+size_to_mask(size_t size)
 {
-	return (state->msrs[NVMM_X64_MSR_EFER] & EFER_LMA) != 0;
+	switch (size) {
+	case 1:
+		return 0x00000000000000FF;
+	case 2:
+		return 0x000000000000FFFF;
+	case 4:
+		return 0x00000000FFFFFFFF;
+	case 8:
+	default:
+		return 0xFFFFFFFFFFFFFFFF;
+	}
 }
 
 static inline bool
@@ -508,22 +523,31 @@ is_16bit(struct nvmm_x64_state *state)
 static int
 segment_check(struct nvmm_x64_state_seg *seg, gvaddr_t gva, size_t size)
 {
-	uint64_t limit;
+	uint64_t lower, upper;
 
-	/*
-	 * This is incomplete. We should check topdown, etc, really that's
-	 * tiring.
-	 */
 	if (__predict_false(!seg->attrib.p)) {
 		goto error;
 	}
 
-	limit = (uint64_t)seg->limit + 1;
-	if (__predict_true(seg->attrib.g)) {
-		limit *= PAGE_SIZE;
+	/*
+	 * TODO: check R/W/X.
+	 */
+
+	upper = (uint64_t)seg->limit + 1;
+
+	/*
+	 * For expand-down data segments, the descriptor limit is the lower
+	 * boundary. The D/B bit selects a maximum offset of 64KB or 4GB.
+	 */
+	if (__predict_false(seg->attrib.s &&
+	    ((seg->attrib.type & 0b1100) == 0b0100))) {
+		lower = upper;
+		upper = seg->attrib.def ? 0x100000000ULL : 0x10000ULL;
+	} else {
+		lower = 0;
 	}
 
-	if (__predict_false(gva + size > limit)) {
+	if (__predict_false(gva < lower || gva > upper || size > upper - gva)) {
 		goto error;
 	}
 
@@ -535,25 +559,47 @@ error:
 }
 
 static inline void
-segment_apply(struct nvmm_x64_state_seg *seg, gvaddr_t *gva)
+segment_apply(struct nvmm_x64_state_seg *seg, gvaddr_t *gva, bool truncate32)
 {
 	*gva += seg->base;
+	if (truncate32) {
+		*gva &= size_to_mask(4);
+	}
 }
 
-static inline uint64_t
-size_to_mask(size_t size)
+static inline void
+gpr_write_address(struct nvmm_x64_state *state, int gpr, size_t adsize,
+    uint64_t val)
 {
-	switch (size) {
-	case 1:
-		return 0x00000000000000FF;
-	case 2:
-		return 0x000000000000FFFF;
-	case 4:
-		return 0x00000000FFFFFFFF;
-	case 8:
-	default:
-		return 0xFFFFFFFFFFFFFFFF;
+	uint64_t mask;
+
+	mask = size_to_mask(adsize);
+	val &= mask;
+
+	if (adsize == 4) {
+		state->gprs[gpr] = val;
+	} else {
+		state->gprs[gpr] &= ~mask;
+		state->gprs[gpr] |= val;
 	}
+}
+
+static void
+gpr_advance_address(struct nvmm_x64_state *state, int gpr, size_t adsize,
+    uint64_t amount, bool backwards)
+{
+	uint64_t mask, val;
+
+	mask = size_to_mask(adsize);
+	val = state->gprs[gpr] & mask;
+
+	if (__predict_false(backwards)) {
+		val -= amount;
+	} else {
+		val += amount;
+	}
+
+	gpr_write_address(state, gpr, adsize, val);
 }
 
 static uint64_t
@@ -570,15 +616,56 @@ rep_get_cnt(struct nvmm_x64_state *state, size_t adsize)
 static void
 rep_set_cnt(struct nvmm_x64_state *state, size_t adsize, uint64_t cnt)
 {
-	uint64_t mask;
-
-	/* XXX: should we zero-extend? */
-	mask = size_to_mask(adsize);
-	state->gprs[NVMM_X64_GPR_RCX] &= ~mask;
-	state->gprs[NVMM_X64_GPR_RCX] |= cnt;
+	gpr_write_address(state, NVMM_X64_GPR_RCX, adsize, cnt);
 }
 
-static int
+static void
+memcpy_from_guest(void *dst, void *src, size_t size)
+{
+	/* Use volatile accesses to preserve implicit atomicity. */
+	switch (size) {
+	case 1:
+		*(uint8_t *)dst = *(volatile uint8_t *)src;
+		break;
+	case 2:
+		*(uint16_t *)dst = *(volatile uint16_t *)src;
+		break;
+	case 4:
+		*(uint32_t *)dst = *(volatile uint32_t *)src;
+		break;
+	case 8:
+		*(uint64_t *)dst = *(volatile uint64_t *)src;
+		break;
+	default:
+		memcpy(dst, (uint8_t *)src, size);
+		break;
+	}
+}
+
+static void
+memcpy_to_guest(void *dst, void *src, size_t size)
+{
+	/* Use volatile accesses to preserve implicit atomicity. */
+	switch (size) {
+	case 1:
+		*(volatile uint8_t *)dst = *(uint8_t *)src;
+		break;
+	case 2:
+		*(volatile uint16_t *)dst = *(uint16_t *)src;
+		break;
+	case 4:
+		*(volatile uint32_t *)dst = *(uint32_t *)src;
+		break;
+	case 8:
+		*(volatile uint64_t *)dst = *(uint64_t *)src;
+		break;
+	default:
+		memcpy((uint8_t *)dst, src, size);
+		break;
+	}
+}
+
+static size_t
 read_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
     gvaddr_t gva, uint8_t *data, size_t size)
 {
@@ -588,15 +675,16 @@ read_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	gpaddr_t gpa;
 	uintptr_t hva;
 	bool is_mmio;
-	int ret, remain;
+	size_t done, remain;
+	int ret;
 
 	ret = x86_gva_to_gpa(mach, state, gva, &gpa, &prot);
 	if (__predict_false(ret == -1)) {
-		return -1;
+		return 0;
 	}
 	if (__predict_false(!(prot & NVMM_PROT_READ))) {
 		errno = EFAULT;
-		return -1;
+		return 0;
 	}
 
 	if ((gva & PAGE_MASK) + size > PAGE_SIZE) {
@@ -620,22 +708,22 @@ read_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	} else {
 		if (__predict_false(!(prot & NVMM_PROT_READ))) {
 			errno = EFAULT;
-			return -1;
+			return 0;
 		}
-		memcpy(data, (uint8_t *)hva, size);
+
+		memcpy_from_guest(data, (void *)hva, size);
 	}
 
+	done = size;
 	if (remain > 0) {
-		ret = read_guest_memory(mach, vcpu, gva + size,
+		done += read_guest_memory(mach, vcpu, gva + size,
 		    data + size, remain);
-	} else {
-		ret = 0;
 	}
 
-	return ret;
+	return done;
 }
 
-static int
+static size_t
 write_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
     gvaddr_t gva, uint8_t *data, size_t size)
 {
@@ -645,15 +733,16 @@ write_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	gpaddr_t gpa;
 	uintptr_t hva;
 	bool is_mmio;
-	int ret, remain;
+	size_t done, remain;
+	int ret;
 
 	ret = x86_gva_to_gpa(mach, state, gva, &gpa, &prot);
 	if (__predict_false(ret == -1)) {
-		return -1;
+		return 0;
 	}
 	if (__predict_false(!(prot & NVMM_PROT_WRITE))) {
 		errno = EFAULT;
-		return -1;
+		return 0;
 	}
 
 	if ((gva & PAGE_MASK) + size > PAGE_SIZE) {
@@ -677,24 +766,24 @@ write_guest_memory(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	} else {
 		if (__predict_false(!(prot & NVMM_PROT_WRITE))) {
 			errno = EFAULT;
-			return -1;
+			return 0;
 		}
-		memcpy((uint8_t *)hva, data, size);
+
+		memcpy_to_guest((void *)hva, data, size);
 	}
 
+	done = size;
 	if (remain > 0) {
-		ret = write_guest_memory(mach, vcpu, gva + size,
+		done += write_guest_memory(mach, vcpu, gva + size,
 		    data + size, remain);
-	} else {
-		ret = 0;
 	}
 
-	return ret;
+	return done;
 }
 
 /* -------------------------------------------------------------------------- */
 
-static int fetch_segment(struct nvmm_machine *, struct nvmm_vcpu *);
+static int fetch_segment_outs(struct nvmm_machine *, struct nvmm_vcpu *);
 
 #define NVMM_IO_BATCH_SIZE	32
 
@@ -704,7 +793,7 @@ assist_io_batch(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 {
 	uint8_t iobuf[NVMM_IO_BATCH_SIZE];
 	size_t i, iosize, iocnt;
-	int ret;
+	size_t done;
 
 	cnt = MIN(cnt, NVMM_IO_BATCH_SIZE);
 	iosize = MIN(io->size * cnt, NVMM_IO_BATCH_SIZE);
@@ -713,8 +802,8 @@ assist_io_batch(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	io->data = iobuf;
 
 	if (!io->in) {
-		ret = read_guest_memory(mach, vcpu, gva, iobuf, iosize);
-		if (ret == -1)
+		done = read_guest_memory(mach, vcpu, gva, iobuf, iosize);
+		if (done != iosize)
 			return -1;
 	}
 
@@ -724,8 +813,8 @@ assist_io_batch(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	}
 
 	if (io->in) {
-		ret = write_guest_memory(mach, vcpu, gva, iobuf, iosize);
-		if (ret == -1)
+		done = write_guest_memory(mach, vcpu, gva, iobuf, iosize);
+		if (done != iosize)
 			return -1;
 	}
 
@@ -744,6 +833,7 @@ nvmm_assist_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 	gvaddr_t gva = 0; /* GCC */
 	int reg = 0; /* GCC */
 	int ret, seg;
+	size_t done;
 	bool psld = false;
 
 	if (__predict_false(exit->reason != NVMM_VCPU_EXIT_IO)) {
@@ -795,24 +885,28 @@ nvmm_assist_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 			if (io.in) {
 				seg = NVMM_X64_SEG_ES;
 			} else {
-				seg = fetch_segment(mach, vcpu);
+				seg = fetch_segment_outs(mach, vcpu);
 				if (seg == -1)
 					return -1;
 			}
 		}
 
-		if (__predict_true(is_long_mode(state))) {
+		if (__predict_true(is_64bit(state))) {
 			if (seg == NVMM_X64_SEG_GS || seg == NVMM_X64_SEG_FS) {
-				segment_apply(&state->segs[seg], &gva);
+				segment_apply(&state->segs[seg], &gva, false);
 			}
 		} else {
 			ret = segment_check(&state->segs[seg], gva, io.size);
 			if (ret == -1)
 				return -1;
-			segment_apply(&state->segs[seg], &gva);
+			segment_apply(&state->segs[seg], &gva, true);
 		}
 
 		if (exit->u.io.rep && !psld) {
+			/*
+			 * TODO: the segment check should be applied to the
+			 * whole batched range.
+			 */
 			iocnt = assist_io_batch(mach, vcpu, &io, gva, cnt);
 			if (iocnt == -1)
 				return -1;
@@ -824,9 +918,9 @@ nvmm_assist_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 		if (!exit->u.io.str) {
 			memcpy(io.data, &state->gprs[NVMM_X64_GPR_RAX], io.size);
 		} else {
-			ret = read_guest_memory(mach, vcpu, gva, io.data,
+			done = read_guest_memory(mach, vcpu, gva, io.data,
 			    io.size);
-			if (ret == -1)
+			if (done != io.size)
 				return -1;
 		}
 	}
@@ -841,20 +935,17 @@ nvmm_assist_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 				state->gprs[NVMM_X64_GPR_RAX] &= size_to_mask(4);
 			}
 		} else {
-			ret = write_guest_memory(mach, vcpu, gva, io.data,
+			done = write_guest_memory(mach, vcpu, gva, io.data,
 			    io.size);
-			if (ret == -1)
+			if (done != io.size)
 				return -1;
 		}
 	}
 
 done:
 	if (exit->u.io.str) {
-		if (__predict_false(psld)) {
-			state->gprs[reg] -= iocnt * io.size;
-		} else {
-			state->gprs[reg] += iocnt * io.size;
-		}
+		gpr_advance_address(state, reg, exit->u.io.address_size,
+		    iocnt * io.size, psld);
 	}
 
 	if (exit->u.io.rep) {
@@ -894,6 +985,7 @@ static void x86_func_test(struct nvmm_vcpu *, struct nvmm_mem *, uint64_t *);
 static void x86_func_mov(struct nvmm_vcpu *, struct nvmm_mem *, uint64_t *);
 static void x86_func_stos(struct nvmm_vcpu *, struct nvmm_mem *, uint64_t *);
 static void x86_func_lods(struct nvmm_vcpu *, struct nvmm_mem *, uint64_t *);
+static void x86_func_bt(struct nvmm_vcpu *, struct nvmm_mem *, uint64_t *);
 
 static const struct x86_emul x86_emul_or = {
 	.readreg = true,
@@ -943,6 +1035,11 @@ static const struct x86_emul x86_emul_lods = {
 	.func = x86_func_lods
 };
 
+static const struct x86_emul x86_emul_bt = {
+	.notouch = true,
+	.func = x86_func_bt
+};
+
 /* Legacy prefixes. */
 #define LEG_LOCK	0xF0
 #define LEG_REPN	0xF2
@@ -990,11 +1087,6 @@ enum x86_disp_type {
 	DISP_4
 };
 
-struct x86_disp {
-	enum x86_disp_type type;
-	uint64_t data; /* 4 bytes, but can be sign-extended */
-};
-
 struct x86_regmodrm {
 	uint8_t mod:2;
 	uint8_t reg:3;
@@ -1003,12 +1095,6 @@ struct x86_regmodrm {
 
 struct x86_immediate {
 	uint64_t data;
-};
-
-struct x86_sib {
-	uint8_t scale;
-	const struct x86_reg *idx;
-	const struct x86_reg *bas;
 };
 
 enum x86_store_type {
@@ -1026,10 +1112,9 @@ struct x86_store {
 		const struct x86_reg *reg;
 		struct x86_dualreg dualreg;
 		struct x86_immediate imm;
-		struct x86_sib sib;
 		uint64_t dmo;
 	} u;
-	struct x86_disp disp;
+	enum x86_disp_type disptype;
 	int hardseg;
 };
 
@@ -1074,6 +1159,7 @@ struct x86_opcode {
 	bool szoverride:1;
 	bool group1:1;
 	bool group3:1;
+	bool group8:1;
 	bool group11:1;
 	bool immediate:1;
 	uint8_t defsize;
@@ -1104,6 +1190,10 @@ static const struct x86_group_entry group1[8] __cacheline_aligned = {
 static const struct x86_group_entry group3[8] __cacheline_aligned = {
 	[0] = { .emul = &x86_emul_test },
 	[1] = { .emul = &x86_emul_test }
+};
+
+static const struct x86_group_entry group8[8] __cacheline_aligned = {
+	[4] = { .emul = &x86_emul_bt }
 };
 
 static const struct x86_group_entry group11[8] __cacheline_aligned = {
@@ -1525,6 +1615,22 @@ static const struct x86_opcode primary_opcode_table[256] __cacheline_aligned = {
 
 static const struct x86_opcode secondary_opcode_table[256] __cacheline_aligned = {
 	/*
+	 * Group8
+	 */
+	[0xBA] = {
+		/* Ev, Ib */
+		.valid = true,
+		.regmodrm = true,
+		.regtorm = true,
+		.szoverride = true,
+		.defsize = -1,
+		.group8 = true,
+		.immediate = true,
+		.flags = FLAG_imm8,
+		.emul = NULL /* group8 */
+	},
+
+	/*
 	 * MOVZX
 	 */
 	[0xB6] = {
@@ -1877,12 +1983,10 @@ node_movs(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	/* DS:RSI */
 	instr->src.type = STORE_REG;
 	instr->src.u.reg = &gpr_map__special[1][2][adrsize-1];
-	instr->src.disp.type = DISP_0;
 
 	/* ES:RDI, force ES */
 	instr->dst.type = STORE_REG;
 	instr->dst.u.reg = &gpr_map__special[1][3][adrsize-1];
-	instr->dst.disp.type = DISP_0;
 	instr->dst.hardseg = NVMM_X64_SEG_ES;
 
 	fsm_advance(fsm, 0, NULL);
@@ -1924,7 +2028,7 @@ node_stlo(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 		/* DS:RSI */
 		stlo->u.reg = &gpr_map__special[1][2][adrsize-1];
 	}
-	stlo->disp.type = DISP_0;
+	stlo->disptype = DISP_0;
 
 	fsm_advance(fsm, 0, NULL);
 
@@ -1983,17 +2087,14 @@ node_immediate(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	const struct x86_opcode *opcode = instr->opcode;
 	struct x86_store *store;
 	uint8_t immsize;
-	size_t sesize = 0;
 
 	/* The immediate is the source */
 	store = &instr->src;
 	immsize = instr->operand_size;
 
 	if (opcode->flags & FLAG_imm8) {
-		sesize = immsize;
 		immsize = 1;
 	} else if ((opcode->flags & FLAG_immz) && (immsize == 8)) {
-		sesize = immsize;
 		immsize = 4;
 	}
 
@@ -2001,11 +2102,9 @@ node_immediate(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	if (fsm_read(fsm, (uint8_t *)&store->u.imm.data, immsize) == -1) {
 		return -1;
 	}
-	fsm_advance(fsm, immsize, NULL);
+	store->u.imm.data = sign_extend(store->u.imm.data, immsize);
 
-	if (sesize != 0) {
-		store->u.imm.data = sign_extend(store->u.imm.data, sesize);
-	}
+	fsm_advance(fsm, immsize, NULL);
 
 	return 0;
 }
@@ -2014,28 +2113,17 @@ static int
 node_disp(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 {
 	const struct x86_opcode *opcode = instr->opcode;
-	uint64_t data = 0;
 	size_t n;
 
-	if (instr->strm->disp.type == DISP_1) {
+	if (instr->strm->disptype == DISP_1) {
 		n = 1;
-	} else if (instr->strm->disp.type == DISP_2) {
+	} else if (instr->strm->disptype == DISP_2) {
 		n = 2;
-	} else if (instr->strm->disp.type == DISP_4) {
+	} else if (instr->strm->disptype == DISP_4) {
 		n = 4;
 	} else {
 		DISASSEMBLER_BUG();
 	}
-
-	if (fsm_read(fsm, (uint8_t *)&data, n) == -1) {
-		return -1;
-	}
-
-	if (__predict_true(fsm->is64bit)) {
-		data = sign_extend(data, n);
-	}
-
-	instr->strm->disp.data = data;
 
 	if (opcode->immediate) {
 		fsm_advance(fsm, n, node_immediate);
@@ -2071,9 +2159,9 @@ node_dual(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	instr->strm->u.dualreg.reg1 = reg1;
 	instr->strm->u.dualreg.reg2 = reg2;
 
-	if (instr->strm->disp.type == DISP_NONE) {
+	if (instr->strm->disptype == DISP_NONE) {
 		DISASSEMBLER_BUG();
-	} else if (instr->strm->disp.type == DISP_0) {
+	} else if (instr->strm->disptype == DISP_0) {
 		/* Indirect register addressing mode */
 		if (instr->opcode->immediate) {
 			fsm_advance(fsm, 1, node_immediate);
@@ -2087,84 +2175,30 @@ node_dual(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	return 0;
 }
 
-static const struct x86_reg *
-get_register_idx(struct x86_instr *instr, uint8_t index)
-{
-	uint8_t enc = index;
-	const struct x86_reg *reg;
-	size_t regsize;
-
-	regsize = instr->address_size;
-	reg = &gpr_map[instr->rexpref.x][enc][regsize-1];
-
-	if (reg->num == -1) {
-		reg = resolve_special_register(instr, enc, regsize);
-	}
-
-	return reg;
-}
-
-static const struct x86_reg *
-get_register_bas(struct x86_instr *instr, uint8_t base)
-{
-	uint8_t enc = base;
-	const struct x86_reg *reg;
-	size_t regsize;
-
-	regsize = instr->address_size;
-	reg = &gpr_map[instr->rexpref.b][enc][regsize-1];
-	if (reg->num == -1) {
-		reg = resolve_special_register(instr, enc, regsize);
-	}
-
-	return reg;
-}
-
 static int
 node_sib(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 {
-	const struct x86_opcode *opcode;
-	uint8_t scale, index, base;
-	bool noindex, nobase;
-	uint8_t byte;
+	uint8_t base, byte;
 
 	if (fsm_read(fsm, &byte, sizeof(byte)) == -1) {
 		return -1;
 	}
 
-	scale = ((byte & 0b11000000) >> 6);
-	index = ((byte & 0b00111000) >> 3);
-	base  = ((byte & 0b00000111) >> 0);
-
-	opcode = instr->opcode;
-
-	noindex = false;
-	nobase = false;
-
-	if (index == 0b100 && !instr->rexpref.x) {
-		/* Special case: the index is null */
-		noindex = true;
-	}
+	base = (byte & 0b00000111);
 
 	if (instr->regmodrm.mod == 0b00 && base == 0b101) {
 		/* Special case: the base is null + disp32 */
-		instr->strm->disp.type = DISP_4;
-		nobase = true;
+		instr->strm->disptype = DISP_4;
 	}
 
 	instr->strm->type = STORE_SIB;
-	instr->strm->u.sib.scale = (1 << scale);
-	if (!noindex)
-		instr->strm->u.sib.idx = get_register_idx(instr, index);
-	if (!nobase)
-		instr->strm->u.sib.bas = get_register_bas(instr, base);
 
 	/* May have a displacement, or an immediate */
-	if (instr->strm->disp.type == DISP_1 ||
-	    instr->strm->disp.type == DISP_2 ||
-	    instr->strm->disp.type == DISP_4) {
+	if (instr->strm->disptype == DISP_1 ||
+	    instr->strm->disptype == DISP_2 ||
+	    instr->strm->disptype == DISP_4) {
 		fsm_advance(fsm, 1, node_disp);
-	} else if (opcode->immediate) {
+	} else if (instr->opcode->immediate) {
 		fsm_advance(fsm, 1, node_immediate);
 	} else {
 		fsm_advance(fsm, 1, NULL);
@@ -2197,7 +2231,7 @@ get_register_rm(struct x86_instr *instr)
 	const struct x86_reg *reg;
 	size_t regsize;
 
-	if (instr->strm->disp.type == DISP_NONE) {
+	if (instr->strm->disptype == DISP_NONE) {
 		regsize = instr->operand_size;
 	} else {
 		/* Indirect access, the size is that of the address. */
@@ -2316,6 +2350,11 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 			return -1;
 		}
 		instr->emul = group3[instr->regmodrm.reg].emul;
+	} else if (opcode->group8) {
+		if (group8[instr->regmodrm.reg].emul == NULL) {
+			return -1;
+		}
+		instr->emul = group8[instr->regmodrm.reg].emul;
 	} else if (opcode->group11) {
 		if (group11[instr->regmodrm.reg].emul == NULL) {
 			return -1;
@@ -2333,7 +2372,7 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	}
 
 	/* The displacement applies to RM. */
-	strm->disp.type = get_disp_type(instr);
+	strm->disptype = get_disp_type(instr);
 
 	if (has_sib(instr)) {
 		/* Overwrites RM */
@@ -2345,7 +2384,7 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 		/* Overwrites RM */
 		strm->type = STORE_REG;
 		strm->u.reg = &gpr_map__rip;
-		strm->disp.type = DISP_4;
+		strm->disptype = DISP_4;
 		fsm_advance(fsm, 1, node_disp);
 		return 0;
 	}
@@ -2354,7 +2393,7 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 		/* Overwrites RM */
 		strm->type = STORE_REG;
 		strm->u.reg = NULL;
-		strm->disp.type = DISP_4;
+		strm->disptype = DISP_4;
 		fsm_advance(fsm, 1, node_disp);
 		return 0;
 	}
@@ -2363,7 +2402,7 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 		/* Overwrites RM */
 		strm->type = STORE_REG;
 		strm->u.reg = NULL;
-		strm->disp.type = DISP_2;
+		strm->disptype = DISP_2;
 		fsm_advance(fsm, 1, node_disp);
 		return 0;
 	}
@@ -2381,14 +2420,14 @@ node_regmodrm(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	strm->type = STORE_REG;
 	strm->u.reg = reg;
 
-	if (strm->disp.type == DISP_NONE) {
+	if (strm->disptype == DISP_NONE) {
 		/* Direct register addressing mode */
 		if (opcode->immediate) {
 			fsm_advance(fsm, 1, node_immediate);
 		} else {
 			fsm_advance(fsm, 1, NULL);
 		}
-	} else if (strm->disp.type == DISP_0) {
+	} else if (strm->disptype == DISP_0) {
 		/* Indirect register addressing mode */
 		if (opcode->immediate) {
 			fsm_advance(fsm, 1, node_immediate);
@@ -2633,7 +2672,9 @@ node_legacy_prefix(struct x86_decode_fsm *fsm, struct x86_instr *instr)
 	} else if (byte == LEG_REPN) {
 		instr->legpref.repn = 1;
 	} else if (byte == LEG_LOCK) {
-		/* ignore */
+		/*
+		 * TODO: don't ignore the lock bit, emulate it correctly.
+		 */
 	} else {
 		/* not a legacy prefix */
 		fsm_advance(fsm, 0, node_rex_prefix);
@@ -2681,15 +2722,14 @@ x86_decode(uint8_t *inst_bytes, size_t inst_len, struct x86_instr *instr,
 static uint##sz##_t							\
 exec_##instr##sz(uint##sz##_t op1, uint##sz##_t op2, uint64_t *rflags)	\
 {									\
-	uint##sz##_t res;						\
 	__asm __volatile (						\
-		#instr"	%2, %3;"					\
-		"mov	%3, %1;"					\
+		#instr"	%2, %1;"					\
 		"pushfq;"						\
 		"popq	%0"						\
-	    : "=r" (*rflags), "=r" (res)				\
-	    : "r" (op1), "r" (op2));					\
-	return res;							\
+	    : "=r" (*rflags), "+r" (op2)				\
+	    : "r" (op1)							\
+	    : "cc", "memory");						\
+	return op2;							\
 }
 
 #define EXEC_DISPATCHER(instr)						\
@@ -2708,7 +2748,7 @@ exec_##instr(uint64_t op1, uint64_t op2, uint64_t *rflags, size_t opsize) \
 	}								\
 }
 
-/* SUB: ret = op1 - op2 */
+/* SUB: ret = op2 - op1 */
 #define PSL_SUB_MASK	(PSL_V|PSL_C|PSL_Z|PSL_N|PSL_PF|PSL_AF)
 EXEC_INSTR(8, sub)
 EXEC_INSTR(16, sub)
@@ -2716,7 +2756,7 @@ EXEC_INSTR(32, sub)
 EXEC_INSTR(64, sub)
 EXEC_DISPATCHER(sub)
 
-/* OR:  ret = op1 | op2 */
+/* OR:  ret = op2 | op1 */
 #define PSL_OR_MASK	(PSL_V|PSL_C|PSL_Z|PSL_N|PSL_PF)
 EXEC_INSTR(8, or)
 EXEC_INSTR(16, or)
@@ -2724,7 +2764,7 @@ EXEC_INSTR(32, or)
 EXEC_INSTR(64, or)
 EXEC_DISPATCHER(or)
 
-/* AND: ret = op1 & op2 */
+/* AND: ret = op2 & op1 */
 #define PSL_AND_MASK	(PSL_V|PSL_C|PSL_Z|PSL_N|PSL_PF)
 EXEC_INSTR(8, and)
 EXEC_INSTR(16, and)
@@ -2732,13 +2772,38 @@ EXEC_INSTR(32, and)
 EXEC_INSTR(64, and)
 EXEC_DISPATCHER(and)
 
-/* XOR: ret = op1 ^ op2 */
+/* XOR: ret = op2 ^ op1 */
 #define PSL_XOR_MASK	(PSL_V|PSL_C|PSL_Z|PSL_N|PSL_PF)
 EXEC_INSTR(8, xor)
 EXEC_INSTR(16, xor)
 EXEC_INSTR(32, xor)
 EXEC_INSTR(64, xor)
 EXEC_DISPATCHER(xor)
+
+/* BT: RFLAGS.CF = (op2 >> op1) & 1 */
+#define PSL_BT_MASK	(PSL_C)
+EXEC_INSTR(16, bt)
+EXEC_INSTR(32, bt)
+EXEC_INSTR(64, bt)
+
+/*
+ * There is no 8bit form of BT, so we can't use EXEC_DISPATCHER here.
+ */
+static void
+exec_bt(uint64_t op1, uint64_t op2, uint64_t *rflags, size_t opsize)
+{
+	switch (opsize) {
+	case 2:
+		exec_bt16(op1, op2, rflags);
+		break;
+	case 4:
+		exec_bt32(op1, op2, rflags);
+		break;
+	default:
+		exec_bt64(op1, op2, rflags);
+		break;
+	}
+}
 
 /* -------------------------------------------------------------------------- */
 
@@ -2957,33 +3022,50 @@ x86_func_mov(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem, uint64_t *gprs __unus
 }
 
 static void
-x86_func_stos(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem, uint64_t *gprs)
+x86_func_stos(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem,
+    uint64_t *gprs __unused)
 {
 	/*
-	 * Just move, and update RDI.
+	 * Just move. RDI is updated by assist_mem_single(), which has the
+	 * instruction's address size.
 	 */
 	(*vcpu->cbs.mem)(mem);
-
-	if (gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) {
-		gprs[NVMM_X64_GPR_RDI] -= mem->size;
-	} else {
-		gprs[NVMM_X64_GPR_RDI] += mem->size;
-	}
 }
 
 static void
-x86_func_lods(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem, uint64_t *gprs)
+x86_func_lods(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem,
+    uint64_t *gprs __unused)
 {
 	/*
-	 * Just move, and update RSI.
+	 * Just move. RSI is updated by assist_mem_single(), which has the
+	 * instruction's address size.
 	 */
 	(*vcpu->cbs.mem)(mem);
+}
 
-	if (gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) {
-		gprs[NVMM_X64_GPR_RSI] -= mem->size;
-	} else {
-		gprs[NVMM_X64_GPR_RSI] += mem->size;
-	}
+static void
+x86_func_bt(struct nvmm_vcpu *vcpu, struct nvmm_mem *mem, uint64_t *gprs)
+{
+	uint64_t *op1, op2, fl;
+
+	/*
+	 * The bit base is always the RM operand, so mem->write is always true
+	 * here, and the bit offset (op1) has already been fetched in
+	 * mem->data by the caller, from the immediate.
+	 */
+	op1 = (uint64_t *)mem->data;
+	op2 = 0;
+
+	/* Fetch the bit base (op2). */
+	mem->data = (uint8_t *)&op2;
+	mem->write = false;
+	(*vcpu->cbs.mem)(mem);
+
+	/* Perform the BT. There is nothing to write back. */
+	exec_bt(*op1, op2, &fl, mem->size);
+
+	gprs[NVMM_X64_GPR_RFLAGS] &= ~PSL_BT_MASK;
+	gprs[NVMM_X64_GPR_RFLAGS] |= (fl & PSL_BT_MASK);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -3000,39 +3082,17 @@ gpr_read_address(struct x86_instr *instr, struct nvmm_x64_state *state, int gpr)
 }
 
 static int
-store_to_gva(struct nvmm_x64_state *state, struct x86_instr *instr,
+store_to_gva_movs(struct nvmm_x64_state *state, struct x86_instr *instr,
     struct x86_store *store, gvaddr_t *gvap, size_t size)
 {
-	struct x86_sib *sib;
-	gvaddr_t gva = 0;
-	uint64_t reg;
+	gvaddr_t gva;
 	int ret, seg;
 
-	if (store->type == STORE_SIB) {
-		sib = &store->u.sib;
-		if (sib->bas != NULL)
-			gva += gpr_read_address(instr, state, sib->bas->num);
-		if (sib->idx != NULL) {
-			reg = gpr_read_address(instr, state, sib->idx->num);
-			gva += sib->scale * reg;
-		}
-	} else if (store->type == STORE_REG) {
-		if (store->u.reg == NULL) {
-			/* The base is null. Happens with disp32-only and
-			 * disp16-only. */
-		} else {
-			gva = gpr_read_address(instr, state, store->u.reg->num);
-		}
-	} else if (store->type == STORE_DUALREG) {
-		gva = gpr_read_address(instr, state, store->u.dualreg.reg1) +
-		    gpr_read_address(instr, state, store->u.dualreg.reg2);
-	} else {
-		gva = store->u.dmo;
+	if (store->type != STORE_REG) {
+		DISASSEMBLER_BUG();
 	}
 
-	if (store->disp.type != DISP_NONE) {
-		gva += store->disp.data;
-	}
+	gva = gpr_read_address(instr, state, store->u.reg->num);
 
 	if (store->hardseg != -1) {
 		seg = store->hardseg;
@@ -3044,15 +3104,15 @@ store_to_gva(struct nvmm_x64_state *state, struct x86_instr *instr,
 		}
 	}
 
-	if (__predict_true(is_long_mode(state))) {
+	if (__predict_true(is_64bit(state))) {
 		if (seg == NVMM_X64_SEG_GS || seg == NVMM_X64_SEG_FS) {
-			segment_apply(&state->segs[seg], &gva);
+			segment_apply(&state->segs[seg], &gva, false);
 		}
 	} else {
 		ret = segment_check(&state->segs[seg], gva, size);
 		if (ret == -1)
 			return -1;
-		segment_apply(&state->segs[seg], &gva);
+		segment_apply(&state->segs[seg], &gva, true);
 	}
 
 	*gvap = gva;
@@ -3060,27 +3120,29 @@ store_to_gva(struct nvmm_x64_state *state, struct x86_instr *instr,
 }
 
 static int
-fetch_segment(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+fetch_segment_outs(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
 	struct nvmm_x64_state *state = vcpu->state;
 	uint8_t inst_bytes[5], byte;
 	size_t i, fetchsize;
 	gvaddr_t gva;
-	int ret, seg;
+	int seg;
 
 	fetchsize = sizeof(inst_bytes);
 
 	gva = state->gprs[NVMM_X64_GPR_RIP];
-	if (__predict_false(!is_long_mode(state))) {
-		ret = segment_check(&state->segs[NVMM_X64_SEG_CS], gva,
-		    fetchsize);
-		if (ret == -1)
-			return -1;
-		segment_apply(&state->segs[NVMM_X64_SEG_CS], &gva);
+	if (__predict_false(!is_64bit(state))) {
+		/*
+		 * No need to check the CS attributes: if they did not allow
+		 * the instruction to execute, then we wouldn't have received
+		 * an IO VMEXIT in the first place. Just apply the segment
+		 * base.
+		 */
+		segment_apply(&state->segs[NVMM_X64_SEG_CS], &gva, true);
 	}
 
-	ret = read_guest_memory(mach, vcpu, gva, inst_bytes, fetchsize);
-	if (ret == -1)
+	fetchsize = read_guest_memory(mach, vcpu, gva, inst_bytes, fetchsize);
+	if (fetchsize == 0)
 		return -1;
 
 	seg = NVMM_X64_SEG_DS;
@@ -3124,22 +3186,21 @@ fetch_instruction(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	struct nvmm_x64_state *state = vcpu->state;
 	size_t fetchsize;
 	gvaddr_t gva;
-	int ret;
-
-	fetchsize = sizeof(exit->u.mem.inst_bytes);
 
 	gva = state->gprs[NVMM_X64_GPR_RIP];
-	if (__predict_false(!is_long_mode(state))) {
-		ret = segment_check(&state->segs[NVMM_X64_SEG_CS], gva,
-		    fetchsize);
-		if (ret == -1)
-			return -1;
-		segment_apply(&state->segs[NVMM_X64_SEG_CS], &gva);
+	if (__predict_false(!is_64bit(state))) {
+		/*
+		 * No need to check the CS attributes: if they did not allow
+		 * the instruction to execute, then we wouldn't have received
+		 * an MMIO VMEXIT in the first place. Just apply the segment
+		 * base.
+		 */
+		segment_apply(&state->segs[NVMM_X64_SEG_CS], &gva, true);
 	}
 
-	ret = read_guest_memory(mach, vcpu, gva, exit->u.mem.inst_bytes,
-	    fetchsize);
-	if (ret == -1)
+	fetchsize = read_guest_memory(mach, vcpu, gva, exit->u.mem.inst_bytes,
+	    sizeof(exit->u.mem.inst_bytes));
+	if (fetchsize == 0)
 		return -1;
 
 	exit->u.mem.inst_len = fetchsize;
@@ -3157,34 +3218,34 @@ assist_mem_double_movs(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	struct nvmm_x64_state *state = vcpu->state;
 	uint8_t data[8];
 	gvaddr_t gva;
-	size_t size;
+	size_t size, done;
+	bool psld;
 	int ret;
 
 	size = instr->operand_size;
 
 	/* Source. */
-	ret = store_to_gva(state, instr, &instr->src, &gva, size);
+	ret = store_to_gva_movs(state, instr, &instr->src, &gva, size);
 	if (ret == -1)
 		return -1;
-	ret = read_guest_memory(mach, vcpu, gva, data, size);
-	if (ret == -1)
+	done = read_guest_memory(mach, vcpu, gva, data, size);
+	if (done != size)
 		return -1;
 
 	/* Destination. */
-	ret = store_to_gva(state, instr, &instr->dst, &gva, size);
+	ret = store_to_gva_movs(state, instr, &instr->dst, &gva, size);
 	if (ret == -1)
 		return -1;
-	ret = write_guest_memory(mach, vcpu, gva, data, size);
-	if (ret == -1)
+	done = write_guest_memory(mach, vcpu, gva, data, size);
+	if (done != size)
 		return -1;
 
-	if (state->gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) {
-		state->gprs[NVMM_X64_GPR_RSI] -= size;
-		state->gprs[NVMM_X64_GPR_RDI] -= size;
-	} else {
-		state->gprs[NVMM_X64_GPR_RSI] += size;
-		state->gprs[NVMM_X64_GPR_RDI] += size;
-	}
+	psld = (state->gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) != 0;
+
+	gpr_advance_address(state, NVMM_X64_GPR_RSI, instr->address_size, size,
+	    psld);
+	gpr_advance_address(state, NVMM_X64_GPR_RDI, instr->address_size, size,
+	    psld);
 
 	return 0;
 }
@@ -3213,7 +3274,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	/* Determine the direction. */
 	switch (instr->src.type) {
 	case STORE_REG:
-		if (instr->src.disp.type != DISP_NONE) {
+		if (instr->src.disptype != DISP_NONE) {
 			/* Indirect access. */
 			mem.write = false;
 		} else {
@@ -3222,7 +3283,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		}
 		break;
 	case STORE_DUALREG:
-		if (instr->src.disp.type == DISP_NONE) {
+		if (instr->src.disptype == DISP_NONE) {
 			DISASSEMBLER_BUG();
 		}
 		mem.write = false;
@@ -3245,7 +3306,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		case STORE_REG:
 			/* The instruction was "reg -> mem". Fetch the register
 			 * in membuf. */
-			if (__predict_false(instr->src.disp.type != DISP_NONE)) {
+			if (__predict_false(instr->src.disptype != DISP_NONE)) {
 				DISASSEMBLER_BUG();
 			}
 			val = state->gprs[instr->src.u.reg->num];
@@ -3266,7 +3327,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		if (__predict_false(instr->dst.type != STORE_REG)) {
 			DISASSEMBLER_BUG();
 		}
-		if (__predict_false(instr->dst.disp.type != DISP_NONE)) {
+		if (__predict_false(instr->dst.disptype != DISP_NONE)) {
 			DISASSEMBLER_BUG();
 		}
 		val = state->gprs[instr->dst.u.reg->num];
@@ -3275,6 +3336,14 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	}
 
 	(*instr->emul->func)(vcpu, &mem, state->gprs);
+
+	if (instr->opcode->stos) {
+		gpr_advance_address(state, NVMM_X64_GPR_RDI, instr->address_size,
+		    mem.size, (state->gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) != 0);
+	} else if (instr->opcode->lods) {
+		gpr_advance_address(state, NVMM_X64_GPR_RSI, instr->address_size,
+		    mem.size, (state->gprs[NVMM_X64_GPR_RFLAGS] & PSL_D) != 0);
+	}
 
 	if (instr->emul->notouch) {
 		/* We're done. */
@@ -3288,7 +3357,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		if (__predict_false(instr->dst.type != STORE_REG)) {
 			DISASSEMBLER_BUG();
 		}
-		if (__predict_false(instr->dst.disp.type != DISP_NONE)) {
+		if (__predict_false(instr->dst.disptype != DISP_NONE)) {
 			DISASSEMBLER_BUG();
 		}
 		memcpy(&val, membuf, sizeof(uint64_t));
@@ -3303,7 +3372,7 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 		if (__predict_false(instr->src.type != STORE_REG)) {
 			DISASSEMBLER_BUG();
 		}
-		if (__predict_false(instr->src.disp.type != DISP_NONE)) {
+		if (__predict_false(instr->src.disptype != DISP_NONE)) {
 			DISASSEMBLER_BUG();
 		}
 		memcpy(&val, membuf, sizeof(uint64_t));
@@ -3316,6 +3385,35 @@ assist_mem_single(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	return 0;
 }
 
+static bool
+is_repeated_insn(struct x86_instr *instr)
+{
+	/*
+	 * MOVS/STOS/LODS are normally documented with the REP prefix. In
+	 * practice though, existing x86 processors also treat REPN as an
+	 * unconditional repeat prefix for these instructions, so emulate
+	 * that behavior as well.
+	 */
+	return (instr->legpref.rep || instr->legpref.repn) &&
+	    (instr->opcode->movs || instr->opcode->stos || instr->opcode->lods);
+}
+
+#ifdef LIBNVMM_DEBUG
+
+static void
+nvmm_dump_instr(struct nvmm_vcpu_exit *exit)
+{
+	size_t i;
+
+	printf("Unrecognized instruction: ");
+	for (i = 0; i < exit->u.mem.inst_len; i++) {
+		printf("%02x ", exit->u.mem.inst_bytes[i]);
+	}
+	printf("\n");
+}
+
+#endif
+
 int
 nvmm_assist_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
@@ -3323,6 +3421,7 @@ nvmm_assist_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 	struct nvmm_vcpu_exit *exit = vcpu->exit;
 	struct x86_instr instr;
 	uint64_t cnt = 0; /* GCC */
+	bool is_rep;
 	int ret;
 
 	if (__predict_false(exit->reason != NVMM_VCPU_EXIT_MEMORY)) {
@@ -3349,11 +3448,16 @@ nvmm_assist_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 	ret = x86_decode(exit->u.mem.inst_bytes, exit->u.mem.inst_len,
 	    &instr, state);
 	if (ret == -1) {
+#ifdef LIBNVMM_DEBUG
+		nvmm_dump_instr(exit);
+#endif
 		errno = ENODEV;
 		return -1;
 	}
 
-	if (instr.legpref.rep || instr.legpref.repn) {
+	is_rep = is_repeated_insn(&instr);
+
+	if (is_rep) {
 		cnt = rep_get_cnt(state, instr.address_size);
 		if (__predict_false(cnt == 0)) {
 			state->gprs[NVMM_X64_GPR_RIP] += instr.len;
@@ -3371,15 +3475,11 @@ nvmm_assist_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 		return -1;
 	}
 
-	if (instr.legpref.rep || instr.legpref.repn) {
+	if (is_rep) {
 		cnt -= 1;
 		rep_set_cnt(state, instr.address_size, cnt);
 		if (cnt == 0) {
 			state->gprs[NVMM_X64_GPR_RIP] += instr.len;
-		} else if (__predict_false(instr.legpref.repn)) {
-			if (state->gprs[NVMM_X64_GPR_RFLAGS] & PSL_Z) {
-				state->gprs[NVMM_X64_GPR_RIP] += instr.len;
-			}
 		}
 	} else {
 		state->gprs[NVMM_X64_GPR_RIP] += instr.len;
