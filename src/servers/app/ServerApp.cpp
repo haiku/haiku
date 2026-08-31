@@ -757,7 +757,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.Attach<uint8>(allocationFlags);
 
 				fLink.Attach<area_id>(bitmap->Area());
-				fLink.Attach<int32>(bitmap->AreaOffset());
+				fLink.Attach<ssize_t>(bitmap->AreaOffset());
 
 				if ((allocationFlags & kFramebuffer) != 0)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
@@ -846,7 +846,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 bytesPerRow;
 			int32 screenID;
 			area_id clientArea;
-			int32 areaOffset;
+			size_t areaOffset;
 
 			link.Read<BRect>(&frame);
 			link.Read<color_space>(&colorSpace);
@@ -854,7 +854,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&bytesPerRow);
 			link.Read<int32>(&screenID);
 			link.Read<int32>(&clientArea);
-			if (link.Read<int32>(&areaOffset) == B_OK) {
+			if (link.Read<size_t>(&areaOffset) == B_OK) {
 				// TODO: choose the right HWInterface with regards to the
 				// screenID
 				bitmap.SetTo(gBitmapManager->CloneFromClient(clientArea, areaOffset,

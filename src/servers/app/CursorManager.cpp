@@ -430,7 +430,7 @@ CursorManager::_RenderVectorCursor(uint32 size, const uint8* vector,
 		agg::recursive_blur<agg::rgba8, agg::recursive_blur_calc_rgba<> > blur;
 		blur.blur(pixFmt, 1);
 
-		for (int32 i = 0; i < shadow.BitsLength(); i += 4) {
+		for (size_t i = 0; i < shadow.BitsLength(); i += 4) {
 			uint8* bits = (uint8*)shadow.Bits() + i;
 			bits[0] = 0;
 			bits[1] = 0;

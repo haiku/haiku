@@ -64,7 +64,7 @@ public:
 
 	virtual area_id				Area() = 0;
 	virtual uint8*				Address() = 0;
-	virtual uint32				AreaOffset() = 0;
+	virtual size_t				AreaOffset() = 0;
 };
 
 
@@ -79,7 +79,7 @@ public:
 
 	virtual area_id				Area();
 	virtual uint8*				Address();
-	virtual uint32				AreaOffset();
+	virtual size_t				AreaOffset();
 
 private:
 			BReference<ClientMemoryAllocator>
@@ -94,16 +94,16 @@ public:
 								ClonedAreaMemory();
 	virtual						~ClonedAreaMemory();
 
-			void*				Clone(area_id area, uint32 offset);
+			void*				Clone(area_id area, size_t offset);
 
 	virtual area_id				Area();
 	virtual uint8*				Address();
-	virtual uint32				AreaOffset();
+	virtual size_t				AreaOffset();
 
 private:
 			area_id		fArea;
 			area_id		fClonedArea;
-			uint32		fOffset;
+			size_t		fOffset;
 			uint8*		fBase;
 };
 

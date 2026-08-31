@@ -189,7 +189,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 
 
 ServerBitmap*
-BitmapManager::CloneFromClient(area_id clientArea, int32 areaOffset,
+BitmapManager::CloneFromClient(area_id clientArea, size_t areaOffset,
 	BRect bounds, color_space space, uint32 flags, int32 bytesPerRow)
 {
 	BAutolock locker(fLock);

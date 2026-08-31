@@ -353,7 +353,7 @@ ClientMemory::Address()
 }
 
 
-uint32
+size_t
 ClientMemory::AreaOffset()
 {
 	if (fBlock != NULL)
@@ -387,7 +387,7 @@ ClonedAreaMemory::~ClonedAreaMemory()
 
 
 void*
-ClonedAreaMemory::Clone(area_id area, uint32 offset)
+ClonedAreaMemory::Clone(area_id area, size_t offset)
 {
 	BAutolock locker(sLocker);
 	if (sClonedAreaMemoryAllocator.AddArea(area, fClonedArea, fBase, 0, false) != B_OK)
@@ -413,7 +413,7 @@ ClonedAreaMemory::Address()
 }
 
 
-uint32
+size_t
 ClonedAreaMemory::AreaOffset()
 {
 	return fOffset;

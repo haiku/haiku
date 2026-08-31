@@ -187,9 +187,9 @@ CursorSet::FindCursor(BCursorID which, BBitmap **_cursor, BPoint *_hotspot)
 		return B_ERROR;
 
 	const void *buffer;
-	int32 bufferLength;
+	ssize_t bufferLength;
 	if (message.FindData("_data", B_RAW_TYPE, (const void **)&buffer,
-			(ssize_t *)&bufferLength) != B_OK) {
+			&bufferLength) != B_OK) {
 		return B_ERROR;
 	}
 
@@ -199,7 +199,7 @@ CursorSet::FindCursor(BCursorID which, BBitmap **_cursor, BPoint *_hotspot)
 		return B_NO_MEMORY;
 
 	memcpy(bitmap->Bits(), buffer,
-		min_c(bufferLength, bitmap->BitsLength()));
+		min_c((size_t)bufferLength, bitmap->BitsLength()));
 
 	*_cursor = bitmap;
 	*_hotspot = hotspot;

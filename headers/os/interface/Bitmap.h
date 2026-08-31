@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_BITMAP_H
@@ -77,7 +77,7 @@ public:
 
 			area_id				Area() const;
 			void*				Bits() const;
-			int32				BitsLength() const;
+			size_t				BitsLength() const;
 			int32				BytesPerRow() const;
 			color_space			ColorSpace() const;
 			BRect				Bounds() const;
@@ -141,7 +141,7 @@ private:
 									color_space colorSpace, uint32 flags,
 									int32 bytesPerRow, screen_id screenID,
 									area_id area = -1,
-									ptrdiff_t areaOffset = 0);
+									size_t areaOffset = 0);
 			void				_CleanUp();
 			void				_AssertPointer();
 
@@ -149,18 +149,18 @@ private:
 
 private:
 			uint8*				fBasePointer;
-			int32				fSize;
-			color_space			fColorSpace;
-			BRect				fBounds;
-			int32				fBytesPerRow;
-			BWindow*			fWindow;
-			int32				fServerToken;
-			int32				fAreaOffset;
-			uint8				unused;
+			size_t				fSize;
 			area_id				fArea;
 			area_id				fServerArea;
+			ssize_t				fAreaOffset;
+			BRect				fBounds;
+			color_space			fColorSpace;
+			int32				fBytesPerRow;
+			int32				fServerToken;
 			uint32				fFlags;
+			BWindow*			fWindow;
 			status_t			fInitError;
+			uint32				_reserved[1];
 };
 
 #endif	// _BITMAP_H

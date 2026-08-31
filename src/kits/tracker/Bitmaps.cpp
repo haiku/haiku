@@ -166,7 +166,7 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 	if (dest->ColorSpace() == B_RGBA32) {
 		// fill with transparent
 		uint8* destBits = (uint8*)dest->Bits();
-		int32 i = 0;
+		size_t i = 0;
 		while (i < dest->BitsLength()) {
 			destBits[i++] = B_TRANSPARENT_32_BIT.red;
 			destBits[i++] = B_TRANSPARENT_32_BIT.green;
@@ -182,7 +182,7 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 	} else { // assume B_CMAP8
 		// fill with transparent
 		uint8* destBits = (uint8*)dest->Bits();
-		for (int32 i = 0; i < dest->BitsLength(); i++)
+		for (size_t i = 0; i < dest->BitsLength(); i++)
 			destBits[i] = B_TRANSPARENT_MAGIC_CMAP8;
 	}
 

@@ -61,7 +61,7 @@ public:
 								{ return fToken; }
 
 			area_id			Area() const;
-			uint32			AreaOffset() const;
+			size_t			AreaOffset() const;
 
 			void			SetOverlay(::Overlay* overlay);
 			::Overlay*		Overlay() const;

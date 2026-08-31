@@ -165,7 +165,7 @@ ServerBitmap::Area() const
 }
 
 
-uint32
+size_t
 ServerBitmap::AreaOffset() const
 {
 	if (fMemory != NULL)

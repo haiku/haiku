@@ -365,7 +365,7 @@ RemoteMessage::ReadBitmap(BBitmap** _bitmap, bool minimal,
 		return result;
 	}
 
-	if (bitmap->BitsLength() < (int32)bitsLength) {
+	if (bitmap->BitsLength() < bitsLength) {
 		delete bitmap;
 		return B_ERROR;
 	}

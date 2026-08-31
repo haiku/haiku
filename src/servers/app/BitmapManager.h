@@ -34,7 +34,7 @@ public:
 									uint8* _allocationFlags = NULL);
 
 			ServerBitmap*		CloneFromClient(area_id clientArea,
-									int32 areaOffset, BRect bounds,
+									size_t areaOffset, BRect bounds,
 									color_space space, uint32 flags,
 									int32 bytesPerRow = -1);
 
