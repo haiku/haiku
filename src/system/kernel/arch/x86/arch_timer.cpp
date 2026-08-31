@@ -428,6 +428,13 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 	if (maxBasicLeaf < IA32_CPUID_LEAF_TSC)
 		return;
 
+	uint32 frequency = 0;
+	if (maxBasicLeaf >= IA32_CPUID_LEAF_FREQUENCY) {
+		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_FREQUENCY, 0);
+		frequency = cpuid.regs.eax;
+		gCPUClockSpeed = frequency * 1000000LL;
+	}
+
 	get_current_cpuid(&cpuid, IA32_CPUID_LEAF_TSC, 0);
 	if (cpuid.regs.eax == 0 || cpuid.regs.ebx == 0)
 		return;
@@ -439,10 +446,9 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 		khz = 25000;
 	}
 
-	if (khz == 0 && maxBasicLeaf >= IA32_CPUID_LEAF_FREQUENCY) {
+	if (khz == 0 && frequency != 0) {
 		// for these CPUs the base frequency is also the tsc frequency
-		get_current_cpuid(&cpuid, IA32_CPUID_LEAF_FREQUENCY, 0);
-		khz = cpuid.regs.eax * 1000 * denominator / numerator;
+		khz = frequency * 1000 * denominator / numerator;
 	}
 	if (khz == 0)
 		return;
