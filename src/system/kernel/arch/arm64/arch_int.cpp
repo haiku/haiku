@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2026 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <interrupts.h>
@@ -23,8 +23,9 @@
 #include "VMSAv8TranslationMap.h"
 #include <string.h>
 
-#include "soc.h"
 #include "arch_int_gicv2.h"
+#include "arch_int_gicv3.h"
+#include "soc.h"
 
 #define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
@@ -94,6 +95,11 @@ arch_int_init_post_vm(kernel_args *args)
 		ic = new(std::nothrow) GICv2InterruptController(
 			args->arch_args.interrupt_controller.regs1.start,
 			args->arch_args.interrupt_controller.regs2.start);
+	}
+	if (strcmp(args->arch_args.interrupt_controller.kind, INTC_KIND_GICV3) == 0) {
+		ic = new(std::nothrow)
+			GICv3InterruptController(args->arch_args.interrupt_controller.regs1.start,
+				args->arch_args.interrupt_controller.regs2.start, args->num_cpus);
 	}
 
 	if (ic == NULL)

@@ -244,6 +244,14 @@ typedef struct acpi_gic_distributor {
 	uint8 reserved[3];
 } _PACKED acpi_gic_distributor;
 
+typedef struct acpi_gic_redistributor {
+	uint8 type;
+	uint8 length;
+	uint16 reserved1;
+	uint64 discovery_range_base_address;
+	uint32 discovery_range_length;
+} _PACKED acpi_gic_redistributor;
+
 typedef struct acpi_gas {
 	uint8 address_space_id;
 	uint8 bit_width;

@@ -98,6 +98,7 @@ arch_handle_acpi()
 	if (madt != NULL) {
 		uint64 gicc_base = 0;
 		uint64 gicd_base = 0;
+		uint64 gicr_base = 0;
 		uint8 version = 0;
 
 		acpi_apic *desc = (acpi_apic*)(madt + 1);
@@ -117,18 +118,28 @@ arch_handle_acpi()
 				acpi_gic_distributor *acpi_gicd = (acpi_gic_distributor*)desc;
 				gicd_base = acpi_gicd->base_address;
 				version = acpi_gicd->gic_version;
+			} else if (desc->type == ACPI_MADT_GIC_REDISTRIBUTOR) {
+				acpi_gic_redistributor* acpi_gicr = (acpi_gic_redistributor*)desc;
+				gicr_base = acpi_gicr->discovery_range_base_address;
 			}
 			desc = (acpi_apic*)((char*)desc + desc->length);
 		}
 
-		if (version == 2 && gicc_base != 0 && gicd_base != 0) {
-			intc_info &intc = gKernelArgs.arch_args.interrupt_controller;
+		intc_info& intc = gKernelArgs.arch_args.interrupt_controller;
+		if (version == GICV2 && gicc_base != 0 && gicd_base != 0) {
 			strcpy(intc.kind, INTC_KIND_GICV2);
-			intc.regs1.start = gicd_base;
-			intc.regs2.start = gicc_base;
-
-			dprintf("discovered gic from acpi: version=%d, gicd=%lx, gicc=%lx\n",
-				version, gicd_base, gicc_base);
+		} else if ((version == GICV3 || version == GICV4) && gicd_base != 0 && gicr_base != 0) {
+			strcpy(intc.kind, INTC_KIND_GICV3);
+		} else {
+			dprintf("unrecognised gic version in acpi: version=%d, gicd=%lx, gicc=%lx, gicr=%lx\n",
+				version, gicd_base, gicc_base, gicr_base);
+			return;
 		}
+
+		intc.regs1.start = gicd_base;
+		intc.regs2.start = version == GICV2 ? gicc_base : gicr_base;
+
+		dprintf("discovered gic from acpi: version=%d, gicd=%lx, gicc=%lx, gicr=%lx\n", version,
+			gicd_base, gicc_base, gicr_base);
 	}
 }

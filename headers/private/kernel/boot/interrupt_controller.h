@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Copyright 2021-2026 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_INTERRUPT_CONTROLLER_H
@@ -12,9 +12,13 @@
 
 #define		INTC_KIND_GICV1		"gicv1"
 #define		INTC_KIND_GICV2		"gicv2"
+#define		INTC_KIND_GICV3		"gicv3" // covers GICv4 as well
 #define		INTC_KIND_OMAP3		"omap3"
 #define		INTC_KIND_PXA		"pxa"
 #define		INTC_KIND_SUN4I		"sun4i"
+
+
+enum { GICV2 = 2, GICV3 = 3, GICV4 = 4 };
 
 
 typedef struct {

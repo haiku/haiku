@@ -4,6 +4,8 @@
  */
 
 
+#include <timer.h>
+
 #include "arch_timer_generic.h"
 
 

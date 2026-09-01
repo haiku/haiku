@@ -3,15 +3,14 @@
 
 class InterruptController;
 
-#include <arch/smp.h>
-#include <drivers/bus/FDT.h>
-#include <private/kernel/interrupts.h>
-#include <private/kernel/timer.h>
+#include <smp.h>
 
 // ------------------------------------------------------ InterruptController
 
 class InterruptController {
 public:
+	virtual ~InterruptController() = default;
+
 	virtual void EnableInterrupt(int32 irq) = 0;
 	virtual void DisableInterrupt(int32 irq) = 0;
 
@@ -23,6 +22,12 @@ public:
 
 	virtual void SendBroadcastIci() {
 		panic("SendBroadcastIci unimplemented");
+	}
+
+	virtual void SendUnicastIci(int32 target_cpu) {
+		CPUSet cpuSet;
+		cpuSet.SetBit(target_cpu);
+		SendMulticastIci(cpuSet);
 	}
 
 	virtual status_t PerCpuInit() {

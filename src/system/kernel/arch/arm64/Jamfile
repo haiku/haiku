@@ -25,6 +25,7 @@ KernelMergeObject kernel_arch_arm64.o :
 	arch_platform.cpp
 	arch_asm.S
 	arch_int_gicv2.cpp
+	arch_int_gicv3.cpp
 	soc.cpp
 	acpi_irq_routing_table.cpp
 

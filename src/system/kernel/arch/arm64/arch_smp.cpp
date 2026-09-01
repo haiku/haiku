@@ -51,9 +51,7 @@ void
 arch_smp_send_ici(int32 target_cpu)
 {
 	InterruptController *ic = InterruptController::Get();
-	CPUSet cpuSet;
-	cpuSet.SetBit(target_cpu);
-	ic->SendMulticastIci(cpuSet);
+	ic->SendUnicastIci(target_cpu);
 }
 
 
