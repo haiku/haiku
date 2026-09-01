@@ -407,7 +407,7 @@ MouseDevice::_ControlThread()
 			status_t status = ioctl(fDevice, MS_READ_TOUCHPAD, &read, sizeof(read));
 			if (status < 0)
 				status = errno;
-			if (status == B_TIMED_OUT || status == B_BAD_DATA) {
+			if (status == B_TIMED_OUT || status == B_WOULD_BLOCK || status == B_BAD_DATA) {
 				read.event = MS_READ_TOUCHPAD;
 				read.u.touchpad = lastTouchpadMovement;
 			} else if (status != B_OK && status != B_INTERRUPTED) {
