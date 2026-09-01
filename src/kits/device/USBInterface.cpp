@@ -229,6 +229,7 @@ BUSBInterface::SetAlternate(uint32 alternateIndex)
 		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
 
+	fAlternate = alternateIndex;
 	_UpdateDescriptorAndEndpoints();
 	return B_OK;
 }
