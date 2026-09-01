@@ -307,7 +307,8 @@ BEntry::GetPath(BPath* path) const
 }
 
 
-status_t BEntry::GetParent(BEntry* entry) const
+status_t
+BEntry::GetParent(BEntry* entry) const
 {
 	// check parameter and initialization
 	if (fCStatus != B_OK)

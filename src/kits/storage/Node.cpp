@@ -191,7 +191,7 @@ BNode::SetTo(const BEntry* entry)
 status_t
 BNode::SetTo(const char* path)
 {
-	return _SetTo(-1, path, false);
+	return _SetTo(AT_FDCWD, path, false);
 }
 
 
