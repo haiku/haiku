@@ -527,12 +527,12 @@ EndpointManager::Unbind(TCPEndpoint* endpoint)
 	TRACE(("EndpointManager::Unbind(%p)\n", endpoint));
 	T(Unbind(endpoint));
 
+	WriteLocker _(fLock);
+
 	if (endpoint == NULL || !endpoint->IsBound()) {
 		TRACE(("  endpoint is unbound.\n"));
 		return B_BAD_VALUE;
 	}
-
-	WriteLocker _(fLock);
 
 	if (!fEndpointHash.Remove(endpoint))
 		panic("bound endpoint %p not in hash!", endpoint);
