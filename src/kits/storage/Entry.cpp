@@ -253,7 +253,7 @@ BEntry::SetTo(const char* path, bool traverse)
 	// check the argument
 	if (!path)
 		return (fCStatus = B_BAD_VALUE);
-	return (fCStatus = _SetTo(-1, path, traverse));
+	return (fCStatus = _SetTo(AT_FDCWD, path, traverse));
 }
 
 
@@ -539,7 +539,7 @@ BEntry::set_stat(struct stat& st, uint32 what)
 	close the FD afterwards.
 
 	\param dirFD File descriptor of a directory relative to which path is to
-		be considered. May be -1 if the current directory shall be considered.
+		be considered. May be AT_FDCWD if the current directory shall be considered.
 	\param path Pointer to a path relative to the given directory.
 	\param traverse If \c true and the given entry is a symbolic link, the
 		object is recursively set to point to the entry linked to by the
