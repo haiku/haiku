@@ -44,11 +44,121 @@ publish_devices
   Returns an array of device names that the driver will export. The names are relative to the /dev directory.
 
 find_device
-  Returns the function pointers that will allow to operate on a device file. These correspond to the following operations on the
-  device file: open, close, free, control, read, write, select, deselect, readv and writev.
+  Returns the function pointers that will allow to operate on a device file. See the next section for details.
 
 api_version
   Populate with B_CUR_DRIVER_VERSION. This lets the kernel know this version of the interface is being used.
+
+Device hooks
+============
+
+Drivers expose themselves to userspace through device files. In Haiku, these are part of a special
+filesystem called devfs, which is mounted in /dev. The device files are organized in subdirectories,
+depending on the type of device. For example, mass storage devices are in /dev/disk/, serial ports
+are in /dev/ports/, and so on. This makes it easy for applications to locate devices of a given type.
+
+Whenever possible, your driver should publish devices in one of the existing directories and provide
+the same interface as the other devices published there by other drivers. This makes sure applications
+can interact with the different devices without having to handle special cases, and the drivers handle
+all the required hardware abstraction. If you are writing the first driver for a new type of device,
+you will need to decide by yourself what interface to use. In that case, try to consider not just the
+device you are working with, but what similar devices may end up in the same directory later on.
+Design the interface so that it can be used in a more general case, by similar but slightly different
+devices using other drivers.
+
+The hooks are defined in os/drivers/Drivers.h:
+
+.. code-block:: cpp
+   status_t open(const char* name. uint32 flags, void **cookie);
+   status_t close(void* cookie);
+   status_t free(void* cookie);
+   status_t control(void* cookie, uint32 op, void* data, size_t len);
+   status_t read(void* cookie, off_t position, void* data, size_t* numBytes);
+   status_t write(void* cookie, off_t position, void* data, size_t* numBytes);
+   status_t select(void* cookie, uint8 event, uint32 ref, selectsync* sync);
+   status_t deselect(void* cookie, uint8 event, selectsync* sync);
+   status_t readv(void* cookie, off_t position, const iovec* vec, size_t count, size_t* numBytes);
+   status_t writev(void* cookie, off_t position, const iovec* vec, size_t count, size_t* numBytes);
+
+If you are familiar with the use of files and file descriptors in UNIX systems, the names of some of
+these functions will look familiar. This is because the driver is implementing the other side of
+these operations in the case of device files. For example, when an application calls read() on the
+device file, this results in calling the driver's read hook.
+
+All the functions return a status_t error code and are allowed to fail with any error code. If in
+doubt, it's always safe to return B_NOT_SUPPORTED for things you don't want to handle. The error
+code will be forwarded to the calling application.
+
+Now let's look into each of these functions in more detail.
+
+open
+   This is the first hook that will be called, when an application opens the device file.
+   It receives the device name (corresponding to one that was listed by publish_devices) and flags
+   (such as O_EXCL, O_RDWR, etc). The cookie argument is an output. You can allocate some memory
+   and store a pointer to it there. The cookie will then be passed to all the other functions. In
+   simple cases, where your driver manages a single device and doesn't need to track any state,
+   you may get away with not using the cookie at all. The cookie is associated with a file
+   descriptor in the application.
+
+close
+   This is called when the file description is closed. Note that UNIX has separate notions of a
+   file descriptor and the underlying file description. For example, duplicating a file descriptor
+   with dup() does not create a new file description. The kernel keeps track of duplicated file
+   descriptors, and calls the close hook only when all file descriptors are closed.
+
+free
+   This is called when the file descriptor can be freed. It is a good time to release the memory
+   allocation for the cookie structure. This is separate from close because a device can be closed
+   while it is still in use by the select/deselect hooks.
+
+control
+   This hook is called when an application uses ioctl or posix_devctl on the device file. It is
+   used for all operations on a device that don't map well to the basic "read" and "write" logic.
+   Some other operations (such as getting and setting file descriptor flags using fcntl) also use
+   the control hook.
+   A control operation contains an operation code, and a sized buffer which may be used for input,
+   output, or both. There is a list of generic and specific ioctls defined in os/drivers/Drivers.h,
+   but drivers can define extra operations as needed.
+
+read, write
+   These implement read and write operations. Note that the direction is as seen from the application
+   calling the function. Therefore, in a read operation, your driver should fill the passed buffer
+   with data from the device, and in a write operation, it should transfer the data from the buffer
+   to the device.
+   read and write operations always include the position (offset). similarly to userspace functions
+   pread and pwrite. The kernel internally handles seeking and keeping track of the current position
+   for you. In some cases, the position can be ignored completely (for example, a driver returning
+   values from a temperature sensor should just return the current value at every read).
+
+select, deselect
+   These are used to implement waiting for events on the device, implementing userspace functions
+   like select(), poll() and kqueue().
+
+readv, writev
+   These function implement "scatter-gather" input and output. They are similar to read and write,
+   but instead of storing the data in a single linear buffer, they have an array of smaller buffers.
+   This gives application more flexibility in the way they manage their memory.
+
+Nonblocking and asynchronous IO
+-------------------------------
+
+By default, the read and write operations are blocking. This means the function should not return
+until the operation is fully complete, and the data buffer is only guaranteed to exist as long as
+the function is running. When implementing non-blocking IO, the driver will have to do its own
+caching and copy the data in its own buffers. This is usually inefficient. If your driver is
+expected to require a high throughput or handle a lot of data in asynchronous mode, using the "new"
+driver model (see the "device manager" section of the documentation) allows an additional io hook
+designed for this, typically used in combination with the IO scheduler.
+
+There are also some special cases of asynchronous IO. For example, network devices implement it through
+a specific ioctl dealing with net_buffer structures.
+
+Unsupported filesystem functions
+--------------------------------
+
+In Haiku, device file cannot be memory-mapped with mmap. Instead, there is typically an ioctl
+allowing to obtain an area id for accessing memory mapped data (for example: framebuffer drivers
+are implemented in this way).
 
 Building and testing your driver
 ================================
