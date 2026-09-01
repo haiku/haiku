@@ -53,10 +53,10 @@ free_asid(size_t asid)
 static void
 flush_tlb_whole_asid(uint64_t asid)
 {
-	asm("dsb ishst");
+	arm64_dsb(ishst);
 	asm("tlbi aside1is, %0" ::"r"(asid << 48));
-	asm("dsb ish");
-	asm("isb");
+	arm64_dsb(ish);
+	arm64_isb();
 }
 
 
@@ -180,7 +180,7 @@ VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8Translatio
 
 	if (to->fASID != -1) {
 		WRITE_SPECIALREG(TTBR0_EL1, ((uint64_t)to->fASID << 48) | ttbr);
-		asm("isb");
+		arm64_isb();
 		return;
 	}
 
@@ -357,7 +357,7 @@ VMSAv8TranslationMap::GetOrMakeTable(phys_addr_t ptPa, int level, int index,
 		ASSERT(type != kPteTypeL12Block);
 
 		// Ensure that writes to page being attached have completed
-		asm("dsb ishst");
+		arm64_dsb(ishst);
 
 		uint64_t oldPteRefetch = (uint64_t)atomic_test_and_set64((int64*) ptePtr,
 			newTablePa | kPteTypeL012Table, oldPte);
@@ -387,15 +387,15 @@ flush_va_if_accessed(uint64_t pte, addr_t va, int asid)
 
 	if ((pte & kAttrNG) == 0) {
 		// Flush from all address spaces
-		asm("dsb ishst"); // Ensure PTE write completed
+		arm64_dsb(ishst); // Ensure PTE write completed
 		asm("tlbi vaae1is, %0" ::"r"(((va >> 12) & kTLBIMask)));
-		asm("dsb ish");
-		asm("isb");
+		arm64_dsb(ish); // Wait for TLB flush to complete
+		arm64_isb();
 	} else if (asid != -1) {
-		asm("dsb ishst"); // Ensure PTE write completed
-        asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (uint64_t(asid) << 48)));
-		asm("dsb ish"); // Wait for TLB flush to complete
-		asm("isb");
+		arm64_dsb(ishst); // Ensure PTE write completed
+		asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (uint64_t(asid) << 48)));
+		arm64_dsb(ish); // Wait for TLB flush to complete
+		arm64_isb();
 		return true;
 	}
 
@@ -602,8 +602,8 @@ VMSAv8TranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes, uint32 m
 
 				// Install the new PTE
 				atomic_set64((int64*)ptePtr, newPte);
-				asm("dsb ishst"); // Ensure PTE write completed
-				asm("isb");
+				arm64_dsb(ishst); // Ensure PTE write completed
+				arm64_isb();
 				if ((attributes & (B_EXECUTE_AREA | B_KERNEL_EXECUTE_AREA)) != 0)
 					arch_cpu_sync_icache((void*)(KERNEL_PMAP_BASE + effectivePa), B_PAGE_SIZE);
 				break;
@@ -834,8 +834,8 @@ VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint3
 						continue;
 
 					atomic_set64((int64_t*)ptePtr, newPte);
-					asm("dsb ishst"); // Ensure PTE write completed
-					asm("isb");
+					arm64_dsb(ishst); // Ensure PTE write completed
+					arm64_isb();
 
 					// No compare-exchange loop required in this case.
 					break;
@@ -933,7 +933,7 @@ VMSAv8TranslationMap::ClearAccessedAndModified(
 				if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
 					break;
 			}
-			asm("dsb ishst"); // Ensure PTE write completed
+			arm64_dsb(ishst); // Ensure PTE write completed
 		});
 
 	pinner.Unlock();

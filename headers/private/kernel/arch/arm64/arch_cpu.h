@@ -1,5 +1,6 @@
 /*
  * Copyright 2018, Jaroslaw Pelczar <jarek@jpelczar.com>
+ * Copyright 2026, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_ARCH_ARM64_ARCH_CPU_H_
@@ -20,14 +21,35 @@
 #include <arch/arm64/arch_thread_types.h>
 #include <kernel.h>
 
-#define arm64_sev()  		__asm__ __volatile__("sev" : : : "memory")
-#define arm64_wfe()  		__asm__ __volatile__("wfe" : : : "memory")
-#define arm64_dsb()  		__asm__ __volatile__("dsb" : : : "memory")
-#define arm64_dmb()  		__asm__ __volatile__("dmb" : : : "memory")
-#define arm64_isb()  		__asm__ __volatile__("isb" : : : "memory")
-#define arm64_nop()  		__asm__ __volatile__("nop" : : : "memory")
-#define arm64_wfi()  		__asm__ __volatile__("wfi" : : : "memory")
-#define arm64_yield() 	__asm__ __volatile__("yield" : : : "memory")
+// Options specifying barrier limitations.
+// As it has to be specified for dsb (data synchronization barrier) and dmb (data memory barrier)
+// these macros act as a whitelist.
+// isb (instruction synchronization barrier) supports only sy, and it's the default.
+// See for details:
+// https://support.arm.com/documentation/dui0801/l/A64-General-Instructions/DSB--A64-
+#define ARM64_BARRIER_OPT_sy	"sy" // full system, read-write (used for memory_full_barrier())
+#define ARM64_BARRIER_OPT_st	"st" // full system, write only
+#define ARM64_BARRIER_OPT_ld	"ld" // full system, read in group A, read-write in group B
+#define ARM64_BARRIER_OPT_ish	"ish" // inner sharable, read-write
+#define ARM64_BARRIER_OPT_ishst	"ishst" // inner sharable, write only (used for memory_write_barrier())
+#define ARM64_BARRIER_OPT_ishld	"ishld" // inner sharable, read in group A, read-write in group B (used for memory_read_barrier())
+#define ARM64_BARRIER_OPT_nsh	"nsh" // non-sharable, read-write
+#define ARM64_BARRIER_OPT_nshst	"nshst" // non-sharable, write only
+#define ARM64_BARRIER_OPT_nshld	"nshld" // non-sharable, read in group A, read-write in group B
+#define ARM64_BARRIER_OPT_osh	"osh" // outer sharable, read-write
+#define ARM64_BARRIER_OPT_oshst	"oshst" // outer sharable, write only
+#define ARM64_BARRIER_OPT_oshld	"oshld" // outer sharable, read in group A, read-write in group B
+
+// Barriers
+#define arm64_dsb(limit)	__asm__ __volatile__("dsb " ARM64_BARRIER_OPT_##limit : : : "memory")
+#define arm64_dmb(limit)	__asm__ __volatile__("dmb " ARM64_BARRIER_OPT_##limit : : : "memory")
+#define arm64_isb()			__asm__ __volatile__("isb" : : : "memory")
+
+#define arm64_sev()		__asm__ __volatile__("sev" : : : "memory")
+#define arm64_wfe()		__asm__ __volatile__("wfe" : : : "memory")
+#define arm64_nop()		__asm__ __volatile__("nop" : : : "memory")
+#define arm64_wfi()		__asm__ __volatile__("wfi" : : : "memory")
+#define arm64_yield()	__asm__ __volatile__("yield" : : : "memory")
 
 /* Extract CPU affinity levels 0-3 */
 #define	CPU_AFF0(mpidr)	(u_int)(((mpidr) >> 0) & 0xff)
