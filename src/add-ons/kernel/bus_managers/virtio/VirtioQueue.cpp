@@ -305,7 +305,6 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 	size_t writtenVectorCount, void *cookie)
 {
 	CALLED();
-	InterruptsSpinLocker locker(fLock);
 
 	size_t count = readVectorCount + writtenVectorCount;
 	if (count < 1)
@@ -314,6 +313,7 @@ VirtioQueue::QueueRequest(const physical_entry* vector, size_t readVectorCount,
 		return QueueRequestIndirect(vector, readVectorCount,
 			writtenVectorCount, cookie);
 	}
+	InterruptsSpinLocker locker(fLock);
 
 	if (count > fRingFree)
 		return B_BUSY;
