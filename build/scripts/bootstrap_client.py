@@ -36,7 +36,7 @@ try:
 	stdioConnection.connect((address, port))
 	stderrConnection.connect((address, port))
 except socket.error as msg:
-    sys.exit('Failed to connect to %s port %d: %s' % (address, port, msg))
+	sys.exit('Failed to connect to %s port %d: %s' % (address, port, msg))
 
 # send command length and command
 controlConnection.send(b"%08d" % len(commandToRun.encode()))
@@ -62,6 +62,7 @@ while connections and (len(connections) > 1 or not sys.stdin in connections):
 		data = stdioConnection.recv(bufferSize)
 		if data:
 			sys.stdout.buffer.write(data)
+			sys.stdout.buffer.flush()
 		else:
 			connections.remove(stdioConnection)
 		
@@ -69,6 +70,7 @@ while connections and (len(connections) > 1 or not sys.stdin in connections):
 		data = stderrConnection.recv(bufferSize)
 		if data:
 			sys.stderr.buffer.write(data)
+			sys.stderr.buffer.flush()
 		else:
 			connections.remove(stderrConnection)
 		
