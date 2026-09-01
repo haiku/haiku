@@ -101,7 +101,7 @@ rldexport_init(void)
 	gRuntimeLoader.api_version field.
 */
 void
-set_abi_api_version(int abi_version, int api_version)
+update_abi_api_version(int abi_version, int api_version)
 {
 	if (gRuntimeLoader.abi_version == 0
 		|| gRuntimeLoader.abi_version > abi_version) {

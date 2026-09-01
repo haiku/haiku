@@ -257,4 +257,12 @@ analyze_image_haiku_version_and_abi(int fd, image_t* image, elf_ehdr& eheader,
 		image->api_version = image->abi > B_HAIKU_ABI_GCC_2_BEOS
 			? HAIKU_VERSION_PRE_GLUE_CODE : B_HAIKU_VERSION_BEOS;
 	}
+
+	// Don't update the global API/ABI version with that of images with no dependencies,
+	// as these may not have the glue code linked in, or are so closely tied to the ABI
+	// that checking their versions is irrelevant (e.g. libgcc).
+	if (image->num_needed == 0)
+		return;
+
+	update_abi_api_version(image->abi, image->api_version);
 }

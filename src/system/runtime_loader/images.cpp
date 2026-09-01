@@ -459,9 +459,12 @@ remap_images()
 				continue;
 
 			uint32 protection = B_READ_AREA;
-			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU) {
+#ifdef __HAIKU_BEOS_COMPATIBLE
+			if (image->abi < B_HAIKU_ABI_GCC_2_HAIKU)
 				protection |= B_WRITE_AREA | B_EXECUTE_AREA;
-			} else {
+			else
+#endif
+			{
 				if ((region.flags & RFLAG_WRITABLE) != 0)
 					protection |= B_WRITE_AREA;
 				if ((region.flags & RFLAG_EXECUTABLE) != 0)
