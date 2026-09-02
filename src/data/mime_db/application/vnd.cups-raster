@@ -1,0 +1,10 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/vnd.cups-raster";
+
+resource(2, "META:SNIFF_RULE") "0.50 ( \"RaSt\" | \"tSaR\" | \"RaS2\" | \"2SaR\" | \"RaS3\" | \"3SaR\" )";
+
+resource(3, "META:S:DESC") #'MSDC' "CUPS raster file";
+
+resource(4, "META:L:DESC") #'MLDC' "CUPS raster print format";

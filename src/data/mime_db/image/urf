@@ -1,0 +1,15 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/urf";
+
+resource(2, "META:SNIFF_RULE") "0.50 (\"UNIRAST\\000\")";
+
+resource(3, "META:S:DESC") #'MSDC' "URF raster image";
+
+resource(4, "META:L:DESC") #'MLDC' "Apple UNIRAST raster print format";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "urf",
+	"type" = "image/urf"
+};

@@ -1,0 +1,15 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/pwg-raster";
+
+resource(2, "META:SNIFF_RULE") "0.60 (\"RaS2PwgRaster\\000\")";
+
+resource(3, "META:S:DESC") #'MSDC' "PWG raster image";
+
+resource(4, "META:L:DESC") #'MLDC' "PWG raster print format";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "pwg",
+	"type" = "image/pwg-raster"
+};
