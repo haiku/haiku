@@ -14,8 +14,10 @@ struct __res_state_ext {
 	} sort_list[MAXRESOLVSORT];
 	char nsuffix[64];
 	char nsuffix2[64];
+#ifndef __HAIKU__
 	struct timespec res_conf_time;
 	int kq, resfd;
+#endif
 };
 
 extern int res_ourserver_p(const res_state, const struct sockaddr *);

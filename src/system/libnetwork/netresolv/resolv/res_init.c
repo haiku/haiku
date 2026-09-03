@@ -141,8 +141,8 @@ static uint32_t net_mask(struct in_addr);
 # define isascii(c) (!(c & 0200))
 #endif
 
-static struct timespec __res_conf_time;
 #ifndef __HAIKU__
+static struct timespec __res_conf_time;
 static const struct timespec ts = { 0, 0 };
 #endif
 
@@ -501,20 +501,19 @@ __res_vinit(res_state statp, int preinit) {
 #ifdef RESOLVSORT
 	    statp->nsort = nsort;
 #endif
+#ifndef __HAIKU__
 	    statp->_u._ext.ext->resfd = fcntl(fileno(fp), F_DUPFD_CLOEXEC, 0);
+#endif
 	    (void) fclose(fp);
+#ifndef __HAIKU__
 	    if (fstat(statp->_u._ext.ext->resfd, &st) != -1)
 		    __res_conf_time = statp->_u._ext.ext->res_conf_time =
-#ifdef __HAIKU__
-			st.st_mtim;
-	    statp->_u._ext.ext->kq = -1;
-#else
 			st.st_mtimespec;
 	    __res_kqinit(statp);
-#endif
 	} else {
 	    statp->_u._ext.ext->kq = -1;
 	    statp->_u._ext.ext->resfd = -1;
+#endif
 	}
 /*
  * Last chance to get a nameserver.  This should not normally
@@ -834,9 +833,9 @@ res_ndestroy(res_state statp)
 #ifndef __HAIKU__
 		if (ext->kq != -1 && ext->kqpid == getpid())
 			(void)close(ext->kq);
-#endif
 		if (ext->resfd != -1)
 			(void)close(ext->resfd);
+#endif
 		free(ext);
 		statp->_u._ext.ext = NULL;
 	}
