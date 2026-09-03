@@ -33,6 +33,7 @@ static const struct {
 	{ 0x8086, 0x43c8},	// Tiger Lake-H HD Audio
 	{ 0x8086, 0xa171},	// CM238 HD Audio
 	{ 0x8086, 0x3198},	// GeminiLake HD Audio
+	{ 0x8086, 0x9d70},	// Sunrise Point-LP HD Audio
 };
 
 
