@@ -92,7 +92,7 @@ packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 
 	status_t error = volume->Mount(parameters);
 	if (error != B_OK) {
-		volumeWriteLocker.Unlock();
+		volumeWriteLocker.Detach();
 		delete volume;
 		return error;
 	}
