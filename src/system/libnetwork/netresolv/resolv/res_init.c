@@ -141,6 +141,11 @@ static uint32_t net_mask(struct in_addr);
 # define isascii(c) (!(c & 0200))
 #endif
 
+static struct timespec __res_conf_time;
+#ifndef __HAIKU__
+static const struct timespec ts = { 0, 0 };
+#endif
+
 /*
  * Resolver state default settings.
  */
@@ -170,6 +175,23 @@ int
 res_ninit(res_state statp) {
 	return (__res_vinit(statp, 0));
 }
+
+#ifndef __HAIKU__
+static int
+__res_kqinit(res_state statp)
+{
+	struct kevent kc;
+	struct __res_state_ext *ext = statp->_u._ext.ext;
+
+	ext->kq = kqueue1(O_CLOEXEC);
+	ext->kqpid = getpid();
+	EV_SET(&kc, ext->resfd, EVFILT_VNODE,
+	    EV_ADD|EV_ENABLE|EV_CLEAR, NOTE_DELETE|NOTE_WRITE| NOTE_EXTEND|
+	    NOTE_ATTRIB|NOTE_LINK|NOTE_RENAME|NOTE_REVOKE, 0, 0);
+	(void)kevent(ext->kq, &kc, 1, NULL, 0, &ts);
+	return ext->kq;
+}
+#endif
 
 /*% This function has to be reachable by res_data.c but not publically. */
 int
@@ -330,6 +352,8 @@ __res_vinit(res_state statp, int preinit) {
 
 	nserv = 0;
 	if ((fp = fopen(path, "re")) != NULL) {
+	    struct stat st;
+
 	    /* read the config file */
 	    while (fgets(buf, (int)sizeof(buf), fp) != NULL) {
 		/* skip comments */
@@ -479,6 +503,15 @@ __res_vinit(res_state statp, int preinit) {
 #endif
 	    statp->_u._ext.ext->resfd = fcntl(fileno(fp), F_DUPFD_CLOEXEC, 0);
 	    (void) fclose(fp);
+	    if (fstat(statp->_u._ext.ext->resfd, &st) != -1)
+		    __res_conf_time = statp->_u._ext.ext->res_conf_time =
+#ifdef __HAIKU__
+			st.st_mtim;
+	    statp->_u._ext.ext->kq = -1;
+#else
+			st.st_mtimespec;
+	    __res_kqinit(statp);
+#endif
 	} else {
 	    statp->_u._ext.ext->kq = -1;
 	    statp->_u._ext.ext->resfd = -1;
@@ -531,6 +564,44 @@ __res_vinit(res_state statp, int preinit) {
 	statp->options |= RES_INIT;
 	return (statp->res_h_errno);
 }
+
+#ifndef __HAIKU__
+int
+res_check(res_state statp, struct timespec *mtime)
+{
+	/*
+	 * If the times are equal, then we check if there
+	 * was a kevent related to resolv.conf and reload.
+	 * If the times are not equal, then we don't bother
+	 * to check the kevent, because another thread already
+	 * did, loaded and changed the time.
+	 */
+	if (timespeccmp(&statp->_u._ext.ext->res_conf_time,
+	    &__res_conf_time, ==)) {
+		struct kevent ke;
+		if (statp->_u._ext.ext->kq == -1)
+			goto out;
+		if (statp->_u._ext.ext->kqpid != getpid() &&
+		    __res_kqinit(statp) == -1)
+			goto out;
+
+		switch (kevent(statp->_u._ext.ext->kq, NULL, 0, &ke, 1, &ts)) {
+		case 0:
+		case -1:
+out:
+			if (mtime)
+				*mtime = __res_conf_time;
+			return 0;
+		default:
+			break;
+		}
+	}
+	(void)__res_vinit(statp, 0);
+	if (mtime)
+		*mtime = __res_conf_time;
+	return 1;
+}
+#endif
 
 static void
 res_setoptions(res_state statp, const char *options, const char *source)
@@ -741,7 +812,7 @@ res_nclose(res_state statp)
 {
 	int ns;
 
-	if (statp->_vcsock >= 0) {
+	if (statp->_vcsock >= 0) { 
 		(void) close(statp->_vcsock);
 		statp->_vcsock = -1;
 		statp->_flags &= ~(RES_F_VC | RES_F_CONN);
@@ -760,13 +831,21 @@ res_ndestroy(res_state statp)
 	struct __res_state_ext *ext = statp->_u._ext.ext;
 	res_nclose(statp);
 	if (ext != NULL) {
-		if (ext->kq != -1)
+#ifndef __HAIKU__
+		if (ext->kq != -1 && ext->kqpid == getpid())
 			(void)close(ext->kq);
+#endif
 		if (ext->resfd != -1)
 			(void)close(ext->resfd);
 		free(ext);
 		statp->_u._ext.ext = NULL;
 	}
+#ifndef __HAIKU__
+	if (statp->_rnd != NULL) {
+		free(statp->_rnd);
+		statp->_rnd = NULL;
+	}
+#endif
 	statp->options &= ~RES_INIT;
 }
 
@@ -835,7 +914,7 @@ res_setservers(res_state statp, const union res_sockaddr_union *set, int cnt)
 		set++;
 	}
 	statp->nscount = nserv;
-
+	
 }
 
 int
@@ -848,7 +927,7 @@ res_getservers(res_state statp, union res_sockaddr_union *set, int cnt)
 	for (i = 0; i < statp->nscount && i < cnt; i++) {
 		if (statp->_u._ext.ext)
 			family = statp->_u._ext.ext->nsaddrs[i].sin.sin_family;
-		else
+		else 
 			family = statp->nsaddr_list[i].sin_family;
 
 		switch (family) {
