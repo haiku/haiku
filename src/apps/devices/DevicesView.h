@@ -15,6 +15,7 @@
 #include <OutlineListView.h>
 #include <PopUpMenu.h>
 #include <TabView.h>
+#include <TextControl.h>
 #include <View.h>
 
 #include <map>
@@ -39,6 +40,8 @@ static const uint32 kMsgOrderCategory		= 'ocat';
 static const uint32 kMsgOrderConnection		= 'ocon';
 static const uint32 kMsgToggleDriver		= 'disd';
 static const uint32 kMsgReboot				= 'rebt';
+static const uint32 kMsgFilterChanged		= 'fltr';
+static const uint32 kMsgClearFilter			= 'clrf';
 
 typedef enum {
 	ORDER_BY_BUS,
@@ -83,6 +86,8 @@ class DevicesView : public BView {
 
 		void				_UpdateBlockButton(Device* device);
 
+		void				_FilterDevices();
+
 		BOutlineListView*	fDevicesOutline;
 		PropertyList*		fAttributesView;
 		BMenuField*			fOrderByMenu;
@@ -94,6 +99,7 @@ class DevicesView : public BView {
 		BMenuBar*			fActionMenuBar;
 		bool				fHasShownDisableAlert;
 		bool				fRebootNeeded;
+		BTextControl*		fFilterControl;
 };
 
 #endif /* DEVICESVIEW_H */

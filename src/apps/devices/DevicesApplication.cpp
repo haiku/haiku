@@ -98,6 +98,8 @@ DevicesWindow::MessageReceived(BMessage* message)
 		case kMsgOrderConnection:
 		case kMsgReboot:
 		case kMsgToggleDriver:
+		case kMsgFilterChanged:
+		case kMsgClearFilter:
 			fDevicesView->MessageReceived(message);
 			break;
 

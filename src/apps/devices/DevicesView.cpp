@@ -19,6 +19,7 @@
 #include <MenuBar.h>
 #include <Path.h>
 #include <ScrollView.h>
+#include <set>
 #include <String.h>
 #include <StringView.h>
 
@@ -109,6 +110,10 @@ DevicesView::CreateLayout()
 		item->SetMarked(true);
 	fOrderByMenu = new BMenuField(B_TRANSLATE("Order by:"), orderByPopupMenu);
 	fAttributesView = new PropertyList("attributesView");
+	fFilterControl = new BTextControl("filterControl", B_TRANSLATE("Filter:"), "", NULL);
+	fFilterControl->SetModificationMessage(new BMessage(kMsgFilterChanged));
+	BButton* clearButton = new BButton("clearButton", B_TRANSLATE("Clear"),
+		new BMessage(kMsgClearFilter));
 	fBlockButton
 		= new BButton("blockButton", B_TRANSLATE("Disable driver"), new BMessage(kMsgToggleDriver));
 	fBlockButton->SetEnabled(false);
@@ -130,6 +135,10 @@ DevicesView::CreateLayout()
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.AddGroup(B_VERTICAL)
 				.Add(fOrderByMenu, 1)
+				.AddGroup(B_HORIZONTAL)
+					.Add(fFilterControl)
+					.Add(clearButton)
+					.End()
 				.Add(scrollView, 2)
 				.End()
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 2.0f)
@@ -635,6 +644,46 @@ DevicesView::_UpdateBlockButton(Device* device)
 }
 
 
+static void
+AddParents(std::set<Device*>& newDevices, Device* device)
+{
+	while (device != NULL) {
+		newDevices.insert(device);
+		device = device->GetPhysicalParent();
+	}
+}
+
+
+void
+DevicesView::_FilterDevices()
+{
+
+	if (BString(fFilterControl->Text()) != "") {
+		std::set<Device*> newDevicesSet;
+		Devices newDevices;
+		fDevicesOutline->MakeEmpty();
+		for (unsigned int i = 0; i < fDevices.size(); i++) {
+			if (BString(fDevices[i]->GetName()).IFindFirst(fFilterControl->Text()) >= 0) {
+				if (fOrderBy == ORDER_BY_CONNECTION || fOrderBy == ORDER_BY_BUS)
+					AddParents(newDevicesSet, fDevices[i]);
+				else
+					newDevicesSet.insert(fDevices[i]);
+			}
+		}
+
+		for (std::set<Device*>::iterator it = newDevicesSet.begin(); it != newDevicesSet.end();
+			++it) {
+			Device* item = *it;
+			newDevices.push_back(item);
+		}
+
+		RebuildDevicesOutline(fDevicesOutline, newDevices, fCategoryMap, fOrderBy);
+	} else {
+		RebuildDevicesOutline(fDevicesOutline, fDevices, fCategoryMap, fOrderBy);
+	}
+}
+
+
 void
 DevicesView::MessageReceived(BMessage *msg)
 {
@@ -711,6 +760,19 @@ DevicesView::MessageReceived(BMessage *msg)
 				BString driver = device->GetDriverUsed();
 				_ToggleDriverState(DriverUtils::IsDriverEnabled(driver));
 			}
+			break;
+		}
+
+		case kMsgFilterChanged:
+		{
+			_FilterDevices();
+			break;
+		}
+
+		case kMsgClearFilter:
+		{
+			fFilterControl->SetText("");
+			fFilterControl->MakeFocus();
 			break;
 		}
 		default:
