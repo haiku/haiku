@@ -33,11 +33,11 @@ private:
 private:
 			thread_id			fWriterThread;
 			BinarySemaphore		fPageWriterCondition;
-			ConditionVariable	fUnderQuotaCondition;
 
 			bigtime_t			fLastAveragePageWriteDuration;
 
 private:
+	static	ConditionVariable	sUnderQuotaCondition;
 	static	int64				sGlobalModifiedCount;
 			int64				fLastReportedModifiedCount = 0;
 
