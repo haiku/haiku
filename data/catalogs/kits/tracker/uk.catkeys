@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	798058031
+1	ukrainian	x-vnd.Haiku-libtracker	2176037616
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -171,6 +171,7 @@ Preferences…	ContainerWindow		Налаштування…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \«%document\» бо програма \«%app\» у смітнику. 
 Work Phone	Person Query Columns		Робочий телефон
 Select folders	FindPanel		Вибір папок
+OK	TrackerInitialState		OK
 Close	ContainerWindow		Закрити
 Get info	ContainerWindow		Дивитись інфо
 MIME Type	AttributesView		MIME Тип
@@ -425,6 +426,7 @@ Move here	ContainerWindow		Перемістити сюди
 the config folder	FSUtils		папка конфігурації
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку.
 MIME Signature	AttributesView		MIME Сигнатура
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Перейменувати
 Clean up all	ContainerWindow		Очистити все
 Add current folder	FilePanelPriv		Додати поточну папку

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2824105974
+1	turkish	x-vnd.Haiku-libtracker	3426677336
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		Yürütme
 no	AttributesView		hayır
 Show volumes on Desktop	SettingsView		Disk bölümlerini Masaüstü’nde göster
 Recent folders	ContainerWindow		Son klasörler
+Error deleting items: %error	FSUtils		Ögeleri silmede hata: %error
 Desktop	Model		Masaüstü
 Select all	ContainerWindow		Tümünü seç
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}

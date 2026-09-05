@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Ten sam co archiwum
 Stop	ExpanderWindow		Zatrzymaj
 Cancel	ExpanderWindow		Anuluj
 Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowywania archiwum
-Expand	ExpanderMenu		Rozpakuj
 Failed to create the destination folder.	ExpanderWindow		Nie udało się utworzyć katalogu docelowego.
+Expand	ExpanderMenu		Rozpakuj
 Settings…	ExpanderMenu		Ustawienia…
 Select current	DirectoryFilePanel		Wybierz obecny
 Expanding '%s'…	ExpanderWindow		Rozpakowywanie „%s”…

@@ -1,5 +1,6 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	italian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Team
+Temp	DataSource		Temp
 Block cache memory	DataSource		Memoria cache a blocchi
 Media nodes	DataSource		Nodi multimediali
 Network send	DataSource		Invio (rete)
@@ -9,8 +10,10 @@ ActivityMonitor	System name		Monitoraggio Attività
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervallo di aggiornamento:
 Settings…	ActivityWindow		Impostazioni...
+Unknown thermal sensor	SystemInfoHandler		Sensore termico sconosciuto
 Block cache	DataSource		Cache a blocchi
 Memory	DataSource		Memoria
+No thermal sensor	SystemInfoHandler		Nessun sensore termico
 CPU speed	DataSource		Velocità della CPU
 CPU usage	DataSource		Uso della CPU
 Raw clipboard	DataSource		Appunti binari
@@ -23,6 +26,7 @@ Page faults	DataSource		Page fault
 Add graph	ActivityWindow		Aggiungi grafico
 Swap	DataSource		Swap
 %s faults/s	DataSource		%s difetti/s
+Temperature	DataSource		Temperatura
 Semaphores	DataSource		Semafori
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms

@@ -17,8 +17,8 @@ Same directory as source (archive) file	ExpanderPreferences		Rovnaký ako zdrojo
 Stop	ExpanderWindow		Zastaviť
 Cancel	ExpanderWindow		Zrušiť
 Error when expanding archive	ExpanderWindow		Chyba počas expandovania archívu
-Expand	ExpanderMenu		Rozbaliť
 Failed to create the destination folder.	ExpanderWindow		Nepodarilo sa vytvoriť cieľový priečinok.
+Expand	ExpanderMenu		Rozbaliť
 Settings…	ExpanderMenu		Nastavenia…
 Select current	DirectoryFilePanel		Vybrať aktuálne
 Expanding '%s'…	ExpanderWindow		Rozbaľuje sa „%s“…

@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Mostra automàticament 
 Expander	System name		Expandidora
 Set source…	ExpanderMenu		Estableix la font...
 OK	ExpanderWindow		D'acord
-The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: trieu una destinació
+The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
 Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.
 Close	ExpanderMenu		Tanca
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		El mateix directori
 Stop	ExpanderWindow		Interromp
 Cancel	ExpanderWindow		Cancel·la
 Error when expanding archive	ExpanderWindow		Error en expandir l'arxiu.
-Expand	ExpanderMenu		Expandeix
 Failed to create the destination folder.	ExpanderWindow		Ha fallat crear la carpeta de destinació.
+Expand	ExpanderMenu		Expandeix
 Settings…	ExpanderMenu		Paràmetres…
 Select current	DirectoryFilePanel		Selecciona l'actual
 Expanding '%s'…	ExpanderWindow		S'expandeix %s…

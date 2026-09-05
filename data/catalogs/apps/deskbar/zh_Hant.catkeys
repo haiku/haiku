@@ -1,14 +1,16 @@
-1	english	x-vnd.Be-TSKB	3780974715
+1	english	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		自動隱藏
 Show all	WindowMenu		顯示全部
 Edit in Tracker…	PreferencesWindow		在Tracker中編輯…
 Menu	PreferencesWindow		菜單
+Location	PreferencesWindow		位置
 Tracker always first	PreferencesWindow		Tracker永遠優先
 Hide clock	TimeView		隱藏時鐘
 Large	PreferencesWindow		大
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar資料夾為空>
 Recent documents	DeskbarMenu		近期檔案
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		應用程式
+%appname% preferences	PreferencesWindow		%appname% 偏好設定
 Always on top	PreferencesWindow		始終位於頂部
 Restart system	DeskbarMenu		重啓
 Recent documents:	PreferencesWindow		近期檔案：
@@ -28,12 +30,14 @@ Close all	WindowMenu		關閉全部
 About this system	DeskbarMenu		關於這個系統
 Quit application	WindowMenu		退出應用程式
 Hide application names	PreferencesWindow		隱藏程式名稱
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		應用程式
 Show application expander	PreferencesWindow		顯示應用程式摺疊擴充
 Suspend	DeskbarMenu		暫停
 Shutdown…	DeskbarMenu		關機…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		示範
 Expand new applications	PreferencesWindow		展開新的應用程式
+%appname% preferences…	DeskbarMenu		%appname% 偏好設定…
 Recent applications:	PreferencesWindow		近期應用程式：
 Recent folders:	PreferencesWindow		近期資料夾：
 Recent folders	DeskbarMenu		近期資料夾

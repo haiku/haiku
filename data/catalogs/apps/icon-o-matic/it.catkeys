@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-icon_o_matic	2321853629
+1	italian	x-vnd.haiku-icon_o_matic	1029251628
 None	Icon-O-Matic-Properties		Nessuno
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Pulisci tracciato
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -55,10 +55,12 @@ OK	Icon-O-Matic-ColorPicker		OK
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Impostazione multipla %property%
 Error: 	Icon-O-Matic-Main		Errore: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Resetta {0, plural, one{trasformazione} other{trasformazioni}}
+SVG does not support some gradient types (conic, diamond, xy, sqrt_xy).\n\nThey will be exported as linear approximations and may look different in other viewers.	Icon-O-Matic-SVGExport		SVG non supporta alcuni tipi di sfumature (conica, a diamante, xy, sqrt_xy).\n\nQueste saranno esportate come approssimazioni lineari e potrebbero apparire in modo diverso in altri visualizzatori.
 Assign style	Icon-O-Matic-AssignStyleCmd		Assegna stile
 Saving your document failed!	Icon-O-Matic-Exporter		Fallito il salvataggio del documento!
 Snap to grid	Icon-O-Matic-Menu-Settings		Vincola alla griglia
 Opening the document failed!	Icon-O-Matic-Main		Apertura del documento fallita!
+SVG export	Icon-O-Matic-SVGExport		Esportazione in formato SVG
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Rimuovi {0, plural, one{stile} other{stili}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Uno o più tracciato hanno troppi vertici. Il formato HVIF ne supporta un massimo di 255 per ognuno.
 Add with path & style	Icon-O-Matic-ShapesList		Aggiungi con tracciato & stile
@@ -76,6 +78,7 @@ Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Aggiungi {0
 Remove	Icon-O-Matic-PathManipulator		Rimuovi
 Duplicate	Icon-O-Matic-ShapesList		Duplica
 Alpha	Icon-O-Matic-PropertyNames		Alfa
+OK	Icon-O-Matic-SVGExport		OK
 Contour	Transformation		Contorno
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Aggiungi {0, plural, one{trasformatore} other{trasformatori}}
 Miter limit	Icon-O-Matic-PropertyNames		Limite giunzione
@@ -93,6 +96,7 @@ Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCm
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Rimuovi {0, plural, one{forma} other{forme}}
 Undo: %action%	Icon-O-Matic-Main		Annulla: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamante
+%appname% might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		È possibile che %appname% non abbia interpretato tutti i dati del file SVG al momento del caricamento. Sovrascrivendo il file originale, queste informazioni andranno perse.
 Don't save	Icon-O-Matic-Menu-Settings		Non salvare
 Add shape with path	Icon-O-Matic-Menu-Shape		Aggiungi forma con tracciato
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Bummer
@@ -157,6 +161,7 @@ Untitled	Icon-O-Matic-Main		Senza Nome
 Max LOD	Icon-O-Matic-PropertyNames		LOD Massimo
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salva le modifiche all'icona corrente prima di chiudere?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Impossibile aprire il file '%s' come documento SVG.\n\n
+<unknown property>	Icon-O-Matic-PropertyNames		<proprietà sconosciuta>
 Save as…	Icon-O-Matic-Menu-File		Salva come...
 Swatches	Icon-O-Matic-Menus		Campioni
 <modify path>	Icon-O-Matic-PathCmd		<modifica tracciato>

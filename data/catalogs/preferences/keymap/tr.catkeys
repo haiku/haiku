@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	2616657510
+1	turkish	x-vnd.Haiku-Keymap	2110477243
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -8,6 +8,7 @@ Brazilian	KeymapNames		Brezilya
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right Option	Keyboard Layout View		Sağ Seçenek
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
+Apple Magic Extended International	KeyboardLayoutNames		Apple Magic Genişletilmiş Uluslararası
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Seçenek:
 Cancel	Modifier keys window		Vazgeç
@@ -24,6 +25,7 @@ Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
 Belgian (point)	KeymapNames		Flamanca (nokta)
 Finnish	KeymapNames		Fince
 Switch shortcut keys to Windows/Linux mode	Keymap window		Kestirmeleri Windows/Linux kipine geçir
+Apple Magic (US)	KeyboardLayoutNames		Apple Magic (ABD)
 Spanish (Dvorak)	KeymapNames		İspanyolca (Dvorak)
 Option	Keyboard Layout View	Option key	Seçenek
 US-International	KeymapNames		Birleşik Devletler–Uluslararası
@@ -65,6 +67,7 @@ Left Option	Keyboard Layout View		Sol Seçenek
 Save as…	Keymap window		Farklı kaydet…
 Lithuanian (Standard)	KeymapNames		Litvanca (Standart)
 Error: duplicate keys	Modifier keys window		Hata: Yinelenen düğmeler
+Apple Magic	KeyboardLayoutNames		Apple Magic
 NUM	Keyboard Layout View	Very short for 'num lock'	SAYI
 Bulgarian (Phonetic)	KeymapNames		Bulgarca (Fonetik)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
@@ -150,6 +153,8 @@ Norwegian	KeymapNames		Norveççe
 Font	Keymap window		Yazıtipi
 Danish	KeymapNames		Danca
 Generic 104-key	KeyboardLayoutNames		Standart 104 düğmeli
+Apple Magic Extended (US)	KeyboardLayoutNames		Apple Magic Genişletilmiş (ABD)
+Apple Magic International	KeyboardLayoutNames		Apple Magic Uluslararası
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Üst Karakter düğmesi
 Russian	KeymapNames		Rusça
 PAUSE	Keyboard Layout View		DURAKLAT

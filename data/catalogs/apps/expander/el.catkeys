@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφ
 Expander	System name		Αποσυμπιεστής
 Set source…	ExpanderMenu		Ορισμός πηγής…
 OK	ExpanderWindow		Εντάξει
-The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Επιλέξτε προορισμό
+The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Ο φάκελος μετακινήθηκε, μετονομάστηκε ή δεν υποστηρίζεται.
 Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας
 Close	ExpanderMenu		Κλείσιμο
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Ίδιος κατά
 Stop	ExpanderWindow		Σταμάτα
 Cancel	ExpanderWindow		Άκυρο
 Error when expanding archive	ExpanderWindow		Σφάλμα κατά την επέκταση του αρχείου
-Expand	ExpanderMenu		Επέκταση
 Failed to create the destination folder.	ExpanderWindow		Η δημιουργία φακέλου προορισμού απέτυχε.
+Expand	ExpanderMenu		Επέκταση
 Settings…	ExpanderMenu		Ρυθμίσεις…
 Select current	DirectoryFilePanel		Τρέχουσα επιλογή
 Expanding '%s'…	ExpanderWindow		Γίνεται επέκταση '%s'…

@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Direktori sama deng
 Stop	ExpanderWindow		Hentikan
 Cancel	ExpanderWindow		Batalkan
 Error when expanding archive	ExpanderWindow		Ada kesalahan saat mengembangkan arsip
-Expand	ExpanderMenu		Kembangkan
 Failed to create the destination folder.	ExpanderWindow		Gagal untuk membuat folder tujuan.
+Expand	ExpanderMenu		Kembangkan
 Settings…	ExpanderMenu		Pengaturan…
 Select current	DirectoryFilePanel		Pilih saat ini
 Expanding '%s'…	ExpanderWindow		Mengembangkan '%s'…

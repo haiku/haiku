@@ -19,8 +19,8 @@ Same directory as source (archive) file	ExpanderPreferences		Uzi la dosierujon d
 Stop	ExpanderWindow		Halti
 Cancel	ExpanderWindow		Nuligi
 Error when expanding archive	ExpanderWindow		Eraris dum la elarkivado
-Expand	ExpanderMenu		Elarkivigi
 Failed to create the destination folder.	ExpanderWindow		Malsukcesis krei la elarkivan dosierujon.
+Expand	ExpanderMenu		Elarkivigi
 Settings…	ExpanderMenu		Agordo…
 Select current	DirectoryFilePanel		Elekti la nunan lokon
 Expanding '%s'…	ExpanderWindow		Elarkivante '%s'…

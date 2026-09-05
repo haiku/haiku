@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	1997899638
+1	italian	x-vnd.Haiku-libtracker	1510077596
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -161,6 +161,7 @@ Could not open \"%name\" (%error). 	FSUtils		Non è stato possibile aprire \"%na
 Media parameter group	AttributesView		Gruppo di parametri multimediali
 %name info	InfoWindow	InfoWindow Title	Informazioni su %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se sposti la tua cartella personale, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?\n\nPer spostare la cartella home, tieni premuto il tasto Maiusc e clicca su \"Sposta\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total selezionati}}
 Property info	AttributesView		Dettagli proprietà
 Sorry, you can't create links in the Trash.	PoseView		Non è possibile creare collegamenti nel Cestino.
 From	Email Query Columns		Da
@@ -169,6 +170,7 @@ Preferences…	ContainerWindow		Impostazioni…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Non è stato possibile aprire \"%document\" perché l'applicazione \"%app\" è nel Cestino. 
 Work Phone	Person Query Columns		Telefono di lavoro
 Select folders	FindPanel		Seleziona cartelle
+OK	TrackerInitialState		OK
 Close	ContainerWindow		Chiudi
 Get info	ContainerWindow		Ottieni informazioni
 MIME Type	AttributesView		Tipo MIME
@@ -285,6 +287,7 @@ Show volumes on Desktop	SettingsView		Mostra i volumi sulla Scrivania
 Recent folders	ContainerWindow		Cartelle recenti
 Desktop	Model		Scrivania
 Select all	ContainerWindow		Seleziona tutti
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		programmi
 Error calculating folder size.	InfoWindow		Errore durante il calcolo della dimenzione della cartella.
 Delete	FSUtils		Elimina

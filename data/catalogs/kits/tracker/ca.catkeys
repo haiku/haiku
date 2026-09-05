@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1150234478
+1	catalan; valencian	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		Executa
 no	AttributesView		no
 Show volumes on Desktop	SettingsView		Mostra els volums a l'escriptori
 Recent folders	ContainerWindow		Carpetes recents
+Error deleting items: %error	FSUtils		Error en suprimir els elements: %error
 Desktop	Model		Escriptori
 Select all	ContainerWindow		Selecciona-ho tot
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filtre}}

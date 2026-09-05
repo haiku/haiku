@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Devices	3091506374
+1	japanese	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Devices	System name		デバイス
@@ -21,7 +21,6 @@ Manufacturer	Device		製造元
 Scanner	DeviceSCSI		スキャナー
 Memory controller	Device		メモリコントローラー
 Unknown device	DevicesView		不明なデバイス
-ShutDown failed with error: 	DevicesView		次のエラーによりシャットダウンに失敗しました: 
 ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		ACPI ボタン '%1'
 Attributes	PropertyList		属性
 Worm	DeviceSCSI		Worm
 Disk drive	DeviceSCSI		ディスクドライブ
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		ドライバーは無効化されました。変更を有効にするには再起動が必要となります。\n\n再起動後、ドライバーが無いのでシステムが認識できないため、このデバイスはデバイスリストに表示されません。\n\nドライバーを最有効化するには、デバイスアプリケーション内でデバイスを見つけて、 \"ドライバーの有効化\"をクリックします。デバイスがすでに見えない場合は、次のパッケージ設定ファイルから対応するブロックされた項目を削除してください:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元
 Bridge	DeviceSCSI		ブリッジ

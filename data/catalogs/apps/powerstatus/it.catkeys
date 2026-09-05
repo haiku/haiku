@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PowerStatus	388505242
+1	italian	x-vnd.Haiku-PowerStatus	4069361317
 Run in window	PowerStatus		Esegui in una finestra
 Extended battery info	PowerStatus		Informazioni batteria estese
 Show status icon	PowerStatus		Mostra l'icona di stato
@@ -14,6 +14,7 @@ Quit	PowerStatus		Esci
 Battery not charging	PowerStatus		La batteria non è in carica
 Battery low	PowerStatus		Livello batteria basso
 Model number: 	PowerStatus		Numero modello: 
+You can run %appname% in a window or install it in the Deskbar.	PowerStatus		Puoi eseguire %appname% in una finestra oppure installarlo nella Deskbar.
 Battery unused	PowerStatus		Batteria non usata
 Type: 	PowerStatus		Tipo: 
 Damaged or missing battery	PowerStatus		Batteria danneggiata o assente
@@ -38,6 +39,7 @@ Capacity granularity 2: 	PowerStatus		Granularità della capacità 2:
 Too bad!	PowerStatus		Brutte notizie!
 Technology: 	PowerStatus		Tecnologia: 
 not charging	PowerStatus		non in carica
+No supported battery detected. %appname% cannot be used on your system.	PowerStatus		Non è stata rilevata alcuna batteria compatibile. %appname% non può essere utilizzato sul tuo sistema.
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Stato Batteria
 Design capacity: 	PowerStatus		Capacità (in base al costruttore): 

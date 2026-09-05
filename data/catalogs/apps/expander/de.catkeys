@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch 
 Expander	System name		Archiventpacker
 Set source…	ExpanderMenu		Quelle wählen …
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Zielordner auswählen
+The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
 Close	ExpanderMenu		Schließen
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie
 Stop	ExpanderWindow		Stopp
 Cancel	ExpanderWindow		Abbrechen
 Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
-Expand	ExpanderMenu		Entpacken
 Failed to create the destination folder.	ExpanderWindow		Der Zielordner konnte nicht angelegt werden.
+Expand	ExpanderMenu		Entpacken
 Settings…	ExpanderMenu		Einstellungen …
 Select current	DirectoryFilePanel		Aktuellen auswählen
 Expanding '%s'…	ExpanderWindow		'%s' wird entpackt …

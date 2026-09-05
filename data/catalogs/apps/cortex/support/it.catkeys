@@ -1,4 +1,4 @@
-1	italian	application/x-vnd.Cortex.support	3450110595
+1	italian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Intestazione ha stati:
 32 bit HLS	MediaString		HLS 32 bit
 Recording	MediaString		Registrazione
@@ -46,6 +46,7 @@ Right	MediaString		Destro
 System mixer	MediaString		Mixer di sistema
 Physical output	MediaString		Uscita fisica
 Top-Back-center	MediaString		Superiore-Posteriore-centro
+(unknown video orientation)	MediaString		(orientamento video sconosciuto)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Da superiore a inferiore, da sinistra a destra
 (unknown run mode)	MediaString		(modo esecuzione sconosciuto)

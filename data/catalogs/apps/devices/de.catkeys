@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	3091506374
+1	german	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Devices	System name		Geräte
@@ -21,7 +21,6 @@ Manufacturer	Device		Hersteller
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Speichercontroller
 Unknown device	DevicesView		Unbekanntes Gerät
-ShutDown failed with error: 	DevicesView		Herunterfahren fehlgeschlagen, Fehler: 
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
 Name	PropertyList		Name
 Manufacturer	DeviceSCSI		Hersteller
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		ACPI Button '%1'
 Attributes	PropertyList		Attribute
 Worm	DeviceSCSI		WORM
 Disk drive	DeviceSCSI		Laufwerk
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Der Treiber wurde deaktiviert. Ein Neustart ist nötig, um diese Änderung anzuwenden.\n\nNach dem Neustart wird dieses Gerät nicht mehr in der Geräteliste erscheinen, da es vom System ohne Treiber nicht erkannt werden kann.\n\nUm den Treiber zu re-aktivieren, muss das Gerät in der Devices (Geräte) Anwendung gesucht und auf \"Treiber aktivieren\" geklickt werden. Falls das Gerät nicht aufzufinden ist, muss der entsprechende Eintrag aus der 'packages' Einstellungsdatei entfernt werden:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Hersteller
 Bridge	DeviceSCSI		Schnittstellen

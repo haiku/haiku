@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	3212551798
+1	italian	x-vnd.Haiku-StyledEdit	73700260
 Document statistics	Statistics		Statistiche sul documento
 Cut	Menus		Taglia
 Center	Menus		Centra
@@ -13,6 +13,8 @@ Search backwards	FindandReplaceWindow		Cerca all'indietro
 Find again	Menus		Cerca ancora
 Read-only	StatusView		Sola lettura
 Save	Menus		Salva
+Untitled %d	Window title		Senza titolo %d
+Cannot revert, file not found: \"%filename%\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%filename%\".
 Cancel	QuitAlert		Annulla
 Copy	Menus		Copia
 Reload	NodeMonitorAlerts		Carica nuovamente
@@ -20,11 +22,13 @@ line %d, column %d	StatusView		riga: %d colonna: %d
 Words:	Statistics		Parole:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Ripristina
+Unable to unlock file\n\t%error%	QuitAlert		Impossibile sbloccare il file\n\t%error%
 OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Sblocca file
 Italic	Menus		Corsivo
 Can't undo	Menus		Impossibile annullare
 Replace…	Menus		Sostituisci…
+This file is marked read-only. Save changes to the document \"%filename%\"? 	SaveAlert		Questo file è contrassegnato come di sola lettura. Salvare le modifiche al documento \"%filename%\"? 
 File	Menus		File
 Paste	Menus		Incolla
 Bold	Menus		Grassetto
@@ -33,7 +37,11 @@ File \"%file%\" was removed by another application, recover it?	NodeMonitorAlert
 Lines:	Statistics		Righe:
 Strikeout	Menus		Barrato
 Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
+Error saving \"%filename%\":\n%error%	SaveAlert		Errore durante il salvataggio di \"%filename%\":\n%error%
+Save changes to the document \"%title%\"?	QuitAlert		Salvare le modifiche al documento \"%title%\"?
+Style	Menus		Stile
 Save	SaveAlert		Salva
+\"%title%\" has unsaved changes.\nRevert it to the last saved version?	RevertToSavedAlert		\"%title%\" contiene modifiche non salvate.\nVuoi ripristinare l'ultima versione salvata?
 Default	Open_and_SaveAsPanel		Predefinito
 Cancel	RevertToSavedAlert		Annulla
 Cancel	FindandReplaceWindow		Annulla
@@ -76,8 +84,10 @@ Open…	Menus		Apri…
 Save as…	Menus		Salva con nome…
 Replace	FindandReplaceWindow		Sostituisci
 Characters:	Statistics		Caratteri:
+Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		Errore durante il caricamento di \"%filename%\":\n\tFormato non supportato
 Don't save	QuitAlert		Non salvare
 Align	Menus		Allinea
 Font	Menus		Carattere
 Select all	Menus		Seleziona tutto
 Right	Menus		Destra
+Error loading \"%filename%\":\n\t%error%	LoadAlert		Errore durante il caricamento di \"%filename%\":\n\t%error%

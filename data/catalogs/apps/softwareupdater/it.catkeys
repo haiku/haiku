@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-softwareupdater	1377379822
+1	italian	x-vnd.haiku-softwareupdater	2176539301
 Updating version	SoftwareUpdaterWindow	List item text	Aggiornamento della versione
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clicca qui per installare {0, plural, one{# pacchetto aggiornato} other{# pacchetti aggiornati}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacchetti da disinstallare
@@ -8,6 +8,7 @@ There were no updates found.	CheckManager		Nessun aggiornamento trovato.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Gli aggiornamenti non sono stati completati, sei sicuro di voler uscire?
 Updates found	SoftwareUpdaterWindow		Aggiornamenti trovati
 Update now	SoftwareUpdaterWindow		Aggiorna
+Settings	SoftwareUpdaterWindow		Impostazioni
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Per qualche motivo non è possibile riavviare il computer.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argomento non riconosciuto
@@ -16,6 +17,7 @@ No updates available	UpdateAction		Nessun aggiornamento disponibile
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Nuovi pacchetti che verranno installati
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pacchetti da aggiornare
 to	SoftwareUpdaterWindow	List item text	a
+Click here to run %appname%. Some updates will require a problem solution to be selected.	CheckManager		Cliccare qui per avviare %appname%. Per alcuni aggiornamenti sarà necessario selezionare una soluzione al problema.
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentativo di cancellazione degli aggiornamenti in corso…
 Contacting software repositories to check for package updates.	CheckManager		Contatto i repository per verificare la presenza di aggiornamenti.
 Available updates found	CheckManager		Aggiornamenti disponibili trovati

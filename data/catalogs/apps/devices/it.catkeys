@@ -1,17 +1,22 @@
-1	italian	x-vnd.Haiku-Devices	1374585159
+1	italian	x-vnd.Haiku-Devices	757947742
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controller di cifratura
 Devices	System name		Dispositivi
 USB bus	DevicesView		Bus USB
 Processor	Device		Processore
 Generate system information	DevicesView		Genera informazioni di sistema
+Disable driver	DevicesView		Disabilita driver
+Reboot needed	DevicesView		È necessario il riavvio
 Class info	DevicePCI		Informazioni sulla classe
 USB bus	Device		Bus USB
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Comunicazioni
+ACPI thermal zone	DeviceACPI		Zona termica ACPI
 Mass storage controller	Device		Controller memorie di massa
 Printer	DeviceSCSI		Stampante
 Connection	DevicesView		Connessione
+Failed to write to the settings file.	DevicesView		Scrittura sul file di impostazioni fallita.
+Enable driver	DevicesView		Abilita driver
 Manufacturer	Device		Produttore
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controller della memoria
@@ -20,13 +25,16 @@ ACPI node '%1'	DeviceACPI		Nodo ACPI '%1'
 Name	PropertyList		Nome
 Manufacturer	DeviceSCSI		Produttore
 Device name	Device		Nome del dispositivo
+unknown	DeviceACPI		sconosciuto
 Satellite communications controller	Device		Controller comunicazioni satellitari
 Device class	DeviceSCSI		Classe dispositivo
 Device	Device		Dispositivo
 Input device controller	Device		Controller dispositivi di ingresso
+OK	DevicesView		OK
 PCI bus	DevicesView		Bus PCI
 Changer	DeviceSCSI		Modificatore
 Serial bus controller	Device		Controller bus seriale
+Restart computer	DevicesView		Riavvia il computer
 Refresh devices	DevicesView		Aggiorna dispositivi
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
@@ -37,7 +45,10 @@ Generic system peripheral	Device		Periferica generica di sistema
 Value	PropertyList		Valore
 Devices	DevicesView		Dispositivi
 Device name	DeviceACPI		Nome del dispositivo
+Optical drive	DeviceSCSI		Unità ottica
+unknown	DevicePCI		sconosciuto
 Display controller	Device		Controller schermo
+Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <sconosciuto>
 Device name	DevicePCI		Nome del dispositivo
 Other	DeviceSCSI		Altro
@@ -45,6 +56,7 @@ Report compatibility	DevicesView		Segnala compatibilità
 Computer	Device		Computer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Allegato
+Tape drive	DeviceSCSI		Unità a nastro
 Order by:	DevicesView		Ordina per:
 Intelligent controller	Device		Controller intelligente
 Multimedia controller	Device		Controller multimediale
@@ -52,17 +64,22 @@ Quit	DevicesView		Esci
 ISA bus	Device		Bus ISA
 ISA bus	DevicesView		Bus ISA
 Processor	DeviceSCSI		Processore
+Card reader	DeviceSCSI		Lettore di schede
 Bridge	Device		Interfaccia
+Attributes	PropertyList		Attributi
 Worm	DeviceSCSI		Worm
+Disk drive	DeviceSCSI		Unità disco
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Produttore
 Bridge	DeviceSCSI		Interfaccia
+ACPI system bus	DeviceACPI		Bus di sistema ACPI
 Signal processing controller	Device		Controller elaborazione segnali
 Device name	DeviceSCSI		Nome del dispositivo
 Docking station	Device		Docking station
 Array	DeviceSCSI		Serie
 Unclassified device	Device		Dispositivo non classificato
 Manufacturer	DeviceACPI		Produttore
+Error	DevicesView		Errore
 ACPI controller	Device		Controller ACPI
 Network controller	Device		Controller di rete
 Driver used	Device		Driver usato

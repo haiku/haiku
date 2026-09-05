@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Mostre in automatic il 
 Expander	System name		Espansôr
 Set source…	ExpanderMenu		Stabilìs la sorzint…
 OK	ExpanderWindow		Va ben
-The destination is not a folder.	ExpanderWindow		La destinazion no je une cartele.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: sielç destinazion
+The destination is not a folder.	ExpanderWindow		La destinazion no je une cartele.
 The folder was either moved, renamed or not supported.	ExpanderWindow		O la cartele e je stade spostade, o e à cambiât non opûr no je supuartade.
 Close window when done expanding	ExpanderPreferences		Siere il barcon une volte finide la espansion
 Close	ExpanderMenu		Siere
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Stesse cartele dal 
 Stop	ExpanderWindow		Ferme
 Cancel	ExpanderWindow		Anule
 Error when expanding archive	ExpanderWindow		Erôr te espansion dal archivi
-Expand	ExpanderMenu		Espant
 Failed to create the destination folder.	ExpanderWindow		No si è rivâts a creâ la cartele di destinazion.
+Expand	ExpanderMenu		Espant
 Settings…	ExpanderMenu		Impostazions…
 Select current	DirectoryFilePanel		Selezione atuâl
 Expanding '%s'…	ExpanderWindow		Espansion di '%s'…

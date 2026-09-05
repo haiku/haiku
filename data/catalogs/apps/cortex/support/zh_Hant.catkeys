@@ -1,4 +1,4 @@
-1	english	x-vnd.Cortex.support	3450110595
+1	english	x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		標頭具有旗標
 32 bit HLS	MediaString		32 位元 HLS
 Recording	MediaString		錄製
@@ -46,6 +46,7 @@ Right	MediaString		右
 System mixer	MediaString		系統混音器
 Physical output	MediaString		實體輸出
 Top-Back-center	MediaString		後上中
+(unknown video orientation)	MediaString		(未知視訊方向)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		由上到下，由左到右
 (unknown run mode)	MediaString		（未知運轉模式）

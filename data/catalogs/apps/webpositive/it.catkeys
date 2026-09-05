@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-WebPositive	2402977561
+1	italian	x-vnd.Haiku-WebPositive	3459776802
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 Copy	Console Window		Copia
@@ -89,6 +89,7 @@ New tab	WebPositive Window		Nuova tab
 Increase size	WebPositive Window		Aumenta dimensioni
 Today	WebPositive Window		Oggi
 Open location	WebPositive Window		Apri indirizzo
+There are still downloads in progress, do you really want to quit %appname% now?	WebPositive		Ci sono ancora dei download in corso; vuoi davvero chiudere %appname% adesso?
 New browser window	Download Window		Nuova finestra del browser
 Open	Download Window		Apri
 New window	WebPositive Window		Nuova finestra
@@ -108,6 +109,7 @@ Apply	Settings Window		Applica
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
 Revert	Settings Window		Ripristina
 Copy	WebPositive Window		Copia
+Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		La tua CPU è troppo vecchia e non supporta le estensioni SSE2, senza le quali %appname% non può funzionare. Ti consigliamo invece di installare NetSurf.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Ultima riga ripetuta # volta.}other{Ultima riga ripetuta # volte.}}
 Default standard font size:	Settings Window		Dimensione predefinita caratteri:
 Custom	Settings Window		Personalizzato
@@ -151,6 +153,7 @@ Proxy server address:	Settings Window		Indirizzo del server proxy:
 Search page:	Settings Window		Cerca nella pagina:
 Settings	WebPositive Window		Impostazioni
 Show in Tracker	BookmarkBar		Mostra nel Tracker
+(%currentSize% received, %rate%/s)	Download Window		(%currentSize% received, %rate%/s)
 Clear	URL Bar		Cancella
 Loading %url	WebPositive Window		Caricamento %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	La vispa Teresa avea tra l’erbetta a volo sorpresa gentil farfalletta.

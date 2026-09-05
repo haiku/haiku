@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1150234478
+1	swedish	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		Kör
 no	AttributesView		nej
 Show volumes on Desktop	SettingsView		Visa volymer på Skrivbordet
 Recent folders	ContainerWindow		Senaste mapparna
+Error deleting items: %error	FSUtils		Fel vid borttagning av objekt: %error
 Desktop	Model		Skrivbord
 Select all	ContainerWindow		Markera allt
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%totalt %filter}}

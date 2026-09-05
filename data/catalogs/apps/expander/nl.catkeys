@@ -19,8 +19,8 @@ Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als he
 Stop	ExpanderWindow		Stop
 Cancel	ExpanderWindow		Annuleren
 Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
-Expand	ExpanderMenu		Uitpakken
 Failed to create the destination folder.	ExpanderWindow		Maken doelmap mislukt.
+Expand	ExpanderMenu		Uitpakken
 Settings…	ExpanderMenu		Instellingen…
 Select current	DirectoryFilePanel		Huidige selecteren
 Expanding '%s'…	ExpanderWindow		Uitpakken van '%s'…

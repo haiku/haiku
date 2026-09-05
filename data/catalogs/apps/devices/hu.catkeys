@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Devices	3091506374
+1	hungarian	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Devices	System name		Eszközök
@@ -21,7 +21,6 @@ Manufacturer	Device		Gyártó
 Scanner	DeviceSCSI		Lapolvasó
 Memory controller	Device		Memóriavezérlő
 Unknown device	DevicesView		Ismeretlen eszköz
-ShutDown failed with error: 	DevicesView		Sikertelen leállítás: 
 ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
 Name	PropertyList		Név
 Manufacturer	DeviceSCSI		Gyártó
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		ACPI gomb '%1'
 Attributes	PropertyList		Jellemzők
 Worm	DeviceSCSI		Féreg
 Disk drive	DeviceSCSI		Lemez-eszköz
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		A vezérlő letiltva. A módosítás érvényesítéséhez újraindítás szükséges.\n\nÚjraindítás után ez az eszköz nem fog megjelenni az eszköz-listában, mivel a rendszer nem tudja azonosítani a vezérlő nélkül.\n\nAhhoz, hogy újra engedélyezzük a vezérlőt, az Eszközök alkalmazásban keresd meg az eszközt és kattints az \"Vezérlő engedélyezése\" lehetőségre. Ha az eszköz már nem látható, akkor töröld a blokkoló bejegyzést a csomag beállítás-fájljából.\n
 CD-ROM	DeviceSCSI		CD meghajtó
 Manufacturer	DevicePCI		Gyártó
 Bridge	DeviceSCSI		Híd

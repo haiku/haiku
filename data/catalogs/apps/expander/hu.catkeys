@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Tartalom listázása au
 Expander	System name		Kicsomagoló
 Set source…	ExpanderMenu		Csomag megadása…
 OK	ExpanderWindow		Rendben
-The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Cél megadása
+The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
 The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
 Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
 Close	ExpanderMenu		Bezár
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a fo
 Stop	ExpanderWindow		Leállítás
 Cancel	ExpanderWindow		Mégse
 Error when expanding archive	ExpanderWindow		Hiba történt a kicsomagolás közben
-Expand	ExpanderMenu		Kicsomagol
 Failed to create the destination folder.	ExpanderWindow		Nem sikerült létrehozni a célmappát.
+Expand	ExpanderMenu		Kicsomagol
 Settings…	ExpanderMenu		Beállítások…
 Select current	DirectoryFilePanel		Jelenlegi kiválasztása
 Expanding '%s'…	ExpanderWindow		'%s' kicsomagolása…

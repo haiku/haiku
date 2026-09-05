@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1150234478
+1	hungarian	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		Futtatás
 no	AttributesView		nem
 Show volumes on Desktop	SettingsView		Lemezek megjelenítése az Asztalon
 Recent folders	ContainerWindow		Legutóbbi mappák
+Error deleting items: %error	FSUtils		Nem tudom törölni: %error
 Desktop	Model		Asztal
 Select all	ContainerWindow		Mind kijelölése
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}

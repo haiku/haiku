@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	3091506374
+1	swedish	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
@@ -21,7 +21,6 @@ Manufacturer	Device		Tillverkare
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Minneskontroller
 Unknown device	DevicesView		Okänd enhet
-ShutDown failed with error: 	DevicesView		Avstängningen misslyckades med felet: 
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 Name	PropertyList		Namn
 Manufacturer	DeviceSCSI		Tillverkare
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		ACPI-knapp ”%1”
 Attributes	PropertyList		Attribut
 Worm	DeviceSCSI		Mask
 Disk drive	DeviceSCSI		Disk-enhet
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Drivrutinen har inaktiverats. En omstart krävs för att ändringen ska träda i kraft.\n\nEfter omstarten kanske enheten inte längre visas i enhetslistan, eftersom systemet inte kan identifiera den utan drivrutinen.\n\nFör att återaktivera drivrutinen letar du upp enheten i programmet Enheter och klickar på \”Aktivera drivrutin\”. Om enheten inte längre syns tar du bort motsvarande blockerad post från paketets inställningsfil:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Tillverkare
 Bridge	DeviceSCSI		Brygga

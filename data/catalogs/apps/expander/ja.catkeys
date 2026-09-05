@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		内容リストを自�
 Expander	System name		ファイル解凍
 Set source…	ExpanderMenu		書庫ファイルを指定...
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
 %appname%: Choose destination	DirectoryFilePanel		%appname%: 解凍先を選択
+The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
 The folder was either moved, renamed or not supported.	ExpanderWindow		フォルダーは移動したか、名前が変更されたか、サポートされてないかのいずれかです。
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Close	ExpanderMenu		閉じる
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		書庫ファイル 
 Stop	ExpanderWindow		中止
 Cancel	ExpanderWindow		中止
 Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
-Expand	ExpanderMenu		解凍
 Failed to create the destination folder.	ExpanderWindow		解凍先のフォルダーを作成できません。
+Expand	ExpanderMenu		解凍
 Settings…	ExpanderMenu		設定...
 Select current	DirectoryFilePanel		このフォルダーを選択
 Expanding '%s'…	ExpanderWindow		'%s' の解凍中...

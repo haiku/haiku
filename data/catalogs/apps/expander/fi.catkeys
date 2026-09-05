@@ -21,8 +21,8 @@ Same directory as source (archive) file	ExpanderPreferences		Sama hakemisto läh
 Stop	ExpanderWindow		Pysäytä
 Cancel	ExpanderWindow		Peru
 Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
-Expand	ExpanderMenu		Laajenna
 Failed to create the destination folder.	ExpanderWindow		Kohdekansion luominen epäonnistui.
+Expand	ExpanderMenu		Laajenna
 Settings…	ExpanderMenu		Asetukset…
 Select current	DirectoryFilePanel		Valitse nykyinen
 Expanding '%s'…	ExpanderWindow		Laajennetaan ’%s’…

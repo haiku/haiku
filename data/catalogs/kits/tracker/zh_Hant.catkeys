@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1997899638
+1	english	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		創建
 Icon	AttributesView		圖標
 Open and make preferred	OpenWithWindow		開啓並設為首選
@@ -57,6 +57,7 @@ Identify	ContainerWindow		判明
 Create link	ContainerWindow		創建鏈結
 starts with	FindPanel		開始於
 Replace	FSUtils		代替
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		於 %func \nfind_directory() failed. \n原因: %error
 ?+* follows nothing.	libtracker		?+* 什麼都不遵循。
 Include Trash	FindPanel		包含資源回收筒
 Rectangle	AttributesView		長方形
@@ -102,6 +103,7 @@ Affine transform	AttributesView		仿射變換
 Window	ContainerWindow		視窗
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		移除
+You cannot create a link to the %trash% directory.	FSUtils		您無法創建對 %trash% 目錄的連結.
 Company	Person Query Columns		公司
 Select folders…	FindPanel		選擇資料夾…
 Recent documents	FavoritesMenu		近期檔案
@@ -161,6 +163,7 @@ Could not open \"%name\" (%error). 	FSUtils		無法開啟 \"%name\"（%error）�
 Media parameter group	AttributesView		媒體參數組
 %name info	InfoWindow	InfoWindow Title	%name 資訊
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		如果您移動主資料夾，%osName 可能會發生運行故障！\n\n您確定要這樣做嗎？\n\n若無論如何也要移動主資料夾，請按住 Shift 鍵並按一下\"Move\".
+{0, plural, other{#/%total selected}}	CountView	Number of selected items out of a total: \"10/30 selected\"	{0, plural, other{#/%total 已選擇}}
 Property info	AttributesView		屬性資訊
 Sorry, you can't create links in the Trash.	PoseView		抱歉，您無法在資源回收筒中建立鏈結。
 From	Email Query Columns		來自
@@ -169,6 +172,7 @@ Preferences…	ContainerWindow		偏好…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		無法開啟 \"%document\" 因為應用程式 \"%app\" 位於資源回收筒。
 Work Phone	Person Query Columns		工作電話
 Select folders	FindPanel		選擇資料夾
+OK	TrackerInitialState		OK
 Close	ContainerWindow		關閉
 Get info	ContainerWindow		獲取資訊
 MIME Type	AttributesView		MIME 類型
@@ -258,6 +262,7 @@ New folder %d	FSUtils		新創資料夾 %d
 Extended attribute	AttributesView		擴充屬性
 Error %error loading Add-On %name.	ContainerWindow		錯誤 %error 發生於載入外掛組件 %name.
 Unmatched brackets.	libtracker		不符的括號（brackets）。
+You cannot copy or move the 'printers' directory.	FSUtils		您無法複製或移動 'printers' 目錄.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		您正在嘗試替換該項目:\n\t%name%dest\n從：\n\t%name%src\n\n您想將其替換為您現在的 %movemode 嗎？
 Empty Trash	ContainerWindow		清空資源回收筒
 no supporting apps	OpenWithWindow		無支援的應用程式
@@ -270,6 +275,7 @@ label too long	PoseView		標籤太長
 Error creating link to \"%name\".	FSUtils		建立鏈結時出錯 \"%name\".
 Unknown	FilePermissionsView		未知
 Paste links	ContainerWindow		貼上鏈結
+You cannot copy or move the %trash% directory.	FSUtils		您無法複製或移動 %trash% 目錄.
 Restoring: 	StatusWindow		恢復中：
 The Tracker must be running to set the default printer.	PoseView		Tracker必須運作才能設定預設印表機。
 calculating…	InfoWindow		計算…
@@ -283,8 +289,10 @@ Execute	FilePermissionsView		執行
 no	AttributesView		否
 Show volumes on Desktop	SettingsView		在桌面上顯示磁碟卷
 Recent folders	ContainerWindow		近期資料夾
+Error deleting items: %error	FSUtils		刪除項目時發生錯誤: %error
 Desktop	Model		桌面
 Select all	ContainerWindow		選擇全部
+{0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
 apps	B_APPS_DIRECTORY		應用程式
 Error calculating folder size.	InfoWindow		計算資料夾大小時發生錯誤。
 Delete	FSUtils		刪除
@@ -338,11 +346,13 @@ The entered file name is too long.	FSUtils		輸入的檔名太長。
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些選定的項目無法移至資源回收筒。您想刪除它們嗎？ （此操作無法恢復。）
 Add printer…	ContainerWindow		新增印表機…
 Permissions	ContainerWindow		權限
+Trash	FSUtils		資源回收筒
 Size:	InfoWindow		大小：
 Copy	ContainerWindow		複製
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		某些選定的項目無法移至資源回收筒。您想刪除它們嗎？ （此操作無法恢復。）
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		抱歉，「字元」屬性無法儲存多位元組字形。
 And	FindPanel		以及
+copy	PoseView	filename copy	複製
 Palette-indexed picture	AttributesView		調色盤索引化的圖片
 Drawing pattern	AttributesView		繪製圖案
 File offset	AttributesView		檔案偏移量
@@ -418,6 +428,7 @@ Move here	ContainerWindow		移動至此
 the config folder	FSUtils		設定資料夾
 Sorry, could not create a new folder.	FSUtils		抱歉，無法創建新資料夾。
 MIME Signature	AttributesView		MIME 簽名
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	再命名
 Clean up all	ContainerWindow		清理全部
 Add current folder	FilePanelPriv		新增目前資料夾

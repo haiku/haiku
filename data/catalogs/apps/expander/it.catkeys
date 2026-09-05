@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-Expander	2040688293
+1	italian	x-vnd.Haiku-Expander	2735024965
 Destination	ExpanderWindow		Destinazione
 Other	ExpanderPreferences		Altro
 Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
 Expander	System name		Estrazione Archivi
 Set source…	ExpanderMenu		Imposta l'origine…
 OK	ExpanderWindow		OK
+%appname%: Choose destination	DirectoryFilePanel		%appname%: Scegli la destinazione
 The destination is not a folder.	ExpanderWindow		La destinazione non è una cartella.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La cartella è stata spostata, rinominata o non è supportata.
 Close window when done expanding	ExpanderPreferences		Chiudi la finestra quando la decompressione è completata
@@ -12,6 +13,7 @@ Close	ExpanderMenu		Chiudi
 Create	ExpanderWindow		Crea
 Creating listing for '%s'…	ExpanderWindow		Creazione della lista per '%s'…
 Show contents	ExpanderMenu		Mostra il contenuto
+%appname% settings	ExpanderPreferences		Impostazioni di %appname%
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Sei sicuro di voler terminare l'estrazione di questo archivio? Potrebbero mancare alcuni elementi tra quelli estratti.
 Settings	ExpanderMenu		Impostazioni
 Expand	ExpanderWindow		Estrai
@@ -20,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Stessa cartella del
 Stop	ExpanderWindow		Arresta
 Cancel	ExpanderWindow		Annulla
 Error when expanding archive	ExpanderWindow		Errore durante la decompressione dell'archivio
-Expand	ExpanderMenu		Decomprimi
 Failed to create the destination folder.	ExpanderWindow		Impossibile creare la cartella di destinazione.
+Expand	ExpanderMenu		Decomprimi
 Settings…	ExpanderMenu		Impostazioni…
 Select current	DirectoryFilePanel		Seleziona la directory corrente
 Expanding '%s'…	ExpanderWindow		Estrazione '%s'…
@@ -45,5 +47,6 @@ The file doesn't exist	ExpanderWindow		Il file non esiste
 Hide contents	ExpanderWindow		Nascondi il contenuto
 Source	ExpanderWindow		Origine
 The destination is read only.	ExpanderWindow		La destinazione è in sola lettura.
+%appname%: Open	ExpanderWindow		%appname%: Apri
 Select	ExpanderPreferences		Seleziona
 File	ExpanderMenu		File

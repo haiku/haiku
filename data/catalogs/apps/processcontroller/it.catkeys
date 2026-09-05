@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ProcessController	2724038695
+1	italian	x-vnd.Haiku-ProcessController	3503705742
 Error saving file	ProcessController		Errore nel salvataggio del file
 Display priority	ProcessController		Priorità visualizzazione
 That's no Fun!	ProcessController		Non è divertente!
@@ -15,6 +15,7 @@ Low priority	ProcessController		Bassa priorità
 Urgent display priority	ProcessController		Priorità video urgente
 Memory usage	ProcessController		Uso della memoria
 Ok!	ProcessController		Ok!
+%appname% is already installed in Deskbar.	ProcessController		%appname% è già installato in Deskbar.
 Normal priority	ProcessController		Priorità normale
 Restart Deskbar	ProcessController		Riavvia la Deskbar
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
@@ -29,7 +30,9 @@ Quit application	ProcessController		Chiudi applicazione
 Info	ProcessController		Informazioni
 Kill this thread!	ProcessController		Termina questo thread!
 This team is already gone…	ProcessController		Questo team è già terminato…
+About %appname%…	ProcessController		Informazioni su %appname%…
 Gone teams…	ProcessController		Team terminati…
+You can run %appname% in a window or install it in the Deskbar.	ProcessController		Puoi eseguire %appname% in una finestra oppure installarlo nella Deskbar.
 Quit an application	ProcessController		Chiudi un'applicazione
 Cancel	ProcessController		Annulla
 Install in Deskbar	ProcessController		Installa nella Deskbar

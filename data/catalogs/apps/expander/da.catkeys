@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kil
 Stop	ExpanderWindow		Stands
 Cancel	ExpanderWindow		Afbryd
 Error when expanding archive	ExpanderWindow		Fejl ved udpakning af arkiv
-Expand	ExpanderMenu		Pak ud
 Failed to create the destination folder.	ExpanderWindow		Kunne ikke oprette målmappen.
+Expand	ExpanderMenu		Pak ud
 Settings…	ExpanderMenu		Indstillinger…
 Select current	DirectoryFilePanel		Vælg nuværende
 Expanding '%s'…	ExpanderWindow		Udvider '%s'…

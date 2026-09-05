@@ -1,17 +1,22 @@
-1	english	x-vnd.Haiku-Devices	1374585159
+1	english	x-vnd.Haiku-Devices	803228278
 ACPI bus	DevicesView		ACPI 匯流排
 Encryption controller	Device		加密控制器
 Devices	System name		裝置
 USB bus	DevicesView		USB 匯流排
 Processor	Device		處理器
 Generate system information	DevicesView		產生系統資訊
+Disable driver	DevicesView		停用驅動程式
+Reboot needed	DevicesView		需要重新開機
 Class info	DevicePCI		類型資訊
 USB bus	Device		USB 匯流排
 Computer	DevicesView		電腦
 Communications	DeviceSCSI		通訊
+ACPI thermal zone	DeviceACPI		ACPI 熱區
 Mass storage controller	Device		大容量儲存控制器
 Printer	DeviceSCSI		印表機
 Connection	DevicesView		連接
+Failed to write to the settings file.	DevicesView		無法寫入設定檔。
+Enable driver	DevicesView		啟用驅動程式
 Manufacturer	Device		製造商
 Scanner	DeviceSCSI		掃描器
 Memory controller	Device		記憶體控制器
@@ -19,14 +24,18 @@ Unknown device	DevicesView		未知設備
 ACPI node '%1'	DeviceACPI		ACPI節點 '%1'
 Name	PropertyList		名稱
 Manufacturer	DeviceSCSI		製造商
+Graphics peripheral	DeviceSCSI		圖形周邊裝置
 Device name	Device		設備名稱
+unknown	DeviceACPI		未知
 Satellite communications controller	Device		衛星通訊控制器
 Device class	DeviceSCSI		設備類別
 Device	Device		設備
 Input device controller	Device		輸入設備控制器
+OK	DevicesView		OK
 PCI bus	DevicesView		PCI 匯流排
 Changer	DeviceSCSI		轉換器
 Serial bus controller	Device		序列匯流排控制器
+Restart computer	DevicesView		重新啟動電腦
 Refresh devices	DevicesView		重新整理裝置
 Category	DevicesView		類別
 RBC	DeviceSCSI		RBC
@@ -37,7 +46,10 @@ Generic system peripheral	Device		通用系統週邊
 Value	PropertyList		值
 Devices	DevicesView		裝置
 Device name	DeviceACPI		設備名稱
+Optical drive	DeviceSCSI		光碟機
+unknown	DevicePCI		未知
 Display controller	Device		顯示控制器
+Bus	DevicesView		匯流排
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		設備名稱
 Other	DeviceSCSI		其他
@@ -45,9 +57,13 @@ Report compatibility	DevicesView		報告相容性
 Computer	Device		電腦
 PCI bus	Device		PCI 匯流排
 Enclosure	DeviceSCSI		外殼
+Tape drive	DeviceSCSI		磁帶機
 Order by:	DevicesView		排序以：
 Intelligent controller	Device		智慧型控制器
+ACPI processor namespace '%2'	DeviceACPI		ACPI 處理器命名空間 '%2'
 Multimedia controller	Device		多媒體控制器
+The driver path is not in a package volume: 	DevicesView		驅動程式路徑不在套件磁碟區：
+none	Device		無
 Quit	DevicesView		Quit
 ISA bus	Device		ISA 匯流排
 ISA bus	DevicesView		ISA 匯流排

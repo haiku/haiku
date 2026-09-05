@@ -16,8 +16,8 @@ Same directory as source (archive) file	ExpanderPreferences		Aplankas, kuriame y
 Stop	ExpanderWindow		Nutraukti
 Cancel	ExpanderWindow		Atsisakyti
 Error when expanding archive	ExpanderWindow		Klaida išskleidžiant archyvą
-Expand	ExpanderMenu		Išskleisti
 Failed to create the destination folder.	ExpanderWindow		Nepavyko sukurti paskirties aplanko.
+Expand	ExpanderMenu		Išskleisti
 Settings…	ExpanderMenu		Nuostatos…
 Select current	DirectoryFilePanel		Parinkti esamą
 OK	ExpanderPreferences		Gerai

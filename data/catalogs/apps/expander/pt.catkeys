@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Mesma pasta que o f
 Stop	ExpanderWindow		Parar
 Cancel	ExpanderWindow		Cancelar
 Error when expanding archive	ExpanderWindow		Erro ao expandir o ficheiro
-Expand	ExpanderMenu		Expandir
 Failed to create the destination folder.	ExpanderWindow		Falhou a criação da pasta de destino.
+Expand	ExpanderMenu		Expandir
 Settings…	ExpanderMenu		Definições…
 Select current	DirectoryFilePanel		Seleccionar actual
 Expanding '%s'…	ExpanderWindow		A descomprimir '%s'…

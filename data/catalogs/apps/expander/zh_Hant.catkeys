@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		與原始（存檔�
 Stop	ExpanderWindow		停止
 Cancel	ExpanderWindow		取消
 Error when expanding archive	ExpanderWindow		擴充存檔時出錯
-Expand	ExpanderMenu		解壓
 Failed to create the destination folder.	ExpanderWindow		無法建立目標資料夾。
+Expand	ExpanderMenu		解壓
 Settings…	ExpanderMenu		設定…
 Select current	DirectoryFilePanel		選擇當前
 Expanding '%s'…	ExpanderWindow		正在解壓 '%s'…

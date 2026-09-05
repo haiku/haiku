@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1150234478
+1	german	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		Ausführen
 no	AttributesView		nein
 Show volumes on Desktop	SettingsView		Datenträger auf dem Desktop zeigen
 Recent folders	ContainerWindow		Letzte Ordner
+Error deleting items: %error	FSUtils		Fehler beim Entfernen: %error
 Desktop	Model		Desktop
 Select all	ContainerWindow		Alles auswählen
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}

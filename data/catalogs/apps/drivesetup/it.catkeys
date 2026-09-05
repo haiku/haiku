@@ -1,7 +1,9 @@
-1	italian	x-vnd.Haiku-DriveSetup	2345310783
+1	italian	x-vnd.Haiku-DriveSetup	2351839435
 Could not unmount partition %s.	MainWindow		Impossibile smontare la partizione %s.
+Register disk image…	MainWindow		Registra immagine disco…
 Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
+Disk image has been added.	MainWindow		È stata aggiunta un'immagine del disco.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco?\n\nSe procedi tutti i dati sulla partizione selezionata saranno irrimediabilmente perduti!
 Device	PartitionList		Dispositivo
 Could not change the parameters of the selected partition.	MainWindow		Impossibile modificare i parametri della partizione selezionata.
@@ -9,6 +11,7 @@ Initialize	MainWindow		Inizializza
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\nTutti i dati contenuti nella partizione \"%s\" saranno irrimediabilmente persi se procedi!
 PGP encrypted	Encryption utils		Crittografia PGP
 Delete partition	MainWindow		Elimina partizione
+Write	MainWindow		Scrivi
 Removable	PartitionList		Rimovibile
 Block size	PartitionList		Dimensioni blocco
 The panel experienced a problem!	MainWindow		Il pannello ha avuto un problema!
@@ -19,27 +22,35 @@ Unmount	MainWindow		Smonta
 Failed to format the partition %s!\n	MainWindow		Non è stato possibile formattare la partizione %s!\n
 Partition size	CreateParametersPanel		Dimensione della partizione
 Validation of the given parameters failed.	MainWindow		Validazione dei parametri forniti fallita.
+Cannot init target partition.	MainWindow		Impossibile inizializzare la partizione di destinazione.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione \"%s\"? Ti sarà nuovamente chiesta conferma prima di salvare i cambiamenti sul disco.
 DriveSetup	System name		Gestione Disco
+Error:	MainWindow	in any error alert	Errore:
 Mounted at	PartitionList		Montato su
 Disk system %s not found!	MainWindow		Il disco di sistema %s non è stato trovato!
 Create…	MainWindow		Crea…
+Failed to register file disk device: %s	MainWindow		Impossibile registrare il file del dispositivo disco: %s
 Write changes	MainWindow		Salva modifiche
 Validation of the given creation parameters failed.	MainWindow		La validazione dei parametri di creazione forniti è fallita.
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		L'inizializzazione della partizione %s è fallita. (Nessuna modifica è stata scritta sul disco.)
 Eject	MainWindow		Espelli
+There is not enough free space on target device.	MainWindow		Lo spazio libero sul dispositivo di destinazione è insufficiente.
 Read only	PartitionList		Sola lettura
 Surface test (not implemented)	MainWindow		Verifica superficie (non implementato)
+Creating disk image	MainWindow		Creazione di un'immagine disco in corso
 The panel could not return successfully.	MainWindow		Il panello non è riuscito a completare l'attività.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Non è stato possibile modificare i parametri della partizione. Nessuna modifica è stata scritta sul disco.
 Partition %ld	DiskView		Partizione %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Su questa partizione non c'è spazio per creare una sotto-partizione.
+%s does not refer to a file disk device.	MainWindow		%s non fa riferimento al file di un dispositivo disco.
 No disk devices have been recognized.	DiskView		Nessun dispositivo disco è stato riconosciuto.
 Attributes	PartitionList		Attributi
+'%s' is not a regular file.	MainWindow		'%s' non è un file normale.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Rimozione della partizione fallita. Nessuna modifica è stata scritta sul disco.
 Change parameters…	MainWindow		Modifica i parametri…
 Format	InitializeParametersPanel		Formatta
 Could not unmount partition	MainWindow		Impossibile smontare la partizione
+Target partition is read only.	MainWindow		La partizione di destinazione è di sola lettura.
 Create	CreateParametersPanel		Crea
 File system	PartitionList		File system
 Unknown (%s)	PartitionList		Sconosciuto (%s)
@@ -56,28 +67,40 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 MIMEs	PartitionList		MIME
 Shared	PartitionList		Condiviso
 BitLocker encrypted	Encryption utils		Crittografia BitLocker
+Cannot init target volume.	MainWindow		Impossibile inizializzare il volume di destinazione.
 You need to select a partition entry from the list.	MainWindow		Devi selezionare una partizione dall'elenco.
 Offset: %s	Support		Offset: %s
 SafeBoot encrypted	Encryption utils		Crittografia SafeBoot
 Volume name	PartitionList		Nome del volume
+Disk image	MainWindow		Immagine disco
+Save image…	MainWindow		Salva immagine…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler salvare le modifiche sul disco ora?\n\nProcedendo tutti i dati sulla partizione saranno irrimediabilmente perduti!
 Change	ChangeParametersPanel		Modifica
 Partition name:	ChangeParametersPanel		Nome della partizione:
 LUKS encrypted	Encryption utils		Crittogradia LUKS
 Empty space	PartitionList		Spazio libero
 Cancel	AbstractParametersPanel		Annulla
+%appname%: Save disk image	MainWindow		%appname%: Salva immagine disco
 Format	MainWindow		Formatta
 OK	MainWindow		OK
+Cannot init target file.	MainWindow		Impossibile inizializzare il file di destinazione.
+Disk image successfully created.	MainWindow		L'immagine del disco è stata creata correttamente.
+Unregister disk image	MainWindow		Annulla la registrazione dell'immagine disco
+The target partition is smaller than the image file.	MainWindow		La partizione di destinazione è più piccola del file immagine.
 Empty space	DiskView		Spazio libero
 Could not delete the selected partition.	MainWindow		Impossibile rimuovere la partizione selezionata.
+Failed to get information about '%s'.	MainWindow		Impossibile ottenere informazioni su "%s".
 Open with DiskProbe	MainWindow		Apri con Analizza Disco
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sei sicuro di voler inizializzare il disco selezionato? Tutti i dati saranno perduti. Ti sarà nuovamente chiesta conferma prima della scrittura delle modifiche sul disco.\n
 There was an error preparing the disk for modifications.	MainWindow		Si è verificato un errore nella preparazione delle modifiche al disco.
 The disk has been successfully initialized.\n	MainWindow		Il disco è stato inizializzato con successo.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Sei sicuro di voler smontare il disco?\n\nAttenzione: se un'applicazione sta attualmente scrivendo sul disco, lo smontaggio potrebbe comportare la perdita di dati.\n
+Disk image has been removed.	MainWindow		L'immagine del disco è stata rimossa.
+No file disk device found with the given ID, trying file '%s'.	MainWindow		Non è stato trovato alcun dispositivo disco con l'ID specificato; prova con il file "%s" in corso.
 Cancel	MainWindow		Annulla
 Free space	PartitionList		Spazio disponibile
 Queries	PartitionList		Interrogazioni
+Register	MainWindow		Registra
 Force unmount	MainWindow		Forza lo smontaggio
 Change parameters	MainWindow		Modifica i parametri
 Partition	MainWindow		Partizione
@@ -88,15 +111,21 @@ The partition cannot be unmounted.	MainWindow		La partizione non può essere smo
 Delete	MainWindow		Rimuovi
 Partition type:	ChangeParametersPanel		Tipo di partizione:
 Parameters	PartitionList		Parametri
+Disk image successfully written to the target.	MainWindow		L'immagine del disco è stata scritta correttamente sulla destinazione.
 Could not acquire partitioning information.	MainWindow		Impossibile acquisire informazioni di partizionamento.
 Cannot delete the selected partition.	MainWindow		La partizione selezionata non può essere rimossa.
 Continue	MainWindow		Continua
 Could not mount partition %s.	MainWindow		Impossibile montare la partizione %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Sei sicuro di voler formattare la partizione? Ti sarà chiesta nuovamente conferma prima di scrivere i cambiamenti sul disco.
+%appname% error	MainWindow		Errore di %appname%
 The selected disk is read-only.	MainWindow		Il disco selezionato è di sola lettura.
+Failed to unregister file disk device %s.	MainWindow		Impossibile annullare la registrazione del file del dispositivo disco %s.
 The partition %s is already unmounted.	MainWindow		La partizione %s è stata già smontata.
+Target volume is read only.	MainWindow		Il volume di destinazione è di sola lettura.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sei sicuro di voler modificare i parametri della partizione selezionata?\n\nLa partizione potrebbe non essere più riconosciuta da altri sistemi operativi!
+Cannot init source volume.	MainWindow		Impossibile inizializzare il volume di origine.
 Boot	PartitionList		Avvio
+%appname%: Select disk image	MainWindow		%appname%: Selezionare immagine disco
 OK	AbstractParametersPanel		OK
 Virtual	PartitionList		Virtuale
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler applicare le modifiche su disco adesso?\n\ntutti i dati contenuti nel disco \"%s\" saranno irrimediabilmente persi se procedi!
@@ -105,7 +134,11 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Seleziona una partizione dall'elenco sottostante.
 Active	PartitionList		Attivo
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sei sicuro di voler eliminare la partizione selezionata?\n\nProcedendo con l'operazione, tutti i dati sulla partizione saranno irrimediabilmente perduti!
+Failed to unregister file disk device.	MainWindow		Impossibile annullare la registrazione del file del dispositivo disco.
+Writing image to disk	MainWindow		Scrittura dell'immagine su disco
 The partition %s has been successfully formatted.\n	MainWindow		La partizione %s è stata formattata con successo.\n
+%appname%: Register disk image	MainWindow		%appname%: Registra immagine disco
+Write image…	MainWindow		Scrivi immagine…
 The partition %s is already mounted.	MainWindow		La partizione %s è stata già montata.
 Size	PartitionList		Dimensione
 Creation of the partition has failed.	MainWindow		Creazione della partizione fallita.

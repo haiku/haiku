@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-BootManager	1012731949
+1	italian	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	Backup del precedente Master Boot Record fallito
 At least one partition must be selected!	BootManagerController		Almeno una partizione deve essere selezionata!
 No space available!	DrivesPage	Cannot install	Spazio insufficiente!
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	Memoria USB
 Restore MBR	BootManagerController	Button	Ripristina MBR
 Hard Drive	DrivesPage	Default disk name	Disco Fisso
 Drives	DrivesPage	Title	Unità
+%appname% is unable to read the partition table!	BootManagerController		%appname% non può leggere la tabella delle partizioni!
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Sono state rilevate le seguenti partizioni. Per favore, seleziona le caselle accanto alle partizioni da inserire nel menu di avvio. È inoltre possibile impostare i nomi delle partizioni da visualizzare nel menu di avvio.
 After five seconds	DefaultPartitionPage		Dopo cinque secondi
 Timeout: %s	DefaultPartitionPage		Tempo di attesa: %s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	Precedente
 Uninstallation of boot menu failed	BootManagerController	Title	Disinstallazione del boot manager non riuscita
 Incompatible format!	DrivesPage	Cannot install	Formato non compatibile!
 Old Master Boot Record saved	BootManagerController	Title	Salvataggio del precedente Master Boot Record (MBR) riuscito
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		La tabella delle partizioni del primo hard disk non è compatibile.\n%appname% funziona solo con partizioni IBM PC MBR.
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Per favore, specifica una partizione di default e un tempo di attesa.\nIl boot manager caricherà la partizione dopo questo periodo, a meno che non sia selezionata un'altra partizione. È, inoltre, possibile ottenere che il menu di avvio rimanga permanentemente in attesa della selezione di una partizione.\nTieni premuto il tasto 'Alt' per azzerare il tempo di attesa durante il boot.
 Partitions	PartitionsPage	Title	Partizioni
 Uninstallation of boot menu completed	BootManagerController	Title	Disinstallazione del boot manager completata
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Per favore, indica il file da cui ripristinare il Master Boot Record (MBR). Questo è il file che è stato creato durante la prima installazione del boot manager.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	Il programma sta per ripristinare il Master Boot Record (MBR) del disco %disk dal file %file. Vuoi continuare?
 Install	DrivesPage	Button	Installa
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		La prima partizione sul disco inizia troppo presto e non lascia spazio libero sufficiente per un menu di avvio.\n%appname% richiede 2 KiB di spazio libero prima della prima partizione.
 File:	FileSelectionPage	Text control label	File:
 Error reading partition table	BootManagerController	Title	Errore di lettura della tabella delle partizioni
 Back	BootManagerController	Button	Indietro

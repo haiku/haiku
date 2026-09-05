@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	171515608
+1	italian	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*MouseRilasciato
 Application	ShortcutsWindow		Applicazione
 Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Salvare le modifiche prima di usci
 Revert to saved	ShortcutsWindow		Ripristina quanto salvato
 Don't save	ShortcutsWindow		Non salvare
 *MouseDown	ShortcutsWindow		*MousePremuto
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% non è riuscito a salvare il tuo set di chiavi.
 *Beep	ShortcutsWindow		*Bip
 Save	ShortcutsWindow		Salva
 Either	ShortcutsSpec		Entrambi
 Oh no	ShortcutsWindow		Oh no
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% non è riuscito a salvare il tuo file set di chiavi!
 Key	ShortcutsWindow		Tasto
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*InviaMessaggio application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Seleziona
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
 File	ShortcutsWindow		File
 *LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% non è riuscito ad analizzare il tuo file set di chiavi!
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

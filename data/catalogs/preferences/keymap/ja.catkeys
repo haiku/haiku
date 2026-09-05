@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Keymap	2616657510
+1	japanese	x-vnd.Haiku-Keymap	2110477243
 Key	Modifier keys window	As in a computer keyboard key	キー
 Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
@@ -8,6 +8,7 @@ Brazilian	KeymapNames		ブラジル語
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right Option	Keyboard Layout View		右 Option キー
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
+Apple Magic Extended International	KeyboardLayoutNames		Apple Magic Extended International
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		中止
@@ -24,6 +25,7 @@ Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
 Belgian (point)	KeymapNames		ベルギー語 (point)
 Finnish	KeymapNames		フィンランド語
 Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキーを Windows/Linux モードに切り替え
+Apple Magic (US)	KeyboardLayoutNames		Apple Magic (US)
 Spanish (Dvorak)	KeymapNames		スペイン語 (Dvorak)
 Option	Keyboard Layout View	Option key	Option
 US-International	KeymapNames		英語 (US-International)
@@ -65,6 +67,7 @@ Left Option	Keyboard Layout View		左 Option キー
 Save as…	Keymap window		名前を付けて保存...
 Lithuanian (Standard)	KeymapNames		リトアニア語 (標準)
 Error: duplicate keys	Modifier keys window		エラー: 重複したキー
+Apple Magic	KeyboardLayoutNames		Apple Magic
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
@@ -150,6 +153,8 @@ Norwegian	KeymapNames		ノルウェー語
 Font	Keymap window		フォント
 Danish	KeymapNames		デンマーク語
 Generic 104-key	KeyboardLayoutNames		104 キーボード
+Apple Magic Extended (US)	KeyboardLayoutNames		Apple Magic Extended (US)
+Apple Magic International	KeyboardLayoutNames		Apple Magic International
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
 Russian	KeymapNames		ロシア語
 PAUSE	Keyboard Layout View		PAUSE

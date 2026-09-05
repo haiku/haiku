@@ -19,8 +19,8 @@ Same directory as source (archive) file	ExpanderPreferences		ไดเร็ก�
 Stop	ExpanderWindow		หยุด
 Cancel	ExpanderWindow		ยกเลิก
 Error when expanding archive	ExpanderWindow		เกิดความผิดพลาดขณะเปิดไฟล์
-Expand	ExpanderMenu		ขยาย
 Failed to create the destination folder.	ExpanderWindow		ไม่สามารถสร้างโฟลเดอร์ปลายทาง
+Expand	ExpanderMenu		ขยาย
 Settings…	ExpanderMenu		ตั้งค่า
 Select current	DirectoryFilePanel		เลือกค่าปัจจุบัน
 Expanding '%s'…	ExpanderWindow		กำลังขยาย '%s'

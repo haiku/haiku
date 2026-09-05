@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Автоматично 
 Expander	System name		Expander
 Set source…	ExpanderMenu		Що розпакувати…
 OK	ExpanderWindow		ОК
-The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Вибір папки призначення
+The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Папка була переміщена, перейменована або не підтримується.
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Close	ExpanderMenu		Закрити
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Каталог, д�
 Stop	ExpanderWindow		Зупинити
 Cancel	ExpanderWindow		Скасувати
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
-Expand	ExpanderMenu		Розпакувати
 Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
+Expand	ExpanderMenu		Розпакувати
 Settings…	ExpanderMenu		Налаштування…
 Select current	DirectoryFilePanel		Вибрати поточний
 Expanding '%s'…	ExpanderWindow		Розпаковка «%s»…

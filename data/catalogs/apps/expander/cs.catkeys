@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit v�
 Expander	System name		Rozbalovač
 Set source…	ExpanderMenu		Nastavit zdroj…
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		Cíl není adresář.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Zvolit cíl
+The destination is not a folder.	ExpanderWindow		Cíl není adresář.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
 Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování
 Close	ExpanderMenu		Zavřít
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Stejná složka, ja
 Stop	ExpanderWindow		Zastavit
 Cancel	ExpanderWindow		Zrušit
 Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
-Expand	ExpanderMenu		Rozbalit
 Failed to create the destination folder.	ExpanderWindow		Chyba při vytváření cílového adresáře.
+Expand	ExpanderMenu		Rozbalit
 Settings…	ExpanderMenu		Nastavení…
 Select current	DirectoryFilePanel		Vybrat aktuální
 Expanding '%s'…	ExpanderWindow		Rozbaluji '%s'…

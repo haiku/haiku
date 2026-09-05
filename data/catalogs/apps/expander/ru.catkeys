@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Автоматичес�
 Expander	System name		Распаковщик
 Set source…	ExpanderMenu		Что распаковать…
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Выбор папки назначения
+The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Папка была перемещена, переименована или не поддерживается.
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Close	ExpanderMenu		Закрыть
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Использов�
 Stop	ExpanderWindow		Остановить
 Cancel	ExpanderWindow		Отменить
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
-Expand	ExpanderMenu		Распаковать
 Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
+Expand	ExpanderMenu		Распаковать
 Settings…	ExpanderMenu		Настройки…
 Select current	DirectoryFilePanel		Выбрать текущий
 Expanding '%s'…	ExpanderWindow		Распаковка «%s»…

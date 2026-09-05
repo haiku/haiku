@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		İçerik listesini kend
 Expander	System name		Paketaçar
 Set source…	ExpanderMenu		Kaynak belirle…
 OK	ExpanderWindow		Tamam
-The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Hedef konum seç
+The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Klasör taşınmış, yeniden adlandırılmış veya desteklenmiyor olabilir.
 Close window when done expanding	ExpanderPreferences		Genişletme bittikten sonra pencereyi kapat
 Close	ExpanderMenu		Kapat
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Kaynak (arşiv) dos
 Stop	ExpanderWindow		Durdur
 Cancel	ExpanderWindow		Vazgeç
 Error when expanding archive	ExpanderWindow		Arşiv genişletilirken hata
-Expand	ExpanderMenu		Genişlet
 Failed to create the destination folder.	ExpanderWindow		Hedef klasör oluşturulamadı.
+Expand	ExpanderMenu		Genişlet
 Settings…	ExpanderMenu		Ayarlar…
 Select current	DirectoryFilePanel		Olanı seç
 Expanding '%s'…	ExpanderWindow		“%s” genişletiliyor…

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Appearance	3146871853
+1	italian	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Bordi del controllo
 Control mark	Colors tab		Marcatore del controllo
 Off	AntialiasingSettingsView		Disattivato
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Seleziona automaticamente i colo
 Window tab text	Colors tab		Testo della linguetta sulla finestra
 Navigation pulse	Colors tab		Navigation pulse
 LCD subpixel	AntialiasingSettingsView		Componenti LCD
+Progress bar	Colors tab		Barra di avanzamento
 Window tab	Colors tab		Linguetta della finestra
 Link text	Colors tab		Testo del collegamento
 Tooltip background	Colors tab		Sfondo dei suggerimenti

@@ -5,8 +5,8 @@ Automatically show contents listing	ExpanderPreferences		Automatiskt visa list i
 Expander	System name		Expandera
 Set source…	ExpanderMenu		Sätt källa…
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
 %appname%: Choose destination	DirectoryFilePanel		%appname%: Välj destination
+The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen har antingen blivit flyttad, bytt namn eller stöds inte.
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Close	ExpanderMenu		Stäng
@@ -22,8 +22,8 @@ Same directory as source (archive) file	ExpanderPreferences		Samma mapp som arki
 Stop	ExpanderWindow		Stopp
 Cancel	ExpanderWindow		Avbryt
 Error when expanding archive	ExpanderWindow		Fel när arkivet skulle expanderas
-Expand	ExpanderMenu		Expandera
 Failed to create the destination folder.	ExpanderWindow		Kunde inte skapa målmappen.
+Expand	ExpanderMenu		Expandera
 Settings…	ExpanderMenu		Inställningar...
 Select current	DirectoryFilePanel		Välj aktuell
 Expanding '%s'…	ExpanderWindow		Expanderar '%s'...

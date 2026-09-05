@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ActivityMonitor	923507156
+1	english	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		隊列
 Temp	DataSource		溫度
 Block cache memory	DataSource		區塊高速快取記憶體
@@ -10,8 +10,10 @@ ActivityMonitor	System name		活動監視器
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		更新時間間隔：
 Settings…	ActivityWindow		設定…
+Unknown thermal sensor	SystemInfoHandler		未知熱感應器
 Block cache	DataSource		塊快取
 Memory	DataSource		記憶體
+No thermal sensor	SystemInfoHandler		無熱感應器
 CPU speed	DataSource		CPU速度
 CPU usage	DataSource		CPU使用率
 Raw clipboard	DataSource		原始剪貼簿

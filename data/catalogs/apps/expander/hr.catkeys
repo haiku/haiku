@@ -18,8 +18,8 @@ Same directory as source (archive) file	ExpanderPreferences		Isti direktorij kao
 Stop	ExpanderWindow		Zaustavi
 Cancel	ExpanderWindow		Otkaži
 Error when expanding archive	ExpanderWindow		Greška pri proširivanju arhive
-Expand	ExpanderMenu		Proširi
 Failed to create the destination folder.	ExpanderWindow		Neuspjelo stvaranje odredišne mape.
+Expand	ExpanderMenu		Proširi
 Settings…	ExpanderMenu		Postavke...
 Select current	DirectoryFilePanel		Odaberi trenutno
 Expanding '%s'…	ExpanderWindow		Širim '%s'…

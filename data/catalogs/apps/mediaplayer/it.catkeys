@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	334504768
+1	italian	x-vnd.Haiku-MediaPlayer	3337408711
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -24,6 +24,7 @@ Resume:	MediaPlayer-SettingsWindow		Riprendi:
 Duration	MediaPlayer-InfoWin		Durata
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importa elementi
 Open network stream	MediaPlayer-Main		Apri stream di rete
+%appname% settings	MediaPlayer-SettingsWindow		Impostazioni di %appname%
 Open file…	MediaPlayer-Main		Apri file…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensiona controlli nella modalità a schermo intero
 View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
@@ -45,6 +46,7 @@ Save error	MediaPlayer-PlaylistWindow		Errore durante il salvataggio
 Attributes	MediaPlayer-Main		Attributi
 Bottom of screen	MediaPlayer-SettingsWindow		Parte inferiore dello schermo
 Copyright	MediaPlayer-InfoWin		Copyright
+%appname%: %title%	MediaPlayer-Main		%appname%: %title%
 Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
 Aspect ratio	MediaPlayer-Main		Proporzioni
 Eject device	MediaPlayer-Main		Espelli dispositivo

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	2616657510
+1	hungarian	x-vnd.Haiku-Keymap	2110477243
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -8,6 +8,7 @@ Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Egyesült Államok)
 Right Option	Keyboard Layout View		Jobb Option
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
+Apple Magic Extended International	KeyboardLayoutNames		Apple Magic Kibővített (Nemzetközi)
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció billentyű
 Cancel	Modifier keys window		Mégse
@@ -24,6 +25,7 @@ Serbian (Cyrillic)	KeymapNames		Szerc (cirill)
 Belgian (point)	KeymapNames		Belga (pont)
 Finnish	KeymapNames		Finn
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
+Apple Magic (US)	KeyboardLayoutNames		Apple Magic (Egyesült Államok)
 Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Opció billentyű
 US-International	KeymapNames		Egyesült Államok (nemzetközi)
@@ -65,6 +67,7 @@ Left Option	Keyboard Layout View		Bal Option
 Save as…	Keymap window		Mentés másként…
 Lithuanian (Standard)	KeymapNames		Litván (hagyományos)
 Error: duplicate keys	Modifier keys window		Hiba: dupla billentyű
+Apple Magic	KeyboardLayoutNames		Apple Magic
 NUM	Keyboard Layout View	Very short for 'num lock'	Num
 Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
@@ -150,6 +153,8 @@ Norwegian	KeymapNames		Norvég
 Font	Keymap window		Betűtípus
 Danish	KeymapNames		Dán
 Generic 104-key	KeyboardLayoutNames		Hagyományos 104 billentyűs
+Apple Magic Extended (US)	KeyboardLayoutNames		Apple Magic Kibővített (Egyesült Államok)
+Apple Magic International	KeyboardLayoutNames		Apple Magic (Nemzetközi)
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
 Russian	KeymapNames		Orosz
 PAUSE	Keyboard Layout View		Pause

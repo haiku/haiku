@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	3091506374
+1	turkish	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
@@ -21,7 +21,6 @@ Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
 Unknown device	DevicesView		Bilinmeyen aygıt
-ShutDown failed with error: 	DevicesView		Kapatma şu hataylı başarısız oldu: 
 ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
 Name	PropertyList		Ad
 Manufacturer	DeviceSCSI		Üretici
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		ACPI düğmesi “%1”
 Attributes	PropertyList		Öznitelikler
 Worm	DeviceSCSI		Solucan
 Disk drive	DeviceSCSI		Disk sürücüsü
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Sürücü devre dışı bırakıldı. Değişikliğin etkili olması için yeniden başlatma gereklidir.\n\nYeniden başlatmanın ardından, sistem, sürücüsü olmadan aygıtı tanımlayamayacağı için bu aygıt artık aygıt listesinde görünmeyebilir.\n\nSürücüyü yeniden etkinleştirmek için Aygıtlar uygulamasında aygıtı bulun ve “Sürücüyü etkinleştir” seçeneğine tıklayın. Aygıt artık görünmüyorsa paket ayarları dosyasından ilgili engellenmiş girdiyi kaldırın:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Üretici
 Bridge	DeviceSCSI		Köprü

@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Misma carpeta que e
 Stop	ExpanderWindow		Parar
 Cancel	ExpanderWindow		Cancelar
 Error when expanding archive	ExpanderWindow		Error extrayendo archivo
-Expand	ExpanderMenu		Extraer
 Failed to create the destination folder.	ExpanderWindow		Fallo al crear la carpeta destino.
+Expand	ExpanderMenu		Extraer
 Settings…	ExpanderMenu		Configuración…
 Select current	DirectoryFilePanel		Selecciona actual
 Expanding '%s'…	ExpanderWindow		Expandiendo '%s'…

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1150234478
+1	japanese	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -289,6 +289,7 @@ Execute	FilePermissionsView		実行
 no	AttributesView		no
 Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示
 Recent folders	ContainerWindow		最近使ったフォルダー
+Error deleting items: %error	FSUtils		アイテム削除時にエラー: %error
 Desktop	Model		デスクトップ
 Select all	ContainerWindow		すべて選択
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%選択済 %filter}}

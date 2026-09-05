@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		Același director c
 Stop	ExpanderWindow		Oprește
 Cancel	ExpanderWindow		Anulează
 Error when expanding archive	ExpanderWindow		Eroare la extinderea arhivei
-Expand	ExpanderMenu		Extinde
 Failed to create the destination folder.	ExpanderWindow		Nu s-a putut crea dosarul de destinație.
+Expand	ExpanderMenu		Extinde
 Settings…	ExpanderMenu		Configurări…
 Select current	DirectoryFilePanel		Selectează curent
 Expanding '%s'…	ExpanderWindow		Se extinde „%s”…

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	3394555425
+1	italian	x-vnd.Haiku-ShowImage	1444474662
 ShowImage	System name		ShowImage
 Page setup…	Menus		Imposta pagina…
 Previous file	Menus		File precedente
@@ -12,6 +12,7 @@ Height: 	PrintOptionsWindow		Altezza:
 Next file	Menus		File seguente
 Slide show	Menus		Mostra sequenza
 Original size	Menus		Dimensione originale
+The document '%filename%' has been changed. Do you want to close the document?	ClosePrompt		Il documento "%filename%" è stato modificato. Vuoi chiudere il documento?
 Width:	PrintOptionsWindow		Larghezza:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensiona (in 1/72 pollici):
 Zoom factor in %:	PrintOptionsWindow		Fattore di zoom in %:
@@ -46,6 +47,7 @@ Clear selection	Menus		Pulisci selezione
 Rotate clockwise	Menus		Ruota in senso orario
 Open with…	Menus		Apri con...
 Rotate counterclockwise	Menus		Ruota in senso antiorario
+The document '%filename%' (page %number%) has been changed. Do you want to close the document?	ClosePrompt		Il documento "%filename%" (pagina %number%) è stato modificato. Vuoi chiudere il documento?
 Previous page	Menus		Pagina precedente
 Fit to window	Menus		Adatta alla finestra
 Go to page	Menus		Vai alla pagina

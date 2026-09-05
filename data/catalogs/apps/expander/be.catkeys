@@ -16,8 +16,8 @@ Same directory as source (archive) file	ExpanderPreferences		Папка ў як�
 Stop	ExpanderWindow		Спыніць
 Cancel	ExpanderWindow		Скасаваць
 Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
-Expand	ExpanderMenu		Распакаваць
 Failed to create the destination folder.	ExpanderWindow		Не ўдалося стварыць мэтавую папку.
+Expand	ExpanderMenu		Распакаваць
 Settings…	ExpanderMenu		Налады…
 Select current	DirectoryFilePanel		Пазначыць бягучы
 OK	ExpanderPreferences		ОК

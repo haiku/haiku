@@ -21,8 +21,8 @@ Same directory as source (archive) file	ExpanderPreferences		Même répertoire q
 Stop	ExpanderWindow		Arrêt
 Cancel	ExpanderWindow		Annuler
 Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l’archive
-Expand	ExpanderMenu		Décompresser
 Failed to create the destination folder.	ExpanderWindow		Impossible de créer le dossier de destination.
+Expand	ExpanderMenu		Décompresser
 Settings…	ExpanderMenu		Réglages…
 Select current	DirectoryFilePanel		Sélectionner le répertoire courant
 Expanding '%s'…	ExpanderWindow		Décompression de « %s »…

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Pairs	3059673093
+1	italian	x-vnd.Haiku-Pairs	156463394
 Pairs	System name		Pairs
 Quit	PairsWindow		Esci
 Medium	PairsWindow		Medio
@@ -14,4 +14,5 @@ Quit game	PairsWindow		Esci dal gioco
 Large	PairsWindow		Grande
 Beginner (4x4)	PairsWindow		Principiante (4×4)
 Intermediate (6x6)	PairsWindow		Intermedio (6×6)
+%s did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%s\" and \"%zu\", but make sure to keep them.	%s non ha trovato un numero sufficiente di icone vettoriali per iniziare; ne occorrono almeno %zu, ne sono state trovate %zu.\n
 New game	PairsWindow		Nuova partita

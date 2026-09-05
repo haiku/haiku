@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	2616657510
+1	catalan; valencian	x-vnd.Haiku-Keymap	2110477243
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -8,6 +8,7 @@ Brazilian	KeymapNames		Brasiler
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
 Right Option	Keyboard Layout View		Opció de la dreta
 X-Bows Nature	KeyboardLayoutNames		X-Bows Natura
+Apple Magic Extended International	KeyboardLayoutNames		Apple Magic ampliat internacional
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció:
 Cancel	Modifier keys window		Cancel·la
@@ -24,6 +25,7 @@ Serbian (Cyrillic)	KeymapNames		Sèrbi (Cyrillic)
 Belgian (point)	KeymapNames		Belga (punt)
 Finnish	KeymapNames		Acaba
 Switch shortcut keys to Windows/Linux mode	Keymap window		Canvia les tecles de drecera al mode de Windows / Linux
+Apple Magic (US)	KeyboardLayoutNames		Apple Magic (US)
 Spanish (Dvorak)	KeymapNames		Espanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Opció
 US-International	KeymapNames		US-Internacional
@@ -65,6 +67,7 @@ Left Option	Keyboard Layout View		Opció de l'esquerra
 Save as…	Keymap window		Desa com a...
 Lithuanian (Standard)	KeymapNames		Lituà (estàndard)
 Error: duplicate keys	Modifier keys window		Error: tecles duplicades
+Apple Magic	KeyboardLayoutNames		Apple Magic
 NUM	Keyboard Layout View	Very short for 'num lock'	NÚM
 Bulgarian (Phonetic)	KeymapNames		Búlgar (fonètic)
 Kinesis Advantage	KeyboardLayoutNames		Avantatge de kinesi
@@ -150,6 +153,8 @@ Norwegian	KeymapNames		Noruec
 Font	Keymap window		Tipus de lletra
 Danish	KeymapNames		Danès
 Generic 104-key	KeyboardLayoutNames		Genèric de 104 tecles
+Apple Magic Extended (US)	KeyboardLayoutNames		Apple Magic ampliat (US)
+Apple Magic International	KeyboardLayoutNames		Apple Magic internacional
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla de majúscules
 Russian	KeymapNames		Rus
 PAUSE	Keyboard Layout View		PAUSA

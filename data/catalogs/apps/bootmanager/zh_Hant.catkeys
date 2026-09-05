@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-BootManager	1012731949
+1	english	x-vnd.Haiku-BootManager	3553759389
 Old Master Boot Record backup failure	BootManagerController	Title	舊主開機記錄備份失敗
 At least one partition must be selected!	BootManagerController		至少必須選擇一個分區！
 No space available!	DrivesPage	Cannot install	沒有可用空間！
@@ -31,6 +31,7 @@ USB Drive	DrivesPage	Default disk name	USB 隨身碟
 Restore MBR	BootManagerController	Button	恢復MBR
 Hard Drive	DrivesPage	Default disk name	硬碟
 Drives	DrivesPage	Title	驅動器
+%appname% is unable to read the partition table!	BootManagerController		%appname% 無法讀取分割區表！
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		偵測到以下分區。請選取要包含在啟動選單中的分割區旁邊的方塊。您也可以設定分割區的名稱，因為您希望它們出現在啟動選單中。
 After five seconds	DefaultPartitionPage		五秒後
 Timeout: %s	DefaultPartitionPage		超時：%s
@@ -47,6 +48,7 @@ Previous	WizardView	Button	以前的
 Uninstallation of boot menu failed	BootManagerController	Title	啟動選單解除安裝失敗
 Incompatible format!	DrivesPage	Cannot install	格式不相容！
 Old Master Boot Record saved	BootManagerController	Title	舊的主引導記錄（MBR）已儲存
+The partition table of the first hard disk is not compatible.\n%appname% only works with IBM PC MBR partitions.	BootManagerController		第一顆硬碟的分割區表不相容。\n%appname% 僅支援 IBM PC MBR 分割區。
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		請指定默認分區和超時時間。\n除非您選擇其他分區，否則啟動選單將在超時後加載默認分區。 您還可以讓啟動選單無限期等待您選擇分區。\n按住“ALT”鍵以禁用啟動時的超時。
 Partitions	PartitionsPage	Title	分區
 Uninstallation of boot menu completed	BootManagerController	Title	啟動選單解除安裝完成
@@ -59,6 +61,7 @@ Please locate the Master Boot Record (MBR) save file to restore from. This is th
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		請找到要從中復原的主開機記錄 (MBR) 儲存檔案。這是首次安裝啟動管理員時所建立的檔案。
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	即將恢復主開機記錄 (MBR) 到 %disk 從 %file. 您想繼續嗎？
 Install	DrivesPage	Button	安裝
+The first partition on the disk starts too early and does not leave enough space free for a boot menu.\n%appname% needs 2 KiB available space before the first partition.	BootManagerController		磁碟上的第一個分割區起始位置過早，沒有足夠閒置空間可供開機選單使用。\n%appname% 需要在第一個分割區之前具備 2 KiB 的可用空間。
 File:	FileSelectionPage	Text control label	檔案：
 Error reading partition table	BootManagerController	Title	讀取分割區表時發生錯誤
 Back	BootManagerController	Button	返回

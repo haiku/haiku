@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	2786669505
+1	english	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		預期目標目錄
 reply: '%s'\n	SftpClient		回覆：'%s'\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (真實密碼已發送)
@@ -50,6 +50,7 @@ server address expected	CodyCam		預期伺服器位址
 Cannot start the video window	CodyCam		無法啟動視訊視窗
 reply: %d, %d\n	FtpClient		回覆：%d, %d\n
 Cannot set the time source for the video window	CodyCam		無法設定視訊視窗的時間來源
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		找不到視訊來源。\n使用 %appname% 需要網路攝影機。
 Every 15 minutes	CodyCam		每15分鐘
 Every 24 hours	CodyCam		每24小時
 Image Format Menu	CodyCam		圖片格式菜單

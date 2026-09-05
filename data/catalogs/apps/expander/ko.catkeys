@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		원본(압축) 파�
 Stop	ExpanderWindow		정지
 Cancel	ExpanderWindow		취소
 Error when expanding archive	ExpanderWindow		압축을 푸는 중 오류가 발생했습니다
-Expand	ExpanderMenu		압축풀기
 Failed to create the destination folder.	ExpanderWindow		목적지 폴더를 생성할 수 없습니다.
+Expand	ExpanderMenu		압축풀기
 Settings…	ExpanderMenu		설정…
 Select current	DirectoryFilePanel		현재 폴더 선택
 Expanding '%s'…	ExpanderWindow		'%s' 압축 푸는 중…

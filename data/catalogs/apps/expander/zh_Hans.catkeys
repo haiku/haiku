@@ -20,8 +20,8 @@ Same directory as source (archive) file	ExpanderPreferences		相同于源文件�
 Stop	ExpanderWindow		停止
 Cancel	ExpanderWindow		取消
 Error when expanding archive	ExpanderWindow		解压缩出错
-Expand	ExpanderMenu		解压缩
 Failed to create the destination folder.	ExpanderWindow		目标目录创建失败。
+Expand	ExpanderMenu		解压缩
 Settings…	ExpanderMenu		设置…
 Select current	DirectoryFilePanel		选择当前
 Expanding '%s'…	ExpanderWindow		解压 '%s' 中…

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	3091506374
+1	catalan; valencian	x-vnd.Haiku-Devices	4001232826
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Devices	System name		Dispositius
@@ -21,7 +21,6 @@ Manufacturer	Device		Fabricant
 Scanner	DeviceSCSI		Escànner
 Memory controller	Device		Controlador de la memòria
 Unknown device	DevicesView		El dispositiu és desconegut
-ShutDown failed with error: 	DevicesView		L'aturada ha fallat amb l'error següent: 
 ACPI node '%1'	DeviceACPI		Node d'ACPI %1
 Name	PropertyList		Nom
 Manufacturer	DeviceSCSI		Fabricant
@@ -80,7 +79,6 @@ ACPI button '%1'	DeviceACPI		Botó ACPI %1
 Attributes	PropertyList		Atributs
 Worm	DeviceSCSI		Cuc
 Disk drive	DeviceSCSI		Unitat de disc
-The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the Devices application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		El controlador s'ha inhabilitat. Cal reiniciar el sistema perquè el canvi tingui efecte.\n\nDesprés de reiniciar, és possible que aquest dispositiu ja no aparegui a la llista de dispositius, ja que el sistema no el podrà identificar sense el seu controlador.\n\nPer tornar a activar el controlador, cerqueu el dispositiu a l'aplicació Dispositius i feu clic a \"Habilita el controlador\". Si el dispositiu ja no és visible, elimineu l'entrada blocada corresponent del fitxer de configuració dels paquets:\n
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		Fabricant
 Bridge	DeviceSCSI		Pont
