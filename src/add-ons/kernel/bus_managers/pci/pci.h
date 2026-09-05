@@ -26,7 +26,7 @@ struct PCIDev;
 
 class PCIResourceWindow {
 public:
-	status_t		AllocateResource(uint64 size, pci_resource_range& out, uint8 flags);
+	status_t		AllocateResource(uint64 size, uint64 alignment, pci_resource_range& out, uint8 flags);
 	void			FreeResource(pci_resource_range resource);
 	status_t		ReserveResource(uint64 start, uint64 size, pci_resource_range& out);
 

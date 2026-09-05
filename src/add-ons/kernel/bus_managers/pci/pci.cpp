@@ -1310,7 +1310,11 @@ PCI::_AssignBARs(PCIBus *bus)
 			else
 				window = &bus->memory_window;
 
-			if (window->AllocateResource(size, resource, flags) == B_OK) {
+			// Size (which is a power of two) is also used for alignment
+			// per PCI Local Bus Specification Revision 3.0, p. 226:
+			// "all address spaces used are a power of 
+			// two in size and are naturally aligned"
+			if (window->AllocateResource(size, size, resource, flags) == B_OK) {
 				dprintf("PCI: Assigned BAR %d of %02x:%02x.%u address 0x%" B_PRIxPHYSADDR"\n",
 					i, dev->bus, dev->device, dev->function, resource.pci_address);
 				WriteConfig(dev->domain, dev->bus, dev->device, dev->function,
@@ -2626,23 +2630,30 @@ PCI::_DisableMSIX(PCIDev *device)
 
 
 status_t
-PCIResourceWindow::AllocateResource(uint64 size, pci_resource_range& newResource, uint8 flags)
+PCIResourceWindow::AllocateResource(uint64 size, uint64 alignment,
+	pci_resource_range& newResource, uint8 flags)
 {
 	// Find an appropriately sized free range in this window
 	// that matches the requested prefetchability and
 	// is within the 32-bit address space (if required)
 	for (int i = 0; i < fResources.Count(); i++) {
-		if (fResources[i].size >= size
+		uint64 resourceAddrAligned = (fResources[i].pci_address + alignment - 1)
+			& ~(alignment - 1);
+		uint64 resourcePaddingSize = resourceAddrAligned - fResources[i].pci_address;
+		uint64 resourceUsableSize = fResources[i].size - resourcePaddingSize;
+		if (fResources[i].size > resourcePaddingSize
+			&& resourceUsableSize >= size
 			&& ((flags & PCI_address_type_64) || fResources[i].pci_address < 0x100000000)
 			&& ((flags & PCI_address_prefetchable)
 				== (fResources[i].address_type & PCI_address_prefetchable)))
-			return ReserveResource(fResources[i].pci_address, size, newResource);
+			return ReserveResource(resourceAddrAligned, size, newResource);
 	}
 
 	// We couldn't allocate prefetchable memory,
 	// try to allocate non-prefetchable instead.
 	if ((flags & PCI_address_prefetchable) != 0)
-		return AllocateResource(size, newResource, flags & ~PCI_address_prefetchable);
+		return AllocateResource(size, alignment, newResource,
+			flags & ~PCI_address_prefetchable);
 	return B_NO_MEMORY;
 }
 
