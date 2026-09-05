@@ -366,7 +366,7 @@ X86PCIControllerMethPcie::InitDriverInt(device_node* node)
 
 		// Areas in the lower part of the address space are special
 		// (BIOS ROM, VGA, etc.) and should not be touched.
-		if (resource.type == B_IO_MEMORY && resource.pci_address < 0x80000000)
+		if (resource.type == B_IO_MEMORY && resource.pci_address < 0x100000)
 			continue;
 
 		fResourceRanges.Add(resource);
