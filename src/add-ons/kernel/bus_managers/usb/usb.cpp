@@ -471,7 +471,7 @@ set_pipe_policy(usb_pipe pipe, uint8 maxQueuedPackets,
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_ISO_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
-	return ((IsochronousPipe *)object.IsSet())->SetPipePolicy(maxQueuedPackets,
+	return ((IsochronousPipe *)object.Get())->SetPipePolicy(maxQueuedPackets,
 		maxBufferDurationMS, sampleSize);
 }
 
