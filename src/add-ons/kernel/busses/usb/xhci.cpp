@@ -1847,6 +1847,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			TRACE_ERROR("no memory to allocate device\n");
 		} else {
 			TRACE_ERROR("device object failed to initialize\n");
+			delete deviceObject;
 		}
 		CleanupDevice(device);
 		return NULL;
