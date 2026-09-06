@@ -261,13 +261,14 @@ MediaReplicant::MouseDown(BPoint where)
 		BRect menuFrame(whereScreen - BPoint(4, 4), whereScreen + BPoint(4, 4));
 		menu->Go(whereScreen, true, false, menuFrame, true);
 	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+		if (fMixerControl != NULL)
+			fMixerControl->SetMuted(!fMixerControl->IsMuted());
+
 		VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
 		if (tip != NULL && fMixerControl != NULL) {
 			tip->Update(fMixerControl);
 			ShowToolTip(tip);
 		}
-
-		Invalidate();
 	} else {
 		BRect windowFrame(whereScreen, BSize(207, 19));
 		VolumeWindow* window = new VolumeWindow(windowFrame);
