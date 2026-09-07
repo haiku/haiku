@@ -25,14 +25,15 @@ be a problem for us? It depends on whether we will be able to use the
 closed-source Be drivers with our own kernel — if not, then we can
 simply ignore v2.
 
-**Watching /dev/midi for changes.** Whenever a new device appears in
-/dev/midi, the midi_server must create and publish a new MidiProducer
-and MidiConsumer for that device. When a device disappears, its
-endpoints must be removed again. Philippe Houdoin suggested we use the
-device_watcher for this, but R5 doesn't appear to do it that way. Either
-it uses node monitoring or doesn't do this at all. Our midi_server
-already has a DeviceWatcher class, but it only examines the entries from
-/dev/midi when the server starts, not while the server is running.
+**BMidiRoster endpoints sorted by names, not ID.** Would be more user
+friendly: currently that order depend on endpoints registration order,
+which cannot be predictable, for both USB midi devices and MIDI apps.
+Proposed sort critiria: "device" endpoints grouped first, in each group
+(devices endpoints group, non devices endpoints group), by endpoint name
+(instead of ID value), and last, for "device" endpoints, the "port"
+index (which could be retrieve from the /dev/midi/*/<leaf> part).
+On endpoint name or properties (device, not device) change, order
+should be rebuild.
 
 **BMidiSynthFile::Fade()** Right now this simply calls Stop(). We could
 set a flag in BMidiStore (which handles our playback), which would then
