@@ -1655,13 +1655,37 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	_WriteContext(&device->input_ctx->slot.dwslot1, SLOT_1_RH_PORT(rhPort));
 	uint32 dwslot2 = SLOT_2_IRQ_TARGET(0);
 
-	// If LS/FS device connected to non-root HS device
-	if (route != 0 && parent->Speed() == USB_SPEED_HIGHSPEED
-		&& (speed == USB_SPEED_LOWSPEED || speed == USB_SPEED_FULLSPEED)) {
-		struct xhci_device *parenthub = (struct xhci_device *)
-			parent->ControllerCookie();
-		dwslot2 |= SLOT_2_PORT_NUM(hubPort);
-		dwslot2 |= SLOT_2_TT_HUB_SLOT(parenthub->slot);
+	// If LS/FS device is connected to a non-root HS device. This includes a LS/FS
+	// device connected to a full speed hub which is itself connected
+	// to a non-root HS device
+	if (route != 0 && (speed == USB_SPEED_LOWSPEED || speed == USB_SPEED_FULLSPEED)) {
+		// Parent Port Number and Parent Hub Slot ID pertain to the
+		// "parent High-speed hub", which is the high speed hub above this LS/FS
+		// device. It may not be this device's direct parent (if this device is
+		// connected to a full speed hub), so we need to look at all of our parent
+		// devices to find the high speed hub.
+		Device *parentHighSpeedHub = NULL;
+		// The first full speed hub looking at this device's parents from the root hub
+		// down. If this device is directly beneath a high speed hub, there will be
+		// no full speed hub involved
+		Device *firstFullSpeedHub = NULL;
+		for (Device *hub = parent; hub != RootObject(); firstFullSpeedHub = hub,
+			hub = (Device *)hub->Parent()) {
+			if (hub->Speed() == USB_SPEED_HIGHSPEED) {
+				parentHighSpeedHub = hub;
+				break;
+			}
+		}
+		if (parentHighSpeedHub != NULL && parentHighSpeedHub != RootObject()) {
+			struct xhci_device *parentHSHub = (struct xhci_device *)
+				parentHighSpeedHub->ControllerCookie();
+
+			dwslot2 |= SLOT_2_TT_HUB_SLOT(parentHSHub->slot);
+			if (firstFullSpeedHub == NULL)
+				dwslot2 |= SLOT_2_PORT_NUM(hubPort);
+			else
+				dwslot2 |= SLOT_2_PORT_NUM(firstFullSpeedHub->HubPort());
+		}
 	}
 
 	_WriteContext(&device->input_ctx->slot.dwslot2, dwslot2);
