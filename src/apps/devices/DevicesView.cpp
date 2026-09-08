@@ -271,10 +271,16 @@ DevicesView::RebuildDevicesOutline(BOutlineListView* outline, const Devices& dev
 		}
 		outline->SortItemsUnder(NULL, false, SortItemsCompare);
 	} else if (orderBy == ORDER_BY_CATEGORY) {
-		// Add all categories to the outline
+		// Add categories that have devices to the outline
 		CategoryMapIterator iter;
-		for (iter = categoryMap.begin(); iter != categoryMap.end(); iter++)
-			outline->AddItem(iter->second);
+		for (iter = categoryMap.begin(); iter != categoryMap.end(); iter++) {
+			for (unsigned int i = 0; i < devices.size(); i++) {
+				if (devices[i]->GetCategory() == iter->first) {
+					outline->AddItem(iter->second);
+					break;
+				}
+			}
+		}
 
 		// Add all devices under the categories
 		for (unsigned int i = 0; i < devices.size(); i++) {
