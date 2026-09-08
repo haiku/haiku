@@ -757,6 +757,11 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 	ProcessRange(fPageTable, fInitialLevel, va, B_PAGE_SIZE, nullptr,
 		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
 			uint64_t pte = atomic_get64((int64_t*)ptePtr);
+
+			// Don't set flags for invalid entries
+			if ((pte & kPteValidMask) == 0)
+				return;
+
 			*pa = pte & kPteAddrMask;
 			*flags |= PAGE_PRESENT | B_KERNEL_READ_AREA;
 			if (is_pte_accessed(pte))
