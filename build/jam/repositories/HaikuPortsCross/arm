@@ -22,8 +22,8 @@ BootstrapPackageRepository HaikuPortsCross
 	expat_bootstrap_devel-2.5.0-1
 	findutils_bootstrap-4.9.0-1
 	flex_bootstrap-2.5.35-1
-	freetype_bootstrap-2.6.3-1
-	freetype_bootstrap_devel-2.6.3-1
+	freetype_bootstrap-2.13.3-1
+	freetype_bootstrap_devel-2.13.3-1
 	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-3.11-1
 	icu74_bootstrap-74.1-1
