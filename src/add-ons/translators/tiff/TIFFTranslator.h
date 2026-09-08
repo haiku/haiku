@@ -43,9 +43,6 @@
 #include <fs_attr.h>
 #include "BaseTranslator.h"
 
-// IO Extension Names:
-#define DOCUMENT_COUNT "/documentCount"
-#define DOCUMENT_INDEX "/documentIndex"
 
 // TIFF Translator Settings
 #define TIFF_SETTING_COMPRESSION "tiff /compression"

@@ -18,9 +18,6 @@
 #include <File.h>
 #include <ByteOrder.h>
 
-#define DOCUMENT_COUNT "/documentCount"
-#define DOCUMENT_INDEX "/documentIndex"
-
 #define PSD_SETTING_COMPRESSION "psd /compression"
 #define PSD_SETTING_VERSION 	"psd /psdversion"
 
@@ -57,8 +54,5 @@ class PSDTranslator : public BaseTranslator {
 	protected:
 		virtual ~PSDTranslator();
 };
-
-extern const char *kDocumentCount;
-extern const char *kDocumentIndex;
 
 #endif	/* PSD_TRANSLATOR_H */

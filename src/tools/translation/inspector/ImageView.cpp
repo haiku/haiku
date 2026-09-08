@@ -435,7 +435,7 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 	const char *tranname = NULL, *traninfo = NULL;
 	int32 tranversion = 0;
 
-	if (ioExtension.FindInt32("/documentCount", &document_count) == B_OK) {
+	if (ioExtension.FindInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, &document_count) == B_OK) {
 		BString str = B_TRANSLATE("Number of Documents: %1\n"
 			"\nTranslator Used:\n"
 			"Name: %2\n"
@@ -450,38 +450,34 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 		sprintf(str2, "%d", (int)tranversion);
 		str.ReplaceFirst("%4", str2);
 		bstr.Append(str.String());
+	} else if (ioExtension.FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &document_index) == B_OK) {
+		BString str = B_TRANSLATE("Selected Document: %1\n"
+			"\nTranslator Used:\n"
+			"Name: %2\n"
+			"Info: %3\n"
+			"Version: %4\n");
+		char str2[127] = { 0 };
+		sprintf(str2, "%ld", document_index);
+		str.ReplaceFirst("%1", str2);
+		str.ReplaceFirst("%2", tranname);
+		str.ReplaceFirst("%3", traninfo);
+		str2[0] = '\0';
+		sprintf(str2, "%d", (int)tranversion);
+		str.ReplaceFirst("%4", str2);
+		bstr.Append(str.String());
+	} else if (proster->GetTranslatorInfo(tinfo.translator, &tranname, &traninfo, &tranversion)
+		== B_OK) {
+		BString str = B_TRANSLATE("\nTranslator Used:\n"
+			"Name: %1\n"
+			"Info: %2\n"
+			"Version: %3\n");
+		str.ReplaceFirst("%1", tranname);
+		str.ReplaceFirst("%2", traninfo);
+		char str2[127] = { 0 };
+		sprintf(str2, "%d", (int)tranversion);
+		str.ReplaceFirst("%3", str2);
+		bstr.Append(str.String());
 	}
-	else
-		if (ioExtension.FindInt32("/documentIndex", &document_index) == B_OK) {
-			BString str = B_TRANSLATE("Selected Document: %1\n"
-				"\nTranslator Used:\n"
-				"Name: %2\n"
-				"Info: %3\n"
-				"Version: %4\n");
-			char str2[127] = { 0 };
-			sprintf(str2, "%ld", document_index);
-			str.ReplaceFirst("%1", str2);
-			str.ReplaceFirst("%2", tranname);
-			str.ReplaceFirst("%3", traninfo);
-			str2[0] = '\0';
-			sprintf(str2, "%d", (int)tranversion);
-			str.ReplaceFirst("%4", str2);
-			bstr.Append(str.String());
-		}
-		else
-			if (proster->GetTranslatorInfo(tinfo.translator, &tranname,
-				&traninfo, &tranversion) == B_OK) {
-					BString str = B_TRANSLATE("\nTranslator Used:\n"
-						"Name: %1\n"
-						"Info: %2\n"
-						"Version: %3\n");
-					str.ReplaceFirst("%1", tranname);
-					str.ReplaceFirst("%2", traninfo);
-					char str2[127] = { 0 };
-					sprintf(str2, "%d", (int)tranversion);
-					str.ReplaceFirst("%3", str2);
-					bstr.Append(str.String());
-			}
 
 	// Translator Input / Output Formats
 	int32 nins = 0, nouts = 0;
@@ -559,7 +555,7 @@ ImageView::SetImage(BMessage *pmsg)
 		if (ref != fcurrentRef)
 			// if new image, reset to first document
 			fdocumentIndex = 1;
-		chk = ioExtension.AddInt32("/documentIndex", fdocumentIndex);
+		chk = ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, fdocumentIndex);
 		chk = proster->Identify(&file, &ioExtension, &tinfo, 0, NULL,
 			B_TRANSLATOR_BITMAP);
 
@@ -575,10 +571,10 @@ ImageView::SetImage(BMessage *pmsg)
 		fcurrentRef = ref;
 			// need to keep the ref around if user wants to switch pages
 		int32 documentCount = 0;
-		if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK &&
-			documentCount > 0)
+		if (ioExtension.FindInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, &documentCount) == B_OK 
+			&& documentCount > 0) {
 			fdocumentCount = documentCount;
-		else
+		} else
 			fdocumentCount = 1;
 
 		// Set the name of the Window to reflect the file name

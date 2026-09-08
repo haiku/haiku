@@ -21,9 +21,6 @@
 #define B_TRANSLATION_CONTEXT "ICOTranslator"
 
 
-const char *kDocumentCount = "/documentCount";
-const char *kDocumentIndex = "/documentIndex";
-
 #define kICOMimeType "image/vnd.microsoft.icon"
 #define kICOName "Windows icon"
 	// I'm lazy - structure initializers don't like const variables...

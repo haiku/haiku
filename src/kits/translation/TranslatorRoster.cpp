@@ -70,6 +70,8 @@ char B_TRANSLATOR_EXT_SOUND_CHANNEL[]		= "nois/channel";
 char B_TRANSLATOR_EXT_SOUND_MONO[]			= "nois/mono";
 char B_TRANSLATOR_EXT_SOUND_MARKER[]		= "nois/marker";
 char B_TRANSLATOR_EXT_SOUND_LOOP[]			= "nois/loop";
+char B_TRANSLATOR_EXT_DOCUMENT_COUNT[]		= "/documentCount";
+char B_TRANSLATOR_EXT_DOCUMENT_INDEX[]		= "/documentIndex";
 
 BTranslatorRoster* BTranslatorRoster::sDefaultRoster = NULL;
 

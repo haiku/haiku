@@ -23,6 +23,8 @@ extern char B_TRANSLATOR_EXT_SOUND_CHANNEL[];
 extern char B_TRANSLATOR_EXT_SOUND_MONO[];
 extern char B_TRANSLATOR_EXT_SOUND_MARKER[];
 extern char B_TRANSLATOR_EXT_SOUND_LOOP[];
+extern char B_TRANSLATOR_EXT_DOCUMENT_COUNT[];
+extern char B_TRANSLATOR_EXT_DOCUMENT_INDEX[];
 
 
 // Standard formats

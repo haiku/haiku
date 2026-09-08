@@ -19,8 +19,6 @@
 #include <File.h>
 #include <ByteOrder.h>
 
-#define DOCUMENT_COUNT "/documentCount"
-#define DOCUMENT_INDEX "/documentIndex"
 
 #define ICNS_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 0, 0)
 #define ICNS_IMAGE_FORMAT	'ICNS'
@@ -57,8 +55,5 @@ class ICNSTranslator : public BaseTranslator {
 		virtual ~ICNSTranslator();
 };
 
-// Extensions that ShowImage supports
-extern const char *kDocumentCount;
-extern const char *kDocumentIndex;
 
 #endif	/* ICNS_TRANSLATOR_H */

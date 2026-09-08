@@ -19,9 +19,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PSDTranslator"
 
-const char *kDocumentCount = "/documentCount";
-const char *kDocumentIndex = "/documentIndex";
-
 #define kPSDMimeType "image/vnd.adobe.photoshop"
 #define kPSDName "Photoshop image"
 

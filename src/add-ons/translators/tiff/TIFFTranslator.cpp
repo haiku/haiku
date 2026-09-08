@@ -209,7 +209,7 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 
 	if (ioExtension) {
 		// Check if a document index has been specified
-		if (ioExtension->FindInt32(DOCUMENT_INDEX, &documentIndex) != B_OK)
+		if (ioExtension->FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &documentIndex) != B_OK)
 			documentIndex = 1;
 
 		if (documentIndex < 1 || documentIndex > documentCount) {
@@ -230,8 +230,8 @@ identify_tiff_header(BPositionIO *inSource, BMessage *ioExtension,
 
 	if (ioExtension) {
 		// add page count to ioExtension
-		ioExtension->RemoveName(DOCUMENT_COUNT);
-		ioExtension->AddInt32(DOCUMENT_COUNT, documentCount);
+		ioExtension->RemoveName(B_TRANSLATOR_EXT_DOCUMENT_COUNT);
+		ioExtension->AddInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, documentCount);
 	}
 
 	if (outInfo) {

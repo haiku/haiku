@@ -22,9 +22,6 @@ extern "C" {
 #include "icns.h"
 }
 
-const char *kDocumentCount = "/documentCount";
-const char *kDocumentIndex = "/documentIndex";
-
 #define kICNSMimeType "image/icns"
 #define kICNSName "Apple Icon"
 
@@ -129,13 +126,13 @@ ICNSTranslator::DerivedIdentify(BPositionIO *stream,
 	int32 documentIndex = 1;
 	
 	if (ioExtension) {
-		if (ioExtension->FindInt32(DOCUMENT_INDEX, &documentIndex) != B_OK)
+		if (ioExtension->FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &documentIndex) != B_OK)
 			documentIndex = 1;
 		if (documentIndex < 1 || documentIndex > documentCount)
 			return B_NO_TRANSLATOR;
 
-		ioExtension->RemoveName(DOCUMENT_COUNT);
-		ioExtension->AddInt32(DOCUMENT_COUNT, documentCount);
+		ioExtension->RemoveName(B_TRANSLATOR_EXT_DOCUMENT_COUNT);
+		ioExtension->AddInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, documentCount);
 	}	
 		
 	info->type = ICNS_IMAGE_FORMAT;
@@ -197,7 +194,7 @@ ICNSTranslator::DerivedTranslate(BPositionIO *source,
 			int32 documentIndex = 1;
 			
 			if (ioExtension) {
-				if (ioExtension->FindInt32(DOCUMENT_INDEX, &documentIndex) != B_OK)
+				if (ioExtension->FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &documentIndex) != B_OK)
 					documentIndex = 1;
 			}
 								

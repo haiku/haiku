@@ -48,8 +48,6 @@ struct progress_data {
 };
 
 // Extensions that ShowImage supports
-const char* kDocumentCount = "/documentCount";
-const char* kDocumentIndex = "/documentIndex";
 const char* kProgressMonitor = "/progressMonitor";
 const char* kProgressMessage = "/progressMessage";
 
@@ -154,12 +152,12 @@ RAWTranslator::DerivedIdentify(BPositionIO *stream,
 		int32 count = raw.CountImages();
 
 		// Add page count to ioExtension
-		settings->RemoveName(kDocumentCount);
-		settings->AddInt32(kDocumentCount, count);
+		settings->RemoveName(B_TRANSLATOR_EXT_DOCUMENT_COUNT);
+		settings->AddInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, count);
 
 		// Check if a document index has been specified
 		int32 index;
-		if (settings->FindInt32(kDocumentIndex, &index) == B_OK)
+		if (settings->FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &index) == B_OK)
 			index--;
 		else
 			index = 0;
@@ -244,7 +242,7 @@ RAWTranslator::DerivedTranslate(BPositionIO* stream,
 
 		if (status == B_OK && settings) {
 			// Check if a document index has been specified
-			if (settings->FindInt32(kDocumentIndex, &imageIndex) == B_OK)
+			if (settings->FindInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, &imageIndex) == B_OK)
 				imageIndex--;
 			else
 				imageIndex = 0;

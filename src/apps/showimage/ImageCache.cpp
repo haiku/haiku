@@ -240,8 +240,9 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 	BMessage ioExtension;
 
 	if (queueEntry->page != 0
-		&& ioExtension.AddInt32("/documentIndex", queueEntry->page) != B_OK)
+		&& ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, queueEntry->page) != B_OK) {
 		return B_NO_MEMORY;
+	}
 
 	// TODO: this doesn't work for images that already are in the queue...
 	if (!queueEntry->listeners.empty()) {
@@ -283,10 +284,10 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 
 	// get the number of documents (pages) if it has been supplied
 	int32 documentCount = 0;
-	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
-		&& documentCount > 0)
+	if (ioExtension.FindInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, &documentCount) == B_OK
+		&& documentCount > 0) {
 		entry->pageCount = documentCount;
-	else
+	} else
 		entry->pageCount = 1;
 
 	deleter.Detach();

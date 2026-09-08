@@ -298,7 +298,7 @@ SlideShowSaver::SetImage(const entry_ref *pref)
 	//if (ref != fCurrentRef)
 		// if new image, reset to first document
 	//	fDocumentIndex = 1;
-	if (ioExtension.AddInt32("/documentIndex", 1 /*fDocumentIndex*/) != B_OK)
+	if (ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, 1 /*fDocumentIndex*/) != B_OK)
 		return B_ERROR;
 	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
 		B_TRANSLATOR_BITMAP) != B_OK)
@@ -381,7 +381,7 @@ SlideShowSaver::IsImage(const entry_ref *pref)
 		return false;
 
 	BMessage ioExtension;
-	if (ioExtension.AddInt32("/documentIndex", 1) != B_OK)
+	if (ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, 1) != B_OK)
 		return false;
 
 	translator_info info;

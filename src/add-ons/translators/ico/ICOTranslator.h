@@ -58,8 +58,5 @@ class ICOTranslator : public BaseTranslator {
 	private:
 };
 
-// Extensions that ShowImage supports
-extern const char *kDocumentCount;
-extern const char *kDocumentIndex;
 
 #endif	/* ICO_TRANSLATOR_H */
