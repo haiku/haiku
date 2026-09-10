@@ -1563,12 +1563,18 @@ LaunchDaemon::_AddRunTargets(BMessage& message)
 void
 LaunchDaemon::_AddRunTargets(BMessage& message, const char* name)
 {
-	BMessage targets;
-	if (name != NULL && message.FindMessage(name, &targets) != B_OK)
-		return;
+	BMessage targetsMessage;
+	BMessage* targets;
+	if (name != NULL) {
+		targets = &targetsMessage;
+		if (message.FindMessage(name, &targetsMessage) != B_OK)
+			return;
+	} else {
+		targets = &message;
+	}
 
 	const char* target;
-	for (int32 index = 0; targets.FindString("target", index, &target) == B_OK;
+	for (int32 index = 0; targets->FindString("target", index, &target) == B_OK;
 			index++) {
 		fRunTargets.Add(target);
 	}
