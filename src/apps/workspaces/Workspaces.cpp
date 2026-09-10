@@ -1080,11 +1080,11 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 			} else if (!strcmp(argv[i], "down")) {
 				activate_workspace((current_workspace() + columns) % (columns * rows));
 			} else if (!strcmp(argv[i], "left")) {
-				activate_workspace(
-					current_workspace() / rows * rows + ((current_workspace() - 1) % rows));
+				activate_workspace(current_workspace() / columns * columns
+					+ ((current_workspace() - 1) % columns));
 			} else if (!strcmp(argv[i], "right")) {
-				activate_workspace(
-					current_workspace() / rows * rows + ((current_workspace() + 1) % rows));
+				activate_workspace(current_workspace() / columns * columns
+					+ ((current_workspace() + 1) % columns));
 			} else {
 				// some unknown arguments were specified
 				fprintf(stderr, B_TRANSLATE("Invalid argument: %s\n"), argv[i]);
