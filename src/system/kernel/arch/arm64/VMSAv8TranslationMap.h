@@ -100,6 +100,8 @@ public:
 
 	static void SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8TranslationMap *to);
 
+	uint64 UserTTBR0() const;
+
 private:
 	bool fIsKernel;
 	phys_addr_t fPageTable;

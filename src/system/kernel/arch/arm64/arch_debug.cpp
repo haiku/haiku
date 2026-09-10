@@ -17,6 +17,8 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
 
+#include "VMSAv8TranslationMap.h"
+
 #define NUM_PREVIOUS_LOCATIONS 32
 
 extern struct iframe_stack gBootFrameStack;
@@ -48,14 +50,16 @@ already_visited(addr_t* visited, int32* _last, int32* _num, addr_t fp)
 static status_t
 get_next_frame(addr_t fp, addr_t *next, addr_t *ip)
 {
-	if (fp != 0) {
-		*ip   = ((addr_t*)fp)[1];
-		*next = ((addr_t*)fp)[0];
+	if (fp == 0)
+		return B_BAD_VALUE;
 
-		return B_OK;
-	}
+	addr_t frame[2]; // [0] = saved fp, [1] = return address
+	if (debug_memcpy(B_CURRENT_TEAM, frame, (void*)fp, sizeof(frame)) != B_OK)
+		return B_BAD_ADDRESS;
 
-	return B_BAD_VALUE;
+	*next = frame[0];
+	*ip = frame[1];
+	return B_OK;
 }
 
 
@@ -344,6 +348,8 @@ stack_trace(int argc, char **argv)
 	Thread* thread = thread_get_current_thread();
 	addr_t fp = arm64_get_fp();
 
+	uint64 savedTTBR0 = 0;
+
 	if (argc > threadIndex) {
 		thread_id id = strtoul(argv[threadIndex], NULL, 0);
 		Thread* target = Thread::GetDebug(id);
@@ -362,6 +368,15 @@ stack_trace(int argc, char **argv)
 			thread = target;
 			// x29 (frame pointer) is stored at regs[10]
 			fp = thread->arch_info.regs[10];
+
+			// If switched to user-space, save current TTBR0 and switch to the thread's one
+			if (thread->team != NULL && thread->team->address_space != NULL) {
+				auto* map = dynamic_cast<VMSAv8TranslationMap*>(
+					thread->team->address_space->TranslationMap());
+				savedTTBR0 = READ_SPECIALREG(TTBR0_EL1);
+				WRITE_SPECIALREG(TTBR0_EL1, map->UserTTBR0());
+				arm64_isb();
+			}
 		}
 	}
 
@@ -435,6 +450,11 @@ stack_trace(int argc, char **argv)
 		}
 		if (fp == 0)
 			break;
+	}
+
+	if (savedTTBR0 != 0) {
+		WRITE_SPECIALREG(TTBR0_EL1, savedTTBR0);
+		arm64_isb();
 	}
 
 	return 0;

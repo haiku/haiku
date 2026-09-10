@@ -210,6 +210,14 @@ VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8Translatio
 }
 
 
+uint64
+VMSAv8TranslationMap::UserTTBR0() const
+{
+	return static_cast<uint64>(fASID) << 48 | fPageTable
+		| (fHwFeature & HW_COMMON_NOT_PRIVATE ? 1 : 0);
+}
+
+
 int
 VMSAv8TranslationMap::CalcStartLevel(int vaBits, int pageBits)
 {
