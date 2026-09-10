@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2026 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -343,6 +343,28 @@ stack_trace(int argc, char **argv)
 	addr_t previousLocations[NUM_PREVIOUS_LOCATIONS];
 	Thread* thread = thread_get_current_thread();
 	addr_t fp = arm64_get_fp();
+
+	if (argc > threadIndex) {
+		thread_id id = strtoul(argv[threadIndex], NULL, 0);
+		Thread* target = Thread::GetDebug(id);
+		if (target == NULL) {
+			kprintf("could not find thread %" B_PRId32 "\n", id);
+			return 0;
+		}
+		if (target != thread) {
+			if (target->state == B_THREAD_RUNNING) {
+				// TODO
+				kprintf("Thread %" B_PRId32 " is running on another CPU. "
+						"Tracing running threads isn't supported on arm64 yet\n",
+					id);
+				return 0;
+			}
+			thread = target;
+			// x29 (frame pointer) is stored at regs[10]
+			fp = thread->arch_info.regs[10];
+		}
+	}
+
 	int32 num = 0, last = 0;
 	struct iframe_stack *frameStack;
 
