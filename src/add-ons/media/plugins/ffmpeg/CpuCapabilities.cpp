@@ -7,12 +7,13 @@
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
- 
+
+#include <stdio.h>
+#include <string.h>
+
+#include <cpu_type.h>
 
 #include "CpuCapabilities.h"
-
-#include <string.h>
-#include <cpu_type.h>
 
 
 CPUCapabilities::~CPUCapabilities()

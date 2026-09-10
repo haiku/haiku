@@ -1,0 +1,408 @@
+/*
+ * Copyright 2004-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
+ * Copyright 2026, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef ARCH_CPU_TYPE_H
+#define ARCH_CPU_TYPE_H
+
+#include <string.h>
+
+/*!	Tries to parse an Intel CPU ID string to match our usual naming scheme.
+	Note, this function is not thread safe, and must only be called once
+	at a time.
+*/
+static inline const char*
+parse_intel(const char* name)
+{
+	static char buffer[49];
+
+	// ignore initial spaces
+	int index = 0;
+	for (; name[index] != '\0'; index++) {
+		if (name[index] != ' ')
+			break;
+	}
+
+
+	// parse model
+	int outIndex = 0;
+	for (; name[index] != '\0'; index++) {
+		// ignore vendor
+		if (strncmp(&name[index], "Intel", 5) == 0) {
+			for (; name[index] != '\0'; index++) {
+				if (name[index] == ' ') {
+					index++;
+					break;
+				}
+			}
+		}
+		if (!strncmp(&name[index], "(R)", 3)) {
+			outIndex += strlcpy(&buffer[outIndex], "®", sizeof(buffer) - outIndex);
+			index += 2;
+		} else if (!strncmp(&name[index], "(TM)", 4)) {
+			outIndex += strlcpy(&buffer[outIndex], "™", sizeof(buffer) - outIndex);
+			index += 3;
+		} else if (!strncmp(&name[index], " CPU", 4)) {
+			// Cut out the "CPU" string
+			index += 3;
+		} else if (!strncmp(&name[index], " processor", 10)) {
+			// Cut out the "processor" string
+			index += 9;
+		} else if (!strncmp(&name[index], "  ", 2)) {
+			// Skip duplicate spaces
+			while (name[index + 2] == ' ')
+				index++;
+		} else if (!strncmp(&name[index], " @", 2)) {
+			// Cut off the remainder
+			break;
+		} else {
+			buffer[outIndex++] = name[index];
+		}
+	}
+
+	// Older Intel CPUs add the clock speed into the Brand String
+	if (outIndex >= 3
+		&& (!memcmp(&buffer[outIndex - 3], "MHz", 3) || !memcmp(&buffer[outIndex - 3], "GHz", 3))) {
+		outIndex -= 3;
+		// remove the numeric value ("900")
+		while (outIndex > 0
+			&& ((buffer[outIndex - 1] >= '0' && buffer[outIndex - 1] <= '9')
+				|| buffer[outIndex - 1] == '.')) {
+			outIndex--;
+		}
+	}
+
+	// cut off trailing spaces
+	while (outIndex > 0 && buffer[outIndex - 1] == ' ')
+		outIndex--;
+
+	buffer[outIndex] = '\0';
+	return buffer;
+}
+
+
+static inline const char*
+parse_amd(const char* name)
+{
+	static char buffer[49];
+
+	// ignore initial spaces
+	int index = 0;
+	for (; name[index] != '\0'; index++) {
+		if (name[index] != ' ')
+			break;
+	}
+
+	// Keep an initial "mobile"
+	int outIndex = 0;
+	bool spaceWritten = false;
+	if (!strncasecmp(&name[index], "Mobile ", 7)) {
+		strcpy(buffer, "Mobile ");
+		spaceWritten = true;
+		outIndex += 7;
+		index += 7;
+	}
+
+	// parse model
+	for (; name[index] != '\0'; index++) {
+		if (!strncasecmp(&name[index], "(r)", 3)) {
+			outIndex += strlcpy(&buffer[outIndex], "®", sizeof(buffer) - outIndex);
+			index += 2;
+		} else if (!strncasecmp(&name[index], "(tm)", 4)) {
+			outIndex += strlcpy(&buffer[outIndex], "™", sizeof(buffer) - outIndex);
+			index += 3;
+		} else if (!strncmp(&name[index], "with ", 5) || !strncmp(&name[index], "/w", 2)) {
+			// Cut off the rest
+			break;
+		} else if (name[index] == '-') {
+			if (!spaceWritten)
+				buffer[outIndex++] = ' ';
+			spaceWritten = true;
+		} else {
+			const char* kWords[] = {"Eight-core", "6-core", "Six-core", "Quad-core", "Dual-core",
+				"Dual core", "Processor", "APU", "AMD", "Intel", "Integrated", "CyrixInstead",
+				"Advanced Micro Devices", "Comb", "DualCore", "Technology", "Mobile",
+				"Triple-Core"};
+			bool removed = false;
+			for (size_t i = 0; i < sizeof(kWords) / sizeof(kWords[0]); i++) {
+				size_t length = strlen(kWords[i]);
+				if (!strncasecmp(&name[index], kWords[i], length)) {
+					index += length - 1;
+					removed = true;
+					break;
+				}
+			}
+			if (removed)
+				continue;
+
+			if (name[index] == ' ') {
+				if (spaceWritten)
+					continue;
+				spaceWritten = true;
+			} else {
+				spaceWritten = false;
+			}
+			buffer[outIndex++] = name[index];
+		}
+	}
+
+	// cut off trailing spaces
+	while (outIndex > 1 && buffer[outIndex - 1] == ' ')
+		outIndex--;
+
+	buffer[outIndex] = '\0';
+
+	// skip new initial spaces
+	for (outIndex = 0; buffer[outIndex] != '\0'; outIndex++) {
+		if (buffer[outIndex] != ' ')
+			break;
+	}
+	return buffer + outIndex;
+}
+
+
+/*! Parameter 'name' needs to point to an allocated array of 49 characters. */
+void
+get_cpuid_model_string(char* name)
+{
+	/* References:
+	 *
+	 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
+	 * http://www.sandpile.org/ia32/cpuid.htm
+	 * http://www.amd.com/us-en/assets/content_type/
+	 *	white_papers_and_tech_docs/TN13.pdf (Duron erratum)
+	 */
+
+	cpuid_info baseInfo;
+	cpuid_info cpuInfo;
+	int32 maxStandardFunction, maxExtendedFunction = 0;
+
+	memset(name, 0, 49 * sizeof(char));
+
+	if (get_cpuid(&baseInfo, 0, 0) != B_OK) {
+		/* This CPU doesn't support cpuid. */
+		return;
+	}
+
+	maxStandardFunction = baseInfo.eax_0.max_eax;
+	if (maxStandardFunction >= 500) {
+		maxStandardFunction = 0;
+			/* Old Pentium sample chips have the CPU signature here. */
+	}
+
+	/* Extended cpuid */
+
+	get_cpuid(&cpuInfo, 0x80000000, 0);
+		/* hardcoded to CPU 0 */
+
+	/* Extended cpuid is only supported if max_eax is greater than the */
+	/* service id. */
+	if (cpuInfo.eax_0.max_eax > 0x80000000)
+		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
+
+	if (maxExtendedFunction >= 4) {
+		int32 i;
+
+		for (i = 0; i < 3; i++) {
+			cpuid_info nameInfo;
+			get_cpuid(&nameInfo, 0x80000002 + i, 0);
+
+			memcpy(name, &nameInfo.regs.eax, 4);
+			memcpy(name + 4, &nameInfo.regs.ebx, 4);
+			memcpy(name + 8, &nameInfo.regs.ecx, 4);
+			memcpy(name + 12, &nameInfo.regs.edx, 4);
+			name += 16;
+		}
+	}
+}
+
+
+static uint8
+get_intel_brand_id(void)
+{
+	cpuid_info info;
+	if (get_cpuid(&info, 1, 0) != B_OK)
+		return 0;
+	return info.regs.ebx & 0xff;
+}
+
+
+//! Manually construct a Brand String based on Brand ID for the few older CPUs
+//! that do not return a Brand String
+static inline const char*
+get_intel_brand_id_string(uint8 brandId, uint32 signature)
+{
+	switch (brandId) {
+		case 0x01:
+			return "Celeron";
+		case 0x02:
+			return "Pentium III";
+		case 0x04:
+			return "Pentium III";
+		case 0x03:
+			return signature == 0x06B1 ? "Celeron" : "Pentium III Xeon";
+		case 0x06:
+			return "Mobile Pentium III-M";
+		case 0x07:
+			return "Mobile Celeron";
+		default:
+			return NULL;
+	}
+}
+
+
+static inline const char*
+get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor, uint32 cpuModel)
+{
+	char cpuidName[49];
+	(void)cpuVendor;
+	(void)cpuModel;
+
+	if (platform != B_CPU_x86 && platform != B_CPU_x86_64)
+		return NULL;
+
+	// XXX: This *really* isn't accurate. There is differing math
+	// based on the CPU vendor.. Don't use these numbers anywhere
+	// except "fast and dumb" identification of processor names.
+	//
+	// see cpuidtool.c to decode cpuid signatures (sysinfo) into a
+	// value for this function.
+	//
+	// sysinfo has code in it which obtains the proper fam/mod/step ids
+
+	uint16 family = ((cpuModel >> 8) & 0xf) | ((cpuModel >> 16) & 0xff0);
+	uint16 model = ((cpuModel >> 4) & 0xf) | ((cpuModel >> 12) & 0xf0);
+	uint8 stepping = cpuModel & 0xf;
+
+	if (cpuVendor == B_CPU_VENDOR_AMD) {
+		if (family == 5) {
+			if (model <= 3)
+				return "K5";
+			if (model <= 7)
+				return "K6";
+			if (model == 8)
+				return "K6-2";
+			if (model == 9 || model == 0xd)
+				return "K6-III";
+			if (model == 0xa)
+				return "Geode LX";
+		} else if (family == 6) {
+			if (model == 3)
+				return "Duron";
+			if (model <= 4)
+				return "Athlon";
+		}
+		get_cpuid_model_string(cpuidName);
+		return parse_amd(cpuidName);
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_CYRIX) {
+		if (family == 5 && model == 4)
+			return "GXm";
+		if (family == 6)
+			return "6x86MX";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_INTEL) {
+		const char* brandIdName;
+
+		// We want to use the CPUID Brand String when the CPU returns one
+		// this should be Pentium 4 and later CPUs
+		get_cpuid_model_string(cpuidName);
+		if (cpuidName[0] != '\0')
+			return parse_intel(cpuidName);
+
+		// Some CPUs do not return a Brand String, but do return a Brand ID
+		// we can use that Brand ID to determine the CPU
+		brandIdName = get_intel_brand_id_string(get_intel_brand_id(), cpuModel);
+		if (brandIdName != NULL)
+			return parse_intel(brandIdName);
+
+		// Even older CPUs do not return a Brand ID or a Brand String, so we
+		// need to look at Model and Family
+		if (family == 5) {
+			if (model == 1 || model == 2)
+				return "Pentium";
+			if (model == 3 || model == 9)
+				return "Pentium OD";
+			if (model == 4 || model == 8)
+				return "Pentium MMX";
+		} else if (family == 6) {
+			if (model == 1)
+				return "Pentium Pro";
+			if (model == 3 || model == 5)
+				return "Pentium II";
+			if (model == 6)
+				return "Celeron";
+			if (model == 7 || model == 8 || model == 0xa || model == 0xb)
+				return "Pentium III";
+			if (model == 9 || model == 0xd)
+				return "Pentium M";
+		}
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_NATIONAL_SEMICONDUCTOR) {
+		if (family == 5) {
+			if (model == 4)
+				return "Geode GX1";
+			if (model == 5)
+				return "Geode GX2";
+			return NULL;
+		}
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_RISE) {
+		if (family == 5)
+			return "mP6";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_TRANSMETA) {
+		if (family == 5 && model == 4)
+			return "Crusoe";
+		if (family == 0xf && (model == 2 || model == 3))
+			return "Efficeon";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_VIA) {
+		if (family == 5) {
+			if (model == 4)
+				return "WinChip C6";
+			if (model == 8)
+				return "WinChip 2";
+			if (model == 9)
+				return "WinChip 3";
+			return NULL;
+		} else if (family == 6) {
+			if (model == 6)
+				return "C3 Samuel";
+			if (model == 7) {
+				if (stepping < 8)
+					return "C3 Eden/Samuel 2";
+				return "C3 Ezra";
+			}
+			if (model == 8)
+				return "C3 Ezra-T";
+			if (model == 9) {
+				if (stepping < 8)
+					return "C3 Nehemiah";
+				return "C3 Ezra-N";
+			}
+			if (model == 0xa || model == 0xd)
+				return "C7";
+			if (model == 0xf)
+				return "Nano";
+			return NULL;
+		}
+	}
+
+
+	return NULL;
+}
+
+#endif // ARCH_CPU_TYPE_H

@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * Copyright (c) 2014-2016 The FreeBSD Foundation
+ * Copyright 2026, Haiku, Inc.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
@@ -162,5 +163,174 @@
     CPU_PART_TO_MIDR((part)) | CPU_VAR_TO_MIDR((var)) |	\
     CPU_REV_TO_MIDR((rev)))
 
+struct cpu_parts {
+	uint32		part_id;
+	const char	*part_name;
+};
+#define CPU_PART_NONE {0, NULL}
+
+struct cpu_implementers {
+	uint32			impl_id;
+	/*
+	 * Part number is implementation defined
+	 * so each vendor will have its own set of values and names.
+	 */
+	const struct cpu_parts	*cpu_parts;
+};
+#define CPU_IMPLEMENTER_NONE {0, NULL}
+
+/*
+ * Per-implementer table of (PartNum, CPU Name) pairs.
+ */
+/* ARM Ltd. */
+static const struct cpu_parts cpu_parts_arm[] = {
+	{CPU_PART_AEM_V8, "AEMv8"},
+	{CPU_PART_FOUNDATION, "Foundation-Model"},
+	{CPU_PART_CORTEX_A34, "Cortex-A34"},
+	{CPU_PART_CORTEX_A35, "Cortex-A35"},
+	{CPU_PART_CORTEX_A53, "Cortex-A53"},
+	{CPU_PART_CORTEX_A55, "Cortex-A55"},
+	{CPU_PART_CORTEX_A57, "Cortex-A57"},
+	{CPU_PART_CORTEX_A65, "Cortex-A65"},
+	{CPU_PART_CORTEX_A65AE, "Cortex-A65AE"},
+	{CPU_PART_CORTEX_A72, "Cortex-A72"},
+	{CPU_PART_CORTEX_A73, "Cortex-A73"},
+	{CPU_PART_CORTEX_A75, "Cortex-A75"},
+	{CPU_PART_CORTEX_A76, "Cortex-A76"},
+	{CPU_PART_CORTEX_A76AE, "Cortex-A76AE"},
+	{CPU_PART_CORTEX_A77, "Cortex-A77"},
+	{CPU_PART_CORTEX_A78, "Cortex-A78"},
+	{CPU_PART_CORTEX_A78AE, "Cortex-A78AE"},
+	{CPU_PART_CORTEX_A78C, "Cortex-A78C"},
+	{CPU_PART_CORTEX_A510, "Cortex-A510"},
+	{CPU_PART_CORTEX_A520, "Cortex-A520"},
+	{CPU_PART_CORTEX_A710, "Cortex-A710"},
+	{CPU_PART_CORTEX_A715, "Cortex-A715"},
+	{CPU_PART_CORTEX_A720, "Cortex-A720"},
+	{CPU_PART_CORTEX_A725, "Cortex-A725"},
+	{CPU_PART_CORTEX_X925, "Cortex-X925"},
+	{CPU_PART_CORTEX_X1, "Cortex-X1"},
+	{CPU_PART_CORTEX_X1C, "Cortex-X1C"},
+	{CPU_PART_CORTEX_X2, "Cortex-X2"},
+	{CPU_PART_CORTEX_X3, "Cortex-X3"},
+	{CPU_PART_CORTEX_X4, "Cortex-X4"},
+	{CPU_PART_C1_NANO, "C1-Nano"},
+	{CPU_PART_C1_PRO, "C1-Pro"},
+	{CPU_PART_C1_PREMIUM, "C1-Premium"},
+	{CPU_PART_C1_ULTRA, "C1-Ultra"},
+	{CPU_PART_NEOVERSE_E1, "Neoverse-E1"},
+	{CPU_PART_NEOVERSE_N1, "Neoverse-N1"},
+	{CPU_PART_NEOVERSE_N2, "Neoverse-N2"},
+	{CPU_PART_NEOVERSE_N3, "Neoverse-N3"},
+	{CPU_PART_NEOVERSE_V1, "Neoverse-V1"},
+	{CPU_PART_NEOVERSE_V2, "Neoverse-V2"},
+	{CPU_PART_NEOVERSE_V3, "Neoverse-V3"},
+	{CPU_PART_NEOVERSE_V3AE, "Neoverse-V3AE"},
+	CPU_PART_NONE,
+};
+
+/* Cavium */
+static const struct cpu_parts cpu_parts_cavium[] = {
+	{CPU_PART_THUNDERX, "ThunderX"},
+	{CPU_PART_THUNDERX2, "ThunderX2"},
+	CPU_PART_NONE,
+};
+
+/* APM (now Ampere) */
+static const struct cpu_parts cpu_parts_apm[] = {
+	{CPU_PART_EMAG8180, "eMAG 8180"},
+	CPU_PART_NONE,
+};
+
+/* Ampere */
+static const struct cpu_parts cpu_parts_ampere[] = {
+	{CPU_PART_AMPERE1, "AmpereOne AC03"},
+	{CPU_PART_AMPERE1A, "AmpereOne AC04"},
+	CPU_PART_NONE,
+};
+
+/* Microsoft */
+static const struct cpu_parts cpu_parts_microsoft[] = {
+	{CPU_PART_AZURE_COBALT_100, "Azure Cobalt 100"},
+	CPU_PART_NONE,
+};
+
+/* Qualcomm */
+static const struct cpu_parts cpu_parts_qcom[] = {
+	{CPU_PART_KRYO400_GOLD, "Kryo 400 Gold"},
+	{CPU_PART_KRYO400_SILVER, "Kryo 400 Silver"},
+	CPU_PART_NONE,
+};
+
+/* Apple */
+static const struct cpu_parts cpu_parts_apple[] = {
+	{CPU_PART_M1_ICESTORM, "M1 Icestorm"},
+	{CPU_PART_M1_FIRESTORM, "M1 Firestorm"},
+	{CPU_PART_M1_ICESTORM_PRO, "M1 Pro Icestorm"},
+	{CPU_PART_M1_FIRESTORM_PRO, "M1 Pro Firestorm"},
+	{CPU_PART_M1_ICESTORM_MAX, "M1 Max Icestorm"},
+	{CPU_PART_M1_FIRESTORM_MAX, "M1 Max Firestorm"},
+	{CPU_PART_M2_BLIZZARD, "M2 Blizzard"},
+	{CPU_PART_M2_AVALANCHE, "M2 Avalanche"},
+	{CPU_PART_M2_BLIZZARD_PRO, "M2 Pro Blizzard"},
+	{CPU_PART_M2_AVALANCHE_PRO, "M2 Pro Avalanche"},
+	{CPU_PART_M2_BLIZZARD_MAX, "M2 Max Blizzard"},
+	{CPU_PART_M2_AVALANCHE_MAX, "M2 Max Avalanche"},
+	CPU_PART_NONE,
+};
+
+/* Unknown */
+static const struct cpu_parts cpu_parts_none[] = {
+	CPU_PART_NONE,
+};
+
+/*
+ * Implementers table.
+ */
+static const struct cpu_implementers cpu_implementers[] = {
+	{CPU_IMPL_AMPERE, cpu_parts_ampere},
+	{CPU_IMPL_APPLE, cpu_parts_apple},
+	{CPU_IMPL_APM, cpu_parts_apm},
+	{CPU_IMPL_ARM, cpu_parts_arm},
+	{CPU_IMPL_BROADCOM, cpu_parts_none},
+	{CPU_IMPL_CAVIUM, cpu_parts_cavium},
+	{CPU_IMPL_DEC, cpu_parts_none},
+	{CPU_IMPL_FREESCALE, cpu_parts_none},
+	{CPU_IMPL_FUJITSU, cpu_parts_none},
+	{CPU_IMPL_HISILICON, cpu_parts_none},
+	{CPU_IMPL_INFINEON, cpu_parts_none},
+	{CPU_IMPL_INTEL, cpu_parts_none},
+	{CPU_IMPL_MARVELL, cpu_parts_none},
+	{CPU_IMPL_MICROSOFT, cpu_parts_microsoft},
+	{CPU_IMPL_NVIDIA, cpu_parts_none},
+	{CPU_IMPL_QUALCOMM, cpu_parts_qcom},
+	CPU_IMPLEMENTER_NONE,
+};
+
+
+static inline const char*
+get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor, uint32 cpuModel)
+{
+	(void)cpuVendor;
+
+	if (platform != B_CPU_ARM_64)
+		return NULL;
+
+	uint32 impl = CPU_IMPL(cpuModel);
+	uint32 part = CPU_PART(cpuModel);
+
+	for (int i = 0; cpu_implementers[i].impl_id != 0; i++) {
+		if (cpu_implementers[i].impl_id != impl)
+			continue;
+		const struct cpu_parts* parts = cpu_implementers[i].cpu_parts;
+		for (int j = 0; parts[j].part_name != NULL; j++) {
+			if (parts[j].part_id == part)
+				return parts[j].part_name;
+		}
+		break;
+	}
+
+	return NULL;
+}
 
 #endif	/* _SYSTEM_ARCH_CPU_TYPE_H */
