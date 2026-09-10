@@ -111,6 +111,11 @@ static status_t
 print_demangled_call(const char* image, const char* symbol, addr_t args,
 	bool noObjectMethod, bool addDebugVariables)
 {
+	// Since arm64 uses registers rather than the stack for the first
+	// 8 integer and 8 floating-point arguments, we cannot use
+	// the same method as arm or x86 to read the function arguments from the stack.
+	// For now just print out the function signature without the argument values.
+
 	static const size_t kBufferSize = 256;
 	char* buffer = (char*)debug_malloc(kBufferSize);
 	if (buffer == NULL)
@@ -124,28 +129,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		return B_ERROR;
 	}
 
-	uint32* arg = (uint32*)args;
-
-	if (noObjectMethod)
-		isObjectMethod = false;
-	if (isObjectMethod) {
-		const char* lastName = strrchr(name, ':') - 1;
-		int namespaceLength = lastName - name;
-
-		uint32 argValue = 0;
-		if (debug_memcpy(B_CURRENT_TEAM, &argValue, arg, 4) == B_OK) {
-			kprintf("<%s> %.*s<\33[32m%#" B_PRIx32 "\33[0m>%s", image,
-				namespaceLength, name, argValue, lastName);
-		} else
-			kprintf("<%s> %.*s<\?\?\?>%s", image, namespaceLength, name, lastName);
-
-		if (addDebugVariables)
-			set_debug_variable("_this", argValue);
-		arg++;
-	} else
-		kprintf("<%s> %s", image, name);
-
-	kprintf("(");
+	kprintf("<%s> %s(", image, name);
 
 	size_t length;
 	int32 type, i = 0;
@@ -155,112 +139,10 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 		if (i++ > 0)
 			kprintf(", ");
 
-		// retrieve value and type identifier
-
-		uint64 value;
-		bool valueKnown = false;
-
-		switch (type) {
-			case B_INT64_TYPE:
-				value = read_function_argument_value<int64>(arg, valueKnown);
-				if (valueKnown)
-					kprintf("int64: \33[34m%" B_PRId64 "\33[0m", value);
-				break;
-			case B_INT32_TYPE:
-				value = read_function_argument_value<int32>(arg, valueKnown);
-				if (valueKnown)
-					kprintf("int32: \33[34m%" B_PRId32 "\33[0m", (int32)value);
-				break;
-			case B_INT16_TYPE:
-				value = read_function_argument_value<int16>(arg, valueKnown);
-				if (valueKnown)
-					kprintf("int16: \33[34m%d\33[0m", (int16)value);
-				break;
-			case B_INT8_TYPE:
-				value = read_function_argument_value<int8>(arg, valueKnown);
-				if (valueKnown)
-					kprintf("int8: \33[34m%d\33[0m", (int8)value);
-				break;
-			case B_UINT64_TYPE:
-				value = read_function_argument_value<uint64>(arg, valueKnown);
-				if (valueKnown) {
-					kprintf("uint64: \33[34m%#" B_PRIx64 "\33[0m", value);
-					if (value < 0x100000)
-						kprintf(" (\33[34m%" B_PRIu64 "\33[0m)", value);
-				}
-				break;
-			case B_UINT32_TYPE:
-				value = read_function_argument_value<uint32>(arg, valueKnown);
-				if (valueKnown) {
-					kprintf("uint32: \33[34m%#" B_PRIx32 "\33[0m", (uint32)value);
-					if (value < 0x100000)
-						kprintf(" (\33[34m%" B_PRIu32 "\33[0m)", (uint32)value);
-				}
-				break;
-			case B_UINT16_TYPE:
-				value = read_function_argument_value<uint16>(arg, valueKnown);
-				if (valueKnown) {
-					kprintf("uint16: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
-						(uint16)value, (uint16)value);
-				}
-				break;
-			case B_UINT8_TYPE:
-				value = read_function_argument_value<uint8>(arg, valueKnown);
-				if (valueKnown) {
-					kprintf("uint8: \33[34m%#x\33[0m (\33[34m%u\33[0m)",
-						(uint8)value, (uint8)value);
-				}
-				break;
-			case B_BOOL_TYPE:
-				value = read_function_argument_value<uint8>(arg, valueKnown);
-				if (valueKnown)
-					kprintf("\33[34m%s\33[0m", value ? "true" : "false");
-				break;
-			default:
-				if (buffer[0])
-					kprintf("%s: ", buffer);
-
-				if (length == 4) {
-					value = read_function_argument_value<uint32>(arg,
-						valueKnown);
-					if (valueKnown) {
-						if (value == 0
-							&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
-							kprintf("NULL");
-						else
-							kprintf("\33[34m%#" B_PRIx32 "\33[0m", (uint32)value);
-					}
-					break;
-				}
-
-
-				if (length == 8) {
-					value = read_function_argument_value<uint64>(arg,
-						valueKnown);
-				} else
-					value = (uint64)arg;
-
-				if (valueKnown)
-					kprintf("\33[34m%#" B_PRIx64 "\33[0m", value);
-				break;
-		}
-
-		if (!valueKnown)
+		if (buffer[0])
+			kprintf("%s", buffer);
+		else
 			kprintf("???");
-
-		if (valueKnown && type == B_STRING_TYPE) {
-			if (value == 0)
-				kprintf(" \33[31m\"<NULL>\"\33[0m");
-			else if (debug_strlcpy(B_CURRENT_TEAM, buffer, (char*)(addr_t)value,
-					kBufferSize) < B_OK) {
-				kprintf(" \33[31m\"<\?\?\?>\"\33[0m");
-			} else
-				kprintf(" \33[36m\"%s\"\33[0m", buffer);
-		}
-
-		if (addDebugVariables)
-			set_debug_argument_variable(i, value);
-		arg = (uint32*)((uint8*)arg + length);
 	}
 
 	debug_free(buffer);
