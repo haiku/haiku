@@ -271,7 +271,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 				if (err != B_OK)
 					result = new BMenuItem(signature, itemMessage);
 				else
-					result = new BMenuItem(entry.name, itemMessage);
+					result = new BMenuItem(B_TRANSLATE_SYSTEM_NAME(entry.name), itemMessage);
 
 				result->SetTarget(this);
 				fPreferredAppMenu->Menu()->AddItem(result);
