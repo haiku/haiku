@@ -9,6 +9,7 @@
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Entry.h>
+#include <IconUtils.h>
 #include <MimeType.h>
 #include <NodeInfo.h>
 #include <Roster.h>
@@ -26,10 +27,10 @@ AutoIcon::Bitmap()
 	if (fBitmap != NULL)
 		return fBitmap;
 
-	if (fSignature) {
-		fBitmap = new BBitmap(BRect(BPoint(0, 0),
-			be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32);
+	fBitmap
+		= new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32);
 
+	if (fSignature) {
 		entry_ref ref;
 		be_roster->FindApp (fSignature, &ref);
 		if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, (icon_size)-1) != B_OK) {
@@ -37,10 +38,9 @@ AutoIcon::Bitmap()
 			genericAppType.GetIcon(fBitmap, (icon_size)(fBitmap->Bounds().IntegerWidth() + 1));
 		}
 	} else if (fbits) {
-		fBitmap = new BBitmap(BRect(BPoint(0, 0),
-			BSize(B_MINI_ICON - 1, B_MINI_ICON - 1)), B_RGBA32);
-
-		fBitmap->SetBits(fbits, 256, 0, B_CMAP8);
+		BIconUtils::ConvertFromCMAP8((const uint8*)fbits, B_MINI_ICON, B_MINI_ICON, B_MINI_ICON,
+			fBitmap);
 	}
+
 	return fBitmap;
 }
