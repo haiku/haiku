@@ -282,7 +282,7 @@ try_acquire_spinlock(spinlock* lock)
 void
 acquire_spinlock(spinlock* lock)
 {
-#if DEBUG_SPINLOCKS
+#if KDEBUG
 	if (are_interrupts_enabled()) {
 		panic("acquire_spinlock: attempt to acquire lock %p with interrupts "
 			"enabled", lock);
@@ -332,16 +332,18 @@ acquire_spinlock(spinlock* lock)
 void
 release_spinlock(spinlock *lock)
 {
+#if KDEBUG
+	if (are_interrupts_enabled()) {
+		panic("release_spinlock: attempt to release lock %p with "
+			"interrupts enabled", lock);
+	}
+#endif
+
 #if B_DEBUG_SPINLOCK_CONTENTION
 	update_lock_held(lock);
 #endif
 
 	if (sNumCPUs > 1) {
-		if (are_interrupts_enabled()) {
-			panic("release_spinlock: attempt to release lock %p with "
-				"interrupts enabled\n", lock);
-		}
-
 #if DEBUG_SPINLOCKS
 		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
@@ -350,10 +352,6 @@ release_spinlock(spinlock *lock)
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (are_interrupts_enabled()) {
-			panic("release_spinlock: attempt to release lock %p with "
-				"interrupts enabled\n", lock);
-		}
 		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #endif
