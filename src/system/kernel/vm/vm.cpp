@@ -3081,7 +3081,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 		name, source->Size(), source->wiring, source->protection,
 		source->protection_max,
 		sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY,
+		(!sharedArea && writableCopy) ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &target, _address);
 	if (status < B_OK) {
 		free_etc(targetPageProtections, HEAP_DONT_LOCK_KERNEL_SPACE);
