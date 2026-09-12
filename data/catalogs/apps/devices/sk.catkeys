@@ -1,67 +1,67 @@
 1	slovak	x-vnd.Haiku-Devices	1509979255
 ACPI bus	DevicesView		Zbernica ACPI
-Encryption controller	Device		Radič šifrovania
-Devices	System name		Zariadenia
-Processor	Device		Procesor
-Generate system information	DevicesView		Vytvoriť informácie o systéme
 Class info	DevicePCI		Info o triede
-Computer	DevicesView		Počítač
 Communications	DeviceSCSI		Komunikácia
 Mass storage controller	Device		Radič hromadného úložiska
 Printer	DeviceSCSI		Tlačiareň
-Connection	DevicesView		Pripojenie
 Manufacturer	Device		Výrobca
-Scanner	DeviceSCSI		Skener
 Memory controller	Device		Radič pamäte
 Unknown device	DevicesView		Neznáme zariadenie
-ACPI node '%1'	DeviceACPI		Uzol ACPI „%1“
 Name	PropertyList		Názov
 Manufacturer	DeviceSCSI		Výrobca
-Device name	Device		Názov zariadenia
 Satellite communications controller	Device		Radič satelitnej komunikácie
-Device class	DeviceSCSI		Trieda zariadenia
-Device	Device		Zariadenie
-Input device controller	Device		Radič vstupných zariadení
 PCI bus	DevicesView		Zbernica PCI
+Device	Device		Zariadenie
 Changer	DeviceSCSI		Menič
-Serial bus controller	Device		Radič sériovej zbernice
-Refresh devices	DevicesView		Obnoviť zariadenia
 Category	DevicesView		Kategória
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Neznáme zariadenie
+Refresh devices	DevicesView		Obnoviť zariadenia
 Device paths	Device		Cesty k zariadeniam
-Wireless controller	Device		Radič bezdrôtových sietí
-Generic system peripheral	Device		Všeobecné periférie systému
+Unknown device	Device		Neznáme zariadenie
 Value	PropertyList		Hodnota
+Generic system peripheral	Device		Všeobecné periférie systému
 Devices	DevicesView		Zariadenia
-Device name	DeviceACPI		Názov zariadenia
 Display controller	Device		Radič zobrazovania
 Device name	DevicePCI		Názov zariadenia
 Other	DeviceSCSI		Iné
-Report compatibility	DevicesView		Nahlásiť kompatibilitu
-Computer	Device		Počítač
-PCI bus	Device		Zbernica PCI
-Enclosure	DeviceSCSI		Skrinka
 Order by:	DevicesView		Zoradiť podľa:
 Intelligent controller	Device		Inteligentný radič
 Multimedia controller	Device		Radič multimédií
 Quit	DevicesView		Ukončiť
-ISA bus	Device		Zbernica ISA
-ISA bus	DevicesView		Zbernica ISA
 Processor	DeviceSCSI		Procesor
 Bridge	Device		Most
 Worm	DeviceSCSI		Červ
 CD-ROM	DeviceSCSI		CD-ROM
-Manufacturer	DevicePCI		Výrobca
-Bridge	DeviceSCSI		Most
 Signal processing controller	Device		Radič spracovania signálov
-Device name	DeviceSCSI		Názov zariadenia
 Docking station	Device		Dokovacia stanica
-Array	DeviceSCSI		Pole
 Unclassified device	Device		Nezaradené zariadenie
 ACPI controller	Device		Radič ACPI
+ACPI bus	Device		Zbernica ACPI
+Encryption controller	Device		Radič šifrovania
+Devices	System name		Zariadenia
+Generate system information	DevicesView		Vytvoriť informácie o systéme
+Processor	Device		Procesor
+Computer	DevicesView		Počítač
+Connection	DevicesView		Pripojenie
+Scanner	DeviceSCSI		Skener
+ACPI node '%1'	DeviceACPI		Uzol ACPI „%1“
+Device name	Device		Názov zariadenia
+Device class	DeviceSCSI		Trieda zariadenia
+Input device controller	Device		Radič vstupných zariadení
+Serial bus controller	Device		Radič sériovej zbernice
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Radič bezdrôtových sietí
+Device name	DeviceACPI		Názov zariadenia
+Report compatibility	DevicesView		Nahlásiť kompatibilitu
+Computer	Device		Počítač
+Enclosure	DeviceSCSI		Skrinka
+PCI bus	Device		Zbernica PCI
+ISA bus	Device		Zbernica ISA
+ISA bus	DevicesView		Zbernica ISA
+Manufacturer	DevicePCI		Výrobca
+Bridge	DeviceSCSI		Most
+Device name	DeviceSCSI		Názov zariadenia
+Array	DeviceSCSI		Pole
 Network controller	Device		Radič siete
 Driver used	Device		Použitý ovládač
 Communication controller	Device		Radič komunikácie
-ACPI bus	Device		Zbernica ACPI
 unknown	Device		neznáme

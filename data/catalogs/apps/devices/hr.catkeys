@@ -1,60 +1,60 @@
 1	croatian	x-vnd.Haiku-Devices	3001748741
 ACPI bus	DevicesView		ACPI bus
-Encryption controller	Device		Kontroler enkripcije
-Devices	System name		Uređaji
-Processor	Device		Procesor
-Generate system information	DevicesView		Generiraj informacije sustava
-Computer	DevicesView		Računalo
 Communications	DeviceSCSI		Komunikacije
 Mass storage controller	Device		Upravljač masovne pohrane
 Printer	DeviceSCSI		Pisač
-Connection	DevicesView		Veza
 Manufacturer	Device		Proizvođač
-Scanner	DeviceSCSI		Skener
 Memory controller	Device		Mrežni upravljač
 Unknown device	DevicesView		Nepoznati uređaj
-ACPI node '%1'	DeviceACPI		ACPI čvor '%1'
 Name	PropertyList		Ime
 Manufacturer	DeviceSCSI		Proizvođač
-Device name	Device		Ime uređaja
 Satellite communications controller	Device		Kontroler za satelitsku komunikaciju
-Device class	DeviceSCSI		Klasa uređaja
-Device	Device		Uređaj
-Input device controller	Device		Kontroler ulaznog uređaja
 PCI bus	DevicesView		PCI bus
-Refresh devices	DevicesView		Osvježi uređaje
+Device	Device		Uređaj
 Category	DevicesView		Kategorija
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Nepoznati uređaj
+Refresh devices	DevicesView		Osvježi uređaje
 Device paths	Device		Putanje uređaja
-Wireless controller	Device		Bežični kontroler
+Unknown device	Device		Nepoznati uređaj
 Value	PropertyList		Vrijednost
 Devices	DevicesView		Uređaji
-Device name	DeviceACPI		Ime uređaja
 Display controller	Device		Upravljač zaslona
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Ime uređaja
 Other	DeviceSCSI		Ostalo
-Report compatibility	DevicesView		Izvještaj o kompatibilnosti
-Computer	Device		Računalo
-PCI bus	Device		PCI bus
 Order by:	DevicesView		Poredaj po:
 Multimedia controller	Device		Multimedijalni kontroler
 Quit	DevicesView		Završi
-ISA bus	Device		ISA bus
-ISA bus	DevicesView		ISA bus
 Processor	DeviceSCSI		Procesor
 Bridge	Device		Most
 Worm	DeviceSCSI		Crv
 CD-ROM	DeviceSCSI		CD-ROM
+Unclassified device	Device		Neklasificirani uređaj
+ACPI controller	Device		ACPI upravljač
+ACPI bus	Device		ACPI bus
+Encryption controller	Device		Kontroler enkripcije
+Devices	System name		Uređaji
+Generate system information	DevicesView		Generiraj informacije sustava
+Processor	Device		Procesor
+Computer	DevicesView		Računalo
+Connection	DevicesView		Veza
+Scanner	DeviceSCSI		Skener
+ACPI node '%1'	DeviceACPI		ACPI čvor '%1'
+Device name	Device		Ime uređaja
+Device class	DeviceSCSI		Klasa uređaja
+Input device controller	Device		Kontroler ulaznog uređaja
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Bežični kontroler
+Device name	DeviceACPI		Ime uređaja
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Izvještaj o kompatibilnosti
+Computer	Device		Računalo
+PCI bus	Device		PCI bus
+ISA bus	Device		ISA bus
+ISA bus	DevicesView		ISA bus
 Manufacturer	DevicePCI		Proizvođač
 Bridge	DeviceSCSI		Most
 Device name	DeviceSCSI		Ime uređaja
 Array	DeviceSCSI		Polje
-Unclassified device	Device		Neklasificirani uređaj
-ACPI controller	Device		ACPI upravljač
 Network controller	Device		Mrežni upravljač
 Driver used	Device		Korišteni upravljački program
 Communication controller	Device		Komunikacijski upravljač
-ACPI bus	Device		ACPI bus
 unknown	Device		nepoznato

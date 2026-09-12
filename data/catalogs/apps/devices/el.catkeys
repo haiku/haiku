@@ -1,71 +1,71 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Δίαυλος ACPI
-Encryption controller	Device		Ελεγκτής κρυπτογράφησης
-Devices	System name		Συσκευές
 USB bus	DevicesView		Θύρα USB
-Processor	Device		Επεξεργαστής
-Generate system information	DevicesView		Πληροφορίες συστήματος
 Class info	DevicePCI		Πληροφορίες κατηγορίας
 USB bus	Device		Θύρα USB
-Computer	DevicesView		Υπολογιστής
 Communications	DeviceSCSI		Επικοινωνίες
 Mass storage controller	Device		Ελεγκτής μαζικής αποθήκευσης
 Printer	DeviceSCSI		Εκτυπωτής
-Connection	DevicesView		Σύνδεση
 Manufacturer	Device		Κατασκευαστής
-Scanner	DeviceSCSI		Σαρωτής
 Memory controller	Device		Ελεγκτής μνήμης
 Unknown device	DevicesView		Άγνωστη συσκευή
-ACPI node '%1'	DeviceACPI		Μονάδα ACPI '%1'
 Name	PropertyList		Όνομα
 Manufacturer	DeviceSCSI		Κατασκευαστής
-Device name	Device		Όνομα συσκευής
 Satellite communications controller	Device		Ελεγκτής επικοινωνιών δορυφόρου
-Device class	DeviceSCSI		Κατηγορία συσκευής
-Device	Device		Συσκευή
-Input device controller	Device		Ελεγκτής εισαγώμενης συσκευής
 PCI bus	DevicesView		Δίαυλος PCI
+Device	Device		Συσκευή
 Changer	DeviceSCSI		Αλλαγή
-Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
-Refresh devices	DevicesView		Ανανέωση συσκευών
 Category	DevicesView		Κατηγορία
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Άγνωστη συσκευή
+Refresh devices	DevicesView		Ανανέωση συσκευών
 Device paths	Device		Διαδρομές συσκευών
-Wireless controller	Device		Ελεγκτής ασύρματων τηλεπικοινωνιών
-Generic system peripheral	Device		Τυπική περιφερειακή συσκευή συστήματος
+Unknown device	Device		Άγνωστη συσκευή
 Value	PropertyList		Τιμή
+Generic system peripheral	Device		Τυπική περιφερειακή συσκευή συστήματος
 Devices	DevicesView		Συσκευές
-Device name	DeviceACPI		Όνομα συσκευής
 Display controller	Device		Ελεγκτής γραφικών
-ACPI <unknown>	DeviceACPI		ACPI <άγνωστο>
 Device name	DevicePCI		Όνομα συσκευής
 Other	DeviceSCSI		Άλλο
-Report compatibility	DevicesView		Αναφορά συμβατότητας
-Computer	Device		Υπολογιστής
-PCI bus	Device		Δίαυλος PCI
-Enclosure	DeviceSCSI		Περίβλημα δίσκου
 Order by:	DevicesView		Κατανομή κατά:
 Intelligent controller	Device		Έξυπνος ελεγκτής
 Multimedia controller	Device		Ελεγκτής πολυμέσων
 Quit	DevicesView		Έξοδος
-ISA bus	Device		Δίαυλος ISA
-ISA bus	DevicesView		Δίαυλος ISA
 Processor	DeviceSCSI		Επεξεργαστής
 Bridge	Device		Γέφυρα
 Worm	DeviceSCSI		Σκώληκας
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Ελεγκτής επεξεργασίας σημάτων
+Docking station	Device		Σταθμός σύνδεσης
+Unclassified device	Device		Απροσδιόριστη συσκευή
+ACPI controller	Device		Ελεγκτής ACPI
+ACPI bus	Device		Δίαυλος ACPI
+Encryption controller	Device		Ελεγκτής κρυπτογράφησης
+Devices	System name		Συσκευές
+Generate system information	DevicesView		Πληροφορίες συστήματος
+Processor	Device		Επεξεργαστής
+Computer	DevicesView		Υπολογιστής
+Connection	DevicesView		Σύνδεση
+Scanner	DeviceSCSI		Σαρωτής
+ACPI node '%1'	DeviceACPI		Μονάδα ACPI '%1'
+Device name	Device		Όνομα συσκευής
+Device class	DeviceSCSI		Κατηγορία συσκευής
+Input device controller	Device		Ελεγκτής εισαγώμενης συσκευής
+Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Ελεγκτής ασύρματων τηλεπικοινωνιών
+Device name	DeviceACPI		Όνομα συσκευής
+ACPI <unknown>	DeviceACPI		ACPI <άγνωστο>
+Report compatibility	DevicesView		Αναφορά συμβατότητας
+Computer	Device		Υπολογιστής
+Enclosure	DeviceSCSI		Περίβλημα δίσκου
+PCI bus	Device		Δίαυλος PCI
+ISA bus	Device		Δίαυλος ISA
+ISA bus	DevicesView		Δίαυλος ISA
 Manufacturer	DevicePCI		Κατασκευαστής
 Bridge	DeviceSCSI		Γέφυρα
-Signal processing controller	Device		Ελεγκτής επεξεργασίας σημάτων
 Device name	DeviceSCSI		Όνομα συσκευής
-Docking station	Device		Σταθμός σύνδεσης
 Array	DeviceSCSI		Συστοιχία δίσκων
-Unclassified device	Device		Απροσδιόριστη συσκευή
 Manufacturer	DeviceACPI		Κατασκευαστής
-ACPI controller	Device		Ελεγκτής ACPI
 Network controller	Device		Ελεγκτής δικτύου
 Driver used	Device		Χρησιμοποιημένος οδηγός
 Communication controller	Device		Ελεγκτής επικοινωνιών
-ACPI bus	Device		Δίαυλος ACPI
 unknown	Device		άγνωστο

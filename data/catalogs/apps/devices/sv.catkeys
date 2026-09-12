@@ -1,99 +1,101 @@
-1	swedish	x-vnd.Haiku-Devices	4001232826
+1	swedish	x-vnd.Haiku-Devices	2248970212
 ACPI bus	DevicesView		ACPI-buss
-Encryption controller	Device		Krypteringsstyrenhet
-Devices	System name		Enheter
 USB bus	DevicesView		USB-buss
-Processor	Device		Processor
-Generate system information	DevicesView		Generera systeminformation
-Disable driver	DevicesView		Inaktivera drivrutinen
-Reboot needed	DevicesView		Omstart krävs
 Class info	DevicePCI		Klass information
 USB bus	Device		USB-buss
-Computer	DevicesView		Dator
 Communications	DeviceSCSI		Kommunikations
-ACPI thermal zone	DeviceACPI		ACPI-termisk zon
 Mass storage controller	Device		Lagringskontroller
 Printer	DeviceSCSI		Skrivare
-Connection	DevicesView		Anslutning
-Failed to write to the settings file.	DevicesView		Det gick inte att skriva till inställningsfilen.
 Enable driver	DevicesView		Aktivera drivrutin
 Manufacturer	Device		Tillverkare
-Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Minneskontroller
 Unknown device	DevicesView		Okänd enhet
-ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 Name	PropertyList		Namn
-Manufacturer	DeviceSCSI		Tillverkare
 Graphics peripheral	DeviceSCSI		Grafikperiferienhet
-Device name	Device		Enhetsnamn
+Manufacturer	DeviceSCSI		Tillverkare
 unknown	DeviceACPI		okänd
 Satellite communications controller	Device		Styrenhet för satellitkommunikation
-Device class	DeviceSCSI		Enhetsklass
-Device	Device		Enhet
-Input device controller	Device		Indataenhetskontroller
 OK	DevicesView		OK
 PCI bus	DevicesView		PCI-buss
+Device	Device		Enhet
 Changer	DeviceSCSI		Växlare
-Serial bus controller	Device		Seriell kontroller
-Restart computer	DevicesView		Starta om datorn
-Refresh devices	DevicesView		Uppdatera enheter
 Category	DevicesView		Kategori
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Okänd enhet
+Refresh devices	DevicesView		Uppdatera enheter
 Device paths	Device		Enhetssökväg
-Wireless controller	Device		Trådlös kontroller
-Generic system peripheral	Device		Allmänt systemtillbehör
+Unknown device	Device		Okänd enhet
 Value	PropertyList		Värde
+Generic system peripheral	Device		Allmänt systemtillbehör
 Devices	DevicesView		Enheter
-Device name	DeviceACPI		Enhetsnamn
 Optical drive	DeviceSCSI		Optisk enhet
-unknown	DevicePCI		okänd
 Display controller	Device		Skärmkontroller
 Bus	DevicesView		Bus
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Enhetsnamn
 Other	DeviceSCSI		Annan
-Report compatibility	DevicesView		Rapportera kompatibilitet
-Computer	Device		Dator
-PCI bus	Device		PCI-buss
-Enclosure	DeviceSCSI		Hölje
-Tape drive	DeviceSCSI		Bandstation
 Order by:	DevicesView		Sortera efter:
 Intelligent controller	Device		Intelligent styrenhet
 ACPI processor namespace '%2'	DeviceACPI		ACPI-processornamnområde ”%2”
-Multimedia controller	Device		Multimediakontroller
 The driver path is not in a package volume: 	DevicesView		Drivrutinssökvägen finns inte i en paketvolym: 
-none	Device		ingen
+Multimedia controller	Device		Multimediakontroller
 Blocked entry:\n	DevicesView		Blockerad åtkomst:\n
 Quit	DevicesView		Avsluta
-Disabling critical system drivers is not allowed.	DevicesView		Det är inte tillåtet att inaktivera kritiska systemdrivrutiner.
-Driver disabled	DevicesView		Drivrutin inaktiverad
-ISA bus	Device		ISA-buss
-ISA bus	DevicesView		ISA-buss
-Basic information	PropertyList		Grundläggande information
 Processor	DeviceSCSI		Processor
-Card reader	DeviceSCSI		Kortläsare
 Disabling non-packaged drivers is not supported.	DevicesView		Det går inte att inaktivera drivrutiner som inte ingår i ett paket.
+Card reader	DeviceSCSI		Kortläsare
 Bridge	Device		Brygga
 ACPI button '%1'	DeviceACPI		ACPI-knapp ”%1”
 Attributes	PropertyList		Attribut
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the %devices% application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Drivrutinen har inaktiverats. En omstart krävs för att ändringen ska träda i kraft.\n\nEfter omstarten kanske enheten inte längre visas i enhetslistan, eftersom systemet inte kan identifiera den utan drivrutinen.\n\nFör att återaktivera drivrutinen letar du upp enheten i programmet %devices% och klickar på \”Aktivera drivrutin\”. Om enheten inte längre syns tar du bort motsvarande blockerad post från paketets inställningsfil:\n
 Worm	DeviceSCSI		Mask
-Disk drive	DeviceSCSI		Disk-enhet
 CD-ROM	DeviceSCSI		CD-ROM
+ACPI system bus	DeviceACPI		ACPI-systembuss
+Signal processing controller	Device		Signalbehandlingskontroller
+Docking station	Device		Dockningsstation
+Unclassified device	Device		Oklassificerad enhet
+Error	DevicesView		Fel
+ACPI controller	Device		ACPI-kontroller
+ACPI bus	Device		ACPI-buss
+Encryption controller	Device		Krypteringsstyrenhet
+Devices	System name		Enheter
+Generate system information	DevicesView		Generera systeminformation
+Processor	Device		Processor
+Disable driver	DevicesView		Inaktivera drivrutinen
+Reboot needed	DevicesView		Omstart krävs
+Computer	DevicesView		Dator
+ACPI thermal zone	DeviceACPI		ACPI-termisk zon
+Connection	DevicesView		Anslutning
+Failed to write to the settings file.	DevicesView		Det gick inte att skriva till inställningsfilen.
+Scanner	DeviceSCSI		Skanner
+ACPI node '%1'	DeviceACPI		ACPI nod '%1'
+Device name	Device		Enhetsnamn
+Device class	DeviceSCSI		Enhetsklass
+Input device controller	Device		Indataenhetskontroller
+Restart computer	DevicesView		Starta om datorn
+Serial bus controller	Device		Seriell kontroller
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Trådlös kontroller
+Device name	DeviceACPI		Enhetsnamn
+Shutdown failed with error: 	DevicesView		Avstängningen misslyckades med felet: 
+unknown	DevicePCI		okänd
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Rapportera kompatibilitet
+Computer	Device		Dator
+Tape drive	DeviceSCSI		Bandstation
+Enclosure	DeviceSCSI		Hölje
+PCI bus	Device		PCI-buss
+none	Device		ingen
+Disabling critical system drivers is not allowed.	DevicesView		Det är inte tillåtet att inaktivera kritiska systemdrivrutiner.
+Driver disabled	DevicesView		Drivrutin inaktiverad
+ISA bus	Device		ISA-buss
+Basic information	PropertyList		Grundläggande information
+ISA bus	DevicesView		ISA-buss
+Disk drive	DeviceSCSI		Disk-enhet
 Manufacturer	DevicePCI		Tillverkare
 Bridge	DeviceSCSI		Brygga
 ACPI system indicator	DeviceACPI		ACPI-systemindikator
-ACPI system bus	DeviceACPI		ACPI-systembuss
-Signal processing controller	Device		Signalbehandlingskontroller
 Device name	DeviceSCSI		Enhetsnamn
-Docking station	Device		Dockningsstation
 Array	DeviceSCSI		Matris
-Unclassified device	Device		Oklassificerad enhet
 Manufacturer	DeviceACPI		Tillverkare
-Error	DevicesView		Fel
-ACPI controller	Device		ACPI-kontroller
 Network controller	Device		Nätverkskontroller
 Driver used	Device		Drivrutin använd
 Communication controller	Device		Kommunikationskontroller
-ACPI bus	Device		ACPI-buss
 unknown	Device		okänd

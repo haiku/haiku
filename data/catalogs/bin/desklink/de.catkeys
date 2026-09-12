@@ -1,5 +1,6 @@
-1	german	x-vnd.Haiku-desklink	748898679
+1	german	x-vnd.Haiku-desklink	378743223
 desklink	MediaReplicant	Title of an alert box	desklink
+Mute	MediaReplicant		Stumm
 Muted	MediaReplicant		Stumm
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		OK
@@ -9,4 +10,5 @@ Volume	VolumeControl		Lautstärke
 Media preferences…	MediaReplicant		Audio & Video-Einstellungen …
 Beep	MediaReplicant		Bestätigungston
 Open %name	DeskButton	Don't translate variable %name	%name öffnen
+Remove replicant	VolumeControl		Replikant entfernen
 No media server running	VolumeControl		Mediaserver läuft nicht

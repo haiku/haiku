@@ -1,74 +1,74 @@
 1	ukrainian	x-vnd.Haiku-Devices	1230536917
 ACPI bus	DevicesView		Шина ACPI
-Encryption controller	Device		Контроллер шифрування
-Devices	System name		Devices
 USB bus	DevicesView		Шина USB
-Processor	Device		Процесор
-Generate system information	DevicesView		Зібрати інформацію про систему
 Class info	DevicePCI		Інфо про клас
 USB bus	Device		Шина USB
-Computer	DevicesView		Комп'ютер
 Communications	DeviceSCSI		Комунікації
 Mass storage controller	Device		Контролер накопичувачів
 Printer	DeviceSCSI		Принтер
-Connection	DevicesView		підключенням
 Manufacturer	Device		Виробник
-Scanner	DeviceSCSI		Сканер
 Memory controller	Device		Контролер пам’яті
 Unknown device	DevicesView		Невідомий пристрій
-ACPI node '%1'	DeviceACPI		Вузол ACPI «%1»
 Name	PropertyList		Назва
 Manufacturer	DeviceSCSI		Виробник
-Device name	Device		Назва пристрою
 Satellite communications controller	Device		Контролер супутникового зв’язку
-Device class	DeviceSCSI		Клас пристрою
-Device	Device		Пристрій
-Input device controller	Device		Контролер пристроїв вводу
 PCI bus	DevicesView		Шина PCI
+Device	Device		Пристрій
 Changer	DeviceSCSI		Чейнджер
-Serial bus controller	Device		Контроллер послідовної шини
-Refresh devices	DevicesView		Оновити список пристроїв
 Category	DevicesView		категорією
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Невідомий пристрій
+Refresh devices	DevicesView		Оновити список пристроїв
 Device paths	Device		Шлях до пристрою
-Wireless controller	Device		Бездротовий контролер
-Generic system peripheral	Device		Загальна системна периферія
+Unknown device	Device		Невідомий пристрій
 Value	PropertyList		Значення
+Generic system peripheral	Device		Загальна системна периферія
 Devices	DevicesView		Пристрої
-Device name	DeviceACPI		Назва пристрою
 Display controller	Device		Контролер дисплея
 Bus	DevicesView		типом шини
-ACPI <unknown>	DeviceACPI		ACPI <невідомо>
 Device name	DevicePCI		Назва пристрою
 Other	DeviceSCSI		Інше
-Report compatibility	DevicesView		Звіт про сумісність
-Computer	Device		Комп’ютер
-PCI bus	Device		Шина PCI
-Enclosure	DeviceSCSI		Enclosure
 Order by:	DevicesView		Сортувати за:
 Intelligent controller	Device		Інтелектуальний контролер
 Multimedia controller	Device		Контролер мультимедіа
 Quit	DevicesView		Вийти
-ISA bus	Device		Шина ISA
-ISA bus	DevicesView		Шина ISA
-Basic information	PropertyList		Загальна інформація
 Processor	DeviceSCSI		Процесор
 Bridge	Device		Міст
 Attributes	PropertyList		Атрибути
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Контролер обробки сигналів
+Docking station	Device		Док-станція
+Unclassified device	Device		Некласифіковані пристрої
+ACPI controller	Device		Контролер ACPI
+ACPI bus	Device		Шина ACPI
+Encryption controller	Device		Контроллер шифрування
+Devices	System name		Devices
+Generate system information	DevicesView		Зібрати інформацію про систему
+Processor	Device		Процесор
+Computer	DevicesView		Комп'ютер
+Connection	DevicesView		підключенням
+Scanner	DeviceSCSI		Сканер
+ACPI node '%1'	DeviceACPI		Вузол ACPI «%1»
+Device name	Device		Назва пристрою
+Device class	DeviceSCSI		Клас пристрою
+Input device controller	Device		Контролер пристроїв вводу
+Serial bus controller	Device		Контроллер послідовної шини
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Бездротовий контролер
+Device name	DeviceACPI		Назва пристрою
+ACPI <unknown>	DeviceACPI		ACPI <невідомо>
+Report compatibility	DevicesView		Звіт про сумісність
+Computer	Device		Комп’ютер
+Enclosure	DeviceSCSI		Enclosure
+PCI bus	Device		Шина PCI
+ISA bus	Device		Шина ISA
+Basic information	PropertyList		Загальна інформація
+ISA bus	DevicesView		Шина ISA
 Manufacturer	DevicePCI		Виробник
 Bridge	DeviceSCSI		Міст
-Signal processing controller	Device		Контролер обробки сигналів
 Device name	DeviceSCSI		Назва пристрою
-Docking station	Device		Док-станція
 Array	DeviceSCSI		Масив
-Unclassified device	Device		Некласифіковані пристрої
 Manufacturer	DeviceACPI		Виробник
-ACPI controller	Device		Контролер ACPI
 Network controller	Device		Мережевий контролер
 Driver used	Device		Використовує драйвер
 Communication controller	Device		Контролер зв’язку
-ACPI bus	Device		Шина ACPI
 unknown	Device		невідомо

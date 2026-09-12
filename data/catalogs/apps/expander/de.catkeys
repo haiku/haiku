@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku-Expander	2735024965
+1	german	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		Ziel
 Other	ExpanderPreferences		Allgemeines
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
+Ignore all	ExpanderWindow		Alles ignorieren
 Expander	System name		Archiventpacker
 Set source…	ExpanderMenu		Quelle wählen …
 OK	ExpanderWindow		OK
@@ -14,6 +15,7 @@ Create	ExpanderWindow		Anlegen
 Creating listing for '%s'…	ExpanderWindow		Dateiliste für '%s' wird erstellt …
 Show contents	ExpanderMenu		Inhalt zeigen
 %appname% settings	ExpanderPreferences		%appname%-Einstellungen
+Ignore	ExpanderWindow		Ignorieren
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
 Settings	ExpanderMenu		Einstellungen
 Expand	ExpanderWindow		Entpacken

@@ -10,5 +10,5 @@ Usage: %s [options] [workspace|direction]\nwhere \"options\" are:\n  --notitle\t
 Always on top	Workspaces		Her zaman üstte
 Show window border	Workspaces		Pencere kenarlığını göster
 Auto-raise	Workspaces		Kendiliğinden öne getir
-Remove replicant	Workspaces		Yineleneni kaldır
+Remove replicant	Workspaces		Replikantı kaldır
 Workspaces	System name		Çalışma Alanları

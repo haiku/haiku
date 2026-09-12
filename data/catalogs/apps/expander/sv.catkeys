@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Haiku-Expander	2735024965
+1	swedish	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Andra
 Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
+Ignore all	ExpanderWindow		Ignorera alla
 Expander	System name		Expandera
 Set source…	ExpanderMenu		Sätt källa…
 OK	ExpanderWindow		OK
@@ -14,6 +15,7 @@ Create	ExpanderWindow		Skapa
 Creating listing for '%s'…	ExpanderWindow		Skapar innehållslista för '%s'...
 Show contents	ExpanderMenu		Visa innehåll
 %appname% settings	ExpanderPreferences		%appname% inställningar
+Ignore	ExpanderWindow		Ignorera
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera detta arkiv? De expanderade objekten är kanske inte fullständiga.
 Settings	ExpanderMenu		Inställningar
 Expand	ExpanderWindow		Expandera

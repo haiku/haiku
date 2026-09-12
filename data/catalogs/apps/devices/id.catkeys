@@ -1,68 +1,68 @@
 1	indonesian	x-vnd.Haiku-Devices	4197922366
 ACPI bus	DevicesView		Bus ACPI
-Encryption controller	Device		Pengontrol enkripsi
-Devices	System name		Perangkat
-Processor	Device		Prosesor
-Generate system information	DevicesView		Hasilkan informasi sistem
 Class info	DevicePCI		Info kelas
-Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikasi
 Mass storage controller	Device		Pengontrol penyimpanan massal
 Printer	DeviceSCSI		Pencetak
-Connection	DevicesView		Koneksi
 Manufacturer	Device		Pabrikan
-Scanner	DeviceSCSI		Pemindai
 Memory controller	Device		Pengendali memori
 Unknown device	DevicesView		Perangkat tak dikenal
-ACPI node '%1'	DeviceACPI		Titik ACPI '%1'
 Name	PropertyList		Nama
 Manufacturer	DeviceSCSI		Pabrikan
-Device name	Device		Nama perangkat
 Satellite communications controller	Device		Pengontrol komunikasi satelit
-Device class	DeviceSCSI		Kelas perangkat
-Device	Device		Perangkat
-Input device controller	Device		Pengontrol perangkat input
 PCI bus	DevicesView		Bus PCI
+Device	Device		Perangkat
 Changer	DeviceSCSI		Pengalih
-Serial bus controller	Device		Pengontrol serial bus
-Refresh devices	DevicesView		Segarkan perangkat
 Category	DevicesView		Kategori
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Perangkat tak dikenal
+Refresh devices	DevicesView		Segarkan perangkat
 Device paths	Device		Jalur perangkat
-Wireless controller	Device		Pengontrol nirkabel
-Generic system peripheral	Device		Periferal sistem generik
+Unknown device	Device		Perangkat tak dikenal
 Value	PropertyList		Nilai
+Generic system peripheral	Device		Periferal sistem generik
 Devices	DevicesView		Perangkat
-Device name	DeviceACPI		Nama perangkat
 Display controller	Device		Pengontrol display
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nama perangkat
 Other	DeviceSCSI		Lain
-Report compatibility	DevicesView		Laporkan kompatibilitas
-Computer	Device		Komputer
-PCI bus	Device		Bus PCI
-Enclosure	DeviceSCSI		Enklosur
 Order by:	DevicesView		Urutkan berdasarkan:
 Intelligent controller	Device		Pengontrol cerdas
 Multimedia controller	Device		Pengontrol multimedia
 Quit	DevicesView		Berhenti
-ISA bus	Device		Bus ISA
-ISA bus	DevicesView		Bus ISA
 Processor	DeviceSCSI		Prosesor
 Bridge	Device		Jembatan
 Worm	DeviceSCSI		Cacing
 CD-ROM	DeviceSCSI		CD-ROM
-Manufacturer	DevicePCI		Pabrikan
-Bridge	DeviceSCSI		Jembatan
 Signal processing controller	Device		Pengontrol pemroses sinyal
-Device name	DeviceSCSI		Nama perangkat
 Docking station	Device		Stasiun perkaitan
-Array	DeviceSCSI		Susunan
 Unclassified device	Device		Perangkat tidak terklasifikasi
 ACPI controller	Device		Pengontrol ACPI
+ACPI bus	Device		Bus ACPI
+Encryption controller	Device		Pengontrol enkripsi
+Devices	System name		Perangkat
+Generate system information	DevicesView		Hasilkan informasi sistem
+Processor	Device		Prosesor
+Computer	DevicesView		Komputer
+Connection	DevicesView		Koneksi
+Scanner	DeviceSCSI		Pemindai
+ACPI node '%1'	DeviceACPI		Titik ACPI '%1'
+Device name	Device		Nama perangkat
+Device class	DeviceSCSI		Kelas perangkat
+Input device controller	Device		Pengontrol perangkat input
+Serial bus controller	Device		Pengontrol serial bus
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Pengontrol nirkabel
+Device name	DeviceACPI		Nama perangkat
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Laporkan kompatibilitas
+Computer	Device		Komputer
+Enclosure	DeviceSCSI		Enklosur
+PCI bus	Device		Bus PCI
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
+Manufacturer	DevicePCI		Pabrikan
+Bridge	DeviceSCSI		Jembatan
+Device name	DeviceSCSI		Nama perangkat
+Array	DeviceSCSI		Susunan
 Network controller	Device		Pengontrol jaringan
 Driver used	Device		Driver yang digunakan
 Communication controller	Device		Pengontrol komunikasi
-ACPI bus	Device		Bus ACPI
 unknown	Device		tidak diketahui

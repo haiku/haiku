@@ -1,68 +1,68 @@
 1	portuguese (brazil)	x-vnd.Haiku-Devices	4197922366
 ACPI bus	DevicesView		Barramento ACPI
-Encryption controller	Device		Controlador de criptografia
-Devices	System name		Dispositivo
-Processor	Device		Processador
-Generate system information	DevicesView		Gerar informações do sistema
 Class info	DevicePCI		Informações da Classe
-Computer	DevicesView		Computador
 Communications	DeviceSCSI		Comunicações
 Mass storage controller	Device		Controlador de armazenamento em massa
 Printer	DeviceSCSI		Impressora
-Connection	DevicesView		Conexão
 Manufacturer	Device		Fabricante
-Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlador de memória
 Unknown device	DevicesView		Dispositivo desconhecido
-ACPI node '%1'	DeviceACPI		Módulo ACPI '%1'
 Name	PropertyList		Nome
 Manufacturer	DeviceSCSI		Fabricante
-Device name	Device		Nome do dispositivo
 Satellite communications controller	Device		Controlador de comunicações via satélite
-Device class	DeviceSCSI		Classe de Dispositivo
-Device	Device		Dispositivo
-Input device controller	Device		Controlador de dispositivo de entrada
 PCI bus	DevicesView		Barramento PCI
+Device	Device		Dispositivo
 Changer	DeviceSCSI		Seletor
-Serial bus controller	Device		Controlador de barramento serial
-Refresh devices	DevicesView		Atualizar dispositivos
 Category	DevicesView		Categoria
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Dispositivo desconhecido
+Refresh devices	DevicesView		Atualizar dispositivos
 Device paths	Device		Caminho dos dispositivos
-Wireless controller	Device		Controlador sem fio
-Generic system peripheral	Device		Periférico genérico do sistema
+Unknown device	Device		Dispositivo desconhecido
 Value	PropertyList		Valor
+Generic system peripheral	Device		Periférico genérico do sistema
 Devices	DevicesView		Dispositivo
-Device name	DeviceACPI		Nome do dispositivo
 Display controller	Device		Controlador de Tela
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nome do dispositivo
 Other	DeviceSCSI		Outro
-Report compatibility	DevicesView		Relatório de compatibilidade
-Computer	Device		Computador
-PCI bus	Device		Barramento PCI
-Enclosure	DeviceSCSI		Anexo
 Order by:	DevicesView		Ordenar por:
 Intelligent controller	Device		Controlador inteligente
 Multimedia controller	Device		Controlador multimídia
 Quit	DevicesView		Sair
-ISA bus	Device		Barramento ISA
-ISA bus	DevicesView		Barramento ISA
 Processor	DeviceSCSI		Processador
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
-Manufacturer	DevicePCI		Fabricante
-Bridge	DeviceSCSI		Bridge
 Signal processing controller	Device		Controlador de processamento de sinais
-Device name	DeviceSCSI		Nome do dispositivo
 Docking station	Device		Base de conexão
-Array	DeviceSCSI		Matriz
 Unclassified device	Device		Dispositivo não classificado
 ACPI controller	Device		Controlador ACPI
+ACPI bus	Device		Barramento ACPI
+Encryption controller	Device		Controlador de criptografia
+Devices	System name		Dispositivo
+Generate system information	DevicesView		Gerar informações do sistema
+Processor	Device		Processador
+Computer	DevicesView		Computador
+Connection	DevicesView		Conexão
+Scanner	DeviceSCSI		Scanner
+ACPI node '%1'	DeviceACPI		Módulo ACPI '%1'
+Device name	Device		Nome do dispositivo
+Device class	DeviceSCSI		Classe de Dispositivo
+Input device controller	Device		Controlador de dispositivo de entrada
+Serial bus controller	Device		Controlador de barramento serial
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Controlador sem fio
+Device name	DeviceACPI		Nome do dispositivo
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Relatório de compatibilidade
+Computer	Device		Computador
+Enclosure	DeviceSCSI		Anexo
+PCI bus	Device		Barramento PCI
+ISA bus	Device		Barramento ISA
+ISA bus	DevicesView		Barramento ISA
+Manufacturer	DevicePCI		Fabricante
+Bridge	DeviceSCSI		Bridge
+Device name	DeviceSCSI		Nome do dispositivo
+Array	DeviceSCSI		Matriz
 Network controller	Device		Controlador de rede
 Driver used	Device		Driver usado
 Communication controller	Device		Controlador de comunicação
-ACPI bus	Device		Barramento ACPI
 unknown	Device		desconhecido

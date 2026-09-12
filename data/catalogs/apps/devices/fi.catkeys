@@ -1,71 +1,71 @@
 1	finnish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-väylä
-Encryption controller	Device		Salausohjain
-Devices	System name		Laitteet
 USB bus	DevicesView		USB-väylä
-Processor	Device		Suoritin
-Generate system information	DevicesView		Tuota järjestelmätiedot
 Class info	DevicePCI		Luokkatiedot
 USB bus	Device		USB-väylä
-Computer	DevicesView		Tietokone
 Communications	DeviceSCSI		Viestinnät
 Mass storage controller	Device		Massamuistilaiteohjain
 Printer	DeviceSCSI		Tulostin
-Connection	DevicesView		Yhteys
 Manufacturer	Device		Valmistaja
-Scanner	DeviceSCSI		Skanneri
 Memory controller	Device		Muistiohjain
 Unknown device	DevicesView		Tuntematon laite
-ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
 Name	PropertyList		Nimi
 Manufacturer	DeviceSCSI		Valmistaja
-Device name	Device		Laitenimi
 Satellite communications controller	Device		Satelliittiviestintäohjain
-Device class	DeviceSCSI		Laiteluokka
-Device	Device		Laite
-Input device controller	Device		Syötelaiteohjain
 PCI bus	DevicesView		PCI-väylä
+Device	Device		Laite
 Changer	DeviceSCSI		Vaihtaja
-Serial bus controller	Device		Sarjaväyläohjain
-Refresh devices	DevicesView		Verestä laitteita
 Category	DevicesView		Luokka
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Tuntematon laite
+Refresh devices	DevicesView		Verestä laitteita
 Device paths	Device		Laitepolut
-Wireless controller	Device		Langaton ohjain
-Generic system peripheral	Device		Yleinen järjestelmän oheislaite
+Unknown device	Device		Tuntematon laite
 Value	PropertyList		Arvo
+Generic system peripheral	Device		Yleinen järjestelmän oheislaite
 Devices	DevicesView		Laitteet
-Device name	DeviceACPI		Laitenimi
 Display controller	Device		Näyttöohjain
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Laitenimi
 Other	DeviceSCSI		Muu
-Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
-Computer	Device		Tietokone
-PCI bus	Device		PCI-väylä
-Enclosure	DeviceSCSI		Kotelo
 Order by:	DevicesView		Järjestys:
 Intelligent controller	Device		Älyohjain
 Multimedia controller	Device		Multimediaohjain
 Quit	DevicesView		Poistu
-ISA bus	Device		ISA-väylä
-ISA bus	DevicesView		ISA-väylä
 Processor	DeviceSCSI		Suoritin
 Bridge	Device		Silta
 Worm	DeviceSCSI		Kertakirjoitteinen
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Signaalikäsittelyohjain
+Docking station	Device		Telakka-asema
+Unclassified device	Device		Luokittelematon laite
+ACPI controller	Device		ACPI-ohjain
+ACPI bus	Device		ACPI-väylä
+Encryption controller	Device		Salausohjain
+Devices	System name		Laitteet
+Generate system information	DevicesView		Tuota järjestelmätiedot
+Processor	Device		Suoritin
+Computer	DevicesView		Tietokone
+Connection	DevicesView		Yhteys
+Scanner	DeviceSCSI		Skanneri
+ACPI node '%1'	DeviceACPI		ACPI-solmu ’%1’
+Device name	Device		Laitenimi
+Device class	DeviceSCSI		Laiteluokka
+Input device controller	Device		Syötelaiteohjain
+Serial bus controller	Device		Sarjaväyläohjain
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Langaton ohjain
+Device name	DeviceACPI		Laitenimi
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Ilmoita yhteensopivuudesta
+Computer	Device		Tietokone
+Enclosure	DeviceSCSI		Kotelo
+PCI bus	Device		PCI-väylä
+ISA bus	Device		ISA-väylä
+ISA bus	DevicesView		ISA-väylä
 Manufacturer	DevicePCI		Valmistaja
 Bridge	DeviceSCSI		Silta
-Signal processing controller	Device		Signaalikäsittelyohjain
 Device name	DeviceSCSI		Laitenimi
-Docking station	Device		Telakka-asema
 Array	DeviceSCSI		Matriisi
-Unclassified device	Device		Luokittelematon laite
 Manufacturer	DeviceACPI		Valmistaja
-ACPI controller	Device		ACPI-ohjain
 Network controller	Device		Verkko-ohjain
 Driver used	Device		Käytetty laite
 Communication controller	Device		Viestintäohjain
-ACPI bus	Device		ACPI-väylä
 unknown	Device		tuntematon

@@ -1,84 +1,84 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	1936288118
 ACPI bus	DevicesView		ACPI-buss
-Encryption controller	Device		Krypteringskontroller
-Devices	System name		Maskinvare
 USB bus	DevicesView		USB bus
-Processor	Device		Prosessor
-Generate system information	DevicesView		Generer systeminformasjon
 Class info	DevicePCI		Klasseinformasjon
 USB bus	Device		USB bus
-Computer	DevicesView		Datamaskin
 Communications	DeviceSCSI		Kommunikasjon
-ACPI thermal zone	DeviceACPI		ACPI termisk sone
 Mass storage controller	Device		Masselagringskontroller
 Printer	DeviceSCSI		Skriver
-Connection	DevicesView		Tilkobling
 Manufacturer	Device		Produsent
-Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Minnekontroller
 Unknown device	DevicesView		Ukjent enhet
-ACPI node '%1'	DeviceACPI		ACPI-node '%1'
 Name	PropertyList		Navn
 Manufacturer	DeviceSCSI		Produsent
-Device name	Device		Enhetsnavn
 unknown	DeviceACPI		ukjent
 Satellite communications controller	Device		Satellittkommunikasjonskontroller
-Device class	DeviceSCSI		Enhetsklasse
-Device	Device		Enhet
-Input device controller	Device		Input-enhetskontroller
 PCI bus	DevicesView		PCI-buss
+Device	Device		Enhet
 Changer	DeviceSCSI		Skifter
-Serial bus controller	Device		Seriebusskontroller
-Refresh devices	DevicesView		Oppdater enheter
 Category	DevicesView		Kategori
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Ukjent enhet
+Refresh devices	DevicesView		Oppdater enheter
 Device paths	Device		Enhetsti
-Wireless controller	Device		Trådløs-kontroller
-Generic system peripheral	Device		Generisk ekstern enhet
+Unknown device	Device		Ukjent enhet
 Value	PropertyList		Verdi
+Generic system peripheral	Device		Generisk ekstern enhet
 Devices	DevicesView		Maskinvare
-Device name	DeviceACPI		Enhetsnavn
 Optical drive	DeviceSCSI		Optisk stasjon
-unknown	DevicePCI		ukjent
 Display controller	Device		Skjermkontroller
 Bus	DevicesView		Bus
-ACPI <unknown>	DeviceACPI		ACPI <ukjent>
 Device name	DevicePCI		Enhetsnavn
 Other	DeviceSCSI		Annet
-Report compatibility	DevicesView		Rapporter kompatibilitet
-Computer	Device		Datamaskin
-PCI bus	Device		PCI-buss
-Enclosure	DeviceSCSI		Vedlegg
-Tape drive	DeviceSCSI		Båndstasjon
 Order by:	DevicesView		Sorter etter:
 Intelligent controller	Device		Intelligent kontroller
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avslutt
-ISA bus	Device		ISA-buss
-ISA bus	DevicesView		ISA-buss
-Basic information	PropertyList		Grunnleggende informasjon
 Processor	DeviceSCSI		Prosessor
 Card reader	DeviceSCSI		Kortleser
 Bridge	Device		Bro
 ACPI button '%1'	DeviceACPI		ACPI-knapp '%1'
 Attributes	PropertyList		Egenskaper
 Worm	DeviceSCSI		Worm
-Disk drive	DeviceSCSI		Diskstasjon
 CD-ROM	DeviceSCSI		CD-ROM
+ACPI system bus	DeviceACPI		ACPI systembuss
+Signal processing controller	Device		Signalbehandlingskontroller
+Docking station	Device		Dokkingstasjon
+Unclassified device	Device		Uklassifisert enhet
+ACPI controller	Device		ACPI-kontroller
+ACPI bus	Device		ACPI-buss
+Encryption controller	Device		Krypteringskontroller
+Devices	System name		Maskinvare
+Generate system information	DevicesView		Generer systeminformasjon
+Processor	Device		Prosessor
+Computer	DevicesView		Datamaskin
+ACPI thermal zone	DeviceACPI		ACPI termisk sone
+Connection	DevicesView		Tilkobling
+Scanner	DeviceSCSI		Scanner
+ACPI node '%1'	DeviceACPI		ACPI-node '%1'
+Device name	Device		Enhetsnavn
+Device class	DeviceSCSI		Enhetsklasse
+Input device controller	Device		Input-enhetskontroller
+Serial bus controller	Device		Seriebusskontroller
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Trådløs-kontroller
+Device name	DeviceACPI		Enhetsnavn
+unknown	DevicePCI		ukjent
+ACPI <unknown>	DeviceACPI		ACPI <ukjent>
+Report compatibility	DevicesView		Rapporter kompatibilitet
+Computer	Device		Datamaskin
+Tape drive	DeviceSCSI		Båndstasjon
+Enclosure	DeviceSCSI		Vedlegg
+PCI bus	Device		PCI-buss
+ISA bus	Device		ISA-buss
+Basic information	PropertyList		Grunnleggende informasjon
+ISA bus	DevicesView		ISA-buss
+Disk drive	DeviceSCSI		Diskstasjon
 Manufacturer	DevicePCI		Produsent
 Bridge	DeviceSCSI		Bro
 ACPI system indicator	DeviceACPI		ACPI systemindikator
-ACPI system bus	DeviceACPI		ACPI systembuss
-Signal processing controller	Device		Signalbehandlingskontroller
 Device name	DeviceSCSI		Enhetsnavn
-Docking station	Device		Dokkingstasjon
 Array	DeviceSCSI		Array
-Unclassified device	Device		Uklassifisert enhet
 Manufacturer	DeviceACPI		Produsent
-ACPI controller	Device		ACPI-kontroller
 Network controller	Device		Nettverkskontroller
 Driver used	Device		Driver brukt
 Communication controller	Device		Kommunikasjonskontroller
-ACPI bus	Device		ACPI-buss
 unknown	Device		ukjent

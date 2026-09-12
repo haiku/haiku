@@ -1,68 +1,68 @@
 1	esperanto	x-vnd.Haiku-Devices	4197922366
 ACPI bus	DevicesView		ACPI-buso
-Encryption controller	Device		Ĉifradregilo
-Devices	System name		Aparatoj
-Processor	Device		Procesoro
-Generate system information	DevicesView		Generi sistemajn informojn
 Class info	DevicePCI		Klasaj informoj
-Computer	DevicesView		Komputilo
 Communications	DeviceSCSI		Komunikadoj
 Mass storage controller	Device		Amaskonserveja regilo
 Printer	DeviceSCSI		Presilo
-Connection	DevicesView		Konekto
 Manufacturer	Device		Fabrikanto
-Scanner	DeviceSCSI		Skanilo
 Memory controller	Device		Memora stirilo
 Unknown device	DevicesView		Nekonata aparato
-ACPI node '%1'	DeviceACPI		ACPI-nodo '%1'
 Name	PropertyList		Nomo
 Manufacturer	DeviceSCSI		Fabrikanto
-Device name	Device		Aparata nomo
 Satellite communications controller	Device		Satelitakomunika regilo
-Device class	DeviceSCSI		Aparata klaso
-Device	Device		Aparato
-Input device controller	Device		Enigaparata regilo
 PCI bus	DevicesView		PCI-buso
+Device	Device		Aparato
 Changer	DeviceSCSI		Ŝanĝanto
-Serial bus controller	Device		Seriabusa regilo
-Refresh devices	DevicesView		Aktualigi aparatojn
 Category	DevicesView		Kategorio
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Nekonata aparato
+Refresh devices	DevicesView		Aktualigi aparatojn
 Device paths	Device		Itinero al aparato
-Wireless controller	Device		Sendratreta regilo
-Generic system peripheral	Device		Ĝenerala sistema flankaparato
+Unknown device	Device		Nekonata aparato
 Value	PropertyList		Valoro
+Generic system peripheral	Device		Ĝenerala sistema flankaparato
 Devices	DevicesView		Aparatoj
-Device name	DeviceACPI		Aparata nomo
 Display controller	Device		Ekrana regilo
-ACPI <unknown>	DeviceACPI		ACPI <nekonata>
 Device name	DevicePCI		Aparata nomo
 Other	DeviceSCSI		Alia
-Report compatibility	DevicesView		Raporto pri kongruo
-Computer	Device		Komputilo
-PCI bus	Device		Buso de PCI
-Enclosure	DeviceSCSI		Kunigaĵo
 Order by:	DevicesView		Ordigi laŭ:
 Intelligent controller	Device		Inteligenta adaptilo
 Multimedia controller	Device		Plurmedia adaptilo
 Quit	DevicesView		Ĉesi
-ISA bus	Device		Buso de ISA
-ISA bus	DevicesView		Buso de ISA
 Processor	DeviceSCSI		Ĉefprocesoro
 Bridge	Device		Ponto
 Worm	DeviceSCSI		Vermo
 CD-ROM	DeviceSCSI		KD Nurlegebla
-Manufacturer	DevicePCI		Produktanto
-Bridge	DeviceSCSI		Ponto
 Signal processing controller	Device		Adpatilo de signala procesoro
-Device name	DeviceSCSI		Nomo de adaptilo
 Docking station	Device		Pordejo
-Array	DeviceSCSI		Vicaro
 Unclassified device	Device		Senklasa aparato
 ACPI controller	Device		ACPI stirilo
+ACPI bus	Device		Buso de ACPI
+Encryption controller	Device		Ĉifradregilo
+Devices	System name		Aparatoj
+Generate system information	DevicesView		Generi sistemajn informojn
+Processor	Device		Procesoro
+Computer	DevicesView		Komputilo
+Connection	DevicesView		Konekto
+Scanner	DeviceSCSI		Skanilo
+ACPI node '%1'	DeviceACPI		ACPI-nodo '%1'
+Device name	Device		Aparata nomo
+Device class	DeviceSCSI		Aparata klaso
+Input device controller	Device		Enigaparata regilo
+Serial bus controller	Device		Seriabusa regilo
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Sendratreta regilo
+Device name	DeviceACPI		Aparata nomo
+ACPI <unknown>	DeviceACPI		ACPI <nekonata>
+Report compatibility	DevicesView		Raporto pri kongruo
+Computer	Device		Komputilo
+Enclosure	DeviceSCSI		Kunigaĵo
+PCI bus	Device		Buso de PCI
+ISA bus	Device		Buso de ISA
+ISA bus	DevicesView		Buso de ISA
+Manufacturer	DevicePCI		Produktanto
+Bridge	DeviceSCSI		Ponto
+Device name	DeviceSCSI		Nomo de adaptilo
+Array	DeviceSCSI		Vicaro
 Network controller	Device		Reta adaptilo
 Driver used	Device		Uzata pelilo
 Communication controller	Device		Komunika adaptilo
-ACPI bus	Device		Buso de ACPI
 unknown	Device		nekonata

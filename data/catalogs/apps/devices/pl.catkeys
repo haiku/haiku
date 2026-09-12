@@ -1,71 +1,71 @@
 1	polish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Magistrala ACPI
-Encryption controller	Device		Kontroler szyfrowania
-Devices	System name		Urządzenia
 USB bus	DevicesView		Szyna USB
-Processor	Device		Procesor
-Generate system information	DevicesView		Wygeneruj informacje systemowe
 Class info	DevicePCI		Informacja klasy
 USB bus	Device		Szyna USB
-Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikacja
 Mass storage controller	Device		Kontroler pamięci masowej
 Printer	DeviceSCSI		Drukarka
-Connection	DevicesView		Połączenie
 Manufacturer	Device		Producent
-Scanner	DeviceSCSI		Skaner
 Memory controller	Device		Kontroler pamięci
 Unknown device	DevicesView		Nieznane urządzenie
-ACPI node '%1'	DeviceACPI		Węzeł ACPI „%1”
 Name	PropertyList		Nazwa
 Manufacturer	DeviceSCSI		Producent
-Device name	Device		Nazwa urządzenia
 Satellite communications controller	Device		Kontroler komunikacji satelitarnej
-Device class	DeviceSCSI		Klasa urządzenia
-Device	Device		Urządzenie
-Input device controller	Device		Kontroler urządzenia wejścia
 PCI bus	DevicesView		Magistrala PCI
+Device	Device		Urządzenie
 Changer	DeviceSCSI		Zmieniarka
-Serial bus controller	Device		Kontroler magistrali szeregowej
-Refresh devices	DevicesView		Odśwież urządzenia
 Category	DevicesView		Kategoria
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Nieznane urządzenie
+Refresh devices	DevicesView		Odśwież urządzenia
 Device paths	Device		Ścieżki urządzeń
-Wireless controller	Device		Kontroler łączy bezprzewodowych
-Generic system peripheral	Device		Generyczne urządzenie peryferyjne
+Unknown device	Device		Nieznane urządzenie
 Value	PropertyList		Wartość
+Generic system peripheral	Device		Generyczne urządzenie peryferyjne
 Devices	DevicesView		Urządzenia
-Device name	DeviceACPI		Nazwa urządzenia
 Display controller	Device		Kontroler ekranu
-ACPI <unknown>	DeviceACPI		ACPI <nieznany>
 Device name	DevicePCI		Nazwa urządzenia
 Other	DeviceSCSI		Inne
-Report compatibility	DevicesView		Raport zgodności
-Computer	Device		Komputer
-PCI bus	Device		Magistrala PCI
-Enclosure	DeviceSCSI		Załącznik
 Order by:	DevicesView		Sortuj według:
 Intelligent controller	Device		Kontroler inteligentny
 Multimedia controller	Device		Kontroler multimediów
 Quit	DevicesView		Zakończ
-ISA bus	Device		Magistrala ISA
-ISA bus	DevicesView		Magistrala ISA
 Processor	DeviceSCSI		Procesor
 Bridge	Device		Mostek
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Kontroler przetwarzania sygnałów
+Docking station	Device		Stacja dokująca
+Unclassified device	Device		Niesklasyfikowane urządzenie
+ACPI controller	Device		Kontroler ACPI
+ACPI bus	Device		Magistrala ACPI
+Encryption controller	Device		Kontroler szyfrowania
+Devices	System name		Urządzenia
+Generate system information	DevicesView		Wygeneruj informacje systemowe
+Processor	Device		Procesor
+Computer	DevicesView		Komputer
+Connection	DevicesView		Połączenie
+Scanner	DeviceSCSI		Skaner
+ACPI node '%1'	DeviceACPI		Węzeł ACPI „%1”
+Device name	Device		Nazwa urządzenia
+Device class	DeviceSCSI		Klasa urządzenia
+Input device controller	Device		Kontroler urządzenia wejścia
+Serial bus controller	Device		Kontroler magistrali szeregowej
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Kontroler łączy bezprzewodowych
+Device name	DeviceACPI		Nazwa urządzenia
+ACPI <unknown>	DeviceACPI		ACPI <nieznany>
+Report compatibility	DevicesView		Raport zgodności
+Computer	Device		Komputer
+Enclosure	DeviceSCSI		Załącznik
+PCI bus	Device		Magistrala PCI
+ISA bus	Device		Magistrala ISA
+ISA bus	DevicesView		Magistrala ISA
 Manufacturer	DevicePCI		Producent
 Bridge	DeviceSCSI		Mostek
-Signal processing controller	Device		Kontroler przetwarzania sygnałów
 Device name	DeviceSCSI		Nazwa urządzenia
-Docking station	Device		Stacja dokująca
 Array	DeviceSCSI		Macierz
-Unclassified device	Device		Niesklasyfikowane urządzenie
 Manufacturer	DeviceACPI		Producent
-ACPI controller	Device		Kontroler ACPI
 Network controller	Device		Kontroler sieci
 Driver used	Device		Użyty sterownik
 Communication controller	Device		Kontroler komunikacji
-ACPI bus	Device		Magistrala ACPI
 unknown	Device		nieznane

@@ -1,71 +1,71 @@
 1	danish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-bus
-Encryption controller	Device		Krypteringsstyreenhed
-Devices	System name		Enheder
 USB bus	DevicesView		USB-bus
-Processor	Device		Processor
-Generate system information	DevicesView		Opbyg systemoplysninger
 Class info	DevicePCI		Klasseoplysninger
 USB bus	Device		USB-bus
-Computer	DevicesView		Computer
 Communications	DeviceSCSI		Kommunikation
 Mass storage controller	Device		Lagringsstyreenhed
 Printer	DeviceSCSI		Printer
-Connection	DevicesView		Forbindelse
 Manufacturer	Device		Producent
-Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Hukommelsesstyreenhed
 Unknown device	DevicesView		Ukendt enhed
-ACPI node '%1'	DeviceACPI		ACPI-knudepunkt '%1'
 Name	PropertyList		Navn
 Manufacturer	DeviceSCSI		Producent
-Device name	Device		Enhedsnavn
 Satellite communications controller	Device		Styreenhed for satellitkommunikation
-Device class	DeviceSCSI		Enhedsklasse
-Device	Device		Enhed
-Input device controller	Device		Styreenhed for inddataenhed
 PCI bus	DevicesView		PCI-bus
+Device	Device		Enhed
 Changer	DeviceSCSI		Skifter
-Serial bus controller	Device		Styreenhed for seriel bus
-Refresh devices	DevicesView		Genopfrisk enheder
 Category	DevicesView		Kategori
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Ukendt enhed
+Refresh devices	DevicesView		Genopfrisk enheder
 Device paths	Device		Enhedsstier
-Wireless controller	Device		Trådløs styreenhed
-Generic system peripheral	Device		Almen systemenhed
+Unknown device	Device		Ukendt enhed
 Value	PropertyList		Værdi
+Generic system peripheral	Device		Almen systemenhed
 Devices	DevicesView		Enheder
-Device name	DeviceACPI		Enhedsnavn
 Display controller	Device		Skærmstyring
-ACPI <unknown>	DeviceACPI		ACPI <ukendt>
 Device name	DevicePCI		Enhedsnavn
 Other	DeviceSCSI		Andet
-Report compatibility	DevicesView		Indberet kompatibilitet
-Computer	Device		Computer
-PCI bus	Device		PCI-bus
-Enclosure	DeviceSCSI		Indpakning
 Order by:	DevicesView		Sortér efter:
 Intelligent controller	Device		Intelligent styreenhed
 Multimedia controller	Device		Multimediestyreenhed
 Quit	DevicesView		Afslut
-ISA bus	Device		ISA-bus
-ISA bus	DevicesView		ISA-bus
 Processor	DeviceSCSI		Processor
 Bridge	Device		Bro
 Worm	DeviceSCSI		Orm
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Styreenhed for signalbehandling
+Docking station	Device		Dockingstation
+Unclassified device	Device		Uklassificeret enhed
+ACPI controller	Device		ACPI-kontroller
+ACPI bus	Device		ACPI-bus
+Encryption controller	Device		Krypteringsstyreenhed
+Devices	System name		Enheder
+Generate system information	DevicesView		Opbyg systemoplysninger
+Processor	Device		Processor
+Computer	DevicesView		Computer
+Connection	DevicesView		Forbindelse
+Scanner	DeviceSCSI		Skanner
+ACPI node '%1'	DeviceACPI		ACPI-knudepunkt '%1'
+Device name	Device		Enhedsnavn
+Device class	DeviceSCSI		Enhedsklasse
+Input device controller	Device		Styreenhed for inddataenhed
+Serial bus controller	Device		Styreenhed for seriel bus
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Trådløs styreenhed
+Device name	DeviceACPI		Enhedsnavn
+ACPI <unknown>	DeviceACPI		ACPI <ukendt>
+Report compatibility	DevicesView		Indberet kompatibilitet
+Computer	Device		Computer
+Enclosure	DeviceSCSI		Indpakning
+PCI bus	Device		PCI-bus
+ISA bus	Device		ISA-bus
+ISA bus	DevicesView		ISA-bus
 Manufacturer	DevicePCI		Producent
 Bridge	DeviceSCSI		Bro
-Signal processing controller	Device		Styreenhed for signalbehandling
 Device name	DeviceSCSI		Enhedsnavn
-Docking station	Device		Dockingstation
 Array	DeviceSCSI		Række
-Unclassified device	Device		Uklassificeret enhed
 Manufacturer	DeviceACPI		Producent
-ACPI controller	Device		ACPI-kontroller
 Network controller	Device		Netværksstyreenhed
 Driver used	Device		Brugt driver
 Communication controller	Device		Styreenhed for kommunikation
-ACPI bus	Device		ACPI-bus
 unknown	Device		ukendt

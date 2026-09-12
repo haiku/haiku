@@ -1,71 +1,71 @@
 1	romanian	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Magistrală ACPI
-Encryption controller	Device		Controlor de criptare
-Devices	System name		Dispozitive
 USB bus	DevicesView		Magistrală USB
-Processor	Device		Procesor
-Generate system information	DevicesView		Generează informațiile de sistem
 Class info	DevicePCI		Informații clasă
 USB bus	Device		Magistrală USB
-Computer	DevicesView		Calculator
 Communications	DeviceSCSI		Comunicații
 Mass storage controller	Device		Controlor de stocare în masă
 Printer	DeviceSCSI		Imprimantă
-Connection	DevicesView		Conexiune
 Manufacturer	Device		Producător
-Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlor de memorie
 Unknown device	DevicesView		Dispozitiv necunoscut
-ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
 Name	PropertyList		Nume
 Manufacturer	DeviceSCSI		Producător
-Device name	Device		Nume dispozitiv
 Satellite communications controller	Device		Controlor de comunicații prin satelit
-Device class	DeviceSCSI		Clasă de dispozitive
-Device	Device		Dispozitiv
-Input device controller	Device		Controlor de dispozitiv de intrare
 PCI bus	DevicesView		Magistrală PCI
+Device	Device		Dispozitiv
 Changer	DeviceSCSI		Schimbător
-Serial bus controller	Device		Controlor de magistrală serială
-Refresh devices	DevicesView		Reîmprospătează dispozitivele
 Category	DevicesView		Categorie
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Dispozitiv necunoscut
+Refresh devices	DevicesView		Reîmprospătează dispozitivele
 Device paths	Device		Căi de dispozitiv
-Wireless controller	Device		Controlor fără fir
-Generic system peripheral	Device		Periferice generice de sistem
+Unknown device	Device		Dispozitiv necunoscut
 Value	PropertyList		Valoare
+Generic system peripheral	Device		Periferice generice de sistem
 Devices	DevicesView		Dispozitive
-Device name	DeviceACPI		Nume dispozitiv
 Display controller	Device		Controlor de afișaj
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nume dispozitiv
 Other	DeviceSCSI		Altele
-Report compatibility	DevicesView		Raportează compatibilitatea
-Computer	Device		Calculator
-PCI bus	Device		Magistrală PCI
-Enclosure	DeviceSCSI		Incintă
 Order by:	DevicesView		Ordonare după:
 Intelligent controller	Device		Controlor inteligent
 Multimedia controller	Device		Controlor multimedia
 Quit	DevicesView		Ieșire
-ISA bus	Device		Magistrală ISA
-ISA bus	DevicesView		Magistrală ISA
 Processor	DeviceSCSI		Procesor
 Bridge	Device		Punte
 Worm	DeviceSCSI		Vierme
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Controlor de procesare a semnalului
+Docking station	Device		Stație de andocare
+Unclassified device	Device		Dispozitiv neclasificat
+ACPI controller	Device		Controlor ACPI
+ACPI bus	Device		Magistrală ACPI
+Encryption controller	Device		Controlor de criptare
+Devices	System name		Dispozitive
+Generate system information	DevicesView		Generează informațiile de sistem
+Processor	Device		Procesor
+Computer	DevicesView		Calculator
+Connection	DevicesView		Conexiune
+Scanner	DeviceSCSI		Scanner
+ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
+Device name	Device		Nume dispozitiv
+Device class	DeviceSCSI		Clasă de dispozitive
+Input device controller	Device		Controlor de dispozitiv de intrare
+Serial bus controller	Device		Controlor de magistrală serială
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Controlor fără fir
+Device name	DeviceACPI		Nume dispozitiv
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Raportează compatibilitatea
+Computer	Device		Calculator
+Enclosure	DeviceSCSI		Incintă
+PCI bus	Device		Magistrală PCI
+ISA bus	Device		Magistrală ISA
+ISA bus	DevicesView		Magistrală ISA
 Manufacturer	DevicePCI		Producător
 Bridge	DeviceSCSI		Punte
-Signal processing controller	Device		Controlor de procesare a semnalului
 Device name	DeviceSCSI		Nume dispozitiv
-Docking station	Device		Stație de andocare
 Array	DeviceSCSI		Vector
-Unclassified device	Device		Dispozitiv neclasificat
 Manufacturer	DeviceACPI		Producător
-ACPI controller	Device		Controlor ACPI
 Network controller	Device		Controlor de rețea
 Driver used	Device		Driver utilizat
 Communication controller	Device		Controlor de comunicație
-ACPI bus	Device		Magistrală ACPI
 unknown	Device		necunoscut

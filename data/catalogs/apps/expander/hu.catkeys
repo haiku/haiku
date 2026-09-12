@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Haiku-Expander	2735024965
+1	hungarian	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		Célmappa
 Other	ExpanderPreferences		Egyéb
 Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
+Ignore all	ExpanderWindow		Összes átugrása
 Expander	System name		Kicsomagoló
 Set source…	ExpanderMenu		Csomag megadása…
 OK	ExpanderWindow		Rendben
@@ -14,6 +15,7 @@ Create	ExpanderWindow		Létrehozás
 Creating listing for '%s'…	ExpanderWindow		'%s' lista létrehozása…
 Show contents	ExpanderMenu		Tartalom megjelenítése
 %appname% settings	ExpanderPreferences		%appname% beállítások
+Ignore	ExpanderWindow		Átugrás
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Biztosan le akarod állítani a kicsomagolást? A kicsomagolt elemek hiányosak lehetnek.
 Settings	ExpanderMenu		Beállítások
 Expand	ExpanderWindow		Kicsomagol

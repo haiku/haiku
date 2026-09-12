@@ -1,67 +1,67 @@
 1	belarusian	x-vnd.Haiku-Devices	1509979255
 ACPI bus	DevicesView		Шына ACPI
-Encryption controller	Device		Кантролер шыфравання
-Devices	System name		Прылады
-Processor	Device		Працэсар
-Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Class info	DevicePCI		Інфа класа
-Computer	DevicesView		Кампутар
 Communications	DeviceSCSI		Камунікацыі
 Mass storage controller	Device		Кантролер прылад захавання даных
 Printer	DeviceSCSI		Друкарка
-Connection	DevicesView		Спалучэнне
 Manufacturer	Device		Вытворца
-Scanner	DeviceSCSI		Сканэр
 Memory controller	Device		Кантролер памяці
 Unknown device	DevicesView		Невядомая прылада
-ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
 Name	PropertyList		Імя
 Manufacturer	DeviceSCSI		Вытворца
-Device name	Device		Імя прылады
 Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
-Device class	DeviceSCSI		Клас прылады
-Device	Device		Прылада
-Input device controller	Device		Кантролер прылад уводу
 PCI bus	DevicesView		Шына PCI
+Device	Device		Прылада
 Changer	DeviceSCSI		Чэйнджэр
-Serial bus controller	Device		Кантролер серыйнай шыны
-Refresh devices	DevicesView		Абнавіць прылады
 Category	DevicesView		Катэгорыя
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Невядомая прылада
+Refresh devices	DevicesView		Абнавіць прылады
 Device paths	Device		Пуці прыладаў
-Wireless controller	Device		Бесшнуравы кантролер
-Generic system peripheral	Device		Агульная перыферыя
+Unknown device	Device		Невядомая прылада
 Value	PropertyList		Велічыня
+Generic system peripheral	Device		Агульная перыферыя
 Devices	DevicesView		Прылады
-Device name	DeviceACPI		Імя прылады
 Display controller	Device		Кантролер экрану
 Device name	DevicePCI		Імя прылады
 Other	DeviceSCSI		Іншы(я)
-Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
-Computer	Device		Кампутар
-PCI bus	Device		Шына PCI
-Enclosure	DeviceSCSI		Уключэнне
 Order by:	DevicesView		Парадкаваць па:
 Intelligent controller	Device		Інтэлектуальны кантролер
 Multimedia controller	Device		Кантролер мультымедыя
 Quit	DevicesView		Выйсці
-ISA bus	Device		Шына ISA
-ISA bus	DevicesView		Шына ISA
 Processor	DeviceSCSI		Працэсар
 Bridge	Device		Мост
 Worm	DeviceSCSI		Ворм
 CD-ROM	DeviceSCSI		CD-ROM
-Manufacturer	DevicePCI		Вытворца
-Bridge	DeviceSCSI		Мост
 Signal processing controller	Device		Кантролер апрацоўкі сігналаў
-Device name	DeviceSCSI		Імя прылады
 Docking station	Device		Док-станцыя
-Array	DeviceSCSI		Массыў
 Unclassified device	Device		Невызначаная прылада
 ACPI controller	Device		Кантролер ACPI
+ACPI bus	Device		Шына ACPI
+Encryption controller	Device		Кантролер шыфравання
+Devices	System name		Прылады
+Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
+Processor	Device		Працэсар
+Computer	DevicesView		Кампутар
+Connection	DevicesView		Спалучэнне
+Scanner	DeviceSCSI		Сканэр
+ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
+Device name	Device		Імя прылады
+Device class	DeviceSCSI		Клас прылады
+Input device controller	Device		Кантролер прылад уводу
+Serial bus controller	Device		Кантролер серыйнай шыны
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Бесшнуравы кантролер
+Device name	DeviceACPI		Імя прылады
+Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
+Computer	Device		Кампутар
+Enclosure	DeviceSCSI		Уключэнне
+PCI bus	Device		Шына PCI
+ISA bus	Device		Шына ISA
+ISA bus	DevicesView		Шына ISA
+Manufacturer	DevicePCI		Вытворца
+Bridge	DeviceSCSI		Мост
+Device name	DeviceSCSI		Імя прылады
+Array	DeviceSCSI		Массыў
 Network controller	Device		Сеткавы кантролер
 Driver used	Device		Ужыты драйвер
 Communication controller	Device		Кантролер камунікацый
-ACPI bus	Device		Шына ACPI
 unknown	Device		невядома

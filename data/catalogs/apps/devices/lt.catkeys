@@ -1,67 +1,67 @@
 1	lithuanian	x-vnd.Haiku-Devices	1509979255
 ACPI bus	DevicesView		ACPI magistralė
-Encryption controller	Device		Šifravimo valdiklis
-Devices	System name		Įrenginiai
-Processor	Device		Procesorius
-Generate system information	DevicesView		Generuoti informaciją apie sistemą
 Class info	DevicePCI		Klasės savybės
-Computer	DevicesView		Kompiuteris
 Communications	DeviceSCSI		Ryšio įrenginiai
 Mass storage controller	Device		Kaupiklių valdiklis
 Printer	DeviceSCSI		Spausdintuvas
-Connection	DevicesView		ryšį
 Manufacturer	Device		Gamintojas
-Scanner	DeviceSCSI		Skeneris
 Memory controller	Device		Atminties valdiklis
 Unknown device	DevicesView		Nežinomas įrenginys
-ACPI node '%1'	DeviceACPI		ACPI mazgas „%1“
 Name	PropertyList		Pavadinimas
 Manufacturer	DeviceSCSI		Gamintojas
-Device name	Device		Įrenginio pavadinimas
 Satellite communications controller	Device		Palydovinio ryšio valdiklis
-Device class	DeviceSCSI		Įrenginio klasė
-Device	Device		Įrenginys
-Input device controller	Device		Įvesties įrenginių valdiklis
 PCI bus	DevicesView		PCI magistralė
+Device	Device		Įrenginys
 Changer	DeviceSCSI		Keitiklis
-Serial bus controller	Device		Nuosekliosios magistralės valdiklis
-Refresh devices	DevicesView		Atnaujinti įrenginių sąrašą
 Category	DevicesView		kategoriją
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Nežinomas įrenginys
+Refresh devices	DevicesView		Atnaujinti įrenginių sąrašą
 Device paths	Device		Įrenginio kelias
-Wireless controller	Device		Bevielio tinklo valdiklis
-Generic system peripheral	Device		Bendro pobūdžio periferiniai įrenginiai
+Unknown device	Device		Nežinomas įrenginys
 Value	PropertyList		Reikšmė
+Generic system peripheral	Device		Bendro pobūdžio periferiniai įrenginiai
 Devices	DevicesView		Įrenginiai
-Device name	DeviceACPI		Įrenginio pavadinimas
 Display controller	Device		Ekranų valdiklis
 Device name	DevicePCI		Įrenginio pavadinimas
 Other	DeviceSCSI		Kita
-Report compatibility	DevicesView		Pranešti apie suderinamumą
-Computer	Device		Kompiuteris
-PCI bus	Device		PCI magistralė
-Enclosure	DeviceSCSI		Kasetė
 Order by:	DevicesView		Rūšiuoti pagal:
 Intelligent controller	Device		Išmanusis valdiklis
 Multimedia controller	Device		Įvairialypės terpės valdiklis
 Quit	DevicesView		Baigti darbą
-ISA bus	Device		ISA magistralė
-ISA bus	DevicesView		ISA magistralė
 Processor	DeviceSCSI		Procesorius
 Bridge	Device		Tiltas
 Worm	DeviceSCSI		WORM
 CD-ROM	DeviceSCSI		CD kaupiklis
-Manufacturer	DevicePCI		Gamintojas
-Bridge	DeviceSCSI		Tiltas
 Signal processing controller	Device		Signalų apdorojimo valdiklis
-Device name	DeviceSCSI		Įrenginio pavadinimas
 Docking station	Device		Jungčių replikatorius
-Array	DeviceSCSI		Masyvas
 Unclassified device	Device		Neklasifikuotas įrenginys
 ACPI controller	Device		ACPI valdiklis
+ACPI bus	Device		ACPI magistralė
+Encryption controller	Device		Šifravimo valdiklis
+Devices	System name		Įrenginiai
+Generate system information	DevicesView		Generuoti informaciją apie sistemą
+Processor	Device		Procesorius
+Computer	DevicesView		Kompiuteris
+Connection	DevicesView		ryšį
+Scanner	DeviceSCSI		Skeneris
+ACPI node '%1'	DeviceACPI		ACPI mazgas „%1“
+Device name	Device		Įrenginio pavadinimas
+Device class	DeviceSCSI		Įrenginio klasė
+Input device controller	Device		Įvesties įrenginių valdiklis
+Serial bus controller	Device		Nuosekliosios magistralės valdiklis
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Bevielio tinklo valdiklis
+Device name	DeviceACPI		Įrenginio pavadinimas
+Report compatibility	DevicesView		Pranešti apie suderinamumą
+Computer	Device		Kompiuteris
+Enclosure	DeviceSCSI		Kasetė
+PCI bus	Device		PCI magistralė
+ISA bus	Device		ISA magistralė
+ISA bus	DevicesView		ISA magistralė
+Manufacturer	DevicePCI		Gamintojas
+Bridge	DeviceSCSI		Tiltas
+Device name	DeviceSCSI		Įrenginio pavadinimas
+Array	DeviceSCSI		Masyvas
 Network controller	Device		Tinklo valdiklis
 Driver used	Device		Naudojama tvarkyklė
 Communication controller	Device		Ryšio įrenginių valdiklis
-ACPI bus	Device		ACPI magistralė
 unknown	Device		nežinoma

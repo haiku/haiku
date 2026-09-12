@@ -1,71 +1,71 @@
 1	spanish; castilian	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		Bus ACPI
-Encryption controller	Device		Controlador de cifrado
-Devices	System name		Dispositivos
 USB bus	DevicesView		Bus USB
-Processor	Device		Procesador
-Generate system information	DevicesView		Generar información del sistema
 Class info	DevicePCI		Información de clase
 USB bus	Device		Bus USB
-Computer	DevicesView		Computadora
 Communications	DeviceSCSI		Comunicaciones
 Mass storage controller	Device		Controlador de almacenamiento masivo
 Printer	DeviceSCSI		Impresora
-Connection	DevicesView		Conexión
 Manufacturer	Device		Fabricante
-Scanner	DeviceSCSI		Escáner
 Memory controller	Device		Controlador de memoria
 Unknown device	DevicesView		Dispositivo desconocido
-ACPI node '%1'	DeviceACPI		Nodo ACPI '%1'
 Name	PropertyList		Nombre
 Manufacturer	DeviceSCSI		Fabricante
-Device name	Device		Nombre de dispositivo
 Satellite communications controller	Device		Controlador de comunicaciones de satélite
-Device class	DeviceSCSI		Clase de dispositivo
-Device	Device		Dispositivo
-Input device controller	Device		Controlador de dispisitivo de entrada
 PCI bus	DevicesView		Bus PCI
+Device	Device		Dispositivo
 Changer	DeviceSCSI		Cambiador
-Serial bus controller	Device		Controlador de bus serial
-Refresh devices	DevicesView		Actualizar dispositivos
 Category	DevicesView		Categoría
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Dispositivo desconocido
+Refresh devices	DevicesView		Actualizar dispositivos
 Device paths	Device		Rutas de Dispositivo
-Wireless controller	Device		Controlador inalámbrico
-Generic system peripheral	Device		Sistema periférico genérico
+Unknown device	Device		Dispositivo desconocido
 Value	PropertyList		Valor
+Generic system peripheral	Device		Sistema periférico genérico
 Devices	DevicesView		Dispositivos
-Device name	DeviceACPI		Nombre de dispositivo
 Display controller	Device		Controlador de pantalla
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nombre de dispositivo
 Other	DeviceSCSI		Otro
-Report compatibility	DevicesView		Reporte de compatibilidad
-Computer	Device		Computadora
-PCI bus	Device		Bus PCI
-Enclosure	DeviceSCSI		Anexo
 Order by:	DevicesView		Ordenar por:
 Intelligent controller	Device		Controlador inteligente
 Multimedia controller	Device		Controlador multimedia
 Quit	DevicesView		Salir
-ISA bus	Device		Bus ISA
-ISA bus	DevicesView		Bus ISA
 Processor	DeviceSCSI		Procesador
 Bridge	Device		Puente
 Worm	DeviceSCSI		Gusano
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Controlador de procesamiento de señal
+Docking station	Device		Estación de acoplamiento
+Unclassified device	Device		Dispositivo sin clasificar
+ACPI controller	Device		Controlador ACPI
+ACPI bus	Device		Bus ACPI
+Encryption controller	Device		Controlador de cifrado
+Devices	System name		Dispositivos
+Generate system information	DevicesView		Generar información del sistema
+Processor	Device		Procesador
+Computer	DevicesView		Computadora
+Connection	DevicesView		Conexión
+Scanner	DeviceSCSI		Escáner
+ACPI node '%1'	DeviceACPI		Nodo ACPI '%1'
+Device name	Device		Nombre de dispositivo
+Device class	DeviceSCSI		Clase de dispositivo
+Input device controller	Device		Controlador de dispisitivo de entrada
+Serial bus controller	Device		Controlador de bus serial
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Controlador inalámbrico
+Device name	DeviceACPI		Nombre de dispositivo
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
+Report compatibility	DevicesView		Reporte de compatibilidad
+Computer	Device		Computadora
+Enclosure	DeviceSCSI		Anexo
+PCI bus	Device		Bus PCI
+ISA bus	Device		Bus ISA
+ISA bus	DevicesView		Bus ISA
 Manufacturer	DevicePCI		Fabricante
 Bridge	DeviceSCSI		Puente
-Signal processing controller	Device		Controlador de procesamiento de señal
 Device name	DeviceSCSI		Nombre de dispositivo
-Docking station	Device		Estación de acoplamiento
 Array	DeviceSCSI		Arreglo
-Unclassified device	Device		Dispositivo sin clasificar
 Manufacturer	DeviceACPI		Fabricante
-ACPI controller	Device		Controlador ACPI
 Network controller	Device		Controlador de red
 Driver used	Device		Controlador utilizado
 Communication controller	Device		Controlador de communicaciones
-ACPI bus	Device		Bus ACPI
 unknown	Device		desconocido

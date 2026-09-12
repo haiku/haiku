@@ -1,71 +1,71 @@
 1	dutch; flemish	x-vnd.Haiku-Devices	1374585159
 ACPI bus	DevicesView		ACPI-bus
-Encryption controller	Device		Encryptie-controller
-Devices	System name		Devices
 USB bus	DevicesView		USB-bus
-Processor	Device		Processor
-Generate system information	DevicesView		Genereer systeeminformatie
 Class info	DevicePCI		Klasse info
 USB bus	Device		USB-bus
-Computer	DevicesView		Computer
 Communications	DeviceSCSI		Communicaties
 Mass storage controller	Device		Massa-opslagcontroller
 Printer	DeviceSCSI		Printer
-Connection	DevicesView		Verbinding
 Manufacturer	Device		Fabrikant
-Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Geheugencontroller
 Unknown device	DevicesView		Onbekend apparaat
-ACPI node '%1'	DeviceACPI		ACPI-node '%1'
 Name	PropertyList		Naam
 Manufacturer	DeviceSCSI		Fabrikant
-Device name	Device		Apparaatnaam
 Satellite communications controller	Device		Satellietcommunicatie-controller
-Device class	DeviceSCSI		Apparaatklasse
-Device	Device		Apparaat
-Input device controller	Device		Inputapparaat-controller
 PCI bus	DevicesView		PCI-bus
+Device	Device		Apparaat
 Changer	DeviceSCSI		Wisselaar
-Serial bus controller	Device		Seriële-bus-controller
-Refresh devices	DevicesView		Apparaten her-initialiseren
 Category	DevicesView		Categorie
-RBC	DeviceSCSI		RBC
-Unknown device	Device		Onbekend apparaat
+Refresh devices	DevicesView		Apparaten her-initialiseren
 Device paths	Device		Apparaatpaden
-Wireless controller	Device		Draadloze controller
-Generic system peripheral	Device		Generiek systeem-randapparaat
+Unknown device	Device		Onbekend apparaat
 Value	PropertyList		Waarde
+Generic system peripheral	Device		Generiek systeem-randapparaat
 Devices	DevicesView		Devices
-Device name	DeviceACPI		Apparaatnaam
 Display controller	Device		Displaycontroller
-ACPI <unknown>	DeviceACPI		ACPI <onbekend>
 Device name	DevicePCI		Apparaatnaam
 Other	DeviceSCSI		Andere
-Report compatibility	DevicesView		Rapporteer compatibiliteit
-Computer	Device		Computer
-PCI bus	Device		PCI-bus
-Enclosure	DeviceSCSI		Behuizing
 Order by:	DevicesView		Rangschik op:
 Intelligent controller	Device		Intelligente controller
 Multimedia controller	Device		Multimedia-controller
 Quit	DevicesView		Afsluiten
-ISA bus	Device		ISA-bus
-ISA bus	DevicesView		ISA-bus
 Processor	DeviceSCSI		Processor
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
+Signal processing controller	Device		Signaalverwerkings-controller 
+Docking station	Device		Dockingstation
+Unclassified device	Device		Ongeclassificeerd apparaat
+ACPI controller	Device		ACPI-controller
+ACPI bus	Device		ACPI bus
+Encryption controller	Device		Encryptie-controller
+Devices	System name		Devices
+Generate system information	DevicesView		Genereer systeeminformatie
+Processor	Device		Processor
+Computer	DevicesView		Computer
+Connection	DevicesView		Verbinding
+Scanner	DeviceSCSI		Scanner
+ACPI node '%1'	DeviceACPI		ACPI-node '%1'
+Device name	Device		Apparaatnaam
+Device class	DeviceSCSI		Apparaatklasse
+Input device controller	Device		Inputapparaat-controller
+Serial bus controller	Device		Seriële-bus-controller
+RBC	DeviceSCSI		RBC
+Wireless controller	Device		Draadloze controller
+Device name	DeviceACPI		Apparaatnaam
+ACPI <unknown>	DeviceACPI		ACPI <onbekend>
+Report compatibility	DevicesView		Rapporteer compatibiliteit
+Computer	Device		Computer
+Enclosure	DeviceSCSI		Behuizing
+PCI bus	Device		PCI-bus
+ISA bus	Device		ISA-bus
+ISA bus	DevicesView		ISA-bus
 Manufacturer	DevicePCI		Fabrikant
 Bridge	DeviceSCSI		Bridge
-Signal processing controller	Device		Signaalverwerkings-controller 
 Device name	DeviceSCSI		Apparaatnaam
-Docking station	Device		Dockingstation
 Array	DeviceSCSI		Array
-Unclassified device	Device		Ongeclassificeerd apparaat
 Manufacturer	DeviceACPI		Fabrikant
-ACPI controller	Device		ACPI-controller
 Network controller	Device		Netwerkcontroller
 Driver used	Device		Gebruikte driver
 Communication controller	Device		Communicatie-controller
-ACPI bus	Device		ACPI bus
 unknown	Device		onbekend
