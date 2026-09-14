@@ -18,6 +18,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#include <socket_defs.h>
 #include <syscall_utils.h>
 
 #include <syscalls.h>
@@ -189,15 +190,8 @@ listen(int socket, int backlog)
 }
 
 
-extern "C" int
-accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
-{
-	return accept4(socket, _address, _addressLength, 0);
-}
-
-
-extern "C" int
-accept4(int socket, struct sockaddr *_address, socklen_t *_addressLength, int flags)
+static int
+_accept(int socket, struct sockaddr *_address, socklen_t *_addressLength, int flags)
 {
 	bool r5compatible = check_r5_compatibility();
 	struct sockaddr haikuAddr;
@@ -230,6 +224,20 @@ accept4(int socket, struct sockaddr *_address, socklen_t *_addressLength, int fl
 		*_addressLength = addressLength;
 
 	return acceptSocket;
+}
+
+
+extern "C" int
+accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
+{
+	return _accept(socket, _address, _addressLength, SOCK_INHERIT);
+}
+
+
+extern "C" int
+accept4(int socket, struct sockaddr *_address, socklen_t *_addressLength, int flags)
+{
+	return _accept(socket, _address, _addressLength, flags);
 }
 
 
