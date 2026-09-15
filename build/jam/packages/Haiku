@@ -54,6 +54,7 @@ AddFilesToPackage add-ons kernel busses random :
 AddFilesToPackage add-ons kernel busses scsi :
 	ahci
 	hyperv_scsi@x86,x86_64
+	ufshci
 	virtio_scsi
 	;
 AddFilesToPackage add-ons kernel busses usb :
@@ -350,6 +351,7 @@ AddBootModuleSymlinksToPackage
 	silicon_image_3112
 	smbios@x86,x86_64
 	sdhci
+	ufshci
 	usb
 	usb_disk
 	<usb>ehci

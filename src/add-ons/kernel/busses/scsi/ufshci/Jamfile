@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel busses scsi ufshci ;
+
+UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+
+KernelAddon ufshci :
+    ufshci.cpp
+    ufshci_sim.cpp
+    ufshci_controller.cpp
+;
