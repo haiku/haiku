@@ -15,6 +15,7 @@
 #include "console.h"
 #include "keyboard.h"
 
+
 class ConsoleHandle : public CharHandle {
 	public:
 		ConsoleHandle();
@@ -152,7 +153,7 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 		if (string[i] == '\0')
 			break;
 		if (string[i] == '\n') {
-			//Text(&gScreen->RastPort, &string[i - len], len);
+			//AtariText(&gScreen->RastPort, &string[i - len], len);
 			fX = 0;
 			fY++;
 			if (fY >= console_height())
@@ -161,7 +162,7 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 			console_set_cursor(fX, fY);
 			continue;
 		}
-		Text(&gScreen->RastPort, &string[i], 1);
+		AtariText(&gScreen->RastPort, &string[i], 1);
 	}
 
 	// not exactly, but we don't care...
@@ -172,8 +173,8 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 void
 ConsoleHandle::Clear()
 {
-	Move(&gScreen->RastPort, 0, sScreenTopOffset);
-	ClearScreen(&gScreen->RastPort);
+	AtariMove(&gScreen->RastPort, 0, sScreenTopOffset);
+	AtariClearScreen(&gScreen->RastPort);
 }
 
 
@@ -182,7 +183,7 @@ ConsoleHandle::MoveTo(int16 x, int16 y)
 {
 	fX = x;
 	fY = y;
-	Move(&gScreen->RastPort, sFontWidth * x,
+	AtariMove(&gScreen->RastPort, sFontWidth * x,
 		sFontHeight * y + sScreenTopOffset);
 	// why do I have to add this to keep the title ?
 	
@@ -192,8 +193,8 @@ ConsoleHandle::MoveTo(int16 x, int16 y)
 void
 ConsoleHandle::SetColor(int32 foreground, int32 background)
 {
-	SetAPen(&gScreen->RastPort, foreground);
-	SetBPen(&gScreen->RastPort, background);
+	AtariSetAPen(&gScreen->RastPort, foreground);
+	AtariSetBPen(&gScreen->RastPort, background);
 }
 
 
@@ -298,12 +299,12 @@ ConsoleDevice::WaitForKey()
 {
 	char ascii;
 	
-	if (Read(&ascii, 1) < 1)
+	if (ReadAt(NULL, 0, &ascii, 1) < 1)
 		return TEXT_CONSOLE_NO_KEY;
 	//dprintf("ascii %d %c\n", ascii, ascii);
 
 	if (ascii == (char)0x9b) {
-		if (Read(&ascii, 1) < 1)
+		if (ReadAt(NULL, 0, &ascii, 1) < 1)
 			return TEXT_CONSOLE_NO_KEY;
 		//dprintf(">ascii %d %c\n", ascii, ascii);
 		switch (ascii) {
@@ -317,16 +318,16 @@ ConsoleDevice::WaitForKey()
 				return TEXT_CONSOLE_KEY_RIGHT;
 			case '4':
 			{
-				if (Read(&ascii, 1) < 1)
+				if (ReadAt(NULL, 0, &ascii, 1) < 1)
 					return TEXT_CONSOLE_NO_KEY;
 				if (ascii == '~')
 					return TEXT_CONSOLE_NO_KEY;
 				switch (ascii) {
 					case '1':
-						Read(&ascii, 1); // ~
+						ReadAt(NULL, 0, &ascii, 1); // ~
 						return TEXT_CONSOLE_KEY_PAGE_UP;
 					case '2':
-						Read(&ascii, 1); // ~
+						ReadAt(NULL, 0, &ascii, 1); // ~
 						return TEXT_CONSOLE_KEY_PAGE_UP;
 					default:
 						return TEXT_CONSOLE_NO_KEY;
@@ -469,7 +470,7 @@ KeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			return err;
 	} while (event.ie_Code > IECODE_UP_PREFIX);
 
-	actual = MapRawKey(&event, (char *)buffer, bufferSize, NULL);
+	actual = AtariMapRawKey(&event, (char *)buffer, bufferSize, NULL);
 	//dprintf("%s actual %d\n", __FUNCTION__, actual);
 	if (actual > 0) {
 		return actual;
@@ -511,7 +512,7 @@ KeyboardDevice::WaitForKey()
 			break;
 	}
 	
-	actual = MapRawKey(&event, &ascii, 1, NULL);
+	actual = AtariMapRawKey(&event, &ascii, 1, NULL);
 	//dprintf("%s actual %d\n", __FUNCTION__, actual);
 	if (actual > 0)
 		return ascii;
@@ -558,7 +559,7 @@ LLKeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSiz
 	uint32 key;
 	
 	
-	key = GetKey();
+	key = AtariGetKey();
 	if (key & 0x0000ffff == 0x0ff)
 		return B_ERROR;
 	event.ie_Class = IECLASS_RAWKEY;
@@ -566,7 +567,7 @@ LLKeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSiz
 	event.ie_Code = (uint16)(key & 0x0000ffff);
 	event.ie_Qualifier = (key & 0xffff0000) >> 16;
 
-	actual = MapRawKey(&event, (char *)buffer, bufferSize, NULL);
+	actual = AtariMapRawKey(&event, (char *)buffer, bufferSize, NULL);
 	//dprintf("%s actual %d\n", __FUNCTION__, actual);
 	if (actual > 0) {
 		return actual;
@@ -585,7 +586,7 @@ LLKeyboardDevice::WaitForKey()
 	status_t err;
 	
 	do {
-		key = GetKey();
+		key = AtariGetKey();
 	} while (key & 0x0000ffff == 0x0ff);
 
 	event.ie_Class = IECLASS_RAWKEY;
@@ -610,7 +611,7 @@ LLKeyboardDevice::WaitForKey()
 			break;
 	}
 	
-	actual = MapRawKey(&event, &ascii, 1, NULL);
+	actual = AtariMapRawKey(&event, &ascii, 1, NULL);
 	//dprintf("%s actual %d\n", __FUNCTION__, actual);
 	if (actual > 0)
 		return ascii;
@@ -664,16 +665,16 @@ console_init(void)
 	if (gScreen == NULL)
 		panic("OpenScreen()\n");
 	
-	LoadRGB4(&gScreen->ViewPort, kPalette, 16);
+	AtariLoadRGB4(&gScreen->ViewPort, kPalette, 16);
 	
-	SetDrMd(&gScreen->RastPort, JAM2);
+	AtariSetDrMd(&gScreen->RastPort, JAM2);
 	
 	// seems not necessary, there is a default font already set.
 	/*
 	TextAttr attrs = { "Topaz", 8, 0, 0};
 	TextFont *font = OpenFont(&attrs);
 	*/
-	TextFont *font = OpenFont(gScreen->Font);
+	TextFont *font = AtariOpenFont(gScreen->Font);
 	if (font == NULL)
 		panic("OpenFont()\n");
 	sFontHeight = gScreen->Font->ta_YSize;
@@ -682,7 +683,7 @@ console_init(void)
 	sScreenTopOffset = gScreen->BarHeight * 2; // ???
 
 	
-	//ClearScreen(&gScreen->RastPort);
+	//AtariClearScreen(&gScreen->RastPort);
 
 	
 	err = sDebugOutput.Open();

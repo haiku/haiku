@@ -116,20 +116,20 @@ video_mode_menu()
 */
 #if 1
 	uint32 modeID = INVALID_ID;
-	while ((modeID = NextDisplayInfo(modeID)) != INVALID_ID) {
-		//DisplayInfoHandle handle = FindDisplayInfo(modeID);
+	while ((modeID = AtariNextDisplayInfo(modeID)) != INVALID_ID) {
+		//DisplayInfoHandle handle = AtariFindDisplayInfo(modeID);
 		//if (handle == NULL)
 		//	continue;
 		struct DisplayInfo info;
 		struct DimensionInfo dimension;
 		struct NameInfo name;
-		if (GetDisplayInfoData(NULL, (uint8 *)&info, sizeof(info),
+		if (AtariGetDisplayInfoData(NULL, (uint8 *)&info, sizeof(info),
 			DTAG_DISP, modeID) < 48/*sizeof(struct DisplayInfo)*/)
 			continue;
-		if (GetDisplayInfoData(NULL, (uint8 *)&dimension, sizeof(dimension),
+		if (AtariGetDisplayInfoData(NULL, (uint8 *)&dimension, sizeof(dimension),
 			DTAG_DIMS, modeID) < 66)
 			continue;
-		/*if (GetDisplayInfoData(NULL, (uint8 *)&name, sizeof(name),
+		/*if (AtariGetDisplayInfoData(NULL, (uint8 *)&name, sizeof(name),
 			DTAG_NAME, modeID) < sizeof(name) - 8)
 			continue;*/
 		if (info.NotAvailable)

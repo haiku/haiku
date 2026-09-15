@@ -1267,51 +1267,51 @@ struct TextFont {
 
 extern struct GfxBase *GRAPHICS_BASE_NAME;
 
-#define ClearScreen(last) \
+#define AtariClearScreen(last) \
 	LP1NR(0x30, ClearScreen, struct RastPort *, last, a1, \
 	, GRAPHICS_BASE_NAME)
 
-#define Text(par1, par2, last) \
+#define AtariText(par1, par2, last) \
 	LP3(0x3c, int32, Text, struct RastPort *, par1, a1, const char *, par2, a0, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define SetFont(par1, last) \
+#define AtariSetFont(par1, last) \
 	LP2(0x42, int32, SetFont, struct RastPort *, par1, a1, struct TextFont *, last, a0, \
 	, GRAPHICS_BASE_NAME)
 
-#define OpenFont(last) \
+#define AtariOpenFont(last) \
 	LP1(0x48, struct TextFont *, OpenFont, struct TextAttr *, last, a0, \
 	, GRAPHICS_BASE_NAME)
 
-#define LoadRGB4(par1, par2, last) \
+#define AtariLoadRGB4(par1, par2, last) \
 	LP3NR(0xc0, LoadRGB4, struct ViewPort *, par1, a0, const uint16 *, par2, a1, long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define Move(par1, par2, last) \
+#define AtariMove(par1, par2, last) \
 	LP3NR(0xf0, Move, struct RastPort *, par1, a1, long, par2, d0, long, last, d1, \
 	, GRAPHICS_BASE_NAME)
 
-#define SetAPen(par1, last) \
+#define AtariSetAPen(par1, last) \
 	LP2NR(0x156, SetAPen, struct RastPort *, par1, a1, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define SetBPen(par1, last) \
+#define AtariSetBPen(par1, last) \
 	LP2NR(0x15c, SetBPen, struct RastPort *, par1, a1, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define SetDrMd(par1, last) \
+#define AtariSetDrMd(par1, last) \
 	LP2NR(0x162, SetDrMd, struct RastPort *, par1, a1, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define FindDisplayInfo(last) \
+#define AtariFindDisplayInfo(last) \
 	LP1(0x2d6, DisplayInfoHandle, FindDisplayInfo, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define NextDisplayInfo(last) \
+#define AtariNextDisplayInfo(last) \
 	LP1(0x2dc, uint32, NextDisplayInfo, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
-#define GetDisplayInfoData(par1, par2, par3, par4, last) \
+#define AtariGetDisplayInfoData(par1, par2, par3, par4, last) \
 	LP5(0x2f4, uint32, GetDisplayInfoData, DisplayInfoHandle, par1, a0, uint8 *, par2, a1, unsigned long, par3, d0, unsigned long, par4, d1, unsigned long, last, d2, \
 	, GRAPHICS_BASE_NAME)
 
@@ -1544,7 +1544,7 @@ struct ConUnit {
 #define KEYMAPNAME "keymap.library"
 
 #ifndef __ASSEMBLER__
-#define MapRawKey(par1, par2, par3, last) \
+#define AtariMapRawKey(par1, par2, par3, last) \
 	LP4(0x2a, int16, MapRawKey, struct InputEvent *, par1, a0, char *, par2, a1, long, par3, d1, struct KeyMap *, last, a2, \
 	, KEYMAP_BASE_NAME)
 
@@ -1562,11 +1562,11 @@ extern struct Library *KEYMAP_BASE_NAME;
 
 #ifndef __ASSEMBLER__
 
-#define GetKey() \
+#define AtariGetKey() \
 	LP0(0x30, uint32, GetKey, \
 	, LOWLEVEL_BASE_NAME)
 
-#define QueryKeys(par1, last) \
+#define AtariQueryKeys(par1, last) \
 	LP2NR(0x36, QueryKeys, struct KeyQuery *, par1, a0, unsigned long, last, d1, \
 	, LOWLEVEL_BASE_NAME)
 
