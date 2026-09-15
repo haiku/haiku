@@ -10,6 +10,12 @@
 #include <module.h>
 
 
+typedef struct {
+	uint8 port_index; // 0 based
+	char port_name[24];
+} midi_device_port_info;
+
+
 /* deprecated interface */
 enum {
 	B_MIDI_GET_READ_TIMEOUT = B_MIDI_DRIVER_BASE,
@@ -18,8 +24,9 @@ enum {
 	B_MIDI_TIMED_WRITE,
 	B_MIDI_WRITE_SYNC,
 	B_MIDI_WRITE_CLEAR,
-	B_MIDI_GET_READ_TIMEOUT_OLD	= B_DEVICE_OP_CODES_END + 1,
-	B_MIDI_SET_READ_TIMEOUT_OLD
+	B_MIDI_GET_READ_TIMEOUT_OLD = B_DEVICE_OP_CODES_END + 1,
+	B_MIDI_SET_READ_TIMEOUT_OLD,
+	B_MIDI_GET_PORT_INFO // see midi_device_port_info
 };
 
 

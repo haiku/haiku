@@ -76,6 +76,7 @@ typedef struct usbmidi_device_info
 {
 	/* Set of actual ports ("cables" -- one or more) */
 	struct usbmidi_port_info* ports[16];
+	uint8 port_count;
 
 	/* maintain device  (common for all ports) */
 	sem_id sem_lock;
@@ -88,8 +89,7 @@ typedef struct usbmidi_device_info
 	const usb_device* dev;
 	uint16 ifno;
 	int devnum;	/* unique device number */
-	char name[20];
-		/* = "/dev/midi/usb/n" --port number will be appended to this */
+	char name[24]; // = "/dev/midi/usb/n", "/port_number" will be appended as leaf
 
 	bool active;
 
@@ -102,6 +102,12 @@ typedef struct usbmidi_device_info
 
 	bigtime_t timestamp;	/* Is this needed? Currently set but never read */
 	uint flags;				/* set to 0 but never used */
+
+	uint16 vendor_id;
+	uint16 product_id;
+	char manufacturer_name[64];
+	char product_name[64];
+	char serial_number[64];
 } usbmidi_device_info;
 
 
@@ -130,7 +136,7 @@ typedef struct usbmidi_port_info
  usb_midi.cpp
 */
 
-extern usb_module_info* usb;
+extern usb_module_info* gUSBModule;
 extern const char* usb_midi_base_name;
 
 extern usbmidi_port_info* create_usbmidi_port(usbmidi_device_info* devinfo,
