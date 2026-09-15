@@ -74,20 +74,10 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 
 status_t 
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier *defaultDiskID)
 {
-	disk_identifier disk_ident;
-        disk_ident.bus_type = UNKNOWN_BUS;
-        disk_ident.device_type = UNKNOWN_DEVICE;
-        disk_ident.device.unknown.size = device->Size();
-
-        for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
-                disk_ident.device.unknown.check_sums[i].offset = -1;
-                disk_ident.device.unknown.check_sums[i].sum = 0;
-        }
-
 	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
-		&disk_ident, sizeof(disk_ident));
+		defaultDiskID, sizeof(disk_identifier));
 
 	return B_OK;
 }

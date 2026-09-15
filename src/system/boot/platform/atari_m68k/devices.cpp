@@ -1223,7 +1223,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 
 status_t 
-platform_register_boot_device(Node *device)
+platform_register_boot_device(Node *device, disk_identifier *defaultDiskID)
 {
 	BlockHandle *drive = (BlockHandle *)device;
 
@@ -1233,7 +1233,7 @@ platform_register_boot_device(Node *device)
 
 	gBootParams.SetInt64("boot drive number", drive->DriveID());
 	gBootParams.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
-		&drive->Identifier(), sizeof(disk_identifier));
+		defaultDiskID, sizeof(disk_identifier));
 
 	return B_OK;
 }
