@@ -12,9 +12,9 @@
 #include "usbhdr.h"
 
 
-static void
+static inline void
 usb_get_class_info(uint8 usb_class_base_id, uint8 usb_class_sub_id, uint8 usb_class_proto_id,
-	char *classInfo, size_t size)
+	char* classInfo, size_t size)
 {
 	USB_CLASSCODETABLE *foundItem = NULL;
 	int i;
@@ -36,8 +36,8 @@ usb_get_class_info(uint8 usb_class_base_id, uint8 usb_class_sub_id, uint8 usb_cl
 }
 
 
-void
-usb_get_vendor_info(uint16 vendorID, const char **vendorName)
+static inline void
+usb_get_vendor_info(uint16 vendorID, const char** vendorName)
 {
 	int i;
 	for (i = 0; i < (int)USB_VENTABLE_LEN; i++) {
@@ -51,8 +51,8 @@ usb_get_vendor_info(uint16 vendorID, const char **vendorName)
 }
 
 
-void
-usb_get_device_info(uint16 vendorID, uint16 deviceID, const char **deviceName)
+static inline void
+usb_get_device_info(uint16 vendorID, uint16 deviceID, const char** deviceName)
 {
 	int i;
 	// search for the device

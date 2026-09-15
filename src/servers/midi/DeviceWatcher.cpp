@@ -20,24 +20,35 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <IconUtils.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <drivers/Drivers.h>
 
-using std::nothrow;
+#include "midi_driver.h"
 
+
+using std::nothrow;
 using namespace BPrivate;
 using BPrivate::HashMap;
 using BPrivate::HashString;
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "midi_server"
+
 const char *kDevicesRoot = "/dev/midi";
+
+const char* kInput = B_TRANSLATE("In");
+const char* kOutput = B_TRANSLATE("Out");
 
 
 class DeviceEndpoints {
@@ -310,11 +321,51 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 	// add device path to endpoint properties
 	msg.AddString("device", path);
 
-	char name[B_FILE_NAME_LENGTH];
-	if (ioctl(fd, B_GET_DEVICE_NAME, name, sizeof(name)) == B_OK) {
+	// try to get more info about this device
+	// - product name?
+	// - serial number? (helpful to detect a device whatever USB port is connected on
+	// - port name (when device has multiple ports)
+	// - vendor name
+
+	const char* productName = NULL;
+
+	BString deviceName;
+	BString portName;
+
+	char value[B_FILE_NAME_LENGTH];
+	if (ioctl(fd, B_GET_DEVICE_NAME, value, sizeof(value)) == B_OK) {
 		// device has a custom, probably more user-friendly name
 		// use it instead of the device path
-		endpoint->SetName(name);
+		deviceName.SetTo(value);
+		productName = deviceName.String(); // use the name returned by the driver
+	}
+
+	if (ioctl(fd, B_GET_DEVICE_SERIAL_NUMBER, value, sizeof(value)) == B_OK)
+		msg.AddString("device:serial_number", value);
+
+	midi_device_port_info portInfo;
+	if (ioctl(fd, B_MIDI_GET_PORT_INFO, &portInfo, sizeof(portInfo)) == B_OK) {
+		msg.AddUInt8("device:port_index", portInfo.port_index);
+		portName.SetTo(portInfo.port_name);
+	}
+
+	if (productName) {
+		// build a more userfriendly endpoint name than the device path
+		BString endpointName;
+
+		if (!portName.IsEmpty()) {
+			endpointName.SetTo(B_TRANSLATE_COMMENT("%product_name% port %port_name% %in/out%",
+				"Endpoint name (multi-ports device)"));
+		} else {
+			endpointName.SetTo(B_TRANSLATE_COMMENT("%product_name% %in/out%",
+				"Endpoint name (single port device)."));
+		}
+
+		endpointName.ReplaceAll("%product_name%", productName);
+		endpointName.ReplaceAll("%port_name%", portName);
+		endpointName.ReplaceAll("%in/out%", endpoint->IsConsumer() ? kInput : kOutput);
+
+		endpoint->SetName(endpointName);
 	}
 
 	// icon(s)
