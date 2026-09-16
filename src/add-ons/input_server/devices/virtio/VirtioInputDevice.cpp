@@ -14,10 +14,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ATKeymap.h>
 #include <Application.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <EvdevKeymap.h>
 #include <ObjectList.h>
 #include <Path.h>
 
@@ -363,6 +363,7 @@ VirtioInputHandler::Watcher(void *arg)
 KeyboardHandler::KeyboardHandler(VirtioInputDevice* dev, const char* name)
 	:
 	VirtioInputHandler(dev, name, B_KEYBOARD_DEVICE),
+	fPendingUnmappedCount(0),
 	fRepeatThread(-1),
 	fRepeatThreadSem(-1)
 {
@@ -398,6 +399,7 @@ KeyboardHandler::Reset()
 {
 	memset(&fNewState, 0, sizeof(KeyboardState));
 	memcpy(&fState, &fNewState, sizeof(KeyboardState));
+	fPendingUnmappedCount = 0;
 	_StopRepeating();
 }
 
@@ -440,12 +442,15 @@ KeyboardHandler::PacketReceived(const VirtioInputPacket &pkt)
 #endif
 	switch (pkt.type) {
 		case kVirtioInputEvKey: {
-			if (pkt.code == 0 || pkt.code > B_COUNT_OF(kATKeycodeMap))
+			uint32 code = evdev_to_haiku_keymap(pkt.code);
+			if (code == 0)
 				break;
-
-			uint32 code = kATKeycodeMap[pkt.code - 1];
 			if (code < 128)
-				SetBitTo(fNewState.keys[code / 8], code % 8, pkt.value != 0);
+				SetBitTo(fNewState.keys[code / 8], 7 - (code % 8), pkt.value != 0);
+			else if (fPendingUnmappedCount < B_COUNT_OF(fPendingUnmappedKeys)) {
+				fPendingUnmappedKeys[fPendingUnmappedCount] = code;
+				fPendingUnmappedPressed[fPendingUnmappedCount++] = pkt.value != 0;
+			}
 			break;
 		}
 		case kVirtioInputEvSyn: {
@@ -459,13 +464,14 @@ KeyboardHandler::PacketReceived(const VirtioInputPacket &pkt)
 bool
 KeyboardHandler::_IsKeyPressed(const KeyboardState &state, uint32 key)
 {
-	return key < 256 && IsBitSet(state.keys[key / 8], key % 8);
+	return key < 256 && IsBitSet(state.keys[key / 8], 7 - (key % 8));
 }
 
 
 void
 KeyboardHandler::_KeyString(uint32 code, char *str, size_t len)
 {
+	// TODO: This could get replaced by BKeymap::GetChars.
 	char *ch;
 	switch (fNewState.modifiers & (
 		B_SHIFT_KEY | B_CONTROL_KEY | B_OPTION_KEY | B_CAPS_LOCK)) {
@@ -564,6 +570,62 @@ KeyboardHandler::_RepeatThread(void *arg)
 }
 
 
+status_t
+KeyboardHandler::_SendKeyEvent(uint32 key, bool pressed)
+{
+	char str[5];
+	str[0] = '\0';
+	if (key < 128)
+		_KeyString(key, str, sizeof(str));
+
+	ObjectDeleter<BMessage> msg(new(std::nothrow) BMessage());
+	if (msg.IsSet()) {
+		msg->AddInt64("when", system_time());
+		msg->AddInt32("key", key);
+		msg->AddInt32("modifiers", fNewState.modifiers);
+		msg->AddData("states", B_UINT8_TYPE, fNewState.keys, 16);
+
+		if (str[0] != '\0') {
+			char rawCh;
+			if (fChars.Get()[fKeyMap->normal_map[key]] != 0)
+				rawCh = fChars.Get()[fKeyMap->normal_map[key] + 1];
+			else
+				rawCh = str[0];
+
+			for (uint8 i = 0; str[i] != '\0'; ++i)
+				msg->AddInt8("byte", str[i]);
+
+			msg->AddString("bytes", str);
+			msg->AddInt32("raw_char", rawCh);
+		}
+
+		if (pressed) {
+			if (str[0] != '\0')
+				msg->what = B_KEY_DOWN;
+			else
+				msg->what = B_UNMAPPED_KEY_DOWN;
+
+			msg->AddInt32("be:key_repeat", 1);
+			_StartRepeating(msg.Get());
+		} else {
+			if (str[0] != '\0')
+				msg->what = B_KEY_UP;
+			else
+				msg->what = B_UNMAPPED_KEY_UP;
+
+			_StopRepeating();
+		}
+
+		status_t err = Device()->EnqueueMessage(msg.Get());
+		if (err >= B_OK)
+			msg.Detach();
+		return err;
+	}
+
+	return B_ERROR;
+}
+
+
 void
 KeyboardHandler::_StateChanged()
 {
@@ -571,6 +633,7 @@ KeyboardHandler::_StateChanged()
 
 	fNewState.modifiers = fState.modifiers
 		& (B_CAPS_LOCK | B_SCROLL_LOCK | B_NUM_LOCK);
+
 	if (_IsKeyPressed(fNewState, fKeyMap->left_shift_key))
 		fNewState.modifiers |= B_SHIFT_KEY   | B_LEFT_SHIFT_KEY;
 	if (_IsKeyPressed(fNewState, fKeyMap->right_shift_key))
@@ -614,61 +677,33 @@ KeyboardHandler::_StateChanged()
 
 
 	uint8 diff[16];
-	char rawCh;
-	char str[5];
-
 	for (i = 0; i < 16; ++i)
 		diff[i] = fState.keys[i] ^ fNewState.keys[i];
 
+	// Mapped keys
 	for (i = 0; i < 128; ++i) {
-		if (diff[i/8] & (1 << (i % 8))) {
-			ObjectDeleter<BMessage> msg(new(std::nothrow) BMessage());
-			if (msg.IsSet()) {
-				_KeyString(i, str, sizeof(str));
-
-				msg->AddInt64("when", system_time());
-				msg->AddInt32("key", i);
-				msg->AddInt32("modifiers", fNewState.modifiers);
-				msg->AddData("states", B_UINT8_TYPE, fNewState.keys, 16);
-
-				if (str[0] != '\0') {
-					if (fChars.Get()[fKeyMap->normal_map[i]] != 0)
-						rawCh = fChars.Get()[fKeyMap->normal_map[i] + 1];
-					else
-						rawCh = str[0];
-
-					for (j = 0; str[j] != '\0'; ++j)
-						msg->AddInt8("byte", str[j]);
-
-					msg->AddString("bytes", str);
-					msg->AddInt32("raw_char", rawCh);
-				}
-
-				if (fNewState.keys[i / 8] & (1 << (i % 8))) {
-					if (str[0] != '\0')
-						msg->what = B_KEY_DOWN;
-					else
-						msg->what = B_UNMAPPED_KEY_DOWN;
-
-					msg->AddInt32("be:key_repeat", 1);
-					_StartRepeating(msg.Get());
-				} else {
-					if (str[0] != '\0')
-						msg->what = B_KEY_UP;
-					else
-						msg->what = B_UNMAPPED_KEY_UP;
-
-					_StopRepeating();
-				}
-
-				if (Device()->EnqueueMessage(msg.Get()) >= B_OK) {
-					msg.Detach();
-					for (j = 0; j < 16; ++j)
-						fState.keys[j] = fNewState.keys[j];
-				}
+		if (diff[i / 8] & 1 << (7 - i % 8)) {
+			bool pressed = IsBitSet(fNewState.keys[i / 8], 7 - (i % 8));
+			status_t err = _SendKeyEvent(i, pressed);
+			if (err >= B_OK) {
+				for (j = 0; j < 16; ++j)
+					fState.keys[j] = fNewState.keys[j];
+			} else {
+				ERROR("Failed to send key event i=%" B_PRIu32 ", pressed=%d, err=%s\n", i, pressed,
+					strerror(err));
 			}
 		}
 	}
+
+	// Unmapped keys
+	for (uint32 k = 0; k < fPendingUnmappedCount; k++) {
+		status_t err = _SendKeyEvent(fPendingUnmappedKeys[k], fPendingUnmappedPressed[k]);
+		if (err < B_OK) {
+			ERROR("Failed to send key event i=%" B_PRIu32 ", pressed=%d, err=%s\n",
+				fPendingUnmappedKeys[k], fPendingUnmappedPressed[k], strerror(err));
+		}
+	}
+	fPendingUnmappedCount = 0;
 }
 
 
