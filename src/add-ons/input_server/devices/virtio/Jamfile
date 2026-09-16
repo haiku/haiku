@@ -4,4 +4,4 @@ UsePrivateHeaders input virtio shared ;
 
 Addon <input>virtio :
 	VirtioInputDevice.cpp
-	: be input_server [ TargetLibsupc++ ] ;
+	: be input_server shared [ TargetLibsupc++ ] ;

@@ -7,9 +7,7 @@
 
 
 #include <AutoDeleter.h>
-#include <Autolock.h>
-#include <Handler.h>
-#include <InterfaceDefs.h>
+#include <Keymap.h>
 #include <Locker.h>
 #include <add-ons/input_server/InputServerDevice.h>
 
@@ -98,7 +96,6 @@ public:
 private:
 	static	bool			_IsKeyPressed(const KeyboardState& state,
 								uint32 key);
-			void			_KeyString(uint32 code, char* str, size_t len);
 			void			_StartRepeating(BMessage* msg);
 			void			_StopRepeating();
 	static	status_t		_RepeatThread(void* arg);
@@ -112,12 +109,9 @@ private:
 			uint32			fPendingUnmappedKeys[8];
 			bool			fPendingUnmappedPressed[8];
 			uint8			fPendingUnmappedCount;
-			BPrivate::AutoDeleter<key_map, BPrivate::MemoryDelete>
-							fKeyMap;
-			BLocker			fKeyMapLock;
-			BPrivate::AutoDeleter<char, BPrivate::MemoryDelete>
-							fChars;
-
+			uint8			fActiveDeadKey;
+			BKeymap			fKeymap;
+			BLocker         fKeymapLock;
 			bigtime_t		fRepeatDelay;
 			int32			fRepeatRate;
 			thread_id		fRepeatThread;
