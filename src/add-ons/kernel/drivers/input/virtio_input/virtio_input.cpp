@@ -192,7 +192,7 @@ WriteInputPacket(const VirtioInputPacket &pkt)
 static status_t
 QueryConfig(VirtioInputDevice* dev, uint8 select, uint8 subsel, VirtioInputConfig* config)
 {
-	MutexLocker(dev->virtioConfigLock);
+	MutexLocker locker(dev->virtioConfigLock);
 
 	status_t status = dev->virtio->write_device_config(dev->virtioDevice,
 		offsetof(VirtioInputConfig, select), &select, sizeof(select));
