@@ -298,7 +298,7 @@ status_t
 virtio_gpu_detach_backing(virtio_gpu_driver_info* info, int resourceId)
 {
 	CALLED();
-	struct virtio_gpu_resource_detach_backing backing;
+	struct virtio_gpu_resource_detach_backing backing = {};
 	struct virtio_gpu_ctrl_hdr response = {};
 
 	backing.hdr.type = VIRTIO_GPU_CMD_RESOURCE_DETACH_BACKING;
