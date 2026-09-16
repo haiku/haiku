@@ -346,9 +346,11 @@ VirtioInputHandler::Watcher(void *arg)
 		VirtioInputPacket pkt;
 		status_t res = ioctl(handler.fDeviceFd.Get(), virtioInputRead, &pkt,
 			sizeof(pkt));
-		// if (res == B_CANCELED) return B_OK;
-		if (res < B_OK)
-			continue;
+		if (res < B_OK) {
+			if (errno == B_INTERRUPTED)
+				continue;
+			break;
+		}
 		handler.PacketReceived(pkt);
 	}
 	return B_OK;
