@@ -366,6 +366,7 @@ KeyboardHandler::KeyboardHandler(VirtioInputDevice* dev, const char* name)
 	VirtioInputHandler(dev, name, B_KEYBOARD_DEVICE),
 	fPendingUnmappedCount(0),
 	fActiveDeadKey(0),
+	fRepeatKey(0),
 	fRepeatThread(-1),
 	fRepeatThreadSem(-1)
 {
@@ -475,11 +476,19 @@ KeyboardHandler::_StartRepeating(BMessage* msg)
 		_StopRepeating();
 
 	fRepeatMsg = *msg;
+
+	fRepeatThreadSem = create_sem(0, "repeat thread sem");
+	if (fRepeatThreadSem < B_OK)
+		return;
+
 	fRepeatThread = spawn_thread(_RepeatThread, "repeat thread",
 		B_REAL_TIME_DISPLAY_PRIORITY + 4, this);
-	fRepeatThreadSem = create_sem(0, "repeat thread sem");
-	if (fRepeatThread >= B_OK)
-		resume_thread(fRepeatThread);
+	if (fRepeatThread < B_OK) {
+		delete_sem(fRepeatThreadSem);
+		fRepeatThreadSem = -1;
+		return;
+	}
+	resume_thread(fRepeatThread);
 }
 
 
@@ -493,6 +502,7 @@ KeyboardHandler::_StopRepeating()
 		fRepeatThread = -1;
 		delete_sem(fRepeatThreadSem);
 		fRepeatThreadSem = -1;
+		fRepeatKey = 0;
 	}
 }
 
@@ -505,7 +515,7 @@ KeyboardHandler::_RepeatThread(void *arg)
 
 	res = acquire_sem_etc(h->fRepeatThreadSem, 1, B_RELATIVE_TIMEOUT,
 		h->fRepeatDelay);
-	if (res >= B_OK)
+	if (res != B_TIMED_OUT)
 		return B_OK;
 
 	while (true) {
@@ -521,7 +531,7 @@ KeyboardHandler::_RepeatThread(void *arg)
 
 		res = acquire_sem_etc(h->fRepeatThreadSem, 1, B_RELATIVE_TIMEOUT,
 			(bigtime_t)10000000 / h->fRepeatRate);
-		if (res >= B_OK)
+		if (res != B_TIMED_OUT)
 			return B_OK;
 	}
 }
@@ -579,13 +589,15 @@ KeyboardHandler::_SendKeyEvent(uint32 key, bool pressed)
 
 			msg->AddInt32("be:key_repeat", 1);
 			_StartRepeating(msg.Get());
+			fRepeatKey = key;
 		} else {
 			if (numBytes > 0)
 				msg->what = B_KEY_UP;
 			else
 				msg->what = B_UNMAPPED_KEY_UP;
 
-			_StopRepeating();
+			if (key == fRepeatKey)
+				_StopRepeating();
 		}
 
 		status_t err = Device()->EnqueueMessage(msg.Get());

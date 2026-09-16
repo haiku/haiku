@@ -114,6 +114,7 @@ private:
 			BLocker         fKeymapLock;
 			bigtime_t		fRepeatDelay;
 			int32			fRepeatRate;
+			uint32			fRepeatKey;
 			thread_id		fRepeatThread;
 			sem_id			fRepeatThreadSem;
 			BMessage		fRepeatMsg;
