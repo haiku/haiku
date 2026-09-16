@@ -409,6 +409,7 @@ KeyboardHandler::Control(uint32 command, BMessage* message)
 {
 	switch (command) {
 		case B_KEY_MAP_CHANGED: {
+			BAutolock lock(fKeyMapLock);
 			key_map *keyMap = NULL;
 			char *chars = NULL;
 			get_key_map(&keyMap, &chars);
@@ -630,6 +631,7 @@ void
 KeyboardHandler::_StateChanged()
 {
 	uint32 i, j;
+	BAutolock locker(fKeyMapLock);
 
 	fNewState.modifiers = fState.modifiers
 		& (B_CAPS_LOCK | B_SCROLL_LOCK | B_NUM_LOCK);

@@ -7,8 +7,10 @@
 
 
 #include <AutoDeleter.h>
+#include <Autolock.h>
 #include <Handler.h>
 #include <InterfaceDefs.h>
+#include <Locker.h>
 #include <add-ons/input_server/InputServerDevice.h>
 
 
@@ -112,6 +114,7 @@ private:
 			uint8			fPendingUnmappedCount;
 			BPrivate::AutoDeleter<key_map, BPrivate::MemoryDelete>
 							fKeyMap;
+			BLocker			fKeyMapLock;
 			BPrivate::AutoDeleter<char, BPrivate::MemoryDelete>
 							fChars;
 
