@@ -648,11 +648,13 @@ KeyboardHandler::_StateChanged()
 		fNewState.modifiers |= B_CONTROL_KEY | B_LEFT_CONTROL_KEY;
 	if (_IsKeyPressed(fNewState, fKeyMap->right_control_key))
 		fNewState.modifiers |= B_CONTROL_KEY | B_RIGHT_CONTROL_KEY;
-	if (_IsKeyPressed(fNewState, fKeyMap->caps_key))
+	if (_IsKeyPressed(fNewState, fKeyMap->caps_key) && !_IsKeyPressed(fState, fKeyMap->caps_key))
 		fNewState.modifiers ^= B_CAPS_LOCK;
-	if (_IsKeyPressed(fNewState, fKeyMap->scroll_key))
+	if (_IsKeyPressed(fNewState, fKeyMap->scroll_key)
+		&& !_IsKeyPressed(fState, fKeyMap->scroll_key)) {
 		fNewState.modifiers ^= B_SCROLL_LOCK;
-	if (_IsKeyPressed(fNewState, fKeyMap->num_key))
+	}
+	if (_IsKeyPressed(fNewState, fKeyMap->num_key) && !_IsKeyPressed(fState, fKeyMap->num_key))
 		fNewState.modifiers ^= B_NUM_LOCK;
 	if (_IsKeyPressed(fNewState, fKeyMap->left_option_key))
 		fNewState.modifiers |= B_OPTION_KEY  | B_LEFT_OPTION_KEY;
