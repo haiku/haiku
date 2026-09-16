@@ -159,6 +159,7 @@ traps_init()
 	MstatusReg mstatus{.val = Mstatus()};
 	mstatus.ie = 1 << modeM;
 	SetMstatus(mstatus.val);
+	SetMcounteren(0xffffffff);
 	InitPmp();
 	MSyscall(kMSyscallSwitchToSmode);
 }

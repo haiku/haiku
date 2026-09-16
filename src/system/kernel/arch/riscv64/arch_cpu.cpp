@@ -41,6 +41,10 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 	SetSstatus(sstatus.val);
 	SetBitsSie((1 << sTimerInt) | (1 << sSoftInt) | (1 << sExternInt));
 
+	SetScounteren((1U << riscvCounterCycle)
+			| (1U << riscvCounterTime)
+			| (1U << riscvCounterInstRet));
+
 	return B_OK;
 }
 

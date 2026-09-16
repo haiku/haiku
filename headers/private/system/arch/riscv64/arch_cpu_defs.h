@@ -19,6 +19,12 @@ enum {
 	modeM = 3,
 };
 
+enum {
+	riscvCounterCycle   = 0,
+	riscvCounterTime    = 1,
+	riscvCounterInstRet = 2,
+};
+
 // fs, xs
 enum {
 	extStatusOff     = 0,
@@ -232,8 +238,9 @@ CSR_REG_MACRO(Scause, scause)
 CSR_REG_MACRO(Mtval, mtval)
 CSR_REG_MACRO(Stval, stval)
 
-// machine-mode counter enable
+// counter enable
 CSR_REG_MACRO(Mcounteren, mcounteren)
+CSR_REG_MACRO(Scounteren, scounteren)
 
 // cycle counter
 CSR_REG_MACRO(CpuMcycle, mcycle)
