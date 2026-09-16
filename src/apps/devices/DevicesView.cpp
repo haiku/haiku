@@ -62,6 +62,17 @@ DevicesView::~DevicesView()
 
 
 void
+DevicesView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+
+	fDevicesOutline->SetTarget(this);
+	if (!fDevicesOutline->IsEmpty())
+		fDevicesOutline->Select(0);
+}
+
+
+void
 DevicesView::CreateLayout()
 {
 	BMenuBar* menuBar = new BMenuBar("menu");

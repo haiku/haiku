@@ -62,6 +62,7 @@ class DevicesView : public BView {
 
 		OrderByType OrderBy() const { return fOrderBy; };
 
+		virtual void AttachedToWindow();
 		virtual void CreateLayout();
 
 		virtual void MessageReceived(BMessage* msg);
