@@ -126,6 +126,9 @@ get_slc_defaults(void)
 void
 add_slc(char func, char flag, cc_t val)
 {
+	/* Do nothing if the entire triplet cannot fit in the buffer. */
+	if (slcbuf + sizeof slcbuf - slcptr <= 6)
+		return;
 
 	if ((*slcptr++ = (unsigned char)func) == 0xff)
 		*slcptr++ = 0xff;
