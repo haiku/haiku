@@ -1126,6 +1126,7 @@ fs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name, int mo
 	if (status != B_OK)
 		return status;
 
+	put_vnode(_volume, inode);
 	return B_OK;
 }
 
