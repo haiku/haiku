@@ -92,8 +92,10 @@ CatKey::GetStringParts(BString* str, BString* ctx, BString* cmt) const
 uint32
 CatKey::HashFun(const char* s, int startValue) {
 	unsigned long h = startValue;
-	for ( ; *s; ++s)
-		h = 5 * h + *s;
+	for (; *s; ++s) {
+		// enforce signed chars on all architectures
+		h = 5 * h + (int8)*s;
+	}
 
 	// Add 1 to differenciate ("ab","cd","ef") from ("abcd","e","f")
 	h = 5 * h + 1;
