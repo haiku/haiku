@@ -1027,6 +1027,8 @@ virtio_net_register_child_devices(void* _cookie)
 
 	status = sDeviceManager->publish_device(info->node, name,
 		VIRTIO_NET_DEVICE_MODULE_NAME);
+	if (status != B_OK)
+		sDeviceManager->free_id(VIRTIO_NET_DEVICE_ID_GENERATOR, id);
 
 	return status;
 }
