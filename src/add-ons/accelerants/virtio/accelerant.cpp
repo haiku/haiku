@@ -154,6 +154,7 @@ virtio_gpu_clone_accelerant(void *info)
 
 err2:
 	uninit_common();
+	return status;
 err1:
 	close(fd);
 	return status;
