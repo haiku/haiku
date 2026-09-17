@@ -530,6 +530,7 @@ virtio_gpu_init_device(void* _info, void** _cookie)
 	return B_OK;
 
 err3:
+	mutex_destroy(&info->commandLock);
 err2:
 	delete_area(info->commandArea);
 err1:
