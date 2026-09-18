@@ -1173,7 +1173,10 @@ UdpEndpoint::DeliverData(net_buffer *_buffer)
 		return status;
 	}
 
-	return Enqueue(buffer);
+	status = Enqueue(buffer);
+	if (status < B_OK)
+		gBufferModule->free(buffer);
+	return status;
 }
 
 
