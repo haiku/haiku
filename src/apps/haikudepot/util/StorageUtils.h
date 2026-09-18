@@ -52,6 +52,7 @@ public:
     static	status_t		DumpExportPkgDataPath(BPath& path, const BString& repositorySourceCode,
     							const LanguageRef language);
 
+	static	status_t		FreeBytesForPackageInstall(off_t* size);
 };
 
 #endif // PATH_UTILS_H

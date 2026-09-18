@@ -31,6 +31,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <StopWatch.h>
+#include <StringForSize.h>
 #include <StringList.h>
 #include <StringView.h>
 #include <TabView.h>
@@ -44,6 +45,7 @@
 #include "LocaleUtils.h"
 #include "Logger.h"
 #include "PackageInfoView.h"
+#include "PackageKitUtils.h"
 #include "PackageListView.h"
 #include "PackageManager.h"
 #include "PackageUtils.h"
@@ -55,6 +57,7 @@
 #include "ServerHelper.h"
 #include "SettingsWindow.h"
 #include "ShuttingDownWindow.h"
+#include "StorageUtils.h"
 #include "ToLatestUserUsageConditionsWindow.h"
 #include "UserLoginWindow.h"
 #include "UserUsageConditionsWindow.h"
@@ -665,13 +668,8 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_PKG_INSTALL:
-		{
-			InstallPackageAction action(message);
-			ProcessCoordinator* coordinator
-				= ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(&fModel, action);
-			_AddProcessCoordinator(coordinator);
+			_HandlePkgInstallMessageReceived(message);
 			break;
-		}
 
 		case MSG_PKG_UNINSTALL:
 		{
@@ -1545,6 +1543,100 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 	message.AddFloat(kKeyWorkStatusProgress, progress);
 
 	this->PostMessage(&message, this);
+}
+
+
+/*! Does a quick check to see that the package can be installed by checking to see if there is
+ *	space for the package on the system.
+ *	\return true if the install should proceed.
+ */
+bool
+MainWindow::_QuickPreflightForPkgInstall(const BString& packageName)
+{
+	const PackageInfoRef package = fModel.PackageForName(packageName);
+
+	if (!package.IsSet())
+		HDFATAL("the package to install was not found in the model");
+
+	if (PackageUtils::State(package) == UNINSTALLED) {
+		HDERROR("the package [%s] is not uninstalled; can't install it", packageName.String());
+		return false;
+	}
+
+	// The package may already be downloaded and stored in a different package kit transaction on
+	// disk as a file. However if this is the case, the data is copied again so there's no need to
+	// look to see if it is cached already.
+
+	off_t packageBytes = PackageUtils::Size(package);
+
+	if (packageBytes <= 0) {
+		HDINFO("no size for package [%s]; can't check on free space capacity; try install anyway",
+			packageName.String());
+			// don't log as error because the application may be running offline and so was
+			// unable to get the sizes.
+		return true;
+	}
+
+	off_t freeBytes;
+
+	if (StorageUtils::FreeBytesForPackageInstall(&freeBytes) != B_OK) {
+		HDERROR("unable to get the spare capacity on the install volume; will install anyway");
+		return true;
+	}
+
+	if (packageBytes < freeBytes) {
+		HDDEBUG("has sufficient available free storage for package [%s] (%" B_PRIdOFF
+				"B required, %" B_PRIdOFF "B available)",
+			packageName.String(), packageBytes, freeBytes);
+		return true;
+	}
+
+	HDERROR("has insufficient free storage for package [%s] (%" B_PRIdOFF "B required ,%" B_PRIdOFF
+			"B available) -- will warn",
+		packageName.String(), packageBytes, freeBytes);
+
+	// Warn the user and allow them to drop out of the installation process if they don't want to
+	// go ahead anyway.
+
+	BString messageTemplate = B_TRANSLATE("To install package %PackageName% requires "
+										  "%PackageBytesDescription% of free disk space, but only "
+										  "%FreeBytesDescription% is available. "
+										  "The installation may fail.");
+	char sizeBuffer[128];
+	messageTemplate.ReplaceAll("%PackageName%", packageName);
+	string_for_size(static_cast<double>(packageBytes), sizeBuffer, 128);
+	messageTemplate.ReplaceAll("%PackageBytesDescription%", sizeBuffer);
+	string_for_size(static_cast<double>(freeBytes), sizeBuffer, 128);
+	messageTemplate.ReplaceAll("%FreeBytesDescription%", sizeBuffer);
+
+	BAlert* alert = new(std::nothrow) BAlert(B_TRANSLATE("Insufficient storage capacity"),
+		messageTemplate, B_TRANSLATE("Cancel"), B_TRANSLATE("Try installing anyway"));
+
+	if (alert == NULL)
+		HDFATAL("unable to create an alert panel to warn the user about install storage capacity");
+
+	alert->SetType(B_WARNING_ALERT);
+	int32 choice = alert->Go();
+	if (choice == 0) {
+		HDINFO("the user has chosen to cancel the install");
+		return false;
+	}
+
+	HDINFO("the user has chosen to proceed with the install");
+	return true;
+}
+
+
+void
+MainWindow::_HandlePkgInstallMessageReceived(const BMessage* message)
+{
+	const InstallPackageAction action(message);
+
+	if (_QuickPreflightForPkgInstall(action.PackageName())) {
+		ProcessCoordinator* coordinator
+			= ProcessCoordinatorFactory::CreateInstallPackageActionCoordinator(&fModel, action);
+		_AddProcessCoordinator(coordinator);
+	}
 }
 
 

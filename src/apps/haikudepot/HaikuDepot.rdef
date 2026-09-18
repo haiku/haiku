@@ -14,7 +14,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "HaikuDepot",
-	long_info = "HaikuDepot ©2013-2024 Haiku"
+	long_info = "HaikuDepot ©2013-2026 Haiku"
 };
 
 resource file_types message {

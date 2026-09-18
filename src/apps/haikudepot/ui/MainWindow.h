@@ -127,6 +127,9 @@ private:
 			void				_HandleExternalPackageUpdateMessageReceived(
 									const BMessage* message);
 
+			void				_HandlePkgInstallMessageReceived(const BMessage* message);
+			bool				_QuickPreflightForPkgInstall(const BString& packageName);
+
 			void				_HandleChangePackageListViewMode();
 
 			void				_HandleProcessCoordinatorChanged(

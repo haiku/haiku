@@ -13,6 +13,7 @@
 #include <Locker.h>
 
 #include "DepotInfo.h"
+#include "Language.h"
 #include "PackageFilter.h"
 #include "PackageFilterSpecification.h"
 #include "PackageIconDefaultRepository.h"

@@ -9,16 +9,13 @@
 
 #include <Referenceable.h>
 
-#include "Language.h"
 #include "List.h"
 #include "PackageClassificationInfo.h"
 #include "PackageCoreInfo.h"
 #include "PackageLocalInfo.h"
 #include "PackageLocalizedText.h"
-#include "PackagePublisherInfo.h"
 #include "PackageScreenshotInfo.h"
 #include "PackageUserRatingInfo.h"
-#include "ScreenshotInfo.h"
 
 
 using BPackageKit::BPackageInfo;
