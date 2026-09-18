@@ -34,7 +34,8 @@ MulticastGroupInterface<Addressing>::MulticastGroupInterface(Filter *parent,
 	:
 	fParent(parent),
 	fMulticastAddress(address),
-	fInterface(interface)
+	fInterface(interface),
+	fFilterMode(kInclude)
 {
 }
 
