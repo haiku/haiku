@@ -287,19 +287,21 @@ static status_t
 acpi_ac_register_child_devices(void *driverCookie)
 {
 	acpi_ac_device_info *device = (acpi_ac_device_info *)driverCookie;
-	int path_id;
 	char name[B_DEV_NAME_LENGTH];
 
-	path_id = sDeviceManager->create_id(ACPI_AC_PATHID_GENERATOR);
-	if (path_id < 0) {
+	int id = sDeviceManager->create_id(ACPI_AC_PATHID_GENERATOR);
+	if (id < 0) {
 		ERROR("register_child_devices: couldn't create a path_id\n");
 		return B_ERROR;
 	}
 
-	snprintf(name, sizeof(name), ACPI_AC_BASENAME, path_id);
+	snprintf(name, sizeof(name), ACPI_AC_BASENAME, id);
 
-	return sDeviceManager->publish_device(device->node, name,
+	status_t status = sDeviceManager->publish_device(device->node, name,
 		ACPI_AC_DEVICE_MODULE_NAME);
+	if (status != B_OK)
+		sDeviceManager->free_id(ACPI_AC_PATHID_GENERATOR, id);
+	return status;
 }
 
 

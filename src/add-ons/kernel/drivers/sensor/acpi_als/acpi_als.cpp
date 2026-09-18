@@ -308,8 +308,11 @@ acpi_als_register_child_devices(void *cookie)
 	char name[B_DEV_NAME_LENGTH];
 	snprintf(name, sizeof(name), ACPI_ALS_BASENAME, pathID);
 
-	return sDeviceManager->publish_device(device->node, name,
+	status_t status = sDeviceManager->publish_device(device->node, name,
 		ACPI_ALS_DEVICE_NAME);
+	if (status != B_OK)
+		sDeviceManager->free_id(ACPI_ALS_PATHID_GENERATOR, pathID);
+	return B_OK;
 }
 
 

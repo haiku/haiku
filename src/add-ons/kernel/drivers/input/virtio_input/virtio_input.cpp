@@ -590,6 +590,7 @@ virtio_input_register_child_devices(void* _cookie)
 		VIRTIO_INPUT_DEVICE_MODULE_NAME);
 
 	if (status < B_OK) {
+		gDeviceManager->free_id(VIRTIO_INPUT_DEVICE_ID_GENERATOR, id);
 		ERROR("publish_device error: 0x%" B_PRIx32 "(%s) \n", status,
 			strerror(status));
 	}

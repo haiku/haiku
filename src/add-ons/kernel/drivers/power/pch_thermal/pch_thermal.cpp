@@ -258,20 +258,22 @@ static status_t
 pch_thermal_register_child_devices(void *_cookie)
 {
 	device_node *node = (device_node*)_cookie;
-	int path_id;
 	char name[B_DEV_NAME_LENGTH];
 
-	path_id = sDeviceManager->create_id(PCH_THERMAL_PATHID_GENERATOR);
-	if (path_id < 0) {
+	int id = sDeviceManager->create_id(PCH_THERMAL_PATHID_GENERATOR);
+	if (id < 0) {
 		ERROR("pch_thermal_register_child_devices: couldn't create a path_id"
 			"\n");
 		return B_ERROR;
 	}
 
-	snprintf(name, sizeof(name), PCH_THERMAL_BASENAME, path_id);
+	snprintf(name, sizeof(name), PCH_THERMAL_BASENAME, id);
 
-	return sDeviceManager->publish_device(node, name,
+	status_t status = sDeviceManager->publish_device(node, name,
 		PCH_THERMAL_DEVICE_MODULE_NAME);
+	if (status != B_OK)
+		sDeviceManager->free_id(PCH_THERMAL_PATHID_GENERATOR, id);
+	return status;
 }
 
 

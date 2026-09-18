@@ -493,7 +493,10 @@ embedded_controller_register_child_devices(void* _cookie)
 	char name[B_DEV_NAME_LENGTH];
 	snprintf(name, sizeof(name), ACPI_EC_BASENAME, pathID);
 
-	return gDeviceManager->publish_device(node, name, ACPI_EC_DEVICE_NAME);
+	status_t status = gDeviceManager->publish_device(node, name, ACPI_EC_DEVICE_NAME);
+	if (status != B_OK)
+		gDeviceManager->free_id(ACPI_EC_PATHID_GENERATOR, pathID);
+	return status;
 }
 
 

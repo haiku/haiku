@@ -242,7 +242,8 @@ usb_ecm_register_child_devices(void* _cookie)
 
 	status = gDeviceManager->publish_device(info->node, name,
 		USB_ECM_DEVICE_MODULE_NAME);
-
+	if (status != B_OK)
+		gDeviceManager->free_id(USB_ECM_DEVICE_ID_GENERATOR, id);
 	return status;
 }
 

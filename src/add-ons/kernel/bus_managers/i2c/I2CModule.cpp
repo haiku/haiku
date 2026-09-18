@@ -34,8 +34,11 @@ i2c_added_device(device_node *parent)
 
 	TRACE("i2c_added_device parent %p\n", parent);
 
-	return gDeviceManager->register_node(parent, I2C_BUS_MODULE_NAME,
+	status_t status = gDeviceManager->register_node(parent, I2C_BUS_MODULE_NAME,
 		attributes, NULL, NULL);
+	if (status != B_OK)
+		gDeviceManager->free_id(I2C_PATHID_GENERATOR, pathID);
+	return status;
 }
 
 

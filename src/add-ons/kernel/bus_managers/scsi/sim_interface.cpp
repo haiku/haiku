@@ -60,8 +60,11 @@ scsi_controller_added(device_node *parent)
 			{}
 		};
 
-		return pnp->register_node(parent, SCSI_BUS_MODULE_NAME, attrs, NULL,
+		status_t status = pnp->register_node(parent, SCSI_BUS_MODULE_NAME, attrs, NULL,
 			NULL);
+		if (status != B_OK)
+			pnp->free_id(SCSI_PATHID_GENERATOR, pathID);
+		return status;
 	}
 }
 

@@ -1227,7 +1227,8 @@ nvme_disk_register_child_devices(void* _cookie)
 
 	status = sDeviceManager->publish_device(info->node, name,
 		NVME_DISK_DEVICE_MODULE_NAME);
-
+	if (status != B_OK)
+		sDeviceManager->free_id(NVME_DISK_DEVICE_ID_GENERATOR, id);
 	return status;
 }
 

@@ -200,8 +200,11 @@ ata_channel_added(device_node *parent)
 		{ NULL }
 	};
 
-	return gDeviceManager->register_node(parent, ATA_SIM_MODULE_NAME,
+	status_t status = gDeviceManager->register_node(parent, ATA_SIM_MODULE_NAME,
 		attributes, NULL, NULL);
+	if (status != B_OK)
+		gDeviceManager->free_id(ATA_CHANNEL_ID_GENERATOR, channelID);
+	return status;
 }
 
 
