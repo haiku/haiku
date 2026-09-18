@@ -426,7 +426,7 @@ Device::CompareAndReattach(usb_device device)
 	}
 
 	if (deviceDescriptor->vendor_id != fVendorID
-		&& deviceDescriptor->product_id != fProductID)
+		|| deviceDescriptor->product_id != fProductID)
 		// this certainly isn't the same device
 		return B_BAD_VALUE;
 
