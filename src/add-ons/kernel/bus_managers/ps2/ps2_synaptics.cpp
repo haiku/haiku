@@ -196,9 +196,11 @@ get_synaptics_movment(synaptics_cookie *cookie, touchpad_movement *_event, bigti
 			event_buffer[0], event_buffer[1], event_buffer[2], event_buffer[3], event_buffer[4],
 			event_buffer[5], wValue);
 
-		if (wValue <= 1) {
+		if (event.zPressure < MIN_PRESSURE)
+			event.fingers = 0;
+		else if (wValue <= 1) {
 			// Multiple fingers detected, report the finger count.
-			event.fingers = 2 + wValue;
+			event.fingers = (1 << (2 + wValue)) - 1;
 
 			// There is a separate "v" value indicating the finger width
 			wValue0 = event_buffer[3] >> 1 & 1;
@@ -267,7 +269,7 @@ get_synaptics_movment(synaptics_cookie *cookie, touchpad_movement *_event, bigti
 
 			// Extended W = 2 - Finger state info
 			if (extendedWValue == 2) {
-				event.fingers = event_buffer[1] & 0x0F;
+				event.fingers = (1 << (event_buffer[1] & 0x0F)) - 1;
 				// TODO this event also provides primary and secondary finger indexes, what do
 				// these mean?
 			}

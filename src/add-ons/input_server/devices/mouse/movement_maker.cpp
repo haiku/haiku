@@ -62,45 +62,25 @@ make_small(float value)
 
 static inline bool
 two_fingers(const touchpad_movement* event) {
-	// TODO: Replace fingerWith related conditions when drivers are adjusted.
-	// They seem to be taken from specifics of Synaptics device driver values
-	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
-	return count_set_bits(event->fingers) == 2
-//		|| event->nFingers == 2
-		|| event->fingerWidth == 0;
+	return count_set_bits(event->fingers) == 2;
 }
 
 
 static inline bool
 two_or_more_fingers(const touchpad_movement* event) {
-	// TODO: Replace fingerWith related conditions when drivers are adjusted.
-	// They seem to be taken from specifics of Synaptics device driver values
-	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
-	return count_set_bits(event->fingers) >= 2
-//		|| event->nFingers >= 2
-		|| event->fingerWidth == 0 || event->fingerWidth == 1;
+	return count_set_bits(event->fingers) >= 2;
 }
 
 
 static inline bool
 three_fingers(const touchpad_movement* event) {
-	// TODO: Replace fingerWith related conditions when drivers are adjusted.
-	// They seem to be taken from specifics of Synaptics device driver values
-	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
-	return count_set_bits(event->fingers) == 3
-//		|| event->nFingers = 3
-		|| event->fingerWidth == 1; // This is 3 or more fingers for Synaptic
+	return count_set_bits(event->fingers) == 3;
 }
 
 
 static inline bool
 three_or_more_fingers(const touchpad_movement* event) {
-	// TODO: Replace fingerWith related conditions when drivers are adjusted.
-	// They seem to be taken from specifics of Synaptics device driver values
-	// for w where 0 means 2 fingers and 1 is means 3 or more fingers.
-	return count_set_bits(event->fingers) > 2
-//		|| event->nFingers > 2
-		|| event->fingerWidth == 1;
+	return count_set_bits(event->fingers) > 2;
 }
 
 
