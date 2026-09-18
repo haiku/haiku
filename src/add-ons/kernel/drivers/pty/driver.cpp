@@ -181,7 +181,12 @@ get_tty_index(struct tty *tty)
 static bool
 master_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
-	// nothing here yet
+	switch (op) {
+		case TTYFLUSH:
+			// nothing to do
+			return true;
+	}
+
 	return false;
 }
 
@@ -189,7 +194,12 @@ master_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 static bool
 slave_service(struct tty *tty, uint32 op, void *buffer, size_t length)
 {
-	// nothing here yet
+	switch (op) {
+		case TTYFLUSH:
+			// nothing to do
+			return true;
+	}
+
 	return false;
 }
 
