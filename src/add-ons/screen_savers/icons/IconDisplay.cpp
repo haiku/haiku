@@ -126,6 +126,9 @@ IconDisplay::DrawOn(BView* view, uint32 delta)
 		default:
 			// finished
 			fIsRunning = false;
+			view->SetDrawingMode(B_OP_COPY);
+			view->FillRect(fFrame);
+			view->SetDrawingMode(B_OP_ALPHA);
 			return;
 			break;
 	};

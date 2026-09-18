@@ -136,9 +136,11 @@ IconsSaver::Draw(BView* view, int32 frame)
 
 	// update drawing
 	if (fBackBitmap->Lock()) {
+		fBackView->SetDrawingMode(B_OP_COPY);
 		for (uint8 i = 0 ; i < kMaxConcurrentIcons ; i++)
 			fIcons[i].ClearOn(fBackView);
 
+		fBackView->SetDrawingMode(B_OP_ALPHA);
 		int32 delta = frame - previousFrame;
 		for (uint8 i = 0 ; i < kMaxConcurrentIcons ; i++)
 			fIcons[i].DrawOn(fBackView, delta);
