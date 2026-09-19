@@ -1203,14 +1203,16 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += fMaxReplicantHeight + sIconGap, row++) {
 			// determine free space in this row
+			bool emptyRow = true;
 			BRect rowRect(loc.x, loc.y,
 				loc.x + Bounds().Width() - fTrayPadding,
 				loc.y + fMaxReplicantHeight);
-			if (row == 0 && !fTime->IsHidden(fTime))
+			if (row == 0 && !fTime->IsHidden(fTime)) {
 				rowRect.right -= fClockMargin + fTime->Frame().Width();
+				emptyRow = false;
+			}
 
 			BRect replicantRect = rowRect;
-			bool emptyRow = true;
 			for (int32 i = 0; i < index; i++) {
 				BView* view = NULL;
 				fShelf->ReplicantAt(i, &view);
