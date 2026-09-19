@@ -1,10 +1,12 @@
-1	english	x-vnd.Haiku-Expander	2040688293
+1	english	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		目标文件
 Other	ExpanderPreferences		其他
 Automatically show contents listing	ExpanderPreferences		自动显示内容列表
+Ignore all	ExpanderWindow		全部忽略
 Expander	System name		归档管理器
 Set source…	ExpanderMenu		设定源文件…
 OK	ExpanderWindow		确定
+%appname%: Choose destination	DirectoryFilePanel		%appname%: 选择目标位置
 The destination is not a folder.	ExpanderWindow		目标文件不是一个文件夹。
 The folder was either moved, renamed or not supported.	ExpanderWindow		文件夹被移动、重命名或者不受支持。
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
@@ -12,6 +14,8 @@ Close	ExpanderMenu		关闭
 Create	ExpanderWindow		创建
 Creating listing for '%s'…	ExpanderWindow		正在为 '%s' 生成列表…
 Show contents	ExpanderMenu		显示内容
+%appname% settings	ExpanderPreferences		%appname% 设置
+Ignore	ExpanderWindow		忽略
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		确定终止解压归档文件吗？已解压的文件可能并不完整。
 Settings	ExpanderMenu		设置
 Expand	ExpanderWindow		解压缩
@@ -45,5 +49,6 @@ The file doesn't exist	ExpanderWindow		文件不存在
 Hide contents	ExpanderWindow		隐藏内容
 Source	ExpanderWindow		源文件
 The destination is read only.	ExpanderWindow		目标文件为只读的。
+%appname%: Open	ExpanderWindow		%appname%: 打开
 Select	ExpanderPreferences		选择
 File	ExpanderMenu		文件

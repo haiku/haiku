@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1018372772
+1	french	x-vnd.Haiku-libtracker	3236035134
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -103,6 +103,7 @@ Window	ContainerWindow		Fenêtre
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Supprimer
 Company	Person Query Columns		Société
+Select folders…	FindPanel		Sélectionnez des répertoires…
 Recent documents	FavoritesMenu		Documents récents
 Edit templates…	TemplatesMenu		Éditer les modèles…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# octet} other{# octets}}
@@ -162,8 +163,11 @@ Property info	AttributesView		Information sur la propriété
 Sorry, you can't create links in the Trash.	PoseView		Désolé, vous ne pouvez pas créer des liens dans la Corbeille.
 From	Email Query Columns		De
 Open selection with:	OpenWithWindow		Ouvrir la sélection avec :
+Preferences…	ContainerWindow		Préférences...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Impossible d’ouvrir « %document », car l’application « %app » est dans la Corbeille. 
 Work Phone	Person Query Columns		Téléphone professionnel
+Select folders	FindPanel		Sélectionner des répertoires
+OK	TrackerInitialState		OK
 Close	ContainerWindow		Fermer
 Get info	ContainerWindow		Informations
 MIME Type	AttributesView		Type MIME
@@ -331,6 +335,7 @@ The entered file name is too long.	FSUtils		Le nom de fichier saisi est trop lon
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération est irrémédiable.)
 Add printer…	ContainerWindow		Ajouter une imprimante…
 Permissions	ContainerWindow		Permissions
+Trash	FSUtils		Corbeille
 Size:	InfoWindow		Taille :
 Copy	ContainerWindow		Copier
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L’élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération est irrémédiable.)
@@ -449,6 +454,7 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déposer les éléments sur une des icônes disques de la fenêtre « Disques ».
 Version:	InfoWindow		Version :
 OK	PoseView		OK
+Add new submenu…	TemplatesMenu		Ajouter un nouveau sous-menu…
 Find	FindPanel		Rechercher
 Empty folder	NavMenu		Dossier vide
 Defaults	TrackerSettingsWindow		Par défaut
@@ -472,7 +478,7 @@ Create a Query	FindPanel		Créer une requête
 I know what I'm doing	FSUtils	button label	Je sais ce que je fais
 Preparing to copy items…	StatusWindow		Copie des éléments en préparation…
 %lld B	WidgetAttributeText	The filesize symbol for byte	%lld o
-Entry ref	AttributesView		Référence de l'entrée
+Entry ref	AttributesView		Référence de l’entrée
 Icon view	ContainerWindow		Vue en icônes
 The entered folder name is too long.	FSUtils		Le nom de dossier saisi est trop long.
 Name	ContainerWindow		Nom

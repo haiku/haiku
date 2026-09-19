@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-HaikuDepot	322393486
+1	english	x-vnd.Haiku-HaikuDepot	791991747
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
+User ratings loading…	PackageInfoView		正在加载用户评分…
 Available packages	MainWindow		可用软件包
 It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
 An unexpected error has been sent from the server [%li]	ServerHelper		服务器 [%li] 发送了一个意外错误
@@ -11,6 +12,7 @@ Rate package…	PackageInfoView		软件包评分…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		您已经成功登录，用户名 %Nickname% 。
 Package problems	PackageProblem	Window title	软件包错误
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		无法从服务器发送回的数据中获取需要的验证码信息。
+Install %PackageTitle%	PackageAction		安装 %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		获取包列表时发生错误：%message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		更新使用条款
 No usage conditions	UserUsageConditions		无使用条款
@@ -41,12 +43,16 @@ Click a package to view information	PackageInfoView		点击软件包查看信息
 Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		无法评价
 Package update error	MainWindow		软件包更新错误
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	点击此处
+No screenshot available.	PackageInfoView		暂无屏幕截图。
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# 个进程} other{# 个进程}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		获取软件包的用户评分
 Reboot required	PackageManager		需要重启
 All packages	PackageListView		全部软件包
+Checking server information	ServerRuntimeInformationVerifierProcess		正在检查服务器信息
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
+Changelog loading…	PackageInfoView		正在加载更新日志…
 There are problems in the supplied data:	UserLoginWindow		提供的数据存在问题：
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		用户 '%Nickname%' 未同意任何使用条款。
 Usage conditions download problem	UserLoginWindow		使用条款下载问题
@@ -69,9 +75,11 @@ n/a	PackageInfoView		不适用
 Checking user details	UserDetailVerifierProcess		检查用户详情中
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
+Error	SimpleAlert		错误
 Continue	App		继续
 A password is required.	UserLoginWindow		需要密码。
 Language	RatePackageWindow		语言
+Open %DeskbarLink%	PackageAction		打开 %DeskbarLink%
 Status	PackageListView		状态
 Network transport error	ServerHelper		网络传输错误
 Cancel	PackageResult		取消
@@ -128,6 +136,7 @@ A network transport error has arisen communicating with the server system: %s	Se
 Rating	PackageListView		评级
 Synchronizing icons	ServerIconExportUpdateProcess		正在同步图标
 Show	MainWindow		显示
+No contents available.	PackageInfoView		空空如也。
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		此应用程序在您的计算机上写入和读取一些工作文件，以便正常工作。似乎在写入测试文件 [%TestFilePath%] 时出现问题。请检查您的本地磁盘或权限是否存在可能阻止此应用程序将文件写入该目录位置的问题。您可以选择忽略此问题并继续，但某些功能可能会被禁用。
 Settings…	MainWindow		设置…
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
@@ -140,6 +149,7 @@ Installed packages	MainWindow		已安装软件包
 User rating	RatePackageWindow		用户评分
 Date	PackageListView		日期
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		密码必须至少为%MinPasswordLength%个字符。必须有 %MinPasswordUppercaseChar% 个为大写字母，%MinPasswordDigitsChar% 个为数字。
+Screenshot loading…	PackageInfoView		正在加载屏幕截图…
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		下载使用条款时出现错误。请查看日志了解详细信息，然后重试。\n有关如何查看日志的信息，请参阅 Haiku 用户指南的 HaikuDepot 部分。
 There was a puzzling response from the web service.	UserLoginWindow		网络服务响应无法解析。
 Opening \"%DeskbarLink%\"	OpenPackageProcess		打开 \"%DeskbarLink%\"
@@ -152,6 +162,7 @@ Contents	PackageInfoView		內容
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		与 Haiku 仓库服务器 共享匿名使用数据
 Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
+ to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 搜索所有软件包。
 About	PackageInfoView		关于
 Password requirements download problem	UserLoginWindow		下载密码要求出错
 Password:	UserLoginWindow		密码：
@@ -181,11 +192,13 @@ Repositories	MainWindow		仓库
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新包数据时，出现了一个问题，可能会导致数据过时或显示应用程序丢失。可以从应用程序日志中获取有关此问题的其他详细信息。\n有关如何查看日志的信息，请参阅《Haiku用户指南》的“Haiku库”部分。
 This rating is visible to other users	RatePackageWindow		此分级对其他用户可见
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		下载使用条款时出现错误。请查看日志以获取详细信息，并重试。\n有关如何查看日志的信息可以在 Haiku 用户指南的 HaikuDepot 部分找到。
+Stop network use	ServerHelper		停止网络访问
 View agreed usage conditions…	MainWindow		查看已同意的使用条款…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		用户 [%Nickname%] 已经通过身份验证，但在继续之前，需要同意最近的使用条款。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
 Apply	SettingsWindow		应用
 View the password requirements	UserLoginWindow		查看密码要求
+Desktop packages only	MainWindow		仅展示桌面软件
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		用户 \"%Nickname%\" 之前已经同意了使用条款，但自那以后使用条款已更新。现在需要同意更新后的使用条款。
 Log out	MainWindow		注销
 Comment language:	RatePackageWindow		评论语言:
@@ -194,6 +207,7 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		查看使用条款
 OK	ServerHelper		确定
 Reading repository data	LocalPkgDataLoadProcess		正在读取仓库数据
+Native desktop packages only	MainWindow		仅展示原生桌面软件
 Fatal error	InstallPackageProcess		严重错误
 A validation error has occurred	ServerHelper		检验发生问题
 The nickname is required.	UserLoginWindow		请填写昵称。
@@ -201,6 +215,7 @@ The nickname is required.	UserLoginWindow		请填写昵称。
 Apply changes	PackageResult		应用修改
 Server error	ServerHelper		服务器错误
 Rate package	RatePackageWindow		软件包评分
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		服务器的时间与本机存在约 %DiscrepancySeconds% 秒的偏差。这可能会导致 HaikuDepot 与服务器通信时出现问题。请检查计算机的时钟设置，并在必要时校正当前时间。
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		 \"%PackageName%\" 的记录视图
 Sending anonymous usage data	MainWindow		发送匿名使用数据
 Log in	UserLoginWindow		登陆
@@ -214,7 +229,9 @@ Category:	FilterView		分类:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	卸载软件包 %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		获取远程仓库数据
 Description	PackageListView		描述
+No results? 	FeaturedPackagesView		没有结果? 
 User creation error	UserLoginWindow		用户创建出错
 You need to be logged into an account before you can rate packages.	MainWindow		您需要登陆账号，才能进行软件包评分。
 Cleaning up…	ShuttingDownWindow		清理中…
+%appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% 即将退出，正在处理未完成的操作。
 Repeat password:	UserLoginWindow		重新输入密码：

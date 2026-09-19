@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ActivityMonitor	2467534740
+1	french	x-vnd.Haiku-ActivityMonitor	1753371419
 Teams	DataSource		Processus
 Block cache memory	DataSource		Mémoire cache de blocs
 Media nodes	DataSource		Nœuds média
@@ -9,8 +9,10 @@ ActivityMonitor	System name		Moniteur d’activité
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Fréquence de mise à jour :
 Settings…	ActivityWindow		Réglages…
+Unknown thermal sensor	SystemInfoHandler		Capteur de température inconnu
 Block cache	DataSource		Cache blocs
 Memory	DataSource		Mémoire
+No thermal sensor	SystemInfoHandler		Aucun capteur de température
 CPU speed	DataSource		Fréquence CPU
 CPU usage	DataSource		Activité CPU
 Raw clipboard	DataSource		Presse-papier brut
@@ -23,6 +25,7 @@ Page faults	DataSource		Fautes de pages
 Add graph	ActivityWindow		Ajouter un graphe
 Swap	DataSource		Échange
 %s faults/s	DataSource		%s défauts/s
+Temperature	DataSource		Température
 Semaphores	DataSource		Sémaphores
 TX	DataSource	Shorter version for Sending	Tx
 %lld ms	SettingsWindow		%lld ms

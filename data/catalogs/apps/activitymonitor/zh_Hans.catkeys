@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ActivityMonitor	2467534740
+1	english	x-vnd.Haiku-ActivityMonitor	2137057658
 Teams	DataSource		团队
 Block cache memory	DataSource		高速缓存
 Media nodes	DataSource		媒介节点
@@ -11,6 +11,7 @@ Update time interval:	SettingsWindow		更新频率：
 Settings…	ActivityWindow		设置...
 Block cache	DataSource		高速缓存
 Memory	DataSource		内存
+No thermal sensor	SystemInfoHandler		未找到温度传感器
 CPU speed	DataSource		CPU 速度
 CPU usage	DataSource		CPU使用率
 Raw clipboard	DataSource		原始剪贴板
@@ -23,6 +24,7 @@ Page faults	DataSource		页面错误
 Add graph	ActivityWindow		添加图示
 Swap	DataSource		交换分区
 %s faults/s	DataSource		%s 错误/秒
+Temperature	DataSource		温度
 Semaphores	DataSource		信号量
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms

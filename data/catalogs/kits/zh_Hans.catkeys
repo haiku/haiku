@@ -1,18 +1,18 @@
-1	english	x-vnd.Haiku-libbe	2599604529
-All Rights Reserved.	AboutWindow		保留所有权利
+1	english	x-vnd.Haiku-libbe	310849835
+All Rights Reserved.	AboutWindow		保留所有权利。
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
 OK	PrintJob		确定
 OK	Dragger		确定
 gamma	AboutWindow		伽马
-development	AboutWindow		开发
+development	AboutWindow		开发版本
 {0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s 字节/秒} other{%s 字节/秒}}
 Print Server is not responding.	PrintJob		打印服务未响应。
 About %app%	AboutMenuItem		关于 %app%
 Warning	Dragger		警告
 Green:	ColorControl		绿色:
 Redo	TextView		恢复
-No pages to print!	PrintJob		无打印页！
+No pages to print!	PrintJob		没有可供打印的页面
 beta	AboutWindow		beta
 %s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		确定
@@ -25,7 +25,7 @@ Paste	TextView		粘贴
 OK	AboutWindow		确定
 %s MiB/s	StringForRate	units per second	%s MiB/s
 %s TiB	StringForSize	size unit	%s TiB
-Default Haiku window decorator.	Default decorator about box		默认 Haiku 窗口主题。
+Default Haiku window decorator.	Default decorator about box		默认 Haiku 窗口主题
 %s GiB	StringForSize	size unit	%s GiB
 %s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		删除克隆控件
@@ -45,5 +45,6 @@ Version history:	AboutWindow		版本历史：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
 %s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		蓝色:
+Special thanks:	AboutWindow		特别感谢：
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
 Written by:	AboutWindow		编写：

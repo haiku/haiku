@@ -1,10 +1,12 @@
-1	french	x-vnd.Haiku-Expander	2545978302
+1	french	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		Destination
 Other	ExpanderPreferences		Autre
 Automatically show contents listing	ExpanderPreferences		Montrer l’inventaire automatiquement
+Ignore all	ExpanderWindow		Ignorer tout
 Expander	System name		Décompresseur
 Set source…	ExpanderMenu		Choisir la source…
 OK	ExpanderWindow		OK
+%appname%: Choose destination	DirectoryFilePanel		%appname% : Choisir un dossier de destination
 The destination is not a folder.	ExpanderWindow		La destination n’est pas un dossier.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Le dossier a été déplacé, renommé, ou il n’est pas pris en charge.
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l’extraction
@@ -13,6 +15,7 @@ Create	ExpanderWindow		Créer
 Creating listing for '%s'…	ExpanderWindow		Créer un inventaire pour « %s »…
 Show contents	ExpanderMenu		Montrer le contenu
 %appname% settings	ExpanderPreferences		Réglages de %appname%
+Ignore	ExpanderWindow		Ignorer
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Êtes-vous sûr de vouloir arrêter l’extraction de cette archive ? Les éléments extraits peuvent ne pas être complets.
 Settings	ExpanderMenu		Réglages
 Expand	ExpanderWindow		Décompresser
@@ -46,5 +49,6 @@ The file doesn't exist	ExpanderWindow		Le fichier n’existe pas
 Hide contents	ExpanderWindow		Cacher le contenu
 Source	ExpanderWindow		Source
 The destination is read only.	ExpanderWindow		La destination est en lecture seule.
+%appname%: Open	ExpanderWindow		%appname% : Ouvrir
 Select	ExpanderPreferences		Sélectionner
 File	ExpanderMenu		Fichier

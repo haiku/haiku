@@ -91,7 +91,7 @@ Attach attributes:	Mail		附加属性：
 Find again	Mail		重新搜索
 Size:	Mail		大小：
 To:	Mail		收件人：
-Need Tracker to move items to trash	Mail		需要使用文件浏览器将其移动到垃圾箱
+Need Tracker to move items to trash	Mail		你需要使用 Tracker 将其移入废件箱
 The mail_daemon could not be started:\n\t	Mail		 mail_daemon 无法启动：\n\t
 <no account found>	Mail		<未发现账户>
 helpful message	Mail		帮助消息
@@ -102,7 +102,7 @@ Previous	Mail		前一封
 Include file attributes in attachments	Mail		在附件中包含文件属性
 Start now	Mail		开始
 (Name unavailable)	Mail		（名称不可用）
-Move to trash	Mail		移动到垃圾箱
+Move to trash	Mail		移入废件箱
 <none>	Mail		<无>
 %d - Date	Mail		%d - 日期
 Check spelling	Mail		检查拼写
@@ -111,7 +111,7 @@ Leave as '%s'	Mail		标记为 '%s'
 Print…	Mail		打印中…
 Settings…	Mail		设置…
 Warn unencodable:	Mail		无法识别的编码类型警告:
-Trash	Mail		垃圾箱
+Trash	Mail		废件箱
 Show raw message	Mail		显示原始信息
 Find…	Mail		查询...
 Select all	Mail		全选

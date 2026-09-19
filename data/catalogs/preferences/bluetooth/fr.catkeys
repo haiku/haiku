@@ -1,15 +1,20 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	305903693
+1	french	x-vnd.Haiku-BluetoothPrefs	530464078
+Cancel	Remote devices		Annuler
 Laptop	Settings view		Portable
 Only from trusted devices	Settings view		Seulement les appareils de confiance
 15 secs	Settings view		15 s
 Quit	main		Quitter
+Scan finished	Inquiry panel		Recherche terminé
 Manufacturer: 	Device View		Fabricant : 
+Scan	Inquiry panel		Recherche
+%secs% remaining	Inquiry panel		%secs% restantes
 Desktop	Settings view		Bureau
 Server	Window		Serveur
 Identify host as:	Settings view		Identifier l’hôte comme :
 Local devices found on system:	Settings view		Appareils locaux trouvés sur le système :
 Service classes: 	Device View		Classes de services : 
 Remote devices	Window		Appareils distants
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Cet ordinateur ne semble pas prendre en charge le Bluetooth.
 Settings	Window		Réglages
 Stop bluetooth services…	Window		Arrêter les services bluetooth…
 61 secs	Settings view		61 s
@@ -17,11 +22,14 @@ Add…	Remote devices		Ajouter…
 Revert	Window		Rétablir
 Refresh local devices…	Window		Rafraîchir la liste des périphériques…
 Disconnect	Remote devices		Déconnexion
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Assurez-vous que la fonction Bluetooth de l’appareil distant est activée avant de lancer la recherche.
 Defaults	Window		Défauts
 From all devices	Settings view		Tous les appareils
 Start bluetooth services…	Window		Démarrer les services bluetooth…
+Cancel	Inquiry panel		Annuler
 Launch now	main		Démarrer
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Récupération du nom de « %1 »
 Remove	Remote devices		Enlever
 Pick device…	Settings view		Sélectionnez un appareil…
 Always ask	Settings view		Toujours demander
@@ -30,13 +38,16 @@ Help	Window		Aide
 Pair…	Remote devices		Associer…
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
 Retrieving names…	Inquiry panel		Récupération des noms…
+Canceling scan…	Inquiry panel		Annulation de la recherche…
 Show name	Extended local device view		Montrer le nom
 Add device to list	Inquiry panel		Ajouter l’appareil à la liste
+Scanning progress:	Inquiry panel		Progression de la recherche :
 The Bluetooth services are not currently running on this system.	main		Les services Bluetooth ne sont pas démarrés.
 Discoverable	Extended local device view		Découvrable
 Authenticate	Extended local device view		Authentification
 Smart phone	Settings view		Téléphone
 Default inquiry time:	Settings view		Temps de requête par défaut :
+Friendly name:	Settings view		Nom personnalisé :
 Server	Settings view		Serveur
 Handheld	Settings view		Appareil de poche
  packets: 	Device View		paquets : 

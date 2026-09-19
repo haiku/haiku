@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	3807978621
+1	french	x-vnd.Haiku-Network	4179418585
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
 WPA	WPA protected network		WPA
@@ -33,6 +33,7 @@ OK	NetworkWindow		OK
 Static	IntefaceAddressView		Statique
 launch error	NetworkWindow		erreur du lancement
 Renegotiate	IntefaceView		Renégocier
+configuring	IntefaceView		Configuration en cours
 MAC address:	IntefaceView		Adresse MAC :
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		désactivé

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	4001232826
+1	catalan; valencian	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		Bus ACPI
 USB bus	DevicesView		Bus USB
 Class info	DevicePCI		Informació de la classe
@@ -38,12 +38,14 @@ The driver path is not in a package volume: 	DevicesView		El camí del controlad
 Multimedia controller	Device		Controlador multimèdia
 Blocked entry:\n	DevicesView		Entrada blocada:\n
 Quit	DevicesView		Surt
+Filter:	DevicesView		Filtre:
 Processor	DeviceSCSI		Processador
 Disabling non-packaged drivers is not supported.	DevicesView		No s'admet la inhabilitació de controladors no empaquetats.
 Card reader	DeviceSCSI		Lector de targetes
 Bridge	Device		Pont
 ACPI button '%1'	DeviceACPI		Botó ACPI %1
 Attributes	PropertyList		Atributs
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the %devices% application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		El controlador s'ha desactivat. Cal reiniciar el sistema perquè el canvi tingui efecte.\n\nDesprés de reiniciar, és possible que aquest dispositiu ja no aparegui a la llista de dispositius, ja que el sistema no el podrà identificar sense el seu controlador.\n\nPer tornar a activar el controlador, cerqueu el dispositiu a l'aplicació %devices% i feu clic a \"Activa el controlador\". Si el dispositiu ja no és visible, elimineu l'entrada blocada corresponent del fitxer de configuració dels paquets:\n
 Worm	DeviceSCSI		Cuc
 CD-ROM	DeviceSCSI		CD-ROM
 ACPI system bus	DeviceACPI		Bus del sistema ACPI
@@ -65,6 +67,7 @@ Connection	DevicesView		Connexió
 Failed to write to the settings file.	DevicesView		Ha fallat escriure al fitxer de configuració.
 Scanner	DeviceSCSI		Escànner
 ACPI node '%1'	DeviceACPI		Node d'ACPI %1
+Clear	DevicesView		Neteja
 Device name	Device		Nom del dispositiu
 Device class	DeviceSCSI		Classe de dispositiu
 Input device controller	Device		Controlador de dispositiu d'entrada
@@ -73,6 +76,7 @@ Serial bus controller	Device		Controlador del bus de sèrie
 RBC	DeviceSCSI		RBC
 Wireless controller	Device		Controlador de xarxa sense fil
 Device name	DeviceACPI		Nom del dispositiu
+Shutdown failed with error: 	DevicesView		L'aturada ha fallat amb l'error següent:
 unknown	DevicePCI		desconegut
 ACPI <unknown>	DeviceACPI		ACPI <desconegut>
 Report compatibility	DevicesView		Informe de compatibilitat

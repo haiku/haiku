@@ -37,7 +37,7 @@ OK	SaveToFile		确认
 Print…	Menus		打印...
 The file '%s' could not be written.	SaveToFile		无法写文件'%s'
 Quit	Menus		退出
-Get info	Menus		获取信息
+Get info	Menus		详情
 Rating	Menus		评级
 Close document	ClosePrompt		关闭文档
 Stretch to window	Menus		伸展到窗口
@@ -52,7 +52,7 @@ Go to page	Menus		转到
 Browse	Menus		浏览
 Progress monitor	ProgressWindow		任务管理器
 Edit	Menus		编辑
-Move to Trash	Menus		移动到垃圾箱
+Move to Trash	Menus		移入废件箱
 Use as background…	Menus		设置为桌面背景…
 Open…	Menus		打开...
 Save as…	Menus		另存为...

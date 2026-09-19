@@ -1,5 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-desklink	748898679
+1	catalan; valencian	x-vnd.Haiku-desklink	378743223
 desklink	MediaReplicant	Title of an alert box	enllaç d'escriptori
+Mute	MediaReplicant		Silencia
 Muted	MediaReplicant		Silenciat
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		D'acord
@@ -9,4 +10,5 @@ Volume	VolumeControl		Volum
 Media preferences…	MediaReplicant		Preferències dels mitjans...
 Beep	MediaReplicant		Timbre
 Open %name	DeskButton	Don't translate variable %name	Obre %name
+Remove replicant	VolumeControl		Suprimeix el replicant
 No media server running	VolumeControl		No s'executa cap servidor multimèdia.

@@ -20,13 +20,13 @@ Mini icon view	MediaRoutingView		小图标视图
 Select all	MediaRoutingView		全选
 (same as group)	MediaNodePanel		（与组一致）
 Input	MediaJack		输入
-Get info	MediaJack		获取信息
+Get info	MediaJack		详情
 Start time source	MediaNodePanel		开始时间源
 Error	MediaRoutingView		错误
 Could not release '%refname%'	MediaRoutingView		无法释放'%refname%'
 Output	MediaJack		输出
-Get info	MediaNodePanel		获取信息
-Get info	MediaRoutingView		获取信息
+Get info	MediaNodePanel		详情
+Get info	MediaRoutingView		详情
 Clean up	MediaRoutingView		清理
 Start control panel	MediaNodePanel		启动控制面板
 Tweak parameters	MediaNodePanel		调节参数

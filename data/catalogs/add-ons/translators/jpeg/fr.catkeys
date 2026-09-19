@@ -10,7 +10,7 @@ About	JPEGTranslator		À propos
 Version %d.%d.%d	JPEGTranslator		Version %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Écrire les images noir&blanc en RVB24
 Output smoothing strength	JPEGTranslator		Force du lissage en sortie
-Use progressive compression	JPEGTranslator		Utiliser l'encodage progressif
+Use progressive compression	JPEGTranslator		Utiliser l’encodage progressif
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Créer un fichier plus petit (qualité légèrement moindre)
 High	JPEGTranslator		Haute
 Read greyscale images as RGB32	JPEGTranslator		Lire les images en nuances de gris en RVB32

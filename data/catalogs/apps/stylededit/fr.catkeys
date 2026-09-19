@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	1599874629
+1	french	x-vnd.Haiku-StyledEdit	3717284958
 Document statistics	Statistics		Statistiques du document
 Cut	Menus		Couper
 Center	Menus		Centré
@@ -31,7 +31,10 @@ Bold	Menus		Gras
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Le fichier « %file% » a été modifié par une autre application, voulez-vous le recharger ?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Le fichier « %file% » a été supprimé par une autre application, voulez-vous le restaurer ?
 Lines:	Statistics		Lignes :
+Strikeout	Menus		Barré
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
+Save changes to the document \"%title%\"?	QuitAlert		Voulez-vous enregistrer les modifications du document « %title% » ?
+Style	Menus		Style
 Save	SaveAlert		Sauvegarder
 Default	Open_and_SaveAsPanel		Défaut
 Cancel	RevertToSavedAlert		Annuler

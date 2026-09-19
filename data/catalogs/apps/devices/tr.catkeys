@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	2248970212
+1	turkish	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		ACPI veri yolu
 USB bus	DevicesView		USB veri yolu
 Class info	DevicePCI		Sınıf bilgisi
@@ -38,6 +38,7 @@ The driver path is not in a package volume: 	DevicesView		Sürücü yolu bir pak
 Multimedia controller	Device		Çoklu ortam denetleyici
 Blocked entry:\n	DevicesView		Engellenen girdi:\n
 Quit	DevicesView		Çık
+Filter:	DevicesView		Süz:
 Processor	DeviceSCSI		İşlemci
 Disabling non-packaged drivers is not supported.	DevicesView		Paketlenmemiş sürücüleri devre dışı bırakma desteklenmiyor.
 Card reader	DeviceSCSI		Kart okuyucusu
@@ -66,6 +67,7 @@ Connection	DevicesView		Bağlantı
 Failed to write to the settings file.	DevicesView		Ayarlar dosyasına yazılamadı.
 Scanner	DeviceSCSI		Tarayıcı
 ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
+Clear	DevicesView		Temizle
 Device name	Device		Aygıt adı
 Device class	DeviceSCSI		Aygıt sınıfı
 Input device controller	Device		Giriş aygıtı denetleyicisi

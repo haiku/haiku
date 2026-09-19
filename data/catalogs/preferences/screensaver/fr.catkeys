@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ScreenSaver	2682415627
+1	french	x-vnd.Haiku-ScreenSaver	377530480
 Display Power Management Signaling not available	ScreenSaver		Le système d’économie d’énergie de l’écran (DPMS) n’est pas disponible
 Blackness	ScreenSaver		Ténèbres
 Fade now when mouse is here	ScreenSaver		Estomper maintenant lorsque la souris est ici
@@ -13,6 +13,7 @@ Cancel	ScreenSaver		Annuler
 Password:	ScreenSaver		Mot de passe :
 Screensaver settings	ScreenSaver		Réglages de l’économiseur
 Password Window	ScreenSaver		Fenêtre de mot de passe
+Use system password	ScreenSaver		Utiliser le mot de passe du système
 Test	ScreenSaver		Tester
 Could not load screen saver	ScreenSaver		Impossible de charger l’économiseur d’écran
 Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé

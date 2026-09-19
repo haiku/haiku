@@ -20,5 +20,5 @@ Mute	AudioMixer		Sourdine
 Output mapping	AudioMixer		Correspondances de sorties
 Virtual output channels	AudioMixer		Canaux de la sortie virtuelle
 Allow output channel remapping	AudioMixer		Autoriser la réassignation des canaux de sorties
-Input gain controls represent:	AudioMixer		Les contrôles de gain d'entrée représentent :
+Input gain controls represent:	AudioMixer		Les contrôles de gain d’entrée représentent :
 Attenuate mixer output by 3 dB	AudioMixer		Atténuer la sortie du mélangeur de 3 dB

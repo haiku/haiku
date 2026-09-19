@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	2599604529
+1	french	x-vnd.Haiku-libbe	310849835
 All Rights Reserved.	AboutWindow		Tous droits réservés.
 gold master	AboutWindow		finale
 Undo	TextView		Annuler
@@ -45,5 +45,6 @@ Version history:	AboutWindow		Historique des versions :
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error
 %s KiB/s	StringForRate	units per second	%s Kio/s
 Blue:	ColorControl		Bleu :
+Special thanks:	AboutWindow		Remerciements spéciaux :
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossible de créer le réplicant pour « %description ».\n%error
 Written by:	AboutWindow		Écrit par :

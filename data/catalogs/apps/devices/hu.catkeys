@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Devices	2248970212
+1	hungarian	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		ACPI port
 USB bus	DevicesView		USB busz
 Class info	DevicePCI		Osztály-információk
@@ -38,6 +38,7 @@ The driver path is not in a package volume: 	DevicesView		A vezérlő útvonala 
 Multimedia controller	Device		Multimedia vezérlő
 Blocked entry:\n	DevicesView		Blokkolt bejegyzés:\n
 Quit	DevicesView		Kilépés
+Filter:	DevicesView		Szűrő:
 Processor	DeviceSCSI		Processzor
 Disabling non-packaged drivers is not supported.	DevicesView		Nem csomagolt vezérlők letiltása nem lehetséges.
 Card reader	DeviceSCSI		Kártyaolvasó
@@ -66,6 +67,7 @@ Connection	DevicesView		Csatlakozás
 Failed to write to the settings file.	DevicesView		Nem tudom elmenteni a beállításokat.
 Scanner	DeviceSCSI		Lapolvasó
 ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
+Clear	DevicesView		Törlés
 Device name	Device		Eszköznév
 Device class	DeviceSCSI		Eszközosztály
 Input device controller	Device		Beviteli eszköz vezérlő

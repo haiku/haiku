@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Devices	1374585159
+1	french	x-vnd.Haiku-Devices	3882080736
 ACPI bus	DevicesView		Bus ACPI
 USB bus	DevicesView		Bus USB
 Class info	DevicePCI		Information de classe
@@ -6,11 +6,14 @@ USB bus	Device		Bus USB
 Communications	DeviceSCSI		Communications
 Mass storage controller	Device		Contrôleur de mémoire de masse
 Printer	DeviceSCSI		Imprimante
+Enable driver	DevicesView		Activer le pilote
 Manufacturer	Device		Fabricant
 Memory controller	Device		Contrôleur mémoire
 Unknown device	DevicesView		Périphérique inconnu
 Name	PropertyList		Nom
+Graphics peripheral	DeviceSCSI		Périphérique graphique
 Manufacturer	DeviceSCSI		Fabricant
+unknown	DeviceACPI		inconnu
 Satellite communications controller	Device		Contrôleur de communications par satellite
 PCI bus	DevicesView		Bus PCI
 Device	Device		Périphérique
@@ -22,15 +25,22 @@ Unknown device	Device		Périphérique inconnu
 Value	PropertyList		Valeur
 Generic system peripheral	Device		Périphérique système générique
 Devices	DevicesView		Périphériques
+Optical drive	DeviceSCSI		Lecteur optique
 Display controller	Device		Contrôleur d’affichage
+Bus	DevicesView		Bus
 Device name	DevicePCI		Nom du périphérique
 Other	DeviceSCSI		Autre
 Order by:	DevicesView		Trier par :
 Intelligent controller	Device		Contrôleur intelligent
+ACPI processor namespace '%2'	DeviceACPI		Espace de noms  ACPI « %2 »
 Multimedia controller	Device		Contrôleur multimédia
 Quit	DevicesView		Quitter
+Filter:	DevicesView		Filtre :
 Processor	DeviceSCSI		Microprocesseur
+Card reader	DeviceSCSI		Lecteur de cartes
 Bridge	Device		Pont
+ACPI button '%1'	DeviceACPI		Bouton ACPI « %1 »
+Attributes	PropertyList		Attributs
 Worm	DeviceSCSI		Disque inscriptible
 CD-ROM	DeviceSCSI		CD-ROM
 Signal processing controller	Device		Contrôleur de traitement du signal
@@ -42,6 +52,8 @@ Encryption controller	Device		Contrôleur de chiffrement
 Devices	System name		Périphériques
 Generate system information	DevicesView		Générer les informations systèmes
 Processor	Device		Microprocesseur
+Disable driver	DevicesView		Désactiver le pilote
+Reboot needed	DevicesView		Un redémarrage est requis
 Computer	DevicesView		Ordinateur
 Connection	DevicesView		Connexion
 Scanner	DeviceSCSI		Scanner
@@ -49,19 +61,27 @@ ACPI node '%1'	DeviceACPI		Noeud ACPI « %1 »
 Device name	Device		Nom du périphérique
 Device class	DeviceSCSI		Classe de périphérique
 Input device controller	Device		Contrôleur de périphérique d’entrée
+Restart computer	DevicesView		Redémarrer l’ordinateur
 Serial bus controller	Device		Contrôleur de bus série
 RBC	DeviceSCSI		RBC
 Wireless controller	Device		Contrôleur sans fils
 Device name	DeviceACPI		Nom du périphérique
+Shutdown failed with error: 	DevicesView		L’arrêt a échoué avec l’erreur suivante : 
 ACPI <unknown>	DeviceACPI		ACPI <inconnu>
 Report compatibility	DevicesView		Rapport de compatibilité
 Computer	Device		Ordinateur
+Tape drive	DeviceSCSI		Lecteur de bande
 Enclosure	DeviceSCSI		Zone de stockage
 PCI bus	Device		Bus PCI
+none	Device		aucun
+Disabling critical system drivers is not allowed.	DevicesView		La désactivation de pilotes systèmes critiques n'est pas autorisée.
+Driver disabled	DevicesView		Pilote désactivé
 ISA bus	Device		Bus ISA
 ISA bus	DevicesView		Bus ISA
+Disk drive	DeviceSCSI		Lecteur de disques
 Manufacturer	DevicePCI		Fabricant
 Bridge	DeviceSCSI		Pont
+ACPI system indicator	DeviceACPI		Indicateur système ACPI
 Device name	DeviceSCSI		Nom du périphérique
 Array	DeviceSCSI		Baie
 Manufacturer	DeviceACPI		Fabricant

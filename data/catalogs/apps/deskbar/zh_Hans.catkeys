@@ -1,8 +1,9 @@
-1	english	x-vnd.Be-TSKB	3780974715
+1	english	x-vnd.Be-TSKB	104349693
 Auto-hide	PreferencesWindow		自动隐藏
 Show all	WindowMenu		显示所有
 Edit in Tracker…	PreferencesWindow		在文件浏览器中编辑…
 Menu	PreferencesWindow		菜单
+Location	PreferencesWindow		位置
 Tracker always first	PreferencesWindow		文件浏览器置顶
 Hide clock	TimeView		隐藏时钟
 Large	PreferencesWindow		大
@@ -15,7 +16,7 @@ Recent documents:	PreferencesWindow		最近文档：
 Auto-raise	PreferencesWindow		自动提升
 Mount	DeskbarMenu		挂载
 Icon size	PreferencesWindow		图标大小
-About Haiku	DeskbarMenu		关于Haiku
+About Haiku	DeskbarMenu		关于 Haiku
 Small	PreferencesWindow		小
 Show calendar…	TimeView		显示日历...
 Find…	DeskbarMenu		查找...

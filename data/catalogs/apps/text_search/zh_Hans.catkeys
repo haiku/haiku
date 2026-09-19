@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku.TextSearch	1757850908
+1	english	x-vnd.Haiku.TextSearch	4043418158
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		请选择需要在文件浏览器中显示的文件。
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		启动 xargs 程序失败！
@@ -7,6 +7,7 @@ Actions	GrepWindow		操作
 New window	GrepWindow		新建窗口
 Encoding	GrepWindow		编码
 Set target to parent folder	GrepWindow		设定目标为父文件夹
+Clear history	GrepWindow		清除历史
 OK	GrepWindow		确定
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		关闭

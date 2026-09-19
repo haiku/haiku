@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	2786669505
+1	english	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		预期目标目录
 reply: '%s'\n	SftpClient		回复：‘%s’\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (发送真实密码)
@@ -50,6 +50,7 @@ server address expected	CodyCam		预期服务器地址
 Cannot start the video window	CodyCam		无法启动录像窗口
 reply: %d, %d\n	FtpClient		回复：%d，%d\n
 Cannot set the time source for the video window	CodyCam		无法为视频源设置时间源
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		没有可用的视频信号源。\n你需要一个摄像头来使用 %appname%。
 Every 15 minutes	CodyCam		间隔 15 分钟
 Every 24 hours	CodyCam		间隔 24 小时
 Image Format Menu	CodyCam		图像格式菜单

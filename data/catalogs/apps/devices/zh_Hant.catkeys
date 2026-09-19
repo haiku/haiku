@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Devices	803228278
+1	english	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		ACPI 匯流排
 USB bus	DevicesView		USB 匯流排
 Class info	DevicePCI		類型資訊
@@ -36,14 +36,23 @@ Intelligent controller	Device		智慧型控制器
 ACPI processor namespace '%2'	DeviceACPI		ACPI 處理器命名空間 '%2'
 The driver path is not in a package volume: 	DevicesView		驅動程式路徑不在套件磁碟區：
 Multimedia controller	Device		多媒體控制器
+Blocked entry:\n	DevicesView		已封鎖項目：\n
 Quit	DevicesView		Quit
+Filter:	DevicesView		篩選：
 Processor	DeviceSCSI		處理器
+Disabling non-packaged drivers is not supported.	DevicesView		不支援停用非封裝驅動程式。
+Card reader	DeviceSCSI		讀卡機
 Bridge	Device		橋
+ACPI button '%1'	DeviceACPI		ACPI 按鈕 '%1'
+Attributes	PropertyList		屬性
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the %devices% application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		驅動程式已停用。需重新開機，變更才會生效。\n\n重新開機後，此裝置可能不會再出現在裝置清單，因為沒有驅動程式，系統將無法辨識它。\n\n若要重新啟用驅動程式，請在 %devices% 應用程式找到該裝置，並點選\" 啟用驅動程式 \"。如果裝置已看不到，請從封裝設定檔移除對應的已封鎖項目:\n
 Worm	DeviceSCSI		蠕蟲
 CD-ROM	DeviceSCSI		CD-ROM
+ACPI system bus	DeviceACPI		ACPI 系統匯流排
 Signal processing controller	Device		訊號處理控制器
 Docking station	Device		擴充座
 Unclassified device	Device		未分類設備
+Error	DevicesView		錯誤
 ACPI controller	Device		ACPI 控制器
 ACPI bus	Device		ACPI 匯流排
 Encryption controller	Device		加密控制器
@@ -58,6 +67,7 @@ Connection	DevicesView		連接
 Failed to write to the settings file.	DevicesView		無法寫入設定檔。
 Scanner	DeviceSCSI		掃描器
 ACPI node '%1'	DeviceACPI		ACPI節點 '%1'
+Clear	DevicesView		清除
 Device name	Device		設備名稱
 Device class	DeviceSCSI		設備類別
 Input device controller	Device		輸入設備控制器
@@ -66,6 +76,7 @@ Serial bus controller	Device		序列匯流排控制器
 RBC	DeviceSCSI		RBC
 Wireless controller	Device		無線控制器
 Device name	DeviceACPI		設備名稱
+Shutdown failed with error: 	DevicesView		關機失敗，錯誤：
 unknown	DevicePCI		未知
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Report compatibility	DevicesView		報告相容性
@@ -74,10 +85,15 @@ Tape drive	DeviceSCSI		磁帶機
 Enclosure	DeviceSCSI		外殼
 PCI bus	Device		PCI 匯流排
 none	Device		無
+Disabling critical system drivers is not allowed.	DevicesView		不允許停用關鍵系統驅動程式。
+Driver disabled	DevicesView		驅動程式已停用
 ISA bus	Device		ISA 匯流排
+Basic information	PropertyList		基本資訊
 ISA bus	DevicesView		ISA 匯流排
+Disk drive	DeviceSCSI		磁碟機
 Manufacturer	DevicePCI		製造商
 Bridge	DeviceSCSI		橋
+ACPI system indicator	DeviceACPI		ACPI 系統指示器
 Device name	DeviceSCSI		設備名稱
 Array	DeviceSCSI		陣列
 Manufacturer	DeviceACPI		製造商

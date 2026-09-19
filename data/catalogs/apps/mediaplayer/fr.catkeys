@@ -74,7 +74,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Quitter
 Redo	MediaPlayer-PlaylistWindow		Rétablir
 Move Entry	MediaPlayer-MovePLItemsCmd		Déplacer l’entrée
-Reset rating	MediaPlayer-Main		Effacer l'évaluation
+Reset rating	MediaPlayer-Main		Effacer l’évaluation
 <unknown>	PlaylistItem-author		<inconnu>
 Cancel	MediaPlayer-SettingsWindow		Annuler
 Large	MediaPlayer-SettingsWindow		Large

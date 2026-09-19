@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Input	130668644
+1	french	x-vnd.Haiku-Input	1849044628
 Defaults	InputMouse		Par défaut
 Scrolling	TouchpadPrefView		Défilement
 Long	KeyboardView		Long
@@ -6,12 +6,18 @@ Cancel	TouchpadPrefView		Annuler
 Slow	TouchpadPrefView		Lent
 Device List	InputWindow		Liste des périphériques
 Double-click speed	SettingsView		Vitesse du double clic
+Edge motion:	TouchpadPrefView		Déplacement en bordure :
 5-Button	SettingsView		5-Boutons
 Typing test area	KeyboardView		Zone de test de frappe
 Fast	KeyboardView		Rapide
+Always	TouchpadPrefView		Toujours
+Software button areas	TouchpadPrefView		Zone de bouton virtuels
 Please confirm	TouchpadPrefView		Merci de confirmer
+Trackpad speed	TouchpadPrefView		Vitesse du pavé tactile
 Mouse speed	SettingsView		Vitesse de la souris
+Trackpad acceleration	TouchpadPrefView		Accélération du pavé tactile
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
+Reverse scroll direction	TouchpadPrefView		Inverser le sens de défilement
 Keyboard lock delay	TouchpadPrefView		Délai de verrouillage du clavier
 Input	System name		Entrées
 Quick	TouchpadPrefView		Rapide
@@ -20,6 +26,7 @@ Revert	InputMouse		Rétablir
 Slow	KeyboardView		Lent
 2-Button	SettingsView		2-Boutons
 Click to focus and raise	SettingsView		Cliquer pour activer et remonter
+Natural scrolling	TouchpadPrefView		Défilement naturel
 Vertical	TouchpadPrefView		Vertical
 Focus follows mouse	SettingsView		L’activation suit le pointeur
 Focus mode:	SettingsView		Mode de focus :
@@ -27,6 +34,7 @@ Double-click test area	SettingsView		Zone de test du double clic
 Revert	TouchpadPrefView		Rétablir
 4-Button	SettingsView		4-Boutons
 Tapping sensitivity	TouchpadPrefView		Sensibilité au toucher
+Disabled	TouchpadPrefView		Désactivé
 Revert	InputKeyboard		Rétablir
 Mouse type:	SettingsView		Type de souris :
 Off	TouchpadPrefView		Désactivé

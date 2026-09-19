@@ -1,12 +1,12 @@
 1	english	x-vnd.Haiku-About	506608794
-The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
+The Haikuware team and their bounty program\n	AboutView		Haikuware 团队及其悬赏计划\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
 \n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht（和他的 NewOS 内核）\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		版权所有 © 1999-2000 Y.Takagi。保留所有权利。
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		谷歌及其编程之夏和 Google Code In 比赛项目\n
 Contributors:\n	AboutView		贡献者：\n
-Kernel:	AboutView		内核：
+Kernel:	AboutView		内核构建时间：
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		版权所有 © 2006-2012 Kentaro Fukuchi
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权素有 © 1990-2002 Info-ZIP，保留所有权利。
 Past website & marketing:\n	AboutView		早先网站及市场：\n
@@ -15,7 +15,7 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Pete
 Testing and bug triaging:\n	AboutView		测试与错误分析：\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{单线程处理器:} other{# 线程处理器:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi 固件
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku 所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权所有 © 1996-1997 Jeff Prosise，保留所有权利。
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		版权所有 © 1999-2006 Brian Paul. Mesa3D 项目，保留所有权利。
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		版权所有 © 2010-2011 Google Inc，保留所有权利。
@@ -25,7 +25,7 @@ Unknown	AboutView		未知
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. 及其开发团队，它们的努力孕育了 BeOS！\n\n
 Licenses: 	AboutView		协议：
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权属于 Haiku, Inc. ，或者代码中注明的相应作者。Haiku® 和 HAIKU 标志® 是 Haiku, Inc. 的注册商标。\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		\nHaiku 代码的版权属于 Haiku, Inc. 或者代码中注明的相应作者。Haiku® 和 HAIKU® 标志是 Haiku, Inc. 的注册商标。\n
 Copyright © 2009 Colin Percival	AboutView		版权所有© 2009 Colin Percival
 Time running:	AboutView		运行时间：
 Visit the Haiku website	AboutView		浏览 Haiku 网站
@@ -76,7 +76,7 @@ Copyright © 2001-2003 Expat maintainers.	AboutView		版权所有 © 2001-2003 E
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		版权所有 © 2002-2006 Maxim Shemanarev（McSeem）。
 Translations:\n	AboutView		翻译人员：\n
 Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Copyright © 2014-2024 Florian Bernd and Joel Höner. 版权所有.
-\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…而且可能还有一些我们未提及的开发人员（非常抱歉）！\n\n
+\n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…以及可能还有一些我们未提及的开发人员（非常抱歉！）\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		版权所有 © 2006-2015 Intel Corporation。保留所有权利。
 BSD (2-clause)	AboutWindow		BSD (2 条款)
 Website & marketing:\n	AboutView		网站及市场：\n

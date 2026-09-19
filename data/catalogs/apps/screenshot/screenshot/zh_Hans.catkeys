@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-screenshot-cli	281883787
+1	english	x-vnd.haiku-screenshot-cli	3697002808
 Include window border	ScreenshotWindow		包含窗口边界
 Overwrite	ScreenshotWindow		覆盖
 Save in:	ScreenshotWindow		保存到:
@@ -19,6 +19,7 @@ overwrite	ScreenshotWindow		覆盖
 Settings…	ScreenshotWindow		设置…
 Choose folder	ScreenshotWindow		选择文件夹
 Name:	ScreenshotWindow		名称:
+Active window	ScreenshotWindow		活动窗口
 Choose folder…	ScreenshotWindow		选择文件夹…
 Please select	ScreenshotWindow		请选择
 Failed to save screenshot	ScreenshotWindow		保存屏幕截图失败

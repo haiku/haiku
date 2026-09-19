@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	2345310783
+1	english	x-vnd.Haiku-DriveSetup	2756866399
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -19,8 +19,10 @@ Unmount	MainWindow		卸载
 Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n
 Partition size	CreateParametersPanel		分区大小
 Validation of the given parameters failed.	MainWindow		指定参数验证失败。
+Cannot init target partition.	MainWindow		无法初始化目标分区。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化分区 \"%s\" ？在磁盘写入修改前，您将需要再次确认。
 DriveSetup	System name		磁盘管理器
+Error:	MainWindow	in any error alert	错误：
 Mounted at	PartitionList		挂载于
 Disk system %s not found!	MainWindow		找不到磁盘系统 %s！
 Create…	MainWindow		创建…
@@ -28,8 +30,10 @@ Write changes	MainWindow		写入修改
 Validation of the given creation parameters failed.	MainWindow		给定创建参数验证失败。
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
 Eject	MainWindow		弹出
+There is not enough free space on target device.	MainWindow		目标设备上空间不足。
 Read only	PartitionList		只读
 Surface test (not implemented)	MainWindow		表面测试（未执行）
+Creating disk image	MainWindow		正在创建磁盘映像
 The panel could not return successfully.	MainWindow		面板无法成功返回。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
 Partition %ld	DiskView		分区 %ld
@@ -40,6 +44,7 @@ Failed to delete the partition. No changes have been written to disk.	MainWindow
 Change parameters…	MainWindow		修改参数…
 Format	InitializeParametersPanel		格式化
 Could not unmount partition	MainWindow		无法卸载分区
+Target partition is read only.	MainWindow		目标分区是只读的。
 Create	CreateParametersPanel		创建
 File system	PartitionList		文件系统
 Unknown (%s)	PartitionList		未知 (%s)
@@ -60,14 +65,18 @@ You need to select a partition entry from the list.	MainWindow		您需要从列�
 Offset: %s	Support		偏移量：%s
 SafeBoot encrypted	Encryption utils		SafeBoot 加密
 Volume name	PartitionList		卷标
+Save image…	MainWindow		保存映像…
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Change	ChangeParametersPanel		修改
 Partition name:	ChangeParametersPanel		分区名称:
 LUKS encrypted	Encryption utils		LUKS 加密
 Empty space	PartitionList		空白
 Cancel	AbstractParametersPanel		取消
+%appname%: Save disk image	MainWindow		%appname%: 保存磁盘映像
 Format	MainWindow		格式化
 OK	MainWindow		确定
+Cannot init target file.	MainWindow		无法初始化目标文件。
+Disk image successfully created.	MainWindow		已成功创建磁盘映像。
 Empty space	DiskView		空白
 Could not delete the selected partition.	MainWindow		无法删除所选分区。
 Open with DiskProbe	MainWindow		使用 DiskProbe 打开
@@ -75,6 +84,7 @@ Are you sure you want to initialize the selected disk? All data will be lost. Yo
 There was an error preparing the disk for modifications.	MainWindow		准备对磁盘写入修改时出现错误。
 The disk has been successfully initialized.\n	MainWindow		磁盘已成功完成初始化。\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		是否强制卸载？\n\n注意：如果目前应用正在写入卷，强制卸载可能会导致数据丢失。\n
+Disk image has been removed.	MainWindow		磁盘映像已被移除。
 Cancel	MainWindow		取消
 Free space	PartitionList		未分配空间
 Queries	PartitionList		查询
@@ -88,15 +98,19 @@ The partition cannot be unmounted.	MainWindow		分区无法挂载。
 Delete	MainWindow		删除
 Partition type:	ChangeParametersPanel		分区类型:
 Parameters	PartitionList		参数
+Disk image successfully written to the target.	MainWindow		磁盘映像已成功写入目标。
 Could not acquire partitioning information.	MainWindow		无法获取分区信息。
 Cannot delete the selected partition.	MainWindow		无法删除选中分区。
 Continue	MainWindow		继续
 Could not mount partition %s.	MainWindow		无法挂载分区 %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化该分区？在磁盘写入修改前，您将需要再次确认。
+%appname% error	MainWindow		%appname% 出现错误
 The selected disk is read-only.	MainWindow		所选磁盘是只读的。
 The partition %s is already unmounted.	MainWindow		分区 %s 已经卸载。  
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		是否确定修改所选分区参数？\n\n该分区以后可能无法被其他操作系统所识别！
+Cannot init source volume.	MainWindow		无法初始化源卷。
 Boot	PartitionList		启动
+%appname%: Select disk image	MainWindow		%appname%: 选择磁盘映像
 OK	AbstractParametersPanel		确定
 Virtual	PartitionList		虚拟
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
@@ -105,7 +119,9 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		请从以下列表选择一个分区。
 Active	PartitionList		活动
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定删除所选分区吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
+Writing image to disk	MainWindow		正在将映像写入磁盘
 The partition %s has been successfully formatted.\n	MainWindow		分区 %s 已完成初始化。\n
+Write image…	MainWindow		写入映像…
 The partition %s is already mounted.	MainWindow		分区 %s 已经挂载。
 Size	PartitionList		大小
 Creation of the partition has failed.	MainWindow		分区创建失败。

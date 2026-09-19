@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	4292781411
+1	english	x-vnd.Haiku-Installer	623597604
 Performing installation.	InstallProgress		执行安装。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
 No optional packages available.	PackagesView		无可用附加软件包。
@@ -13,7 +13,9 @@ Cancel	InstallProgress		取消
 Are you sure you want to to stop the installation?	InstallerWindow		您是否确定终止安装过程？
 Installer	System name		系统安装器
 Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		按“开始”按钮，从 '%1s' 安装到 '%2s'。
+Failed to read EFI loader file!	InstallProgress		为 EFI 引导加载程序创建文件夹时出现错误。
 Are you sure you want to stop the installation?	InstallerWindow		是否确定停止安装？
+Failed to create EFI loader directory!	InstallProgress		读取 EFI 引导加载程序文件时出现错误。
 README	InstallerApp		README
 Quit	InstallerWindow		退出
 Please close the BootManager window before closing the Installer window.	InstallerWindow		请在关闭安装窗口前，关闭引导管理器。
@@ -34,6 +36,7 @@ Install from:	InstallerWindow		安装源：
 Additional disk space required: 0.0 KiB	InstallerWindow		需要额外磁盘空间：0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		这是测试版软件！这意味着有丢失重要数据的风险。请注意经常备份数据！已警告过您了。\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Rename	InstallProgress		重命名
 Install anyway	InstallProgress		仍要安装
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   如果您在真正的硬件上安装 Haiku (不是在模拟器内)，您可能会想从另一个操作系统准备一个硬盘分区(例如，您可以使用 GParted Live-CD，它也可以调整现有分区的大小以腾出空间)。\n也可以通过从安装程序启动磁盘管理器来设置分区，但您不能用它来调整现有分区的大小。虽然多年来磁盘管理器已经经过了相当彻底的测试，但建议对系统上的其他分区进行最新备份。以防万一…
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   安装程序将使 Haiku 分区本身可引导，但不会采取任何步骤将 Haiku 集成到现有的引导菜单中。如果已经安装了 GRUB，可以将 Haiku 添加到其中。\n详细信息，请在我们的网站 https://www.haiku-os.org/guides/booting 上查阅引导Haiku的指南。\n或者您可以从安装程序的 \"工具\" 菜单中设置一个启动菜单，参见 Haiku 用户指南中关于应用程序  \"引导管理器\" 的主题。\n\n\n
@@ -44,6 +47,7 @@ Quit	InstallerApp		退出
 Quit BootManager and DriveSetup	InstallerWindow		退出引导管理和驱动设置
 Error writing boot sector.	InstallProgress		写入引导扇区错误。
 OK	InstallerWindow		确定
+Failed to find EFI loader file!	InstallProgress		未能找到 EFI 引导加载程序文件。
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   当您第一次成功启动进入 Haiku 时，请一定要阅读我们的 \"User Guide\" ，并阅读 \"Quick Tour\"。在桌面上和 WebPositive 的书签中都有链接\n\n
 Try installing anyway	InstallProgress		尝试继续安装
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAIKU安装前必读\n\n
@@ -51,6 +55,7 @@ Additional disk space required: %s	InstallerWindow		需要额外磁盘空间：%
 Stop	InstallerWindow	In alert after pressing Stop	暂停
 Boot sector successfully written.	InstallProgress		引导扇区写入成功。
 Failed to launch BootManager	InstallerWindow		启动引导管理器失败
+Install EFI loader	InstallerWindow		安装 EFI 引导加载程序
 Writing bootsector.	InstallProgress		正在写入引导扇区。
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		发生意外错误，系统安装未完成：\n\nError：%s
 Restart	InstallerWindow		重启系统
@@ -75,10 +80,12 @@ Install progress:  	InstallerWindow		安装进度：
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		您无法将磁盘内容进行自我安装。请选择其他磁盘。
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		请在关闭安装器窗口之前关闭引导管理器和磁盘管理器窗口。
 Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		请在弹出的菜单中选择源盘，然后点击“开始”。
+No valid EFI system data partitions found	InstallerWindow		未找到有效的 EFI 系统分区。
 OK	InstallProgress		确定
 Quit BootManager	InstallerWindow		退出引导管理器
 Onto:	InstallerWindow		安装到：
 Tools	InstallerWindow		工具
 scanning…	InstallerWindow		扫描...
+Failed to access installation destination!	InstallProgress		无法访问安装目标位置。
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		请在弹出菜单中选择要安装的磁盘。然后点击“开始”。
 Continue	InstallerApp		继续

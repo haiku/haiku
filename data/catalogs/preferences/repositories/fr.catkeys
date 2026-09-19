@@ -21,7 +21,7 @@ Status	RepositoriesView	Column title	État
 Name	RepositoriesView	Column title	Nom
 Add	AddRepoWindow	Button label	Ajouter
 Enable all	RepositoriesView	Button label	Tout activer
-%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% n'a pas pu récupérer les noms des référentiels actuellement actifs.
+%prefname% could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	%prefname% n’a pas pu récupérer les noms des référentiels actuellement actifs.
 Aborted	TaskLooper	Aborted task status message	Abandon
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	Actif

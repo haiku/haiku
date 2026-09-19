@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	2248970212
+1	swedish	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		ACPI-buss
 USB bus	DevicesView		USB-buss
 Class info	DevicePCI		Klass information
@@ -38,6 +38,7 @@ The driver path is not in a package volume: 	DevicesView		Drivrutinssökvägen f
 Multimedia controller	Device		Multimediakontroller
 Blocked entry:\n	DevicesView		Blockerad åtkomst:\n
 Quit	DevicesView		Avsluta
+Filter:	DevicesView		Filter:
 Processor	DeviceSCSI		Processor
 Disabling non-packaged drivers is not supported.	DevicesView		Det går inte att inaktivera drivrutiner som inte ingår i ett paket.
 Card reader	DeviceSCSI		Kortläsare
@@ -66,6 +67,7 @@ Connection	DevicesView		Anslutning
 Failed to write to the settings file.	DevicesView		Det gick inte att skriva till inställningsfilen.
 Scanner	DeviceSCSI		Skanner
 ACPI node '%1'	DeviceACPI		ACPI nod '%1'
+Clear	DevicesView		Rensa
 Device name	Device		Enhetsnamn
 Device class	DeviceSCSI		Enhetsklass
 Input device controller	Device		Indataenhetskontroller

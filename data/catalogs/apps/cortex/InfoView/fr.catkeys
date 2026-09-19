@@ -21,7 +21,7 @@ Resolution	InfoView		Résolution
 Chunk size	InfoView		Taille des fragments
 File format	AppNodeInfoView		Format de fichier
 Orientation	InfoView		Orientation
-Live file-interface node	FileNodeInfoView		Nœud d'interface-fichier en direct
+Live file-interface node	FileNodeInfoView		Nœud d’interface-fichier en direct
 Channels	InfoView		Canaux
 Sample rate	InfoView		Fréquence d’échantillonnage
 File format	FileNodeInfoView		Format de fichier

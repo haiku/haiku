@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Devices	2248970212
+1	german	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		ACPI-Bus
 USB bus	DevicesView		USB-Bus
 Class info	DevicePCI		Klassen-Info
@@ -38,6 +38,7 @@ The driver path is not in a package volume: 	DevicesView		Der Treiber-Pfad befin
 Multimedia controller	Device		Multimedia-Controller
 Blocked entry:\n	DevicesView		Blockierter Eintrag:\n
 Quit	DevicesView		Beenden
+Filter:	DevicesView		Filter:
 Processor	DeviceSCSI		Prozessor
 Disabling non-packaged drivers is not supported.	DevicesView		Das Deaktivieren von "non-packaged" Treibern wird nicht unterstützt.
 Card reader	DeviceSCSI		Kartenleser
@@ -66,6 +67,7 @@ Connection	DevicesView		Verbindung
 Failed to write to the settings file.	DevicesView		Die Einstellungsdatei konnte nicht gespeichert werden.
 Scanner	DeviceSCSI		Scanner
 ACPI node '%1'	DeviceACPI		ACPI Node '%1'
+Clear	DevicesView		Löschen
 Device name	Device		Gerätename
 Device class	DeviceSCSI		Geräteklasse
 Input device controller	Device		Eingabegeräte-Kontroller

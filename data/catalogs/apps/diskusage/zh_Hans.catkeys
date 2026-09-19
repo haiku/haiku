@@ -11,8 +11,8 @@ Path	Info Window		路径
 Scan	Status View		扫描
 Rescan	Status View		重新扫描
 file unavailable	Status View		文件不可用
-Get info	Pie View		获取信息
-DiskUsage	System name		磁盘查看器
+Get info	Pie View		详情
+DiskUsage	System name		磁盘占用查看器
 Created	Info Window		已创建
 Modified	Info Window		已修改
 Abort	Status View		退出

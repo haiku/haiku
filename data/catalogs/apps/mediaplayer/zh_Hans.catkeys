@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-MediaPlayer	334504768
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		将条目移入废件箱
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		如硬件视频覆盖层可用则使用
@@ -80,10 +80,10 @@ Large	MediaPlayer-SettingsWindow		大
 Import Entry	MediaPlayer-ImportPLItemsCmd		导入项目
 unknown format	MediaPlayer-InfoWin		未知格式
 Track %d	MediaPlayer-Main		第 %d 轨
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		无法移动全部文件到垃圾桶.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		所有文件都无法移入废件箱。
 Total duration: %s	MediaPlayer-PlaylistWindow		总时长：%s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-Move into trash error	MediaPlayer-RemovePLItemsCmd		移入垃圾箱出错
+Move into trash error	MediaPlayer-RemovePLItemsCmd		移入废件箱时出现问题
 50% scale	MediaPlayer-Main		50% 缩放
 Drop files to play	MediaPlayer-Main		拖放文件以播放
 Copy Entry	MediaPlayer-CopyPLItemsCmd		复制条目
@@ -135,14 +135,14 @@ Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		平滑缩�
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		文件 '%filename' 无法打开。\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		您想播放的文件中没有媒体文件。
 Remove Entry	MediaPlayer-RemovePLItemsCmd		删除项目
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		移除条目至垃圾箱
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		将条目移入废件箱
 Subtitle size:	MediaPlayer-SettingsWindow		字幕大小:
 No aspect correction	MediaPlayer-Main		无宽高比修正
 raw video	MediaPlayer-InfoWin		原始视频
 Container	MediaPlayer-InfoWin		容器
 none	MediaPlayer-Main		无
 Open clips	MediaPlayer-Main		打开剪辑
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		一些文件不能被移至垃圾箱。
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		一些文件无法被移入废件箱。
 <nothing to undo>	MediaPlayer-PlaylistWindow		<无需撤消>
 Save as…	MediaPlayer-PlaylistWindow		另存为…
 Error: 	MediaPlayer-RemovePLItemsCmd		错误: 
