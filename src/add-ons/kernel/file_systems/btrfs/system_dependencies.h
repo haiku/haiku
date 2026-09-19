@@ -12,7 +12,6 @@
 #include "fssh_auto_deleter.h"
 
 #include <util/AVLTree.h>
-#include <zlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +53,6 @@ void uuid_generate(uuid_t out);
 #include <stdlib.h>
 #include <unistd.h>
 #include <uuid.h>
-#include <zlib.h>
 
 #endif	// !FS_SHELL
 

@@ -11,6 +11,7 @@
 #include "CachedBlock.h"
 #include "CRCTable.h"
 #include "Utility.h"
+#include <zlib.h>
 #ifdef ZSTD_ENABLED
 #include <zstd.h>
 #endif
