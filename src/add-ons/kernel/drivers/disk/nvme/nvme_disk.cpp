@@ -1098,6 +1098,18 @@ nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			return user_memcpy(buffer, &geometry, length);
 		}
 
+		case B_GET_DEVICE_NAME:
+		{
+			return user_strlcpy((char*)buffer, (char*)info->ctrlr->cdata.mn,
+				MIN(length, NVME_MODEL_NUMBER_LENGTH - 1)) >= 0 ? B_OK : B_BAD_ADDRESS;
+		}
+
+		case B_GET_DEVICE_SERIAL_NUMBER:
+		{
+			return user_strlcpy((char*)buffer, (char*)info->ctrlr->cdata.sn,
+				MIN(length, NVME_SERIAL_NUMBER_LENGTH - 1)) >= 0 ? B_OK : B_BAD_ADDRESS;
+		}
+
 		case B_GET_ICON_NAME:
 			return user_strlcpy((char*)buffer, "devices/drive-harddisk",
 				B_FILE_NAME_LENGTH);
