@@ -34,6 +34,7 @@
 #include "AppUtils.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "PackageKitUtils.h"
 #include "PackageManager.h"
 #include "PackageUtils.h"
 
@@ -178,13 +179,15 @@ InstallPackageProcess::RunInternal()
 	try {
 		packageManager->Install(&packageNameString, 1);
 	} catch (BFatalErrorException& ex) {
-		BString errorString;
-		errorString.SetToFormat("Fatal error occurred while installing package %s: %s (%s)\n",
-			packageNameString, ex.Message().String(), ex.Details().String());
-		AppUtils::NotifySimpleError(
-			SimpleAlert(B_TRANSLATE("Fatal error"), errorString, B_STOP_ALERT));
+		BString logExStr = PackageKitUtils::ExceptionToLogString(&ex);
+		HDERROR(logExStr.String());
+
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Install failure"),
+			PackageKitUtils::ExceptionToAlertString(&ex), B_STOP_ALERT));
+
 		_SetDownloadedPackagesState(NONE);
 		SetPackageState(fPackageName, state);
+
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {
 		HDINFO("Installation of package %s is aborted by user: %s", packageNameString,

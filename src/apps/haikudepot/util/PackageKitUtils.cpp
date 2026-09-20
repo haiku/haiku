@@ -1,13 +1,23 @@
 /*
- * Copyright 2022-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2022-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "PackageKitUtils.h"
 
+#include <Catalog.h>
+
+#include <package/CommitTransactionResult.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageKitUtils"
+
 
 using namespace BPackageKit;
+using namespace BPackageKit::BPrivate;
+using namespace BPackageKit::BManager::BPrivate;
 
 
 /*static*/ status_t
@@ -124,5 +134,86 @@ PackageKitUtils::CreatePublisherInfo(const BPackageInfo& info)
 		publisherName.Prepend("© ");
 
 	PackagePublisherInfoRef result(new PackagePublisherInfo(publisherName, publisherURL), true);
+	return result;
+}
+
+
+/*!	This method will convert the exception into a string that is suitable for use in a human
+ *	readable message included as part of a BAlert message.
+ */
+/*static*/ BString
+PackageKitUtils::ExceptionToAlertString(const BFatalErrorException* fatalEx)
+{
+	BString result = "";
+
+	result << fatalEx->Message();
+
+	if (!fatalEx->Details().IsEmpty()) {
+		if (!result.IsEmpty())
+			result << '\n';
+		BString detailsTemplate = B_TRANSLATE("Details: %Details%");
+		detailsTemplate.ReplaceAll("%Details%", fatalEx->Details());
+		result << detailsTemplate;
+	}
+
+	if (fatalEx->Error() != B_OK) {
+		if (!result.IsEmpty())
+			result << '\n';
+		BString errnoStr;
+		errnoStr.SetToFormat("%" B_PRId32, fatalEx->Error());
+		BString errorTemplate = B_TRANSLATE("Error: %Errstr% (%Errno%)");
+		errorTemplate.ReplaceAll("%Errno%", errnoStr);
+		errorTemplate.ReplaceAll("%Errstr%", strerror(fatalEx->Error()));
+		result << errorTemplate;
+	}
+
+	if (fatalEx->HasCommitTransactionFailed()) {
+		if (!result.IsEmpty())
+			result << '\n';
+		BCommitTransactionResult txnResult = fatalEx->CommitTransactionResult();
+		BString txnResultTemplate = B_TRANSLATE("Transaction Result: %TxnResultFullErrorMessage%");
+		txnResultTemplate.ReplaceAll("%TxnResultFullErrorMessage%", txnResult.FullErrorMessage());
+		result << txnResultTemplate;
+	}
+
+	if (result.IsEmpty())
+		result << "???";
+
+	return result;
+}
+
+
+/*!	This method will convert the exception into a string that is suitable for use in a human
+ *	readable message included as part of a log message.
+ */
+/*static*/ BString
+PackageKitUtils::ExceptionToLogString(const BFatalErrorException* fatalEx)
+{
+	BString result = "";
+
+	result << fatalEx->Message();
+
+	if (!fatalEx->Details().IsEmpty()) {
+		if (!result.IsEmpty())
+			result << ", ";
+		result << "details: [" << fatalEx->Details() << "]";
+	}
+
+	if (fatalEx->Error() != B_OK) {
+		if (!result.IsEmpty())
+			result << ", ";
+		result << "errno: " << fatalEx->Error() << ", errstr: " << strerror(fatalEx->Error());
+	}
+
+	if (fatalEx->HasCommitTransactionFailed()) {
+		if (!result.IsEmpty())
+			result << ", ";
+		BCommitTransactionResult txnResult = fatalEx->CommitTransactionResult();
+		result << "txn-result: " << txnResult.FullErrorMessage();
+	}
+
+	if (result.IsEmpty())
+		result << "???";
+
 	return result;
 }

@@ -25,6 +25,7 @@
 #include "Alert.h"
 #include "AppUtils.h"
 #include "Logger.h"
+#include "PackageKitUtils.h"
 #include "PackageManager.h"
 #include "PackageUtils.h"
 
@@ -90,11 +91,11 @@ UninstallPackageProcess::RunInternal()
 	try {
 		packageManager->Uninstall(&packageNameString, 1);
 	} catch (BFatalErrorException& ex) {
-		BString errorString;
-		errorString.SetToFormat("Fatal error occurred while uninstalling package %s: %s (%s)\n",
-			fPackageName.String(), ex.Message().String(), ex.Details().String());
-		AppUtils::NotifySimpleError(
-			SimpleAlert(B_TRANSLATE("Fatal error"), errorString, B_STOP_ALERT));
+		BString logExStr = PackageKitUtils::ExceptionToLogString(&ex);
+		HDERROR(logExStr.String());
+
+		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Uninstall failure"),
+			PackageKitUtils::ExceptionToAlertString(&ex), B_STOP_ALERT));
 		SetPackageState(fPackageName, state);
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {
