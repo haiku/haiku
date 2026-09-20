@@ -773,6 +773,8 @@ virtio_net_send(void* cookie, net_buffer* buffer)
 	// queue the virtio_net_hdr + buffer data
 	status_t status = info->virtio->queue_request_v(info->txQueues[0],
 		entries, 2, 0, buf);
+	if (status != B_OK)
+		info->txFreeList.Add(buf);
 	mutex_unlock(&info->txLock);
 
 	if (status != B_OK) {
