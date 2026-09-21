@@ -68,10 +68,13 @@ public:
 			void				SetScaleBilinear(bool b);
 			bool				ScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
+			void				EnableBoundariesMarks(bool enable);
+			bool				IsBoundariesMarksEnabled()  { return fBoundariesMarks; }
 			void				SetStretchToBounds(bool enable);
 			bool				StretchesToBounds() const
 									{ return fStretchToBounds; }
 			void				SetHideIdlingCursor(bool hide);
+			void				SetNoBackground(bool noBackground);
 
 			void				FixupScrollBar(enum orientation orientation,
 									float bitmapLength, float viewLength);
@@ -197,6 +200,8 @@ private:
 			bool				fStretchToBounds;
 			bool				fForceOriginalSize;
 			bool				fHideCursor;
+			bool				fNoBackground;
+			bool				fBoundariesMarks;
 			bool				fScrollingBitmap;
 			bool				fCreatingSelection;
 			BPoint				fFirstPoint;

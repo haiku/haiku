@@ -140,6 +140,7 @@ private:
 			bool				fFullScreen;
 			bool				fShowCaption;
 			bool				fShowToolBar;
+			bool				fShowBoundariesMarks;
 			BRect				fWindowFrame;
 			BMessage*			fPrintSettings;
 			PrintOptions		fPrintOptions;

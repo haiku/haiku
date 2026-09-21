@@ -95,6 +95,17 @@ ShowImageView::fTransformation[ImageProcessor::kNumberOfAffineTransformations]
 const rgb_color kAlphaLow = (rgb_color) { 0xbb, 0xbb, 0xbb, 0xff };
 const rgb_color kAlphaHigh = (rgb_color) { 0xe0, 0xe0, 0xe0, 0xff };
 
+static const pattern kStripes = { {
+	0xc7, // 11000111
+	0x8f, // 10001111
+	0x1f, // 00011111
+	0x3e, // 00111110
+	0x7c, // 01111100
+	0xf8, // 11111000
+	0xf1, // 11110001
+	0xe3  // 11100011
+} };
+
 const uint32 kMsgPopUpMenuClosed = 'pmcl';
 
 
@@ -522,6 +533,23 @@ ShowImageView::SetHideIdlingCursor(bool hide)
 }
 
 
+void
+ShowImageView::SetNoBackground(bool noBackground)
+{
+	fNoBackground = noBackground;
+}
+
+
+void
+ShowImageView::EnableBoundariesMarks(bool enable)
+{
+	if (fBoundariesMarks != enable) {
+		fBoundariesMarks = enable;
+		Invalidate();
+	}
+}
+
+
 BBitmap*
 ShowImageView::Bitmap()
 {
@@ -616,15 +644,39 @@ ShowImageView::_AlignBitmap()
 void
 ShowImageView::_DrawBackground(BRect border)
 {
+	PushState();
+
 	BRect bounds(Bounds());
-	// top
-	FillRect(BRect(0, 0, bounds.right, border.top - 1), B_SOLID_LOW);
-	// left
-	FillRect(BRect(0, border.top, border.left - 1, border.bottom), B_SOLID_LOW);
-	// right
-	FillRect(BRect(border.right + 1, border.top, bounds.right, border.bottom), B_SOLID_LOW);
-	// bottom
-	FillRect(BRect(0, border.bottom + 1, bounds.right, bounds.bottom), B_SOLID_LOW);
+
+	if (border.IsValid()) {
+		BRegion clip(bounds);
+		clip.Exclude(border);
+		ConstrainClippingRegion(&clip);
+	}
+
+	if (fNoBackground) {
+		// slide show mode
+		SetLowColor(0, 0, 0);
+		FillRect(bounds, B_SOLID_LOW);
+	} else {
+		SetLowColor(112, 112, 112);
+		SetHighColor(104, 104, 104);
+
+		FillRect(bounds, B_SOLID_LOW);
+		StrokeRect(bounds);
+		FillRect(bounds.InsetByCopy(3, 3), kStripes);
+
+		if (border.IsValid() && fBoundariesMarks) {
+			// draw boundaries marks
+			SetHighColor(255, 255, 255);
+			StrokeLine(BPoint(border.left - 30, border.top), BPoint(border.right + 30, border.top));
+			StrokeLine(BPoint(border.left - 30, border.bottom), BPoint(border.right + 30, border.bottom));
+			StrokeLine(BPoint(border.left, border.top - 30), BPoint(border.left, border.bottom + 30));
+			StrokeLine(BPoint(border.right, border.top - 30), BPoint(border.right, border.bottom + 30));
+		}
+	}
+
+	PopState();
 }
 
 
@@ -702,27 +754,31 @@ ShowImageView::_DrawImage(BRect rect)
 		fDisplayBitmap = fBitmap;
 
 	uint32 options = fScaleBilinear ? B_FILTER_BITMAP_BILINEAR : 0;
-	DrawBitmap(fDisplayBitmap, fDisplayBitmap->Bounds(), rect, options);
+	DrawBitmapAsync(fDisplayBitmap, fDisplayBitmap->Bounds(), rect, options);
 }
 
 
 void
 ShowImageView::Draw(BRect updateRect)
 {
-	if (fBitmap == NULL)
-		return;
-
 	if (IsPrinting()) {
-		DrawBitmap(fBitmap);
+		if (fBitmap != NULL)
+			DrawBitmap(fBitmap);
 		return;
 	}
 
-	BRect rect = _AlignBitmap();
-	fBitmapLocationInView.x = floorf(rect.left);
-	fBitmapLocationInView.y = floorf(rect.top);
+	BRect imageRect(0, 0, -1, -1);
+	if (fBitmap == NULL) {
+		_DrawBackground(imageRect);
+		return;
+	}
 
-	_DrawBackground(rect);
-	_DrawImage(rect);
+	imageRect = _AlignBitmap();
+	fBitmapLocationInView.x = floorf(imageRect.left);
+	fBitmapLocationInView.y = floorf(imageRect.top);
+
+	_DrawBackground(imageRect);
+	_DrawImage(imageRect);
 
 	if (fShowCaption)
 		_DrawCaption();

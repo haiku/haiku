@@ -55,6 +55,7 @@ private:
 };
 
 
+extern const char* kApplicationName;
 extern const char* kApplicationSignature;
 
 #define my_app dynamic_cast<ShowImageApp*>(be_app)

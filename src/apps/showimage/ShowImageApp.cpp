@@ -27,6 +27,7 @@
 #include "ToolBarIcons.h"
 
 
+const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME("ShowImage");
 const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 const int32 kWindowsToIgnore = 1;
 	// ignore the always open file panel
@@ -39,7 +40,6 @@ ShowImageApp::ShowImageApp()
 	fPulseStarted(false),
 	fLastWindowFrame(BRect(30, 30, 430, 330))
 {
-	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("ShowImage");
 	_UpdateLastWindowFrame();
 	// BBitmap can be created after there is a BApplication instance.
 	init_tool_bar_icons();
