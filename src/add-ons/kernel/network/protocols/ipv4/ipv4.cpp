@@ -172,6 +172,7 @@ struct ipv4_protocol : net_protocol {
 	~ipv4_protocol()
 	{
 		delete raw;
+		delete multicast_address;
 	}
 
 	RawSocket*			raw;
