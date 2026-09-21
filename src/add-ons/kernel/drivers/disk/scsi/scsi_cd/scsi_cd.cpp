@@ -815,8 +815,14 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		}
 
 		case B_SCSI_GET_TOC:
-			// TODO: we pass a user buffer here!
-			return get_toc(info, (scsi_toc *)buffer);
+		{
+			scsi_toc toc;
+			status_t status = get_toc(info, &toc);
+			if (status != B_OK)
+				return status;
+
+			return user_memcpy(buffer, &toc, sizeof(scsi_toc));
+		}
 
 		case B_EJECT_DEVICE:
 		case B_SCSI_EJECT:
