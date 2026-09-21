@@ -1,142 +1,74 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2026, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe Houdoin
  */
 
 
 #include "ShowImageStatusView.h"
 
-#include <ControlLook.h>
-#include <Entry.h>
-#include <MenuItem.h>
-#include <NumberFormat.h>
-#include <Path.h>
-#include <PopUpMenu.h>
-#include <ScrollView.h>
-#include <StatusView.h>
+#include <GroupLayout.h>
 
-#include <tracker_private.h>
-#include "DirMenu.h"
-
-#include "ShowImageView.h"
-#include "ShowImageWindow.h"
-
-const float kHorzSpacing = 5.f;
+#include "InfoStatusView.h"
+#include "ProgressStatusView.h"
 
 
-ShowImageStatusView::ShowImageStatusView()
+ShowImageStatusView::ShowImageStatusView(const char* name)
 	:
-	BView("statusview", B_WILL_DRAW),
-	fPreferredSize(0.0, 0.0)
+	BView(name, B_SUPPORTS_LAYOUT),
+	fBusy(false),
+	fInfoStatusView(new InfoStatusView),
+	fProgressStatusView(new ProgressStatusView)
 {
-	memset(fCellWidth, 0, sizeof(fCellWidth));
+	SetLayout(new BGroupLayout(B_VERTICAL, 0));
+
+	fProgressStatusView->Hide();
+
+	GetLayout()->AddView(fInfoStatusView);
+	GetLayout()->AddView(fProgressStatusView);
 }
 
 
 void
 ShowImageStatusView::AttachedToWindow()
 {
-	SetFont(be_plain_font);
-	BPrivate::AdoptScrollBarFontSize(this);
-
-	AdoptParentColors();
-
-	ResizeToPreferred();
+	SetBusy(false);
 }
 
 
 void
-ShowImageStatusView::GetPreferredSize(float* _width, float* _height)
+ShowImageStatusView::SetBusy(bool busy)
 {
-	_ValidatePreferredSize();
-
-	if (_width)
-		*_width = fPreferredSize.width;
-
-	if (_height)
-		*_height = fPreferredSize.height;
-}
-
-
-void
-ShowImageStatusView::ResizeToPreferred()
-{
-	float width, height;
-	GetPreferredSize(&width, &height);
-
-	if (Bounds().Width() > width)
-		width = Bounds().Width();
-
-	BView::ResizeTo(width, height);
-}
-
-
-void
-ShowImageStatusView::Draw(BRect updateRect)
-{
-	if (fPreferredSize.width <= 0)
+	if (busy == fBusy)
 		return;
 
-	if (be_control_look != NULL) {
-		BRect bounds(Bounds());
-		be_control_look->DrawMenuBarBackground(this,
-			bounds, updateRect,	ViewColor());
+	if (busy) {
+		fInfoStatusView->Hide();
+		fProgressStatusView->Show();
+	} else {
+		fInfoStatusView->Show();
+		fProgressStatusView->Hide();
 	}
-
-	BRect bounds(Bounds());
-	rgb_color highColor = ui_color(B_PANEL_TEXT_COLOR);
-
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
-	StrokeLine(bounds.LeftTop(), bounds.RightTop());
-
-	float x = bounds.left;
-	for (size_t i = 0; i < kStatusCellCount - 1; i++) {
-		x += fCellWidth[i];
-		StrokeLine(BPoint(x, bounds.top + 3), BPoint(x, bounds.bottom - 3));
-	}
-
-	SetLowColor(ViewColor());
-	SetHighColor(highColor);
-
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-
-	x = bounds.left;
-	float y = (bounds.bottom + bounds.top
-		+ ceilf(fontHeight.ascent) - ceilf(fontHeight.descent)) / 2;
-
-	for (size_t i = 0; i < kStatusCellCount; i++) {
-		if (fCellText[i].Length() == 0)
-			continue;
-		DrawString(fCellText[i], BPoint(x + kHorzSpacing, y));
-		x += fCellWidth[i];
-	}
+	fBusy = busy;
 }
 
 
 void
-ShowImageStatusView::MouseDown(BPoint where)
+ShowImageStatusView::SetBusyText(const BString& text)
 {
-	BPrivate::BDirMenu* menu = new BDirMenu(NULL, BMessenger(kTrackerSignature),
-		B_REFS_RECEIVED);
-	BEntry entry;
-	if (entry.SetTo(&fRef) == B_OK)
-		menu->Populate(&entry, Window(), false, false, true, false, true);
-	else
-		menu->Populate(NULL, Window(), false, false, true, false, true);
+	fProgressStatusView->SetBusy(text);
+}
 
-	BPoint point = Bounds().LeftBottom();
-	point.y += 3;
-	ConvertToScreen(&point);
-	BRect clickToOpenRect(Bounds());
-	ConvertToScreen(&clickToOpenRect);
-	menu->Go(point, true, true, clickToOpenRect);
-	delete menu;
+
+void
+ShowImageStatusView::SetBusyProgress(float progress)
+{
+	fProgressStatusView->SetProgress(progress);
 }
 
 
@@ -144,87 +76,14 @@ void
 ShowImageStatusView::Update(const entry_ref& ref, const BString& text,
 	const BString& pages, const BString& imageType, float zoom)
 {
-	fRef = ref;
-
-	_SetFrameText(text);
-	_SetZoomText(zoom);
-	_SetPagesText(pages);
-	_SetImageTypeText(imageType);
-
-	_ValidatePreferredSize();
-	Invalidate();
+	SetBusy(false);
+	fInfoStatusView->Update(ref, text, pages, imageType, zoom);
 }
 
 
 void
 ShowImageStatusView::SetZoom(float zoom)
 {
-	_SetZoomText(zoom);
-	_ValidatePreferredSize();
-	Invalidate();
-}
-
-
-void
-ShowImageStatusView::_SetFrameText(const BString& text)
-{
-	fCellText[kFrameSizeCell] = text;
-}
-
-
-void
-ShowImageStatusView::_SetZoomText(float zoom)
-{
-	BNumberFormat numberFormat;
-	BString data;
-	numberFormat.FormatPercent(data, zoom);
-
-	fCellText[kZoomCell] = data;
-}
-
-
-void
-ShowImageStatusView::_SetPagesText(const BString& pages)
-{
-	fCellText[kPagesCell] = pages;
-}
-
-
-void
-ShowImageStatusView::_SetImageTypeText(const BString& imageType)
-{
-	fCellText[kImageTypeCell] = imageType;
-}
-
-
-void
-ShowImageStatusView::_ValidatePreferredSize()
-{
-	// width
-	fPreferredSize.width = 0.f;
-	for (size_t i = 0; i < kStatusCellCount; i++) {
-		if (fCellText[i].Length() == 0) {
-			fCellWidth[i] = 0;
-			continue;
-		}
-		float width = ceilf(StringWidth(fCellText[i]));
-		if (width > 0)
-			width += kHorzSpacing * 2;
-		fCellWidth[i] = width;
-		fPreferredSize.width += fCellWidth[i];
-	}
-
-	// height
-	font_height fontHeight;
-	GetFontHeight(&fontHeight);
-
-	fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading);
-
-	float scrollBarSize = be_control_look->GetScrollBarWidth(B_HORIZONTAL);
-	if (fPreferredSize.height < scrollBarSize)
-		fPreferredSize.height = scrollBarSize;
-
-	SetExplicitMinSize(fPreferredSize);
-	SetExplicitMaxSize(fPreferredSize);
+	SetBusy(false);
+	fInfoStatusView->SetZoom(zoom);
 }

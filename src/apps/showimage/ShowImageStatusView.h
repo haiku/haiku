@@ -5,6 +5,7 @@
  * Authors:
  *		Fernando Francisco de Oliveira
  *		Michael Wilber
+ *		Philippe Houdoin
  */
 #ifndef SHOW_IMAGE_STATUS_VIEW_H
 #define SHOW_IMAGE_STATUS_VIEW_H
@@ -14,40 +15,29 @@
 #include <String.h>
 #include <View.h>
 
-
-enum {
-	kFrameSizeCell,
-	kZoomCell,
-	kPagesCell,
-	kImageTypeCell,
-	kStatusCellCount
-};
+class InfoStatusView;
+class ProgressStatusView;
 
 
 class ShowImageStatusView : public BView {
 public:
-								ShowImageStatusView();
+						ShowImageStatusView(const char* name = "image_status");
 
-	virtual	void				AttachedToWindow();
-	virtual void				GetPreferredSize(float* _width, float* _height);
-	virtual	void				ResizeToPreferred();
-	virtual	void				Draw(BRect updateRect);
-	virtual	void				MouseDown(BPoint where);
+	virtual	void		AttachedToWindow();
 
-			void				Update(const entry_ref& ref,
+	void				SetBusy(bool busy = true);
+	void				SetBusyText(const BString& text);
+	void				SetBusyProgress(float progress);
+
+	void				Update(const entry_ref& ref,
 									const BString& text, const BString& pages,
 									const BString& imageType, float zoom);
-			void				SetZoom(float zoom);
- private:
-			void				_SetFrameText(const BString& text);
-			void				_SetZoomText(float zoom);
-			void				_SetPagesText(const BString& pages);
-			void				_SetImageTypeText(const BString& imageType);
-			void				_ValidatePreferredSize();
-			BSize				fPreferredSize;
-			BString				fCellText[kStatusCellCount];
-			float				fCellWidth[kStatusCellCount];
-			entry_ref			fRef;
+	void				SetZoom(float zoom);
+private:
+	bool				fBusy;
+
+ 	InfoStatusView*		fInfoStatusView;
+ 	ProgressStatusView* fProgressStatusView;
 };
 
 

@@ -1,6 +1,11 @@
 /*
+ * Copyright 2003-2026, Haiku, Inc. All Rights Reserved.
  * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe Houdoin
  */
 
 
@@ -241,6 +246,22 @@ ImageCache::_RetrieveImage(QueueEntry* queueEntry, CacheEntry** _entry)
 
 	if (queueEntry->page != 0
 		&& ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_INDEX, queueEntry->page) != B_OK) {
+		return B_NO_MEMORY;
+	}
+
+	// lookup in cache entries if we already know the pageCount
+	int32 cachedPageCount = 0;
+	CacheEntry* cacheEntry = fCacheEntriesByAge.Tail();
+	while (cacheEntry != NULL) {
+		if (cacheEntry->ref == queueEntry->ref) {
+			cachedPageCount = cacheEntry->pageCount;
+			break;
+		}
+		cacheEntry = fCacheEntriesByAge.GetPrevious(cacheEntry);
+	}
+
+	if (cachedPageCount != 0
+		&& ioExtension.AddInt32(B_TRANSLATOR_EXT_DOCUMENT_COUNT, cachedPageCount) != B_OK) {
 		return B_NO_MEMORY;
 	}
 

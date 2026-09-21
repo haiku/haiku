@@ -24,10 +24,9 @@ class BMenu;
 class BMenuBar;
 class BMenuItem;
 class BMessageRunner;
-class BMessageRunner;
 class BMimeType;
 class BScrollBar;
-class ProgressWindow;
+
 class ShowImageView;
 class ShowImageStatusView;
 
@@ -88,6 +87,7 @@ private:
 			void				_MarkSlideShowDelay(bigtime_t delay);
 
 			void				_UpdateStatusText(const BMessage* message);
+			void				_LoadProgressUpdate(const BMessage* message);
 			void				_LoadError(const entry_ref& ref, status_t status);
 			void				_SaveAs(BMessage* message);
 									// Handle Save As submenu choice
@@ -135,7 +135,6 @@ private:
 			BScrollBar			*fVScrollBar, *fHScrollBar;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
-			ProgressWindow*		fProgressWindow;
 			bool				fModified;
 			bool				fFullScreen;
 			bool				fShowCaption;
@@ -150,6 +149,8 @@ private:
 
 			BMessageRunner*		fSlideShowRunner;
 			bigtime_t			fSlideShowDelay;
+
+			BMessageRunner*		fQuietLoadRunner;
 };
 
 

@@ -13,6 +13,7 @@
  *		Bernd Korz
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Philippe Houdoin
  */
 
 
@@ -778,7 +779,8 @@ ShowImageView::Draw(BRect updateRect)
 	fBitmapLocationInView.y = floorf(imageRect.top);
 
 	_DrawBackground(imageRect);
-	_DrawImage(imageRect);
+	if (updateRect.Intersects(imageRect))
+		_DrawImage(imageRect);
 
 	if (fShowCaption)
 		_DrawCaption();

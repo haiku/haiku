@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2026, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -12,6 +12,7 @@
  *		Bernd Korz
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Philippe Houdoin
  */
 
 
@@ -54,7 +55,6 @@
 #include <posix/locale.h>
 
 #include "ImageCache.h"
-#include "ProgressWindow.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
@@ -67,8 +67,8 @@
 const char* kTypeField = "be:type";
 const char* kTranslatorField = "be:translator";
 
-const bigtime_t kDefaultSlideShowDelay = 3000000;
-	// 3 seconds
+const bigtime_t kDefaultSlideShowDelay = 3000000; // 3 seconds
+const bigtime_t kQuietLoadingDelay = 200000; // 200ms
 
 
 // message constants
@@ -107,7 +107,8 @@ enum {
 	kMsgToggleToolBar			= 'mTTB',
 	kMsgToggleBoundariesMarks	= 'mTBM',
 	kMsgSlideToolBar			= 'mSTB',
-	kMsgFinishSlidingToolBar	= 'mFST'
+	kMsgFinishSlidingToolBar	= 'mFST',
+	kMsgShowLoadingProgress		= 'mSLP'
 };
 
 
@@ -131,7 +132,6 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	fToolBar(NULL),
 	fImageView(NULL),
 	fStatusView(NULL),
-	fProgressWindow(new ProgressWindow()),
 	fModified(false),
 	fFullScreen(false),
 	fShowCaption(true),
@@ -139,7 +139,8 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	fShowBoundariesMarks(false),
 	fPrintSettings(NULL),
 	fSlideShowRunner(NULL),
-	fSlideShowDelay(kDefaultSlideShowDelay)
+	fSlideShowDelay(kDefaultSlideShowDelay),
+	fQuietLoadRunner(NULL)
 {
 	_ApplySettings();
 
@@ -242,7 +243,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	}
 
 	fHScrollBar = new BScrollBar(NULL, NULL, 0, 0, B_HORIZONTAL); {
-		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
+		BGroupView* hScrollBarContainer = new BGroupView(B_HORIZONTAL, 0);
 		hScrollBarContainer->GroupLayout()->AddView(fHScrollBar);
 		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, -1, -1);
 		gridLayout->AddView(hScrollBarContainer, 1, 1);
@@ -260,14 +261,6 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	float toolBarMinWidth = fToolBar->MinSize().width;
 	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000,
 		fBar->MinSize().height + gridLayout->MinSize().height, 100000);
-
-	// finish creating the window
-	status_t status = _LoadImage();
-	if (status != B_OK) {
-		_LoadError(ref, status);
-		Quit();
-		return;
-	}
 
 	// add View menu here so it can access ShowImageView methods
 	BMenu* menu = new BMenu(B_TRANSLATE_CONTEXT("View", "Menus"));
@@ -292,16 +285,20 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	// and tell this window if it contains interesting data or not
 	be_app_messenger.SendMessage(B_CLIPBOARD_CHANGED);
 
-	// The window will be shown on screen automatically
+	status_t status = _LoadImage();
+	if (status != B_OK) {
+		_LoadError(ref, status);
+		Quit();
+		return;
+	}
+
+	// The window will show up on screen automatically
 	Run();
 }
 
 
 ShowImageWindow::~ShowImageWindow()
 {
-	fProgressWindow->Lock();
-	fProgressWindow->Quit();
-
 	_StopSlideShow();
 }
 
@@ -646,8 +643,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgImageCacheImageLoaded:
 		{
-			fProgressWindow->Stop();
-
 			BitmapOwner* bitmapOwner = NULL;
 			message->FindPointer("bitmapOwner", (void**)&bitmapOwner);
 
@@ -669,6 +664,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 					bitmapOwner->ReleaseReference();
 				break;
 			}
+
+			// image loading done
+			delete fQuietLoadRunner;
+			fQuietLoadRunner = NULL;
+			fStatusView->SetBusy(false);
 
 			status_t status = fImageView->SetImage(message);
 			if (status != B_OK) {
@@ -704,12 +704,24 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case kMsgImageCacheProgressUpdate:
 		{
-			entry_ref ref;
-			if (message->FindRef("ref", &ref) == B_OK
-				&& ref == fNavigator.CurrentRef()) {
-				message->what = kMsgProgressUpdate;
-				fProgressWindow->PostMessage(message);
+			_LoadProgressUpdate(message);
+			break;
+		}
+
+		case kMsgShowLoadingProgress:
+		{
+			delete fQuietLoadRunner;
+			fQuietLoadRunner = NULL;
+
+			if (fImageView->Bitmap() == NULL) {
+				// first image still loading, show window now
+				// so user can see loading progress status
+				Show();
+				BPath path(&fNavigator.CurrentRef());
+				SetTitle(path.Path());
 			}
+			// long image loading, show progress status
+			fStatusView->SetBusy();
 			break;
 		}
 
@@ -1354,7 +1366,11 @@ ShowImageWindow::_LoadImage(bool forward)
 	if (status != B_OK)
 		return status;
 
-	fProgressWindow->Start(this);
+	// start of quiet loading phase
+	// fire a runner to show load progress if it take too long time
+	fStatusView->SetBusyText("Loading...");
+	fQuietLoadRunner
+		= new BMessageRunner(this, new BMessage(kMsgShowLoadingProgress), kQuietLoadingDelay, 1);
 
 	// Preload previous/next images - two in the navigation direction, one
 	// in the opposite direction.
@@ -1379,6 +1395,29 @@ ShowImageWindow::_PreloadImage(bool forward, entry_ref& ref)
 		return false;
 
 	return my_app->DefaultCache().RetrieveImage(ref) == B_OK;
+}
+
+
+void
+ShowImageWindow::_LoadProgressUpdate(const BMessage* message)
+{
+	entry_ref ref;
+	if (message->FindRef("ref", &ref) != B_OK || ref != fNavigator.CurrentRef()) {
+		// not the current image, ignore
+		return;
+	}
+
+	float percent;
+	const char* text = NULL;
+
+	bool hasPercent = message->FindFloat("percent", &percent) == B_OK;
+	message->FindString("message", &text);
+
+	if (text)
+		fStatusView->SetBusyText(BString(text));
+
+	if (hasPercent)
+		fStatusView->SetBusyProgress(percent / 100.0f);
 }
 
 

@@ -32,7 +32,6 @@
 
 #include <tracker_private.h>
 
-#include "ProgressWindow.h"
 #include "ShowImageConstants.h"
 
 
