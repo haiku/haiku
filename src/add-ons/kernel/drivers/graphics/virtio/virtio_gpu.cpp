@@ -675,6 +675,10 @@ virtio_gpu_free(void* cookie)
 	wait_for_thread(info->updateThread, &result);
 	info->updateThread = -1;
 	virtio_gpu_drain_queues(info);
+	delete_area(info->framebufferArea);
+	info->framebufferArea = -1;
+	delete_area(info->sharedArea);
+	info->sharedArea = -1;
 	free(handle);
 	return B_OK;
 }
