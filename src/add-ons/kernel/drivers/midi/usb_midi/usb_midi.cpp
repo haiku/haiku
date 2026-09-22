@@ -684,29 +684,40 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 			memset(pkt, 0, sizeof(usb_midi_event_packet));
 			pkt->cin = cin;
 			pkt->cn = port->cable;
+
 			DPRINTF_DEBUG((MY_ID "using packet data (code %x -- %d bytes)"
 				" %x %x %x\n", pkt->cin, CINbytes[pkt->cin],
 				midiseq[0], midiseq[1], midiseq[2]));
-			if (user_memcpy(pkt->midi, midiseq, pkt_bytes) != B_OK)
+
+			if (user_memcpy(pkt->midi, midiseq, pkt_bytes) != B_OK) {
+				release_sem(midiDevice->sem_send);
 				return B_BAD_ADDRESS;
+			}
+
 			DPRINTF_DEBUG((MY_ID "built packet %p %x:%d %x %x %x\n",
 				pkt, pkt->cin, pkt->cn,
 				pkt->midi[0], pkt->midi[1], pkt->midi[2]));
+
 			xfer_bytes -= pkt_bytes;
 			bytes_left -= pkt_bytes;
 			midiseq += pkt_bytes;
 			packet_count++;
 			pkt++;
-			if (midicode == 0xF0 && bytes_left < 4) cin = 4 + bytes_left;
+
+			if (midicode == 0xF0 && bytes_left < 4) {
 				/* see USB-MIDI Spec */
+				cin = 4 + bytes_left;
+			}
 		}
 		status = usb->queue_bulk(midiDevice->ept_out->handle,
 			midiDevice->out_buffer,	sizeof(usb_midi_event_packet)
 			* packet_count, (usb_callback_func)midi_usb_write_callback,
 			midiDevice);
+
 		if (status != B_OK) {
 			DPRINTF_ERR((MY_ID "midi write queue_bulk() error 0x%" B_PRIx32
 				"\n", status));
+			release_sem(midiDevice->sem_send);
 			return B_ERROR;
 		}
 	}
