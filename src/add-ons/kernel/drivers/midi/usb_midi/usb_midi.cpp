@@ -577,10 +577,15 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 	while (midiDevice && midiDevice->active) {
 		ZDPRINTF_DEBUG((MY_ID "waiting on acquire_sem_etc\n"));
 		err = acquire_sem_etc(cookie->sem_cb, 1,
-			 B_RELATIVE_TIMEOUT, 1000000);
+			 B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 1000000);
 		if (err == B_TIMED_OUT) {
 			ZDPRINTF_DEBUG((MY_ID "acquire_sem_etc timed out\n"));
 			continue;	/* see if we're still active */
+		}
+		if (err == B_INTERRUPTED) {
+			// reader got interrupted while device idle
+			*num_bytes = 0;
+			return err;
 		}
 		if (err != B_OK) {
 			*num_bytes = 0;
