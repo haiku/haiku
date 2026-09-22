@@ -194,6 +194,8 @@ kevent(int kq,
 		int errors = 0;
 		for (int i = 0; i < changedInfos; i++) {
 			int64_t data = waitInfos[i].events;
+			if (data == 0)
+				continue;
 			if (data > 0) {
 				if (requestedEvents[i] > 0)
 					continue;
