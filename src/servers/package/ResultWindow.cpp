@@ -33,7 +33,7 @@ ResultWindow::ResultWindow()
 	:
 	BWindow(BRect(0, 0, 400, 300), B_TRANSLATE_COMMENT("Package changes",
 			"Window title"), B_TITLED_WINDOW_LOOK,
-		B_NORMAL_WINDOW_FEEL,
+		B_FLOATING_ALL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
 	fDoneSemaphore(-1),
@@ -42,7 +42,6 @@ ResultWindow::ResultWindow()
 	fContainerView(NULL),
 	fCancelButton(NULL),
 	fApplyButton(NULL)
-
 {
 	fDoneSemaphore = create_sem(0, "package changes");
 	if (fDoneSemaphore < 0)
