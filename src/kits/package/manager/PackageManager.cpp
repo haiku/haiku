@@ -719,6 +719,12 @@ BPackageManager::_ClonePackageFile(LocalRepository* repository,
 	error = BCopyEngine().CopyEntry(sourcePath.Path(), destinationPath.Path());
 	if (error != B_OK)
 		DIE(error, "Failed to copy package file \"%s\"", sourcePath.Path());
+	else {
+		BNode node(destinationPath.Path());
+		node.SetOwner(getuid());
+		node.SetGroup(getgid());
+		node.SetPermissions(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |S_IROTH);
+	}
 }
 
 
