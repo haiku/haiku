@@ -5,7 +5,9 @@
  * Copyright 2013-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Revisions by Pete Goodeve
+ * Revisions by:
+ * 		Pete Goodeve
+ *		Philippe Houdoin
  *
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
@@ -29,7 +31,19 @@
 #include "UnknownDeviceIcons.h"
 
 
-#define B_TRANSLATION_CONTEXT "Patch Bay"
+#define B_TRANSLATION_CONTEXT "PatchBay"
+
+
+static const pattern kStripes = { {
+	0xc7, // 11000111
+	0x8f, // 10001111
+	0x1f, // 00011111
+	0x3e, // 00111110
+	0x7c, // 01111100
+	0xf8, // 11111000
+	0xf1, // 11110001
+	0xe3  // 11100011
+} };
 
 
 PatchView::PatchView(BRect rect)
@@ -132,18 +146,27 @@ PatchView::GetToolTipAt(BPoint point, BToolTip** tip)
 		return false;
 
 	BString str;
-	str << "<" << obj->ID() << ">: " << obj->Name();
+	str <<  obj->Name();
+	str << "\nID: " << obj->ID();
 
 	// if endpoint is from a device, display
 	// its device path also
 	BMessage properties;
 	if (obj->GetProperties(&properties) == B_OK) {
-		BString deviceName;
-		if (properties.FindString("device", &deviceName) == B_OK
-			&& strcmp(obj->Name(), deviceName.String()) != 0) {
+		BString value;
+		BString extraInfo;
+		if (properties.FindString("device:vendor", &value) == B_OK)
+			extraInfo << "\n" << value;
+		if (properties.FindString("device:serial_number", &value) == B_OK)
+			extraInfo << "\nS/N: " << value;
+		if (properties.FindString("device", &value) == B_OK
+			&& strcmp(obj->Name(), value.String()) != 0) {
 			// endpoint name is not the device path
-			str << "\n(" << deviceName << ")";
+			extraInfo << "\n" << value;
 		}
+
+		if (!extraInfo.IsEmpty())
+			str << "\n" << extraInfo;
 	}
 
 	obj->Release();
@@ -177,15 +200,36 @@ PatchView::Draw(BRect /* updateRect */)
 	}
 
 	if (index == 0 && index2 == 0) {
-		const char* message = B_TRANSLATE("No MIDI devices found!");
-		float width = StringWidth(message);
-		BRect rect = Bounds();
+		const char* message = B_TRANSLATE("No MIDI endpoints found!");
 
-		rect.top = rect.top + rect.bottom / 2;
-		rect.left = rect.left + rect.right / 2;
-		rect.left -= width / 2;
+		SetDrawingMode(B_OP_ALPHA);
+		SetLowColor(0, 0, 0, 0);
+		rgb_color color = tint_color(ui_color(B_CONTROL_BACKGROUND_COLOR),
+			ui_color(B_CONTROL_BACKGROUND_COLOR).IsDark() ? 0.9 : 1.2);
+		SetHighColor(color);
 
-		DrawString(message, rect.LeftTop());
+		BRect bounds = Bounds();
+		FillRect(bounds, B_SOLID_LOW);
+		StrokeRect(bounds);
+		FillRect(bounds.InsetByCopy(3, 3), kStripes);
+
+		// no strip under the text for better readability
+
+		BFont font;
+		GetFont(&font);
+		BRect stringRect;
+		escapement_delta delta = { 0.0, 0.0 };
+		font.GetBoundingBoxesForStrings(&message, 1, B_SCREEN_METRIC, &delta, &stringRect);
+		BRect rect(
+			(bounds.Width() - stringRect.Width()) / 2,
+			(bounds.Height() - stringRect.Height()) / 2 + 1,
+			((bounds.Width() - stringRect.Width()) / 2) + stringRect.Width(),
+			((bounds.Height() - stringRect.Height()) / 2) + stringRect.Height());
+		SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		FillRect(rect.InsetByCopy(-8, -8));
+
+		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		DrawString(message, rect.LeftBottom());
 
 		// Since the message is centered, we need to redraw the whole view in
 		// this case.

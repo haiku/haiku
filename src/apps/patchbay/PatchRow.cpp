@@ -1,10 +1,12 @@
 /* PatchRow.cpp
  * ------------
  *
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2026, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Revisions by Pete Goodeve
+ * Revisions by:
+ * 		Pete Goodeve
+ *		Philippe Houdoin
  *
  * Copyright 1999, Be Incorporated.   All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
@@ -13,6 +15,8 @@
 #include "PatchRow.h"
 
 #include <stdio.h>
+
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
 #include <MidiRoster.h>
@@ -31,6 +35,16 @@ extern const uint32 MSG_CONNECT_REQUEST = 'mCRQ';
 
 static const BPoint kBoxOffset(8, 7);
 
+
+#define B_TRANSLATION_CONTEXT "PatchBay Rows"
+
+static const char* kPatchCheckBoxTooltip = B_TRANSLATE(
+	"%producer_name%\n"
+	"  to\n"
+	"%consumer_name%"
+);
+
+
 // PatchCheckBox is the check box that describes a connection
 // between a producer and a consumer.
 class PatchCheckBox : public BCheckBox
@@ -41,7 +55,29 @@ public:
 		BCheckBox(r, "", "", new BMessage(MSG_CONNECT_REQUEST)),
 		fProducerID(producerID),
 		fConsumerID(consumerID)
-	{}
+	{
+		BString tooltip;
+
+		BMidiRoster* roster = BMidiRoster::MidiRoster();
+		if (roster) {
+			BMidiProducer* producer = roster->FindProducer(producerID);
+			BMidiConsumer* consumer = roster->FindConsumer(consumerID);
+			if (producer != NULL && consumer != NULL) {
+				tooltip.SetTo(kPatchCheckBoxTooltip);
+				tooltip.ReplaceAll("%producer_name%", producer->Name());
+				tooltip.ReplaceAll("%consumer_name%", consumer->Name());
+			}
+			if (producer)
+				producer->Release();
+			if (consumer)
+				consumer->Release();
+		}
+
+		if (tooltip.IsEmpty())
+			tooltip << producerID << " -> " << consumerID;
+
+		SetToolTip(tooltip);
+	}
 
 	int32 ProducerID() const
 	{
