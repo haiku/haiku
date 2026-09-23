@@ -54,9 +54,9 @@ virtio_rng_register_device(device_node *parent)
 {
 	CALLED();
 
-	device_attr attrs[] = {
-		{ NULL }
-	};
+	device_attr attrs[]
+		= {{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = VIRTIO_RNG_CONTROLLER_PRETTY_NAME}},
+			{NULL}};
 
 	return gDeviceManager->register_node(parent, VIRTIO_RNG_DRIVER_MODULE_NAME,
 		attrs, NULL, NULL);
