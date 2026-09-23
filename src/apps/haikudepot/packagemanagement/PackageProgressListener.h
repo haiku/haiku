@@ -3,7 +3,7 @@
  * Copyright 2011, Ingo Weinhold, <ingo_weinhold@gmx.de>
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -24,22 +24,16 @@ class PackageProgressListener {
 	public:
 	virtual	~PackageProgressListener();
 
-	virtual	void				DownloadProgressChanged(
-									const char* packageName,
-									float progress);
-	virtual	void				DownloadProgressComplete(
-									const char* packageName);
+	virtual	void				DownloadProgressChanged(const char* packageName, float progress,
+									off_t bytes, off_t totalBytes);
+	virtual	void				DownloadProgressComplete(const char* packageName);
 
-	virtual	void				ConfirmedChanges(
-									BPackageManager::InstalledRepository&
-										repository);
+	virtual	void				ConfirmedChanges(BPackageManager::InstalledRepository& repository);
 
 	virtual	void				StartApplyingChanges(
-									BPackageManager::InstalledRepository&
-										repository);
+									BPackageManager::InstalledRepository& repository);
 	virtual	void				ApplyingChangesDone(
-									BPackageManager::InstalledRepository&
-										repository);
+									BPackageManager::InstalledRepository& repository);
 };
 
 

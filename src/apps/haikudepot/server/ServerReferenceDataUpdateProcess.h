@@ -28,7 +28,7 @@ public:
 	virtual						~ServerReferenceDataUpdateProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 			status_t			GetStandardMetaDataPath(BPath& path) const;

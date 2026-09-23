@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef REPOSITORY_DATA_UPDATE_PROCESS_H
@@ -26,7 +26,7 @@ public:
 	virtual						~ServerRepositoryDataUpdateProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 			status_t			GetStandardMetaDataPath(BPath& path) const;

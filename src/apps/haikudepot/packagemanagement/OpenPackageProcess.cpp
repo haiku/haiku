@@ -126,8 +126,8 @@ OpenPackageProcess::Name() const
 }
 
 
-const char*
-OpenPackageProcess::Description() const
+const BString
+OpenPackageProcess::Description()
 {
 	return fDescription;
 }

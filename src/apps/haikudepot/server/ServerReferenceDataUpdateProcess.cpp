@@ -41,8 +41,8 @@ ServerReferenceDataUpdateProcess::Name() const
 }
 
 
-const char*
-ServerReferenceDataUpdateProcess::Description() const
+const BString
+ServerReferenceDataUpdateProcess::Description()
 {
 	return B_TRANSLATE("Synchronizing reference data from server");
 }

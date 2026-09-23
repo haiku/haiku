@@ -61,8 +61,8 @@ UninstallPackageProcess::Name() const
 }
 
 
-const char*
-UninstallPackageProcess::Description() const
+const BString
+UninstallPackageProcess::Description()
 {
 	return fDescription;
 }

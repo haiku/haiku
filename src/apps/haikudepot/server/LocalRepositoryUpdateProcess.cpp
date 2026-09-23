@@ -54,8 +54,8 @@ LocalRepositoryUpdateProcess::Name() const
 }
 
 
-const char*
-LocalRepositoryUpdateProcess::Description() const
+const BString
+LocalRepositoryUpdateProcess::Description()
 {
 	return B_TRANSLATE("Fetching remote repository data");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -45,10 +45,10 @@ IncrementViewCounterProcess::Name() const
 }
 
 
-const char*
-IncrementViewCounterProcess::Description() const
+const BString
+IncrementViewCounterProcess::Description()
 {
-	return fDescription.String();
+	return fDescription;
 }
 
 

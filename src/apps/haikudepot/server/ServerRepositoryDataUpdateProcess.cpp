@@ -161,8 +161,8 @@ ServerRepositoryDataUpdateProcess::Name() const
 }
 
 
-const char*
-ServerRepositoryDataUpdateProcess::Description() const
+const BString
+ServerRepositoryDataUpdateProcess::Description()
 {
 	return B_TRANSLATE("Synchronizing meta-data about repositories");
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2022-2026, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_PACKAGE_PROCESS_H
@@ -27,13 +27,10 @@ protected:
 			PackageInfoRef		FindPackageByName(const BString& packageName) const;
 
 			void				SetPackageState(const BString& packageName, PackageState state);
-			void				SetPackageDownloadProgress(const BString& packageName, float value);
 			void				ClearPackageInstallationLocations(const BString& packageName);
 
 protected:
 			BString				fPackageName;
-
-private:
 			Model*				fModel;
 };
 

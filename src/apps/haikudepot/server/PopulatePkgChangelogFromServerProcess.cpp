@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Note that this file included code earlier from `Model.cpp` and
@@ -40,8 +40,8 @@ PopulatePkgChangelogFromServerProcess::Name() const
 }
 
 
-const char*
-PopulatePkgChangelogFromServerProcess::Description() const
+const BString
+PopulatePkgChangelogFromServerProcess::Description()
 {
 	return B_TRANSLATE("Fetching changelog for package");
 }

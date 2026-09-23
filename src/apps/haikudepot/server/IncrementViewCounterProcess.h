@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef INCREMENT_VIEW_COUNTER_PROCESS_H
@@ -22,7 +22,7 @@ public:
 	virtual						~IncrementViewCounterProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 	virtual	status_t			RunInternal();

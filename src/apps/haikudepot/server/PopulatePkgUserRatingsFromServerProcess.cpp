@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -42,8 +42,8 @@ PopulatePkgUserRatingsFromServerProcess::Name() const
 }
 
 
-const char*
-PopulatePkgUserRatingsFromServerProcess::Description() const
+const BString
+PopulatePkgUserRatingsFromServerProcess::Description()
 {
 	return B_TRANSLATE("Fetching user ratings for package");
 }

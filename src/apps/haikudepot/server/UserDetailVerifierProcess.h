@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_DETAIL_VERIFIER_PROCESS_H
@@ -34,7 +34,7 @@ public:
 	virtual						~UserDetailVerifierProcess();
 
 	virtual	const char*			Name() const;
-	virtual	const char*			Description() const;
+	virtual	const BString		Description();
 
 protected:
 	virtual	status_t			RunInternal();

@@ -20,7 +20,7 @@ public:
 	virtual						~ServerIconExportUpdateProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 	virtual status_t			ProcessLocalData();
 

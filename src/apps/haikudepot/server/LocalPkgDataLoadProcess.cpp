@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
@@ -165,8 +165,8 @@ LocalPkgDataLoadProcess::Name() const
 }
 
 
-const char*
-LocalPkgDataLoadProcess::Description() const
+const BString
+LocalPkgDataLoadProcess::Description()
 {
 	return B_TRANSLATE("Reading repository data");
 }

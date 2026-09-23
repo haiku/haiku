@@ -1558,7 +1558,9 @@ MainWindow::_QuickPreflightForPkgInstall(const BString& packageName)
 	if (!package.IsSet())
 		HDFATAL("the package to install was not found in the model");
 
-	if (PackageUtils::State(package) == UNINSTALLED) {
+	PackageState state = PackageUtils::State(package);
+
+	if (state != NONE && state != UNINSTALLED) {
 		HDERROR("the package [%s] is not uninstalled; can't install it", packageName.String());
 		return false;
 	}

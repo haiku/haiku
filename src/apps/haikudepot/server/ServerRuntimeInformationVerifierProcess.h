@@ -37,7 +37,7 @@ public:
 	virtual						~ServerRuntimeInformationVerifierProcess();
 
 	virtual	const char*			Name() const;
-	virtual	const char*			Description() const;
+	virtual	const BString		Description();
 
 protected:
 	virtual	status_t			RunInternal();

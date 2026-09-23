@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2023-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef POPULATE_PKG_SIZES_PROCESS_H
@@ -25,7 +25,7 @@ public:
 	virtual						~PopulatePkgSizesProcess();
 
 	virtual	const char*			Name() const;
-	virtual	const char*			Description() const;
+	virtual	const BString		Description();
 	virtual float				Progress();
 
 protected:

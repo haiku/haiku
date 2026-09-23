@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,19 +7,26 @@
 #include "AbstractProcess.h"
 
 #include <AutoLocker.h>
-#include <StopWatch.h>
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ProcessListener.h"
 
 
-static const bigtime_t kProcessUpdateMinimumDelay = 250000;
+#define QUARTER_SECOND 250000
+
+// If there are updates for the process then they will happen at at minimum
+// delay of kProcessUpdateMinimumDelayInitial for kInitialPeriod and after
+// that will happen at a delay of kProcessUpdateMinimumDelay.
+static const bigtime_t kProcessUpdateMinimumDelayInitial = QUARTER_SECOND;
+static const bigtime_t kProcessUpdateMinimumDelay = 4 * QUARTER_SECOND;
+static const bigtime_t kInitialPeriod = 10 * 4 * QUARTER_SECOND;
 
 
 AbstractProcess::AbstractProcess()
 	:
 	fLock(),
+	fStopWatch("process", true),
 	fListener(NULL),
 	fWasStopped(false),
 	fProcessState(PROCESS_INITIAL),
@@ -27,6 +34,8 @@ AbstractProcess::AbstractProcess()
 	fDurationSeconds(0.0),
 	fLastProgressUpdate(0)
 {
+	fStopWatch.Suspend();
+	fStopWatch.Reset();
 }
 
 
@@ -39,7 +48,7 @@ void
 AbstractProcess::SetListener(ProcessListener* listener)
 {
 	if (fListener != listener) {
-		AutoLocker<BLocker> locker(&fLock);
+		AutoLocker<BLocker> locker(fLock);
 		fListener = listener;
 	}
 }
@@ -51,7 +60,7 @@ AbstractProcess::Run()
 	ProcessListener* listener;
 
 	{
-		AutoLocker<BLocker> locker(&fLock);
+		AutoLocker<BLocker> locker(fLock);
 
 		if (ProcessState() != PROCESS_INITIAL) {
 			HDINFO("cannot start process as it is not idle");
@@ -70,9 +79,9 @@ AbstractProcess::Run()
 	if (listener != NULL)
 		listener->ProcessChanged();
 
-	BStopWatch stopWatch("process", true);
+	fStopWatch.Resume();
 	status_t runResult = RunInternal();
-	fDurationSeconds = static_cast<double>(stopWatch.ElapsedTime()) / 1000000.0;
+	fDurationSeconds = static_cast<double>(fStopWatch.ElapsedTime()) / 1000000.0;
 
 	if (runResult != B_OK)
 		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult));
@@ -202,9 +211,14 @@ AbstractProcess::LogReport()
 bool
 AbstractProcess::_ShouldProcessProgress()
 {
+	bigtime_t minDelay = kProcessUpdateMinimumDelayInitial;
+
+	if (fStopWatch.ElapsedTime() > kInitialPeriod)
+		minDelay = kProcessUpdateMinimumDelay;
+
 	bigtime_t now = system_time();
 
-	if (now - fLastProgressUpdate < kProcessUpdateMinimumDelay)
+	if (now - fLastProgressUpdate < minDelay)
 		return false;
 
 	fLastProgressUpdate = now;

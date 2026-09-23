@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef POPULATE_PKG_USER_RATINGS_FROM_SERVER_PROCESS__H
@@ -31,7 +31,7 @@ public:
 	virtual						~PopulatePkgUserRatingsFromServerProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 	virtual status_t			RunInternal();

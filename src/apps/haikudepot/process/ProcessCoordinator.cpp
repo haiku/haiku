@@ -300,10 +300,11 @@ ProcessCoordinator::_CreateStatusMessage()
 		AbstractProcess* process = fNodes.ItemAt(i)->Process();
 		if (process->ProcessState() == PROCESS_RUNNING) {
 			if (firstProcessDescription.IsEmpty()) {
-				if (strlen(process->Description()) != 0)
-					firstProcessDescription = process->Description();
-				else
+				const BString processDescription = process->Description();
+				if (processDescription.IsEmpty())
 					additionalRunningProcesses++;
+				else
+					firstProcessDescription = processDescription;
 			}
 			else
 				additionalRunningProcesses++;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -107,8 +107,8 @@ ServerIconExportUpdateProcess::Name() const
 }
 
 
-const char*
-ServerIconExportUpdateProcess::Description() const
+const BString
+ServerIconExportUpdateProcess::Description()
 {
 	return B_TRANSLATE("Synchronizing icons");
 }

@@ -287,8 +287,8 @@ ServerPkgDataUpdateProcess::Name() const
 }
 
 
-const char*
-ServerPkgDataUpdateProcess::Description() const
+const BString
+ServerPkgDataUpdateProcess::Description()
 {
 	return fDescription.String();
 }

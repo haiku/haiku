@@ -38,8 +38,8 @@ CacheScreenshotProcess::Name() const
 }
 
 
-const char*
-CacheScreenshotProcess::Description() const
+const BString
+CacheScreenshotProcess::Description()
 {
 	return B_TRANSLATE("Fetching screenshot");
 }

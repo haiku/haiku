@@ -1,5 +1,5 @@
 /*
- * Copyright 2024-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
 
  */
@@ -33,7 +33,7 @@ public:
 	virtual						~PopulatePkgChangelogFromServerProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 	virtual status_t			RunInternal();

@@ -74,8 +74,8 @@ PackageProgressListener::~PackageProgressListener()
 
 
 void
-PackageProgressListener::DownloadProgressChanged(const char* packageName,
-	float progress)
+PackageProgressListener::DownloadProgressChanged(const char* packageName, float progress,
+	off_t bytes, off_t totalBytes)
 {
 }
 
@@ -168,12 +168,10 @@ PackageManager::CollectPackageActions(PackageInfoRef package,
 			break;
 		}
 		case DOWNLOADING:
-			HDINFO("no package actions for [%s] (downloading)",
-				package->Name().String());
+			HDDEBUG("no package actions for [%s] (downloading)", package->Name().String());
 			break;
 		case PENDING:
-			HDINFO("no package actions for [%s] (pending)",
-				package->Name().String());
+			HDDEBUG("no package actions for [%s] (pending)", package->Name().String());
 			break;
 		default:
 			HDFATAL("unexpected status for package [%s]",
@@ -354,12 +352,12 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 
 
 void
-PackageManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage, off_t bytes, off_t totalBytes)
+PackageManager::ProgressPackageDownloadActive(const char* packageName, float progress, off_t bytes,
+	off_t totalBytes)
 {
-	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++) {
-		fPackageProgressListeners.ItemAt(i)->DownloadProgressChanged(
-			packageName, completionPercentage);
+	for (int32 i = fPackageProgressListeners.CountItems() - 1; i >= 0; i--) {
+		fPackageProgressListeners.ItemAt(i)->DownloadProgressChanged(packageName, progress, bytes,
+			totalBytes);
 	}
 }
 
@@ -367,10 +365,8 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++) {
-		fPackageProgressListeners.ItemAt(i)->DownloadProgressComplete(
-			packageName);
-	}
+	for (int32 i = fPackageProgressListeners.CountItems() - 1; i >= 0; i--)
+		fPackageProgressListeners.ItemAt(i)->DownloadProgressComplete(packageName);
 }
 
 
@@ -391,7 +387,7 @@ PackageManager::ProgressPackageChecksumComplete(const char* title)
 void
 PackageManager::ProgressStartApplyingChanges(InstalledRepository& repository)
 {
-	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++)
+	for (int32 i = fPackageProgressListeners.CountItems() - 1; i >= 0; i--)
 		fPackageProgressListeners.ItemAt(i)->StartApplyingChanges(repository);
 }
 

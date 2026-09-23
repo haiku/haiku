@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LOCAL_PKG_DATA_LOAD_PROCESS__H
@@ -30,7 +30,7 @@ public:
 	virtual						~LocalPkgDataLoadProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 	virtual status_t			RunInternal();

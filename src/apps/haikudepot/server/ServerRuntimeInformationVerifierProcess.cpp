@@ -40,8 +40,8 @@ ServerRuntimeInformationVerifierProcess::Name() const
 }
 
 
-const char*
-ServerRuntimeInformationVerifierProcess::Description() const
+const BString
+ServerRuntimeInformationVerifierProcess::Description()
 {
 	return B_TRANSLATE("Checking server information");
 }

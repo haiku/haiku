@@ -3,7 +3,7 @@
  * Copyright 2011, Ingo Weinhold, <ingo_weinhold@gmx.de>
  * Copyright 2013, Rene Gollent, <rene@gollent.com>
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>
- * Copyright 2021-2025, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2021-2026, Andrew Lindesay <apl@lindesay.co.nz>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -27,7 +27,7 @@ public:
 	virtual						~UninstallPackageProcess();
 
 	virtual	const char*			Name() const;
-	virtual	const char*			Description() const;
+	virtual	const BString		Description();
 
 			void				StartApplyingChanges(
 									BPackageManager::InstalledRepository&

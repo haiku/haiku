@@ -20,7 +20,7 @@ public:
 	virtual						~CacheScreenshotProcess();
 
 			const char*			Name() const;
-			const char*			Description() const;
+			const BString		Description();
 
 protected:
 	virtual status_t			RunInternal();
