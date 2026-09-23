@@ -1,13 +1,14 @@
 /*
- * midi usb driver
- * usb_midi.c
+ * MIDI USB driver
+ * usb_midi.cpp
  *
- * Copyright 2006-2013 Haiku Inc.  All rights reserved.
+ * Copyright 2006-2026 Haiku Inc.  All rights reserved.
  * Distributed under the terms of the MIT Licence.
  *
  * Authors:
  *		Jérôme Duval
- *		Pete Goodeve, pete.goodeve@computer.org
+ *		Pete Goodeve <pete.goodeve@computer.org>
+ *		Philippe Houdoin
  *
  *		Some portions of this code were originally derived from
  *		USB Joystick driver for BeOS R5
@@ -133,6 +134,8 @@ create_device(const usb_device* dev, uint16 ifno)
 	midiDevice->ifno = ifno;
 	midiDevice->active = true;
 	midiDevice->flags = 0;
+	midiDevice->consecutive_read_errors = 0;
+
 	memset(midiDevice->ports, 0, sizeof(midiDevice->ports));
 	midiDevice->inMaxPkt = midiDevice->outMaxPkt = B_PAGE_SIZE / 2;
 		/* Initially -- will get reduced */
@@ -214,8 +217,7 @@ interpret_midi_buffer(usbmidi_device_info* midiDevice)
 			DPRINTF_ERR((MY_ID "no port matching cable number %d!\n",
 				packet->cn));
 		} else if (port->open_fd == NULL) {
-			DPRINTF_ERR((MY_ID "received data for port %d but it is closed!\n",
-				packet->cn));
+			DPRINTF_DEBUG((MY_ID "received data for port %d but it is closed!\n", packet->cn));
 		} else {
 			ring_buffer_write(port->rbuf, packet->midi, pktlen);
 			release_sem_etc(port->open_fd->sem_cb, pktlen,
@@ -228,12 +230,11 @@ interpret_midi_buffer(usbmidi_device_info* midiDevice)
 }
 
 
-/*
-	callback: got a report, issue next request
-*/
+// #pragma mark - USB transfers callbacks
+
 
 static void
-midi_usb_read_callback(void* cookie, status_t status,
+usb_midi_read_callback(void* cookie, status_t status,
 	void* data, size_t actual_len)
 {
 	status_t st;
@@ -241,8 +242,7 @@ midi_usb_read_callback(void* cookie, status_t status,
 
 	assert(cookie != NULL);
 	if (actual_len > 0) {
-		DPRINTF_DEBUG((MY_ID "midi_usb_read_callback() -- packet length %ld\n",
-			actual_len));
+		DPRINTF_DEBUG((MY_ID "midi_usb_read_callback() -- packet length %ld\n",	actual_len));
 	}
 
 	acquire_sem(midiDevice->sem_lock);
@@ -268,19 +268,30 @@ midi_usb_read_callback(void* cookie, status_t status,
 			release_sem(midiDevice->sem_lock);
 			return;
 		}
-		release_sem(midiDevice->sem_lock);
+
+		// device still there, but (continuously?) returning errors
+		midiDevice->consecutive_read_errors++;
+		if (midiDevice->consecutive_read_errors > MAX_CONSECUTIVE_READ_ERRORS) {
+			// Stop re-queue expecting a different result
+			DPRINTF_ERR((MY_ID "%s: %d consecutive IN transfer errors: giving up. "
+				"Device likely unplugged or faulty\n",
+				midiDevice->name, midiDevice->consecutive_read_errors));
+			release_sem(midiDevice->sem_lock);
+			return;
+		}
 	} else {
 		/* got a report */
 		midiDevice->timestamp = system_time();	/* not used... */
+		midiDevice->consecutive_read_errors = 0;
 
 		interpret_midi_buffer(midiDevice);
-		release_sem(midiDevice->sem_lock);
 	}
 
+	release_sem(midiDevice->sem_lock);
+
 	/* issue next request */
-	st = usb->queue_bulk(midiDevice->ept_in->handle,
-		midiDevice->buffer, midiDevice->inMaxPkt,
-		(usb_callback_func)midi_usb_read_callback, midiDevice);
+	st = usb->queue_bulk(midiDevice->ept_in->handle, midiDevice->buffer, midiDevice->inMaxPkt,
+		(usb_callback_func)usb_midi_read_callback, midiDevice);
 	if (st != B_OK) {
 		/* probably endpoint stall */
 		DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", st));
@@ -289,8 +300,7 @@ midi_usb_read_callback(void* cookie, status_t status,
 
 
 static void
-midi_usb_write_callback(void* cookie, status_t status,
-	void* data, size_t actual_len)
+usb_midi_write_callback(void* cookie, status_t status, void* data, size_t actual_len)
 {
 	usbmidi_device_info* midiDevice = (usbmidi_device_info*)cookie;
 #ifdef DEBUG
@@ -305,9 +315,8 @@ midi_usb_write_callback(void* cookie, status_t status,
 }
 
 
-/*
-	USB specific device hooks
-*/
+// #pragma mark - USB module specific device hooks
+
 
 static status_t
 usb_midi_added(const usb_device* dev, void** cookie)
@@ -434,8 +443,7 @@ got_one:
 	if (midiDevice->ept_in != NULL) {
 		DPRINTF_DEBUG((MY_ID "queueing bulk xfer IN endpoint\n"));
 		status = usb->queue_bulk(midiDevice->ept_in->handle, midiDevice->buffer,
-			midiDevice->inMaxPkt,
-			(usb_callback_func)midi_usb_read_callback, midiDevice);
+			midiDevice->inMaxPkt, (usb_callback_func)usb_midi_read_callback, midiDevice);
 		if (status != B_OK) {
 			DPRINTF_ERR((MY_ID "queue_bulk() error 0x%" B_PRIx32 "\n", status));
 			return B_ERROR;
@@ -485,9 +493,9 @@ usb_midi_removed(void* cookie)
 }
 
 
-static usb_notify_hooks my_notify_hooks =
-{
-	usb_midi_added, usb_midi_removed
+static usb_notify_hooks my_notify_hooks = {
+	usb_midi_added,
+	usb_midi_removed
 };
 
 #define	SUPPORTED_DEVICES	1
@@ -501,10 +509,8 @@ usb_support_descriptor my_supported_devices[SUPPORTED_DEVICES] =
 };
 
 
-/*
-	Device Driver Hook Functions
-	-- open, read, write, close, and free
- */
+// #pragma mark device(s) hooks
+
 
 static status_t
 usb_midi_open(const char* name, uint32 flags,
@@ -709,10 +715,9 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 				cin = 4 + bytes_left;
 			}
 		}
-		status = usb->queue_bulk(midiDevice->ept_out->handle,
-			midiDevice->out_buffer,	sizeof(usb_midi_event_packet)
-			* packet_count, (usb_callback_func)midi_usb_write_callback,
-			midiDevice);
+		status = usb->queue_bulk(midiDevice->ept_out->handle, midiDevice->out_buffer,
+			sizeof(usb_midi_event_packet) * packet_count,
+			(usb_callback_func)usb_midi_write_callback,	midiDevice);
 
 		if (status != B_OK) {
 			DPRINTF_ERR((MY_ID "midi write queue_bulk() error 0x%" B_PRIx32
@@ -781,9 +786,8 @@ static device_hooks usb_midi_hooks = {
 };
 
 
-/*
-	Driver Registration
- */
+// #pragma mark -Driver Registration
+
 
 _EXPORT status_t
 init_hardware(void)

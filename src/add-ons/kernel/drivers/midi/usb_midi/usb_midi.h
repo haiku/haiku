@@ -66,7 +66,8 @@
 	do { if (!(x)) { dprintf(MY_ID "assertion failed at " \
 	 __FILE__ ", line %d\n", __LINE__); }} while (0)
 
-#define	DEFAULT_CONFIGURATION	0
+#define DEFAULT_CONFIGURATION		0
+#define MAX_CONSECUTIVE_READ_ERRORS	100
 
 struct driver_cookie;
 
@@ -95,6 +96,7 @@ typedef struct usbmidi_device_info
 	/* work area for transfer */
 	int bus_status;
 	int actual_length;
+	int consecutive_read_errors;
 	const usb_endpoint_info* ept_in;
 	const usb_endpoint_info* ept_out;
 
