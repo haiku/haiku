@@ -55,7 +55,7 @@ FUNCTION_END(system_time)
 
 /* int64 system_time_nsecs(); */
 FUNCTION(system_time_nsecs):
-	testb	$0, cv_factor_nsecs_shift
+	cmpb	$0, cv_factor_nsecs_shift
 	jne		1f
 
 	/* same algorithm as system_time(), just with a different factor */
