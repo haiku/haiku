@@ -2057,6 +2057,7 @@ TCPEndpoint::ErrorReceived(net_error error, net_error_data* errorData,
 			fSendMaxSegmentSize = newMaxSegmentSize;
 			gStackModule->set_timer(&fRetransmitTimer, 0);
 		}
+		gBufferModule->free(data);
 		return B_OK;
 	}
 
