@@ -642,7 +642,7 @@ read_cd(cd_driver_info *info, const scsi_read_cd *readCD)
 	// are 10 seconds enough for timeout?
 	ccb->timeout = 10;
 
-	// TODO: we pass a user buffer here!
+	// we pass a user buffer here, scsi_periph is able to cope with it
 	ccb->data = (uint8 *)readCD->buffer;
 	ccb->sg_list = NULL;
 	ccb->data_length = readCD->buffer_length;
