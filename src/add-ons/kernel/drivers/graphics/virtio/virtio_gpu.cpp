@@ -568,6 +568,9 @@ virtio_gpu_open(void* _info, const char* path, int openMode, void** _cookie)
 	if (handle == NULL)
 		return B_NO_MEMORY;
 
+	info->sharedArea = -1;
+	info->framebufferArea = -1;
+
 	info->commandDone = create_sem(1, "virtio_gpu_command");
 	if (info->commandDone < B_OK)
 		goto error;
@@ -642,6 +645,8 @@ virtio_gpu_open(void* _info, const char* path, int openMode, void** _cookie)
 error:
 	delete_area(info->framebufferArea);
 	info->framebufferArea = -1;
+	delete_area(info->sharedArea);
+	info->sharedArea = -1;
 	delete_sem(info->commandDone);
 	info->commandDone = -1;
 	free(handle);
@@ -810,6 +815,9 @@ virtio_gpu_init_driver(device_node* node, void** cookie)
 		return B_NO_MEMORY;
 
 	memset(info, 0, sizeof(*info));
+
+	info->framebufferArea = -1;
+	info->sharedArea = -1;
 
 	info->node = node;
 
