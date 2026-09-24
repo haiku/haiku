@@ -78,7 +78,7 @@ MulticastGroupInterface<Addressing>::UnblockSource(
 	if (!fAddresses.Has(sourceAddress))
 		return EADDRNOTAVAIL;
 
-	fAddresses.Add(sourceAddress);
+	fAddresses.Remove(sourceAddress);
 	return B_OK;
 }
 
@@ -103,7 +103,9 @@ MulticastGroupInterface<Addressing>::DropSSM(const AddressType &sourceAddress)
 	if (!fAddresses.Has(sourceAddress))
 		return EADDRNOTAVAIL;
 
-	fAddresses.Add(sourceAddress);
+	fAddresses.Remove(sourceAddress);
+	if (fAddresses.IsEmpty())
+		Addressing::LeaveGroup(this);
 	return B_OK;
 }
 
