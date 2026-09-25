@@ -310,6 +310,8 @@ get_synaptics_movment(synaptics_cookie *cookie, touchpad_movement *_event, bigti
 						sTouchpadInfo.extendedButtonsState &= ~(1 << button);
 					}
 				}
+			} else {
+				sTouchpadInfo.extendedButtonsState = 0;
 			}
 
 			event.buttons |= sTouchpadInfo.extendedButtonsState
