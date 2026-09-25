@@ -2430,13 +2430,15 @@ Inode::_ShrinkStream(Transaction& transaction, off_t size)
 	status_t status;
 
 	if (data->MaxDoubleIndirectRange() > size) {
-		off_t* maxDoubleIndirect = &data->max_double_indirect_range;
+		off_t maxDoubleIndirect = data->max_double_indirect_range;
 			// gcc 4 work-around: "error: cannot bind packed field
 			// 'data->data_stream::max_double_indirect_range' to 'off_t&'"
 		status = _FreeStaticStreamArray(transaction, 0, data->double_indirect,
-			size, data->MaxIndirectRange(), *maxDoubleIndirect);
+			size, data->MaxIndirectRange(), maxDoubleIndirect);
 		if (status != B_OK)
 			return status;
+
+		data->max_double_indirect_range = maxDoubleIndirect;
 
 		if (size <= data->MaxIndirectRange()) {
 			fVolume->Free(transaction, data->double_indirect);
@@ -2457,12 +2459,12 @@ Inode::_ShrinkStream(Transaction& transaction, off_t size)
 
 			block_run* array = (block_run*)cached.WritableBlock();
 
-			off_t* maxIndirect = &data->max_indirect_range;
-				// gcc 4 work-around: "error: cannot bind packed field
-				// 'data->data_stream::max_indirect_range' to 'off_t&'"
+			off_t maxIndirect = data->max_indirect_range;
 			if (_FreeStreamArray(transaction, array, fVolume->BlockSize()
-					/ sizeof(block_run), size, offset, *maxIndirect) != B_OK)
+					/ sizeof(block_run), size, offset, maxIndirect) != B_OK)
 				return B_IO_ERROR;
+
+			data->max_indirect_range = maxIndirect;
 		}
 		if (data->max_direct_range == data->max_indirect_range) {
 			fVolume->Free(transaction, data->indirect);
@@ -2473,13 +2475,13 @@ Inode::_ShrinkStream(Transaction& transaction, off_t size)
 
 	if (data->MaxDirectRange() > size) {
 		off_t offset = 0;
-		off_t *maxDirect = &data->max_direct_range;
-			// gcc 4 work-around: "error: cannot bind packed field
-			// 'data->data_stream::max_direct_range' to 'off_t&'"
+		off_t maxDirect = data->max_direct_range;
 		status = _FreeStreamArray(transaction, data->direct, NUM_DIRECT_BLOCKS,
-			size, offset, *maxDirect);
+			size, offset, maxDirect);
 		if (status != B_OK)
 			return status;
+
+		data->max_direct_range = maxDirect;
 	}
 
 	data->size = HOST_ENDIAN_TO_BFS_INT64(size);
