@@ -1460,8 +1460,8 @@ TermParse::_DecPrivateModeSet(int value)
 {
 	switch (value) {
 		case 1:
-			// Application Cursor Keys (whatever that means).
-			// Not supported yet.
+			// Select Application Cursor Keys.
+			fBuffer->SetMode(MODE_APPLICATION_CURSOR_KEYS);
 			break;
 		case 5:
 			// Reverse Video (inverses colors for the complete screen
@@ -1537,8 +1537,8 @@ TermParse::_DecPrivateModeReset(int value)
 {
 	switch (value) {
 		case 1:
-			// Normal Cursor Keys (whatever that means).
-			// Not supported yet.
+			// Select ANSI Cursor Keys.
+			fBuffer->ResetMode(MODE_APPLICATION_CURSOR_KEYS);
 			break;
 		case 3:
 			// 80 Column Mode.
@@ -1619,23 +1619,28 @@ TermParse::_DecPrivateModeRequest(int value)
 {
 	BString reply;
 	switch (value) {
+		case 1:
+			// Request Application Cursor Keys mode
+			reply.SetToFormat("\033[?1;%u$y",
+				fBuffer->IsMode(MODE_APPLICATION_CURSOR_KEYS) ? 1 : 2);
+			break;
 		case 12:
 			// Request cursor blinking mode
-			reply.SetToFormat("\033[?12;%u$y\033\\",
-				fBuffer->IsMode(MODE_CURSOR_BLINKING) ? 1 : 2);
+			reply.SetToFormat("\033[?12;%u$y", fBuffer->IsMode(MODE_CURSOR_BLINKING) ? 1 : 2);
 			break;
 		case 1006:
 			// Request extended mouse coordinates with SGR scheme
-			reply.SetToFormat("\033[?1006;%u$y\033\\",
+			reply.SetToFormat("\033[?1006;%u$y",
 				fBuffer->IsMode(MODE_EXTENDED_MOUSE_COORDINATES) ? 1 : 2);
 			break;
 		case 2004:
 			// Request bracketed paste mode
-			reply.SetToFormat("\033[?2004;%u$y\033\\",
-				fBuffer->IsMode(MODE_BRACKETED_PASTE) ? 1 : 2);
+			reply.SetToFormat("\033[?2004;%u$y", fBuffer->IsMode(MODE_BRACKETED_PASTE) ? 1 : 2);
 			break;
 		default:
-			return;
+			// Unsupported option
+			reply.SetToFormat("\033[?%u;0$y", value);
+			break;
 	}
 	_WriteReply(reply);
 }

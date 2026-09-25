@@ -78,6 +78,7 @@ public:
 
 private:
 			bool				_CheckEnterHyperLinkState(int32 modifiers);
+
 };
 
 
