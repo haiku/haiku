@@ -182,6 +182,7 @@ status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_ring_setup();
 status_t radeon_gpu_ring_boot(uint32 ringType);
 status_t radeon_gpu_ss_control(pll_info* pll, bool enable);
+void radeon_gpu_dump_registers();
 
 
 #endif

@@ -25,6 +25,7 @@
 #include "display.h"
 #include "displayport.h"
 #include "encoder.h"
+#include "gpu.h"
 #include "pll.h"
 #include "utility.h"
 
@@ -237,27 +238,7 @@ radeon_set_display_mode(display_mode* mode)
 	#ifdef TRACE_MODE
 	// for debugging
 	debug_dp_info();
-
-	TRACE("D1CRTC_STATUS        Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1CRTC_STATUS));
-	TRACE("D2CRTC_STATUS        Value: 0x%X\n",
-		Read32(CRT, AVIVO_D2CRTC_STATUS));
-	TRACE("D1CRTC_CONTROL       Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1CRTC_CONTROL));
-	TRACE("D2CRTC_CONTROL       Value: 0x%X\n",
-		Read32(CRT, AVIVO_D2CRTC_CONTROL));
-	TRACE("D1GRPH_ENABLE        Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1GRPH_ENABLE));
-	TRACE("D2GRPH_ENABLE        Value: 0x%X\n",
-		Read32(CRT, AVIVO_D2GRPH_ENABLE));
-	TRACE("D1SCL_ENABLE         Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1SCL_SCALER_ENABLE));
-	TRACE("D2SCL_ENABLE         Value: 0x%X\n",
-		Read32(CRT, AVIVO_D2SCL_SCALER_ENABLE));
-	TRACE("D1CRTC_BLANK_CONTROL Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
-	TRACE("D2CRTC_BLANK_CONTROL Value: 0x%X\n",
-		Read32(CRT, AVIVO_D1CRTC_BLANK_CONTROL));
+	radeon_gpu_dump_registers();
 	#endif
 
 	return B_OK;
