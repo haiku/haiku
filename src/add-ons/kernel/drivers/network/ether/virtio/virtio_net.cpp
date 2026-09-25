@@ -434,21 +434,21 @@ virtio_net_init_device(void* _info, void** _cookie)
 	status = info->virtio->setup_interrupt(info->virtio_device, NULL, info);
 	if (status != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(status));
-		goto err6;
+		goto err7;
 	}
 
 	status = info->virtio->queue_setup_interrupt(info->rxQueues[0],
 		virtio_net_rxDone, info);
 	if (status != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-		goto err6;
+		goto err7;
 	}
 
 	status = info->virtio->queue_setup_interrupt(info->txQueues[0],
 		virtio_net_txDone, info);
 	if (status != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-		goto err6;
+		goto err7;
 	}
 
 	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0) {
@@ -456,13 +456,16 @@ virtio_net_init_device(void* _info, void** _cookie)
 			NULL, info);
 		if (status != B_OK) {
 			ERROR("queue interrupt setup failed (%s)\n", strerror(status));
-			goto err6;
+			goto err7;
 		}
 	}
 
 	*_cookie = info;
 	return B_OK;
 
+err7:
+	mutex_destroy(&info->rxLock);
+	mutex_destroy(&info->txLock);
 err6:
 	for (int i = 0; i < info->txSizes[0]; i++)
 		delete info->txBufInfos[i];
