@@ -69,6 +69,11 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 	TRACE("\tserial_number:.......0x%02x\n", fDeviceDescriptor.serial_number);
 	TRACE("\tnum_configurations:..%d\n", fDeviceDescriptor.num_configurations);
 
+	if (fDeviceDescriptor.num_configurations == 0) {
+		TRACE_ERROR("device without any configuration!\n");
+		return;
+	}
+
 	// Get the configurations
 	fConfigurations = (usb_configuration_info*)malloc(
 		fDeviceDescriptor.num_configurations * sizeof(usb_configuration_info));
@@ -105,6 +110,13 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 		TRACE("\tattributes:..........0x%02x\n", configDescriptor.attributes);
 		TRACE("\tmax_power:...........%d\n", configDescriptor.max_power);
 
+		if (configDescriptor.total_length < sizeof(configDescriptor)) {
+			TRACE_ERROR("invalid configuration %" B_PRId32
+				" descriptor total length %" B_PRIu16 ", correcting!\n",
+				i, configDescriptor.total_length);
+			configDescriptor.total_length = sizeof(configDescriptor);
+		}
+
 		uint8* configData = (uint8*)malloc(configDescriptor.total_length);
 		if (configData == NULL) {
 			TRACE_ERROR("out of memory when reading config\n");
@@ -138,16 +150,36 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 		usb_interface_info* currentInterface = NULL;
 		uint32 descriptorStart = sizeof(usb_configuration_descriptor);
-		while (descriptorStart < actualLength) {
-			switch (configData[descriptorStart + 1]) {
+		while (descriptorStart + 2 <= actualLength) { // descriptor minimal length
+			usb_generic_descriptor* descriptor
+				= (usb_generic_descriptor*)&configData[descriptorStart];
+
+			uint8 descriptorLength = descriptor->length;
+			if (descriptorLength < 2 || descriptorStart + descriptorLength > actualLength) {
+				TRACE_ERROR("invalid descriptor length %" B_PRIu8 " in configuration %" B_PRId32
+					", ignoring!\n",
+					i, descriptorLength);
+				break;
+			}
+
+			switch (descriptor->descriptor_type) {
 				case USB_DESCRIPTOR_INTERFACE:
 				{
-					TRACE("got interface descriptor\n");
+					if (descriptorLength < sizeof(usb_interface_descriptor)) {
+						TRACE_ERROR("invalid interface descriptor length %" B_PRIu8
+							" in configuration %" B_PRId32 ", ignoring!\n",
+							i, descriptorLength);
+						break;
+					}
+
 					usb_interface_descriptor* interfaceDescriptor
-						= (usb_interface_descriptor*)&configData[
-							descriptorStart];
+						= (usb_interface_descriptor*)descriptor;
+
+					TRACE("got interface descriptor\n");
 					TRACE("\tlength:.............%d\n",
 						interfaceDescriptor->length);
+					if (descriptorLength != sizeof(usb_interface_descriptor))
+						TRACE_ERROR("\t\tNON COMPLIANT descriptor length\n");
 					TRACE("\tdescriptor_type:....0x%02x\n",
 						interfaceDescriptor->descriptor_type);
 					TRACE("\tinterface_number:...%d\n",
@@ -216,11 +248,21 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 				case USB_DESCRIPTOR_ENDPOINT:
 				{
-					TRACE("got endpoint descriptor\n");
+					if (descriptorLength < sizeof(usb_endpoint_descriptor)) {
+						TRACE_ERROR("invalid endpoint descriptor length %" B_PRIu8
+							" in configuration %" B_PRId32 ", ignoring!\n",
+							i, descriptorLength);
+						break;
+					}
+
 					usb_endpoint_descriptor* endpointDescriptor
-						= (usb_endpoint_descriptor*)&configData[descriptorStart];
+						= (usb_endpoint_descriptor*)descriptor;
+
+					TRACE("got endpoint descriptor\n");
 					TRACE("\tlength:.............%d\n",
 						endpointDescriptor->length);
+					if (descriptorLength != sizeof(usb_endpoint_descriptor))
+						TRACE_ERROR("\t\tNON COMPLIANT descriptor length\n");
 					TRACE("\tdescriptor_type:....0x%02x\n",
 						endpointDescriptor->descriptor_type);
 					TRACE("\tendpoint_address:...0x%02x\n",
@@ -280,12 +322,8 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 
 				default:
 					TRACE("got generic descriptor\n");
-					usb_generic_descriptor* genericDescriptor
-						= (usb_generic_descriptor*)&configData[descriptorStart];
-					TRACE("\tlength:.............%d\n",
-						genericDescriptor->length);
-					TRACE("\tdescriptor_type:....0x%02x\n",
-						genericDescriptor->descriptor_type);
+					TRACE("\tlength:.............%d\n", descriptor->length);
+					TRACE("\tdescriptor_type:....0x%02x\n", descriptor->descriptor_type);
 
 					if (currentInterface == NULL)
 						break;
@@ -306,13 +344,12 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 					currentInterface->generic = newGenerics;
 
 					// Add this descriptor
-					currentInterface->generic[
-						currentInterface->generic_count - 1]
-							= (usb_descriptor*)genericDescriptor;
+					currentInterface->generic[currentInterface->generic_count - 1]
+						= (usb_descriptor*)descriptor;
 					break;
 			}
 
-			descriptorStart += configData[descriptorStart];
+			descriptorStart += descriptorLength;
 		}
 	}
 
