@@ -297,10 +297,10 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
 	} else if (partition->IsDevice()) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+		BString deviceName(kUnavailableString);
 		if (partition->Name() != NULL && partition->Name()[0])
-			SetField(new BStringField(partition->Name()), kVolumeNameColumn);
-		else
-			SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
+			deviceName.SetTo(partition->Name());
+		SetField(new BStringField(deviceName.Trim()), kVolumeNameColumn);
 	} else if (partition->CountChildren() > 0) {
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
