@@ -59,6 +59,6 @@ struct virtio_balloon_config {
 struct virtio_balloon_stat {
 	uint16_t tag;
 	uint64_t val;
-} __packed;
+} __attribute__((packed));
 
 #endif /* _VIRTIO_BALLOON_H */

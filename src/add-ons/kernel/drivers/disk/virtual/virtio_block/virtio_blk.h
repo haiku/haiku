@@ -73,7 +73,7 @@ struct virtio_blk_config {
 	/* Writeback mode (if VIRTIO_BLK_F_CONFIG_WCE) */
 	uint8_t writeback;
 
-} __packed;
+} __attribute__((packed));
 
 /*
  * Command types
