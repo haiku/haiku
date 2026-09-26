@@ -15,8 +15,10 @@
 #include <stdio.h>
 
 #include <DirectWindow.h>
+#include <Entry.h>
 #include <FindDirectory.h>
 #include <Message.h>
+#include <Path.h>
 #include <Window.h>
 
 
@@ -112,6 +114,7 @@ ScreenSaverRunner::_LoadAddOn()
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};
 	BPath path;
+	BEntry entry;
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		if (find_directory(which[i], &path, false) != B_OK)
@@ -119,6 +122,10 @@ ScreenSaverRunner::_LoadAddOn()
 		else if (path.Append("Screen Savers") != B_OK)
 			continue;
 		else if (path.Append(fSettings.ModuleName()) != B_OK)
+			continue;
+
+		entry.SetTo(path.Path(), true);
+		if (!entry.IsFile())
 			continue;
 
 		fAddonImage = load_add_on(path.Path());
