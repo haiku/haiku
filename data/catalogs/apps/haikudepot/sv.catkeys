@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4230673291
+1	swedish	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jag godkänne
 Installing \"%PackageName%\"	InstallPackageProcess		Installerar \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Avinstallera %PackageTitle%
 OK	App		OK
-Fatal error	UninstallPackageAction		Allvarligt fel
 Develop packages	MainWindow		Utvecklingspaket
 Starting the package daemon failed:\n\n%Error%	App		Starta package daemon misslyckades:\n\n%Error%
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Se användningsvill
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
 Native desktop packages only	MainWindow		Endast inbyggda skrivbordspaket
-Fatal error	InstallPackageProcess		Allvarligt fel
 A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de senaste användningsvillkoren för användning av HaikuDepotServer-tjänsten.
 The nickname is required.	UserLoginWindow		Ett användarnamn krävs.

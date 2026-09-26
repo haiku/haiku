@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1716484992
+1	english	x-vnd.Haiku-HaikuDepot	2478499492
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
@@ -119,7 +119,6 @@ Uninstalled	PackageListView		已解除安裝
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用條件
 Installing \"%PackageName%\"	InstallPackageProcess		正在安裝 \"%PackageName%\"
 OK	App		確認
-Fatal error	UninstallPackageAction		致命錯誤
 Develop packages	MainWindow		開發套件
 Starting the package daemon failed:\n\n%Error%	App		啟動包守護程式失敗：\n\n%Error%
 No user ratings available.	PackageInfoView		沒有可用的用戶評級。
@@ -201,7 +200,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		檢視使用條件
 OK	ServerHelper		確認
 Reading repository data	LocalPkgDataLoadProcess		正在讀取庫數據
 Native desktop packages only	MainWindow		僅原生桌面套件
-Fatal error	InstallPackageProcess		致命錯誤
 A validation error has occurred	ServerHelper		發生驗證錯誤
 The nickname is required.	UserLoginWindow		暱稱是必需的。
 -	no package size		-

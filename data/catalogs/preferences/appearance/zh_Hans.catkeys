@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	3146871853
+1	english	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		控件边界
 Control mark	Colors tab		控件标记
 Off	AntialiasingSettingsView		关闭
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		自动选取次要颜色
 Window tab text	Colors tab		窗口标签文本
 Navigation pulse	Colors tab		导航引导
 LCD subpixel	AntialiasingSettingsView		LCD 亚像素精度
+Progress bar	Colors tab		进度条
 Window tab	Colors tab		窗口选项
 Link text	Colors tab		链接文本
 Tooltip background	Colors tab		工具提示背景

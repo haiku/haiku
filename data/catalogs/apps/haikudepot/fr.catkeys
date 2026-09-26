@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3728126065
+1	french	x-vnd.Haiku-HaikuDepot	195173269
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d’utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
@@ -114,7 +114,6 @@ Uninstalled	PackageListView		Désinstallé
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		J’accepte les conditions d’utilisation
 Installing \"%PackageName%\"	InstallPackageProcess		Installation de « %PackageName% »
 OK	App		OK
-Fatal error	UninstallPackageAction		Erreur fatale
 Develop packages	MainWindow		Paquets de développement
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
@@ -187,7 +186,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Voir les conditions d’utilisation
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Lecture des données du dépôt
-Fatal error	InstallPackageProcess		Erreur fatale
 A validation error has occurred	ServerHelper		Une erreur de validation est survenue
 The nickname is required.	UserLoginWindow		Le surnom est requis.
 -	no package size		-

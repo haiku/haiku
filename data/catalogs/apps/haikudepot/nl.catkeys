@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1113377448
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1875391948
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Gebruiksvoorwaarden downloadprobleem
 Available packages	MainWindow		Beschikbare pakketten
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
@@ -113,7 +113,6 @@ Uninstalled	PackageListView		Verwijderd
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		I aanvaard de gebruikersvoorwaarden
 Installing \"%PackageName%\"	InstallPackageProcess		Installeer \"%PackageName%\"
 OK	App		OK
-Fatal error	UninstallPackageAction		Fatale fout
 Develop packages	MainWindow		Ontwikkelaarspakketten
 Starting the package daemon failed:\n\n%Error%	App		Starten van de pakket-daemon mislukt:\n\n%Error%
 No user ratings available.	PackageInfoView		Geen beoordelingen beschikbaar.
@@ -185,7 +184,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Toon de gebruikersvoorwaarden
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Lees pakketbron data
-Fatal error	InstallPackageProcess		Fatale fout
 A validation error has occurred	ServerHelper		Een validatie fout is opgetreden
 The nickname is required.	UserLoginWindow		De gebruikersnaam is vereist.
 -	no package size		-

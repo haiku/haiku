@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	4230673291
+1	czech	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití
 User ratings loading…	PackageInfoView		Načítání hodnocení uživatelů…
 Available packages	MainWindow		Dostupné balíčky
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Souhlasím s 
 Installing \"%PackageName%\"	InstallPackageProcess		Instaluji \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Odinstalovat %PackageTitle%
 OK	App		OK
-Fatal error	UninstallPackageAction		Závažná chybka
 Develop packages	MainWindow		Vývojové balíčky
 Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčku se nezdařilo:\n\n%Error%
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Zobrazit podmínky 
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Čtu data repozitáře
 Native desktop packages only	MainWindow		Pouze Haiku klikátka
-Fatal error	InstallPackageProcess		Závažná chybka
 A validation error has occurred	ServerHelper		Došlo k chybě ověření
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% komunikuje se serverem HaikuDepotServer. Toto jsou nejčerstvější podmínky použití služby HaikuDepotServer.
 The nickname is required.	UserLoginWindow		Přezdívka je vyžadována.

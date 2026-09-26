@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4230673291
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Accepto les c
 Installing \"%PackageName%\"	InstallPackageProcess		S'instal·la \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Desinstal·la %PackageTitle%
 OK	App		D'acord
-Fatal error	UninstallPackageAction		Error fatal
 Develop packages	MainWindow		Paquets de desenvolupament
 Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni del paquet:\n\n%Error%
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Consulteu les condi
 OK	ServerHelper		D'acord
 Reading repository data	LocalPkgDataLoadProcess		Es llegeixen les dades del repositori.
 Native desktop packages only	MainWindow		Només paquets d'escriptori nadius
-Fatal error	InstallPackageProcess		Error fatal
 A validation error has occurred	ServerHelper		Hi ha hagut un error de validació.
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% es comunica amb un component de servidor anomenat HaikuDepotServer. Aquestes són les condicions d'ús més recents per a l'ús del servei del Servidor del dipòsit del Haiku.
 The nickname is required.	UserLoginWindow		Cal el sobrenom.

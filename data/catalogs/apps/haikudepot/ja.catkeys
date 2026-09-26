@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	4230673291
+1	japanese	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		私は使用�
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" をインストール中
 Uninstall %PackageTitle%	PackageAction		%PackageTitle% をアンインストール
 OK	App		OK
-Fatal error	UninstallPackageAction		致命的なエラー
 Develop packages	MainWindow		開発用パッケージ
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		使用条件を見�
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		リポジトリのデータを読み込み中
 Native desktop packages only	MainWindow		ネイティブデスクトップパッケージのみ
-Fatal error	InstallPackageProcess		致命的なエラー
 A validation error has occurred	ServerHelper		検証エラーが発生しました
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% HaikuDepotServer と呼ばれるサーバーコンポーネントと通信します。HaikuDepotServer サービスの利用に関する最新の使用条件があります。
 The nickname is required.	UserLoginWindow		ニックネームが必要です。

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	4230673291
+1	turkish	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım ko�
 Installing \"%PackageName%\"	InstallPackageProcess		“%PackageName%” kuruluyor…
 Uninstall %PackageTitle%	PackageAction		Kaldır: %PackageTitle%
 OK	App		Tamam
-Fatal error	UninstallPackageAction		Onulmaz hata
 Develop packages	MainWindow		Geliştirme paketleri
 Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamadı:\n\n%Error%
 No user ratings available.	PackageInfoView		Kullanıcı derecelendirmesi yok.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullar
 OK	ServerHelper		Tamam
 Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor…
 Native desktop packages only	MainWindow		Yalnızca Haiku’ya özel masaüstü paketleri
-Fatal error	InstallPackageProcess		Onulmaz hata
 A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname%, HaikuDepotServer adındaki bir sunucu bileşeni ile iletişim kurar. Bunlar, HaikuDepotServer hizmetinin kullanımına ilişkin güncel kullanım koşullarıdır.
 The nickname is required.	UserLoginWindow		Takma ad gerekli.

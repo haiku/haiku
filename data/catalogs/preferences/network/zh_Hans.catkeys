@@ -3,11 +3,11 @@ Ethernet device	InterfaceListItem		以太网设备
 Link speed:	IntefaceView		连接速度：
 WPA	WPA protected network		WPA
 Network:	IntefaceView		网络：
-Received:	IntefaceView		收到：
+Received:	IntefaceView		已接收：
 New…	NetworkWindow		新建...
 no link	InterfaceListItem		无连接
 Other	NetworkWindow		其他
-Sent:	IntefaceView		发送：
+Sent:	IntefaceView		已发送：
 Gateway:	IntefaceAddressView		网关：
 The netmask defines your local network	IntefaceAddressView		子网掩码定义您的本地网络
 Your IP address	IntefaceAddressView		您的 IP 地址

@@ -58,7 +58,7 @@ BootManager	System name		引导管理器
 Done	BootManagerController	Button	完成
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		请确定主引导记录备份文件以进行恢复。该文件创建于引导管理器首次安装时。
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		请选择执行恢复的主引导记录（MBR）文件。该文件创建于首次安装引导管理器时。
-About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	将要恢复 %disk 的主引导记录(MBR)，使用 %file 恢复。是否希望继续?
+About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	即将使用 %file 恢复 %disk 的主引导记录（MBR）。您确定要继续吗？
 Install	DrivesPage	Button	安装
 File:	FileSelectionPage	Text control label	文件：
 Error reading partition table	BootManagerController	Title	分区表读取出错

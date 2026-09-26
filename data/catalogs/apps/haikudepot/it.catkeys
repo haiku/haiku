@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	3945138144
+1	italian	x-vnd.Haiku-HaikuDepot	412185348
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
@@ -125,7 +125,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Accetto le co
 Installing \"%PackageName%\"	InstallPackageProcess		Installazione di \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Disinstalla %PackageTitle%
 OK	App		OK
-Fatal error	UninstallPackageAction		Errore fatale
 Develop packages	MainWindow		Sviluppo
 Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchetti fallito:\n\n%Error%
 No user ratings available.	PackageInfoView		Nessuna valutazione utente è disponibile.
@@ -208,7 +207,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Visualizza le condi
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Lettura dei dati del repository
 Native desktop packages only	MainWindow		Solo pacchetti desktop nativi
-Fatal error	InstallPackageProcess		Errore fatale
 A validation error has occurred	ServerHelper		Si è verificato un errore nella validazione
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% comunica con un componente server denominato HaikuDepotServer. Di seguito sono riportate le condizioni d'uso aggiornate relative al servizio HaikuDepotServer.
 The nickname is required.	UserLoginWindow		Il nickname è necessario.

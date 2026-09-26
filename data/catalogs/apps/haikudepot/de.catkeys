@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	4230673291
+1	german	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Ich stimme de
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" wird installiert
 Uninstall %PackageTitle%	PackageAction		%PackageTitle% deinstallieren
 OK	App		OK
-Fatal error	UninstallPackageAction		Fataler Fehler
 Develop packages	MainWindow		Entwicklungs-Pakete
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
 No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
 Native desktop packages only	MainWindow		Nur native Desktop Pakete
-Fatal error	InstallPackageProcess		Fataler Fehler
 A validation error has occurred	ServerHelper		Fehler bei der Validieren
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommuniziert mit einer Serverkomponente, dem HaikuDepotServer. Dies sind die aktuellen Nutzungsbedingungen, die mit dem HaikuDepotServer-Dienst zu tun haben.
 The nickname is required.	UserLoginWindow		Der Benutzername wird benötigt.

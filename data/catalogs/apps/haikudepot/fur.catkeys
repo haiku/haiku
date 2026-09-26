@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	4230673291
+1	friulian	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 User ratings loading…	PackageInfoView		Cjariament valutazions dai utents…
 Available packages	MainWindow		Pachets disponibii
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		O aceti lis c
 Installing \"%PackageName%\"	InstallPackageProcess		Instalazion di \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Disinstale %PackageTitle%
 OK	App		Va ben
-Fatal error	UninstallPackageAction		Erôr fatâl
 Develop packages	MainWindow		Pachets di svilup
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Visualize lis cundi
 OK	ServerHelper		Va ben
 Reading repository data	LocalPkgDataLoadProcess		Leture dâts dal dipuesit
 Native desktop packages only	MainWindow		Nome pachets natîfs pal scritori
-Fatal error	InstallPackageProcess		Erôr fatâl
 A validation error has occurred	ServerHelper		Si è verificât un erôr di convalide
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% al comuniche cuntun component di servidôr clamât HaikuDepotServer. Chestis a son lis ultimis cundizions di utilizazion par doprâ il servizi HaikuDepotServer.
 The nickname is required.	UserLoginWindow		Il sorenon al è necessari.

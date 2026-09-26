@@ -1,15 +1,20 @@
-1	english	x-vnd.Haiku-BluetoothPrefs	305903693
+1	english	x-vnd.Haiku-BluetoothPrefs	4067685561
+Cancel	Remote devices		取消
 Laptop	Settings view		便携电脑
 Only from trusted devices	Settings view		仅从信任设备
 15 secs	Settings view		15秒
 Quit	main		退出
+Scan finished	Inquiry panel		扫描完毕
 Manufacturer: 	Device View		制造商：
+Scan	Inquiry panel		扫描
+%secs% remaining	Inquiry panel		剩余 %secs%
 Desktop	Settings view		桌面电脑
 Server	Window		服务器
 Identify host as:	Settings view		识别主机为：
 Local devices found on system:	Settings view		系统本地设备：
 Service classes: 	Device View		服务等级：
 Remote devices	Window		远程设备
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		这台电脑似乎并不支持蓝牙。
 Settings	Window		设置
 Stop bluetooth services…	Window		停止蓝牙服务...
 61 secs	Settings view		61秒
@@ -17,9 +22,11 @@ Add…	Remote devices		添加...
 Revert	Window		恢复
 Refresh local devices…	Window		刷新本地设备...
 Disconnect	Remote devices		断开连接
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		在开始执行扫描前，请确保远程设备上的蓝牙功能已启用。
 Defaults	Window		默认
 From all devices	Settings view		从所有设备
 Start bluetooth services…	Window		启动蓝牙服务...
+Cancel	Inquiry panel		取消
 Launch now	main		立即打开
 Bluetooth	System name		蓝牙
 Remove	Remote devices		删除

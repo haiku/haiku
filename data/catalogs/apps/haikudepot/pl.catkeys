@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	4091113752
+1	polish	x-vnd.Haiku-HaikuDepot	558160956
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem z pobieraniem warunków korzystania
 Available packages	MainWindow		Dostępne pakiety
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
@@ -115,7 +115,6 @@ Uninstalled	PackageListView		Niezainstalowany
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Zgadzam się na warunki korzystania
 Installing \"%PackageName%\"	InstallPackageProcess		Instalowanie „%PackageName%”
 OK	App		OK
-Fatal error	UninstallPackageAction		Błąd krytyczny
 Develop packages	MainWindow		Pakiety deweloperskie
 Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
@@ -193,7 +192,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Zobacz warunki korzystania
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Odczytywanie danych repozytorium
-Fatal error	InstallPackageProcess		Błąd krytyczny
 A validation error has occurred	ServerHelper		Wystąpił błąd walidacji
 The nickname is required.	UserLoginWindow		Pseudonim jest wymagany.
 -	no package size		-

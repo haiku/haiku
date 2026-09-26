@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2384088929
+1	russian	x-vnd.Haiku-HaikuDepot	3146103429
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 User ratings loading…	PackageInfoView		Загружаются оценки пользователей…
 Available packages	MainWindow		Доступные пакеты
@@ -128,7 +128,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Я прини
 Installing \"%PackageName%\"	InstallPackageProcess		Устанавливается \«%PackageName%\»
 Uninstall %PackageTitle%	PackageAction		Деинсталляция %PackageTitle%
 OK	App		OK
-Fatal error	UninstallPackageAction		Критическая ошибка
 Develop packages	MainWindow		Пакеты для разработчиков
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
@@ -213,7 +212,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Ознакомит�
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Чтение данных репозитария
 Native desktop packages only	MainWindow		Только пакеты нативных десктоп-приложений
-Fatal error	InstallPackageProcess		Критическая ошибка
 A validation error has occurred	ServerHelper		Произошла ошибка валидации
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		%Appname% взаимодействует с серверным компонентом HaikuDepotServer. Ниже приведены актуальные условия использования службы HaikuDepotServer.
 The nickname is required.	UserLoginWindow		Имя пользователя обязательно.

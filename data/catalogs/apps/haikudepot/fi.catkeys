@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2935349206
+1	finnish	x-vnd.Haiku-HaikuDepot	3697363706
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -118,7 +118,6 @@ Uninstalled	PackageListView		Poistetut asennukset
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Hyväksyn käyttöehdot
 Installing \"%PackageName%\"	InstallPackageProcess		Asennetaan \"%PackageName%\"
 OK	App		Valmis
-Fatal error	UninstallPackageAction		Tuhoisa virhe
 Develop packages	MainWindow		Kehityspaketit
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
@@ -197,7 +196,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Katso käyttöehtoja
 OK	ServerHelper		Valmis
 Reading repository data	LocalPkgDataLoadProcess		Luetaan tietovarastotietoja
-Fatal error	InstallPackageProcess		Tuhoisa virhe
 A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
 The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 -	no package size		-

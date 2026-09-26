@@ -224,7 +224,7 @@ Memory size	AttributesView		内存大小
 New folder	TemplatesMenu		新建目录
  (broken)	InfoWindow		 (已损坏)
 Replace all	FSUtils		替换所有
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 应用不支持您希望打开的文档格式。\n您确定要执行吗？\n\n如果您了解该应用所支持的文档类型，您需要联系应用的发行人，并且让他们更新其应用，将您的文档类型列入支持列表。
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 应用不支持您试图打开的这个文档格式。\n您确定要继续吗？\n\n如果您认为该应用支持这个文档类型，您需要联系应用开发者，并且让他们更新此应用，将这个文档类型加入其支持列表。
 Reverse order	ContainerWindow		倒序排列
 Copying: 	StatusWindow		复制：
 Show navigator	SettingsView		显示导航

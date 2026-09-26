@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	791991747
+1	english	x-vnd.Haiku-HaikuDepot	1554006247
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 User ratings loading…	PackageInfoView		正在加载用户评分…
 Available packages	MainWindow		可用软件包
@@ -124,7 +124,6 @@ Uninstalled	PackageListView		已卸载
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用条款
 Installing \"%PackageName%\"	InstallPackageProcess		安装 \"%PackageName%\"
 OK	App		确定
-Fatal error	UninstallPackageAction		严重错误
 Develop packages	MainWindow		开发软件包
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 No user ratings available.	PackageInfoView		未发现用户评分。
@@ -208,7 +207,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		查看使用条款
 OK	ServerHelper		确定
 Reading repository data	LocalPkgDataLoadProcess		正在读取仓库数据
 Native desktop packages only	MainWindow		仅展示原生桌面软件
-Fatal error	InstallPackageProcess		严重错误
 A validation error has occurred	ServerHelper		检验发生问题
 The nickname is required.	UserLoginWindow		请填写昵称。
 -	no package size		-

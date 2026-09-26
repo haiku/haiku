@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	4230673291
+1	hungarian	x-vnd.Haiku-HaikuDepot	697720495
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -130,7 +130,6 @@ I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Egyetértek a
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" telepítése
 Uninstall %PackageTitle%	PackageAction		%PackageTitle% eltávolítása
 OK	App		Rendben
-Fatal error	UninstallPackageAction		Végzetes hiba
 Develop packages	MainWindow		Fejlesztői csomagok
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
@@ -216,7 +215,6 @@ View the usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási fel
 OK	ServerHelper		Rendben
 Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
 Native desktop packages only	MainWindow		Csak natív aszali csomagok
-Fatal error	InstallPackageProcess		Végzetes hiba
 A validation error has occurred	ServerHelper		Hitelesítési hiba
 %Appname% communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		A %Appname% a HaikuDepotServer komponensel kommunikál. Ezek a HaikuDepotServer szolgáltatás legújabb felhasználási feltételei.
 The nickname is required.	UserLoginWindow		Felhasználói név szükséges.

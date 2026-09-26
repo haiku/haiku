@@ -1,10 +1,10 @@
 1	english	x-vnd.Be-TSKB	104349693
 Auto-hide	PreferencesWindow		自动隐藏
 Show all	WindowMenu		显示所有
-Edit in Tracker…	PreferencesWindow		在文件浏览器中编辑…
+Edit in Tracker…	PreferencesWindow		在 Tracker 中编辑…
 Menu	PreferencesWindow		菜单
 Location	PreferencesWindow		位置
-Tracker always first	PreferencesWindow		文件浏览器置顶
+Tracker always first	PreferencesWindow		置顶 Tracker
 Hide clock	TimeView		隐藏时钟
 Large	PreferencesWindow		大
 <Deskbar folder is empty>	DeskbarMenu		<桌面栏目录为空>
@@ -26,7 +26,7 @@ Show replicants	DeskbarMenu		显示程序副本
 No windows	WindowMenu		无窗口
 Show clock	Tray		显示时钟
 Close all	WindowMenu		关闭所有
-About this system	DeskbarMenu		关于操作系统
+About this system	DeskbarMenu		关于此系统
 Quit application	WindowMenu		退出程序
 Hide application names	PreferencesWindow		隐藏应用名称
 Applications	PreferencesWindow		应用程序

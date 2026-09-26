@@ -7,7 +7,7 @@ Short format:	TimeFormatSettings		极短格式：
 24 hour	TimeFormatSettings		二十四小时
 Time	TimeFormatSettings		时间
 Defaults	Locale Preflet Window		默认
-Locale	System name		本地化
+Locale	System name		语言与格式
 Date	TimeFormatSettings		日期
 OK	Locale Preflet Window		确定
 Long format:	TimeFormatSettings		较长格式：

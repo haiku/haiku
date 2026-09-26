@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	3569822741
+1	danish	x-vnd.Haiku-HaikuDepot	36869945
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med at indhente brugsvilkår
 Available packages	MainWindow		Tilgængelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
@@ -114,7 +114,6 @@ Uninstalled	PackageListView		Afinstalleret
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jeg godkender brugsvilkårene
 Installing \"%PackageName%\"	InstallPackageProcess		Installerer \"%PackageName%\"
 OK	App		O.k.
-Fatal error	UninstallPackageAction		Alvorlig fejl
 Develop packages	MainWindow		Udviklingspakker
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
@@ -191,7 +190,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		Vis brugsvilkårene
 OK	ServerHelper		O.k.
 Reading repository data	LocalPkgDataLoadProcess		Indlæser data for programarkiv
-Fatal error	InstallPackageProcess		Alvorlig fejl
 A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
 The nickname is required.	UserLoginWindow		Brugernavnet er påkrævet.
 -	no package size		-

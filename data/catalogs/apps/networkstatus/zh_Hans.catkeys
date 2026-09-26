@@ -2,16 +2,16 @@
 IPv6 address:	NetworkStatusView		IPv6 地址：
 Quit	NetworkStatusView		退出
 Unknown	NetworkStatusView		未知
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		启动网络首选项失败。\n\n错误：
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		打开网络设置失败。\n\n错误：
 Install in Deskbar	NetworkStatus		安装到桌面栏
-Open network preferences…	NetworkStatusView		打开网络首选项…
+Open network preferences…	NetworkStatusView		打开网络设置…
 NetworkStatus	System name		网络状态
 Broadcast:	NetworkStatusView		广播地址：
 OK	NetworkStatusView		确定
 No link	NetworkStatusView		无连接
 Could not join wireless network:\n	NetworkStatusView		无法加入无线网络：\n
 Network Status	NetworkStatusView		网络状态
-Deskbar is not running, giving up.	NetworkStatus		Deskbar 未运行，放弃。
+Deskbar is not running, giving up.	NetworkStatus		桌面栏未运行，无法继续。
 Netmask:	NetworkStatusView		子网掩码：
 No stateful configuration	NetworkStatusView		无状态设置
 IPv4 address:	NetworkStatusView		IPv4 地址：

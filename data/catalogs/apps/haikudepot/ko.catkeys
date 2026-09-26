@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-HaikuDepot	322393486
+1	korean	x-vnd.Haiku-HaikuDepot	1084407986
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		사용자 약관 다운로드 문제
 Available packages	MainWindow		사용 가능한 패키지
 It was not possible to create the new user.	UserLoginWindow		새 사용자를 생성할 수 없습니다.
@@ -116,7 +116,6 @@ Uninstalled	PackageListView		제거됨
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		사용자 약관에 동의합니다
 Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" 설치 중
 OK	App		확인
-Fatal error	UninstallPackageAction		치명적인 오류
 Develop packages	MainWindow		패키지 개발
 Starting the package daemon failed:\n\n%Error%	App		데몬을 시작할 수 없습니다:\n\n%Error%
 No user ratings available.	PackageInfoView		사용자 평가를 사용할 수 없습니다.
@@ -194,7 +193,6 @@ The password previously supplied for the user [%Nickname%] is not currently vali
 View the usage conditions	ToLatestUserUsageConditionsWindow		사용자 약관 보기
 OK	ServerHelper		확인
 Reading repository data	LocalPkgDataLoadProcess		저장소 데이터 불러오는 중
-Fatal error	InstallPackageProcess		치명적인 오류
 A validation error has occurred	ServerHelper		검증 오류가 발생하였습니다
 The nickname is required.	UserLoginWindow		별명을 입력해야 합니다.
 -	no package size		-
