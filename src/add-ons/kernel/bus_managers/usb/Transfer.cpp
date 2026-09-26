@@ -246,7 +246,9 @@ Transfer::Finished(uint32 status, size_t actualLength)
 
 
 /*
- * USB 2.0 Spec function, pag 64.
+ * USB 2.0 Specification
+ * chapter 5.11.3 "Calculating Bus Transaction Times", pages 63-64.
+ *
  * This function sets fBandwidth in microsecond
  * to the bandwidth needed to transfer fData.iov_len bytes.
  * The calculation is based on
@@ -258,47 +260,38 @@ Transfer::Finished(uint32 status, size_t actualLength)
 status_t
 Transfer::_CalculateBandwidth()
 {
-	uint16 bandwidthNS;
+	uint32 bandwidthNS;
 	uint32 type = fPipe->Type();
+	uint32 dataNS = (uint32)(3.167 + (1.1667 * 8 * fData.length));
 
 	switch (fPipe->Speed()) {
 		case USB_SPEED_HIGHSPEED:
 		{
 			// Direction doesn't matter for highspeed
 			if (type & USB_OBJECT_ISO_PIPE)
-				bandwidthNS = (uint16)((38 * 8 * 2.083)
-					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)((38 * 8 * 2.083) + (2.083 * dataNS) + USB_BW_HOST_DELAY);
 			else
-				bandwidthNS = (uint16)((55 * 8 * 2.083)
-					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)((55 * 8 * 2.083) + (2.083 * dataNS) + USB_BW_HOST_DELAY);
 			break;
 		}
 		case USB_SPEED_FULLSPEED:
 		{
 			// Direction does matter this time for isochronous
 			if (type & USB_OBJECT_ISO_PIPE)
-				bandwidthNS = (uint16)
-					(((fPipe->Direction() == Pipe::In) ? 7268 : 6265)
-					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)(((fPipe->Direction() == Pipe::In) ? 7268 : 6265)
+					+ (83.54 * dataNS) + USB_BW_HOST_DELAY);
 			else
-				bandwidthNS = (uint16)(9107
-					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)(9107 + (83.54 * dataNS) + USB_BW_HOST_DELAY);
 			break;
 		}
 		case USB_SPEED_LOWSPEED:
 		{
 			if (fPipe->Direction() == Pipe::In)
-				bandwidthNS = (uint16) (64060 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
-					+ (676.67 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)(64060 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
+					+ (676.67 * dataNS) + USB_BW_HOST_DELAY);
 			else
-				bandwidthNS = (uint16)(64107 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
-					+ (667.0 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
-					+ USB_BW_HOST_DELAY);
+				bandwidthNS = (uint32)(64107 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
+					+ (667.0 * dataNS) + USB_BW_HOST_DELAY);
 			break;
 		}
 
