@@ -631,10 +631,12 @@ mutex_destroy(mutex* lock)
 	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock);
 
 #if KDEBUG
-	if (lock->waiters != NULL && find_thread(NULL)
-		!= lock->holder) {
-		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
-			"hold the lock (%p)", lock);
+	// Never-used statically initialized mutexes will have holder set to 0, because
+	// MUTEX_INITIALIZER needs to be the same for both KDEBUG and non-KDEBUG kernels.
+	if (lock->holder != 0 && lock->holder != -1 && find_thread(NULL) != lock->holder) {
+		panic("mutex_destroy(): the lock (%p) is held by %" B_PRId32 ", not "
+			  "by the caller @! bt %" B_PRId32,
+			lock, lock->holder, lock->holder);
 		if (_mutex_lock_threads_locked(lock) != B_OK)
 			return;
 	}
@@ -645,10 +647,18 @@ mutex_destroy(mutex* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
-		_kern_unblock_thread(get_thread_id(waiter->thread), B_ERROR);
+		Thread* thread = waiter->thread;
+		waiter->thread = NULL;
+		_kern_unblock_thread(get_thread_id(thread), B_ERROR);
 	}
 
 	lock->name = NULL;
+	lock->flags = 0;
+#if KDEBUG
+	lock->holder = INT16_MIN;
+#else
+	lock->count = INT16_MIN;
+#endif
 
 	locker.Unlock();
 
@@ -694,14 +704,15 @@ _mutex_lock_threads_locked(mutex* lock)
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #if KDEBUG
-	if (lock->holder < 0) {
+	if (lock->holder == 0 || lock->holder == -1) {
 		lock->holder = find_thread(NULL);
 		return B_OK;
 	} else if (lock->holder == find_thread(NULL)) {
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
-	} else if (lock->holder == 0)
+	} else if (lock->holder < -1) {
 		panic("_mutex_lock(): using unitialized lock %p", lock);
+	}
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;
