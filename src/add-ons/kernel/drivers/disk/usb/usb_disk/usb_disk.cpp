@@ -28,6 +28,7 @@
 
 #include "scsi_sense.h"
 #include "usb_disk_scsi.h"
+
 #include "icons.h"
 
 
@@ -54,14 +55,14 @@
 #endif
 
 
-device_manager_info *gDeviceManager;
-static usb_module_info *gUSBModule = NULL;
+device_manager_info* gDeviceManager;
+static usb_module_info* gUSBModule = NULL;
 
 struct {
-	const char *vendor;
-	const char *product;
-	device_icon *icon;
-	const char *name;
+	const char* vendor;
+	const char* product;
+	device_icon* icon;
+	const char* name;
 } kIconMatches[] = {
 	// matches for Hama USB 2.0 Card Reader 35 in 1
 	// vendor: "Transcend Information, Inc."
@@ -84,23 +85,22 @@ struct {
 //
 
 
-static void	usb_disk_callback(void *cookie, status_t status, void *data,
-				size_t actualLength);
-static status_t usb_disk_do_io(void* cookie, IOOperation* operation);
+static void	usb_disk_callback(void* cookie, status_t status, void* data, size_t actualLength);
+static status_t	usb_disk_do_io(void* cookie, IOOperation* operation);
 
-uint8		usb_disk_get_max_lun(disk_device *device);
-void		usb_disk_reset_recovery(disk_device *device, err_act *_action);
-status_t	usb_disk_receive_csw(disk_device *device,
-				usb_massbulk_command_status_wrapper *status);
+uint8		usb_disk_get_max_lun(disk_device* device);
+void		usb_disk_reset_recovery(disk_device* device, err_act* _action);
+status_t	usb_disk_receive_csw(disk_device* device,
+				usb_massbulk_command_status_wrapper* status);
 
-status_t	usb_disk_send_diagnostic(device_lun *lun);
-status_t	usb_disk_request_sense(device_lun *lun, err_act *action);
-status_t	usb_disk_mode_sense(device_lun *lun);
-status_t	usb_disk_test_unit_ready(device_lun *lun, err_act *action = NULL);
-status_t	usb_disk_inquiry(device_lun *lun);
-status_t	usb_disk_reset_capacity(device_lun *lun);
-status_t	usb_disk_update_capacity(device_lun *lun);
-status_t	usb_disk_synchronize(device_lun *lun, bool force);
+status_t	usb_disk_send_diagnostic(device_lun* lun);
+status_t	usb_disk_request_sense(device_lun* lun, err_act* action);
+status_t	usb_disk_mode_sense(device_lun* lun);
+status_t	usb_disk_test_unit_ready(device_lun* lun, err_act* action = NULL);
+status_t	usb_disk_inquiry(device_lun* lun);
+status_t	usb_disk_reset_capacity(device_lun* lun);
+status_t	usb_disk_update_capacity(device_lun* lun);
+status_t	usb_disk_synchronize(device_lun* lun, bool force);
 
 
 // #pragma mark - disk_device helper functions
@@ -129,7 +129,7 @@ disk_device_s::~disk_device_s()
 
 
 void
-usb_disk_free_device_and_luns(disk_device *device)
+usb_disk_free_device_and_luns(disk_device* device)
 {
 	ASSERT_LOCKED_MUTEX(&device->lock);
 	CALLED();
@@ -149,16 +149,15 @@ usb_disk_free_device_and_luns(disk_device *device)
 
 
 static status_t
-usb_disk_mass_storage_reset(disk_device *device)
+usb_disk_mass_storage_reset(disk_device* device)
 {
-	return gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_OUT
-		| USB_REQTYPE_CLASS, USB_MASSBULK_REQUEST_MASS_STORAGE_RESET, 0x0000,
-		device->interface, 0, NULL, NULL);
+	return gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
+		USB_MASSBULK_REQUEST_MASS_STORAGE_RESET, 0x0000, device->interface, 0, NULL, NULL);
 }
 
 
 uint8
-usb_disk_get_max_lun(disk_device *device)
+usb_disk_get_max_lun(disk_device* device)
 {
 	ASSERT_LOCKED_RECURSIVE(&device->io_lock);
 
@@ -166,10 +165,9 @@ usb_disk_get_max_lun(disk_device *device)
 	size_t actualLength = 0;
 
 	// devices that do not support multiple LUNs may stall this request
-	if (gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_IN
-		| USB_REQTYPE_CLASS, USB_MASSBULK_REQUEST_GET_MAX_LUN, 0x0000,
-		device->interface, 1, &result, &actualLength) != B_OK
-			|| actualLength != 1) {
+	if (gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_CLASS,
+		USB_MASSBULK_REQUEST_GET_MAX_LUN, 0x0000, device->interface, 1, &result, &actualLength)
+			!= B_OK || actualLength != 1) {
 		return 0;
 	}
 
@@ -191,7 +189,7 @@ usb_disk_clear_halt(usb_pipe pipe)
 
 
 void
-usb_disk_reset_recovery(disk_device *device, err_act *_action)
+usb_disk_reset_recovery(disk_device* device, err_act* _action)
 {
 	TRACE("reset recovery\n");
 	ASSERT_LOCKED_RECURSIVE(&device->io_lock);
@@ -221,18 +219,18 @@ struct transfer_data {
 
 
 static status_t
-usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_data& data)
+usb_disk_transfer_data(disk_device* device, bool directionIn, const transfer_data& data)
 {
+	usb_pipe pipe = directionIn ? device->bulk_in : device->bulk_out;
 	status_t result;
 	if (data.physical) {
-		result = gUSBModule->queue_bulk_v_physical(
-			directionIn ? device->bulk_in : device->bulk_out,
-			data.phys_vecs, data.vec_count, usb_disk_callback, device);
+		result = gUSBModule->queue_bulk_v_physical(pipe, data.phys_vecs, data.vec_count,
+			usb_disk_callback, device);
 	} else {
-		result = gUSBModule->queue_bulk_v(
-			directionIn ? device->bulk_in : device->bulk_out,
-			data.vecs, data.vec_count, usb_disk_callback, device);
+		result = gUSBModule->queue_bulk_v(pipe, data.vecs, data.vec_count,
+			usb_disk_callback, device);
 	}
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to queue data transfer: %s\n", strerror(result));
 		return result;
@@ -240,15 +238,13 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_dat
 
 	mutex_unlock(&device->lock);
 	do {
-		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT,
-			10 * 1000 * 1000);
+		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, 10 * 1000 * 1000);
 		if (result == B_TIMED_OUT) {
 			// Cancel the transfer and collect the sem that should now be
 			// released through the callback on cancel. Handling of device
 			// reset is done in usb_disk_operation() when it detects that
 			// the transfer failed.
-			gUSBModule->cancel_queued_transfers(directionIn ? device->bulk_in
-				: device->bulk_out);
+			gUSBModule->cancel_queued_transfers(pipe);
 			acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, 0);
 		}
 	} while (result == B_INTERRUPTED);
@@ -265,8 +261,7 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_dat
 
 
 static status_t
-usb_disk_transfer_data(disk_device *device, bool directionIn,
-	void* buffer, size_t dataLength)
+usb_disk_transfer_data(disk_device* device, bool directionIn, void* buffer, size_t dataLength)
 {
 	iovec vec;
 	vec.iov_base = buffer;
@@ -281,16 +276,17 @@ usb_disk_transfer_data(disk_device *device, bool directionIn,
 
 
 static void
-callback_interrupt(void* cookie, int32 status, void* data, size_t length)
+usb_disk_callback_interrupt(void* cookie, int32 status, void* data, size_t dataLength)
 {
 	disk_device* device = (disk_device*)cookie;
+
 	// We release the lock even if the interrupt is invalid. This way there
 	// is at least a chance for the driver to terminate properly.
 	release_sem(device->interruptLock);
 
-	if (length != 2) {
+	if (dataLength != 2) {
 		TRACE_ALWAYS("interrupt of length %" B_PRIuSIZE "! (expected 2)\n",
-			length);
+			dataLength);
 		// In this case we do not reschedule the interrupt. This means the
 		// driver will be locked. The interrupt should perhaps be scheduled
 		// when starting a transfer instead. But getting there means something
@@ -300,18 +296,17 @@ callback_interrupt(void* cookie, int32 status, void* data, size_t length)
 
 	// Reschedule the interrupt for next time
 	gUSBModule->queue_interrupt(device->interrupt, device->interruptBuffer, 2,
-		callback_interrupt, cookie);
+		usb_disk_callback_interrupt, cookie);
 }
 
 
 static status_t
-receive_csw_interrupt(disk_device *device,
-	interrupt_status_wrapper *status)
+receive_csw_interrupt(disk_device* device, interrupt_status_wrapper* status)
 {
 	TRACE("Waiting for result...\n");
 
 	gUSBModule->queue_interrupt(device->interrupt,
-			device->interruptBuffer, 2, callback_interrupt, device);
+		device->interruptBuffer, 2, usb_disk_callback_interrupt, device);
 
 	acquire_sem(device->interruptLock);
 
@@ -323,8 +318,7 @@ receive_csw_interrupt(disk_device *device,
 
 
 static status_t
-receive_csw_bulk(disk_device *device,
-	usb_massbulk_command_status_wrapper *status)
+receive_csw_bulk(disk_device* device, usb_massbulk_command_status_wrapper* status)
 {
 	status_t result = usb_disk_transfer_data(device, true, status,
 		sizeof(usb_massbulk_command_status_wrapper));
@@ -332,8 +326,7 @@ receive_csw_bulk(disk_device *device,
 		return result;
 
 	if (device->status != B_OK
-			|| device->actual_length
-			!= sizeof(usb_massbulk_command_status_wrapper)) {
+		|| device->actual_length != sizeof(usb_massbulk_command_status_wrapper)) {
 		// receiving the command status wrapper failed
 		return B_ERROR;
 	}
@@ -343,9 +336,8 @@ receive_csw_bulk(disk_device *device,
 
 
 status_t
-usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
-	const transfer_data& data, size_t *dataLength,
-	bool directionIn, err_act *_action)
+usb_disk_operation_interrupt(device_lun* lun, uint8* operation,
+	const transfer_data& data, size_t* dataLength, bool directionIn, err_act* _action)
 {
 	TRACE("operation: lun: %u; op: 0x%x; data: %p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation[0], data.vecs, dataLength,
@@ -358,16 +350,16 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 	size_t actualLength = 12;
 	status_t result = gUSBModule->send_request(device->device,
 		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, 0 /*request*/,
-		0/*value*/, device->interface/*index*/, 12, operation, &actualLength);
+		0 /*value*/, device->interface /*index*/, 12, operation, &actualLength);
 
 	if (result != B_OK || actualLength != 12) {
 		TRACE("Command stage: wrote %ld bytes (error: %s)\n",
 			actualLength, strerror(result));
 
 		// There was an error, we have to do a request sense to reset the device
-		if (operation[0] != SCSI_REQUEST_SENSE_6) {
+		if (operation[0] != SCSI_REQUEST_SENSE_6)
 			usb_disk_request_sense(lun, _action);
-		}
+
 		return result;
 	}
 
@@ -416,14 +408,14 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 		// wait for the device to finish the operation.
 		result = usb_disk_request_sense(lun, _action);
 	}
+
 	return result;
 }
 
 
 status_t
-usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLength,
-	const transfer_data& data, size_t *dataLength,
-	bool directionIn, err_act *_action)
+usb_disk_operation_bulk(device_lun* lun, uint8* operation, size_t operationLength,
+	const transfer_data& data, size_t* dataLength, bool directionIn, err_act* _action)
 {
 	TRACE("operation: lun: %u; op: %u; data: %p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation[0],
@@ -431,16 +423,14 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 		directionIn ? 'y' : 'n');
 	ASSERT_LOCKED_RECURSIVE(&lun->device->io_lock);
 
-	disk_device *device = lun->device;
+	disk_device* device = lun->device;
 	usb_massbulk_command_block_wrapper command;
 	command.signature = USB_MASSBULK_CBW_SIGNATURE;
 	command.tag = device->current_tag++;
 	command.data_transfer_length = (dataLength != NULL ? *dataLength : 0);
-	command.flags = (directionIn ? USB_MASSBULK_CBW_DATA_INPUT
-		: USB_MASSBULK_CBW_DATA_OUTPUT);
+	command.flags = (directionIn ? USB_MASSBULK_CBW_DATA_INPUT : USB_MASSBULK_CBW_DATA_OUTPUT);
 	command.lun = lun->logical_unit_number;
-	command.command_block_length
-		= device->is_atapi ? ATAPI_COMMAND_LENGTH : operationLength;
+	command.command_block_length = device->is_atapi ? ATAPI_COMMAND_LENGTH : operationLength;
 	memset(command.command_block, 0, sizeof(command.command_block));
 	memcpy(command.command_block, operation, operationLength);
 
@@ -516,8 +506,8 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 				*dataLength -= residue;
 				if (transferedData < *dataLength) {
 					TRACE_ALWAYS("less data transfered than indicated: %"
-						B_PRIuSIZE " vs. %" B_PRIuSIZE "\n", transferedData,
-						*dataLength);
+						B_PRIuSIZE " vs. %" B_PRIuSIZE "\n",
+						transferedData, *dataLength);
 					*dataLength = transferedData;
 				}
 			}
@@ -541,44 +531,38 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 		}
 
 		case USB_MASSBULK_CSW_STATUS_PHASE_ERROR:
-		{
 			// a protocol or device error occured
 			TRACE_ALWAYS("phase error in operation %#" B_PRIx8 "\n",
 				operation[0]);
 			usb_disk_reset_recovery(device, _action);
 			return B_ERROR;
-		}
 
 		default:
-		{
 			// command status wrapper is not meaningful
 			TRACE_ALWAYS("command status wrapper has invalid status\n");
 			usb_disk_reset_recovery(device, _action);
 			return B_ERROR;
-		}
 	}
 }
 
 
 static status_t
-usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
-	const transfer_data& data, size_t *dataLength,
-	bool directionIn, err_act *_action = NULL)
+usb_disk_operation(device_lun* lun, uint8* operation, size_t operationLength,
+	const transfer_data& data, size_t* dataLength, bool directionIn, err_act* _action = NULL)
 {
 	if (lun->device->is_ufi) {
 		return usb_disk_operation_interrupt(lun, operation,
 			data, dataLength, directionIn, _action);
 	} else {
-		return usb_disk_operation_bulk(lun, operation, opLength,
+		return usb_disk_operation_bulk(lun, operation, operationLength,
 			data, dataLength, directionIn, _action);
 	}
 }
 
 
 static status_t
-usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
-	void *buffer, size_t *dataLength,
-	bool directionIn, err_act *_action = NULL)
+usb_disk_operation(device_lun* lun, uint8* operation, size_t operationLength,
+	void* buffer, size_t* dataLength, bool directionIn, err_act* _action = NULL)
 {
 	iovec vec;
 	vec.iov_base = buffer;
@@ -594,8 +578,8 @@ usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
 		data.vec_count = 0;
 	}
 
-	return usb_disk_operation(lun, operation, opLength,
-		data, dataLength, directionIn, _action);
+	return usb_disk_operation(lun, operation, operationLength, data, dataLength,
+		directionIn, _action);
 }
 
 
@@ -605,7 +589,7 @@ usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
 
 
 status_t
-usb_disk_send_diagnostic(device_lun *lun)
+usb_disk_send_diagnostic(device_lun* lun)
 {
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -625,14 +609,17 @@ usb_disk_send_diagnostic(device_lun *lun)
 
 	if (result != B_OK)
 		TRACE("Send Diagnostic failed: %s\n", strerror(result));
+
 	return result;
 }
 
 
 status_t
-usb_disk_request_sense(device_lun *lun, err_act *_action)
+usb_disk_request_sense(device_lun* lun, err_act* _action)
 {
+	status_t result = B_ERROR;
 	size_t dataLength = sizeof(scsi_request_sense_6_parameter);
+	scsi_request_sense_6_parameter parameter;
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
@@ -641,39 +628,35 @@ usb_disk_request_sense(device_lun *lun, err_act *_action)
 	commandBlock[2] = 0; // page code
 	commandBlock[4] = dataLength;
 
-	scsi_request_sense_6_parameter parameter;
-	status_t result = B_ERROR;
 	for (uint32 tries = 0; tries < 3; tries++) {
-		result = usb_disk_operation(lun, commandBlock, 6, &parameter,
-			&dataLength, true);
+		result = usb_disk_operation(lun, commandBlock, 6, &parameter, &dataLength, true);
 		if (result != B_TIMED_OUT)
 			break;
+
 		snooze(100000);
 	}
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting request sense data failed: %s\n",
 			strerror(result));
 		return result;
 	}
 
-	const char *label = NULL;
+	const char* label = NULL;
 	err_act action = err_act_fail;
 	status_t status = B_ERROR;
-	scsi_get_sense_asc_info((parameter.additional_sense_code << 8)
-		| parameter.additional_sense_code_qualifier, &label, &action,
-		&status);
+	uint16 code = (parameter.additional_sense_code << 8)
+		| parameter.additional_sense_code_qualifier;
+	scsi_get_sense_asc_info(code, &label, &action, &status);
 
 	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY
 		&& parameter.sense_key != SCSI_SENSE_KEY_UNIT_ATTENTION) {
-		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: "
-			"0x%02x; %s\n", parameter.sense_key,
-			parameter.additional_sense_code,
-			parameter.additional_sense_code_qualifier,
-			label ? label : "(unknown)");
+		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: 0x%02x; %s\n",
+			parameter.sense_key, parameter.additional_sense_code,
+			parameter.additional_sense_code_qualifier, label ? label : "(unknown)");
 	}
 
-	if ((parameter.additional_sense_code == 0
-			&& parameter.additional_sense_code_qualifier == 0)
+	if ((parameter.additional_sense_code == 0 && parameter.additional_sense_code_qualifier == 0)
 		|| label == NULL) {
 		scsi_get_sense_key_info(parameter.sense_key, &label, &action, &status);
 	}
@@ -699,8 +682,9 @@ usb_disk_request_sense(device_lun *lun, err_act *_action)
 
 
 status_t
-usb_disk_mode_sense(device_lun *lun)
+usb_disk_mode_sense(device_lun* lun)
 {
+	status_t result = B_ERROR;
 	size_t dataLength = sizeof(scsi_mode_sense_6_parameter);
 
 	uint8 commandBlock[12];
@@ -713,27 +697,26 @@ usb_disk_mode_sense(device_lun *lun)
 	commandBlock[4] = dataLength;
 
 	scsi_mode_sense_6_parameter parameter;
-	status_t result = usb_disk_operation(lun, commandBlock, 6,
-		&parameter, &dataLength, true);
+	result = usb_disk_operation(lun, commandBlock, 6, &parameter, &dataLength, true);
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting mode sense data failed: %s\n", strerror(result));
 		return result;
 	}
 
-	lun->write_protected
-		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT)
-			!= 0;
+	lun->write_protected = (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT) != 0;
 	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");
+
 	return B_OK;
 }
 
 
 status_t
-usb_disk_test_unit_ready(device_lun *lun, err_act *_action)
+usb_disk_test_unit_ready(device_lun* lun, err_act* _action)
 {
 	// if unsupported we assume the unit is fixed and therefore always ok
 	if (lun->device->is_ufi || !lun->device->tur_supported)
 		return B_OK;
+
 	if (lun->device->removed)
 		return B_DEV_NOT_READY;
 
@@ -748,16 +731,14 @@ usb_disk_test_unit_ready(device_lun *lun, err_act *_action)
 		commandBlock[3] = 0;
 		commandBlock[4] = 1;
 
-		result = usb_disk_operation(lun, commandBlock, 6, NULL, NULL, false,
-			_action);
+		result = usb_disk_operation(lun, commandBlock, 6, NULL, NULL, false, _action);
 	} else {
 		commandBlock[0] = SCSI_TEST_UNIT_READY_6;
 		commandBlock[1] = lun->logical_unit_number << 5;
 		commandBlock[2] = 0;
 		commandBlock[3] = 0;
 		commandBlock[4] = 0;
-		result = usb_disk_operation(lun, commandBlock, 6, NULL, NULL, true,
-			_action);
+		result = usb_disk_operation(lun, commandBlock, 6, NULL, NULL, true, _action);
 	}
 
 	if (result == B_DEV_INVALID_IOCTL) {
@@ -770,7 +751,7 @@ usb_disk_test_unit_ready(device_lun *lun, err_act *_action)
 
 
 status_t
-usb_disk_inquiry(device_lun *lun)
+usb_disk_inquiry(device_lun* lun)
 {
 	size_t dataLength = sizeof(scsi_inquiry_6_parameter);
 
@@ -806,8 +787,10 @@ usb_disk_inquiry(device_lun *lun)
 		parameter.peripherial_qualifier);
 	TRACE("removable_medium         %s\n",
 		parameter.removable_medium ? "yes" : "no");
-	TRACE("version                  0x%02x\n", parameter.version);
-	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);
+	TRACE("version                  0x%02x\n",
+		parameter.version);
+	TRACE("response_data_format     0x%02x\n",
+		parameter.response_data_format);
 	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n",
 		parameter.vendor_identification);
 	TRACE_ALWAYS("product_identification   \"%.16s\"\n",
@@ -818,29 +801,29 @@ usb_disk_inquiry(device_lun *lun)
 	memcpy(lun->vendor_name, parameter.vendor_identification,
 		MIN(sizeof(lun->vendor_name), sizeof(parameter.vendor_identification)));
 	memcpy(lun->product_name, parameter.product_identification,
-		MIN(sizeof(lun->product_name),
-			sizeof(parameter.product_identification)));
+		MIN(sizeof(lun->product_name), sizeof(parameter.product_identification)));
 	memcpy(lun->product_revision, parameter.product_revision_level,
-		MIN(sizeof(lun->product_revision),
-			sizeof(parameter.product_revision_level)));
+		MIN(sizeof(lun->product_revision), sizeof(parameter.product_revision_level)));
 
 	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
 	lun->removable = (parameter.removable_medium == 1);
+
 	return B_OK;
 }
 
 
 status_t
-usb_disk_reset_capacity(device_lun *lun)
+usb_disk_reset_capacity(device_lun* lun)
 {
 	lun->block_size = 512;
 	lun->block_count = 0;
+
 	return B_OK;
 }
 
 
 static status_t
-usb_disk_update_capacity_16(device_lun *lun)
+usb_disk_update_capacity_16(device_lun* lun)
 {
 	size_t dataLength = sizeof(scsi_read_capacity_16_parameter);
 	scsi_read_capacity_16_parameter parameter;
@@ -884,14 +867,14 @@ usb_disk_update_capacity_16(device_lun *lun)
 	lun->media_changed = false;
 	lun->block_size = B_BENDIAN_TO_HOST_INT32(parameter.logical_block_length);
 	lun->physical_block_size = lun->block_size;
-	lun->block_count =
-		B_BENDIAN_TO_HOST_INT64(parameter.last_logical_block_address) + 1;
+	lun->block_count = B_BENDIAN_TO_HOST_INT64(parameter.last_logical_block_address) + 1;
+
 	return B_OK;
 }
 
 
 status_t
-usb_disk_update_capacity(device_lun *lun)
+usb_disk_update_capacity(device_lun* lun)
 {
 	size_t dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
@@ -918,11 +901,11 @@ usb_disk_update_capacity(device_lun *lun)
 			break;
 		}
 
-		// In some cases, it's best to wait a little for the device to settle
-		// before retrying.
-		if (lun->device->is_ufi && (result == B_DEV_NO_MEDIA
-				|| result == B_TIMED_OUT || result == B_DEV_STALLED))
+		// It's best to wait a little for the device to settle before retrying.
+		if (lun->device->is_ufi
+			&& (result == B_DEV_NO_MEDIA || result == B_TIMED_OUT || result == B_DEV_STALLED)) {
 			snooze(10000);
+		}
 	}
 
 	if (result != B_OK) {
@@ -972,7 +955,7 @@ usb_disk_update_capacity(device_lun *lun)
 	if (lun->io_scheduler == NULL) {
 		dma_restrictions restrictions = {};
 		restrictions.high_address = UINT32_MAX;
-		restrictions.max_transfer_size = (lun->block_size * MAX_IO_BLOCKS);
+		restrictions.max_transfer_size = MAX_IO_BLOCKS * lun->block_size;
 
 		DMAResource* dmaResource = new DMAResource;
 		result = dmaResource->Init(restrictions, lun->block_size, 1, 1);
@@ -980,7 +963,7 @@ usb_disk_update_capacity(device_lun *lun)
 			return result;
 
 		lun->io_scheduler = new IOSchedulerSimple(dmaResource);
-		result = lun->io_scheduler->Init("usb_disk");
+		result = lun->io_scheduler->Init(DRIVER_NAME);
 		if (result != B_OK)
 			panic("initializing IOScheduler failed: %s", strerror(result));
 
@@ -992,7 +975,7 @@ usb_disk_update_capacity(device_lun *lun)
 
 
 status_t
-usb_disk_synchronize(device_lun *lun, bool force)
+usb_disk_synchronize(device_lun* lun, bool force)
 {
 	if (lun->device->is_ufi) {
 		// UFI use interrupt because it runs all commands immediately, and
@@ -1019,12 +1002,12 @@ usb_disk_synchronize(device_lun *lun, bool force)
 	commandBlock[0] = SCSI_SYNCHRONIZE_CACHE_10;
 	commandBlock[1] = lun->logical_unit_number << 5;
 
-	status_t result = usb_disk_operation(lun, commandBlock, 10,
-		NULL, NULL, false);
+	status_t result = usb_disk_operation(lun, commandBlock, 10, NULL, NULL, false);
 
 	if (result == B_OK) {
 		lun->device->sync_support = SYNC_SUPPORT_RELOAD;
 		lun->should_sync = false;
+
 		return B_OK;
 	}
 
@@ -1043,22 +1026,22 @@ usb_disk_synchronize(device_lun *lun, bool force)
 
 
 static void
-usb_disk_callback(void *cookie, status_t status, void *data,
-	size_t actualLength)
+usb_disk_callback(void* cookie, status_t status, void* data, size_t actualLength)
 {
 	//TRACE("callback()\n");
-	disk_device *device = (disk_device *)cookie;
+	disk_device* device = (disk_device*)cookie;
 	device->status = status;
 	device->actual_length = actualLength;
+
 	release_sem(device->notify);
 }
 
 
 static status_t
-usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
+usb_disk_attach(device_node* node, usb_device newDevice, void** cookie)
 {
 	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
-	disk_device *device = new(std::nothrow) disk_device;
+	disk_device* device = new(std::nothrow) disk_device;
 	recursive_lock_lock(&device->io_lock);
 	mutex_lock(&device->lock);
 
@@ -1074,16 +1057,15 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	device->is_ufi = false;
 	device->luns = NULL;
 
-	// scan through the interfaces to find our bulk-only data interface
-	const usb_configuration_info *configuration
-		= gUSBModule->get_configuration(newDevice);
+	// scan through the interfaces to find our bulk-only or CBI data interface
+	const usb_configuration_info* configuration = gUSBModule->get_configuration(newDevice);
 	if (configuration == NULL) {
 		delete device;
 		return B_ERROR;
 	}
 
 	for (size_t i = 0; i < configuration->interface_count; i++) {
-		usb_interface_info *interface = configuration->interface[i].active;
+		usb_interface_info* interface = configuration->interface[i].active;
 		if (interface == NULL)
 			continue;
 
@@ -1099,24 +1081,23 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 			bool hasOut = false;
 			bool hasInt = false;
 			for (size_t j = 0; j < interface->endpoint_count; j++) {
-				usb_endpoint_info *endpoint = &interface->endpoint[j];
+				usb_endpoint_info* endpoint = &interface->endpoint[j];
 				if (endpoint == NULL)
 					continue;
 
-				if (!hasIn && (endpoint->descr->endpoint_address
-					& USB_ENDPOINT_ADDR_DIR_IN) != 0
+				if (!hasIn
+					&& (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) != 0
 					&& endpoint->descr->attributes == USB_ENDPOINT_ATTR_BULK) {
 					device->bulk_in = endpoint->handle;
 					hasIn = true;
-				} else if (!hasOut && (endpoint->descr->endpoint_address
-					& USB_ENDPOINT_ADDR_DIR_IN) == 0
+				} else if (!hasOut
+					&& (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) == 0
 					&& endpoint->descr->attributes == USB_ENDPOINT_ATTR_BULK) {
 					device->bulk_out = endpoint->handle;
 					hasOut = true;
-				} else if (!hasInt && (endpoint->descr->endpoint_address
-					& USB_ENDPOINT_ADDR_DIR_IN)
-					&& endpoint->descr->attributes
-					== USB_ENDPOINT_ATTR_INTERRUPT) {
+				} else if (!hasInt
+					&& (endpoint->descr->endpoint_address & USB_ENDPOINT_ADDR_DIR_IN) != 0
+					&& endpoint->descr->attributes == USB_ENDPOINT_ATTR_INTERRUPT) {
 					device->interrupt = endpoint->handle;
 					hasInt = true;
 				}
@@ -1166,8 +1147,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	}
 
 	device->lun_count = usb_disk_get_max_lun(device) + 1;
-	device->luns = (device_lun **)malloc(device->lun_count
-		* sizeof(device_lun *));
+	device->luns = (device_lun**)malloc(device->lun_count * sizeof(device_lun*));
 	for (uint8 i = 0; i < device->lun_count; i++)
 		device->luns[i] = NULL;
 
@@ -1176,7 +1156,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	TRACE_ALWAYS("device reports a lun count of %d\n", device->lun_count);
 	for (uint8 i = 0; i < device->lun_count; i++) {
 		// create the individual luns present on this device
-		device_lun *lun = (device_lun *)malloc(sizeof(device_lun));
+		device_lun* lun = (device_lun*)malloc(sizeof(device_lun));
 		if (lun == NULL) {
 			result = B_NO_MEMORY;
 			break;
@@ -1211,10 +1191,9 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 			TRACE("usb lun %" B_PRIu8 " inquiry attempt %" B_PRIu32 " begin\n",
 				i, tries);
 			status_t ready = usb_disk_test_unit_ready(lun, &action);
-			if (ready == B_OK || ready == B_DEV_NO_MEDIA
-				|| ready == B_DEV_MEDIA_CHANGED) {
-				TRACE("usb lun %" B_PRIu8 " ready. %s\n", i,
-					ready == B_DEV_NO_MEDIA ? " (no media inserted)" : "");
+			if (ready == B_OK || ready == B_DEV_NO_MEDIA || ready == B_DEV_MEDIA_CHANGED) {
+				TRACE("usb lun %" B_PRIu8 " ready. %s\n",
+					i, ready == B_DEV_NO_MEDIA ? " (no media inserted)" : "");
 				break;
 			}
 
@@ -1246,16 +1225,17 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	recursive_lock_unlock(&device->io_lock);
 
 	TRACE("new device: 0x%p\n", device);
-	*cookie = (void *)device;
+	*cookie = (void*)device;
+
 	return B_OK;
 }
 
 
 static void
-usb_disk_device_removed(void *cookie)
+usb_disk_device_removed(void* cookie)
 {
 	TRACE("device_removed(0x%p)\n", cookie);
-	disk_device *device = (disk_device *)cookie;
+	disk_device* device = (disk_device*)cookie;
 	mutex_lock(&device->lock);
 
 	for (uint8 i = 0; i < device->lun_count; i++)
@@ -1272,8 +1252,8 @@ usb_disk_device_removed(void *cookie)
 
 
 static status_t
-usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
-	struct transfer_data data, size_t *length)
+usb_disk_block_read(device_lun* lun, uint64 blockPosition, size_t blockCount,
+	struct transfer_data data, size_t* dataLength)
 {
 	if (!lun->media_present)
 		return B_DEV_NO_MEDIA;
@@ -1295,8 +1275,7 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 
 		status_t result = B_OK;
 		for (int tries = 0; tries < 5; tries++) {
-			result = usb_disk_operation(lun, commandBlock, 12, data,
-				length, true);
+			result = usb_disk_operation(lun, commandBlock, 12, data, dataLength, true);
 			if (result == B_OK)
 				break;
 			else
@@ -1312,8 +1291,8 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[5] = blockPosition;
 		commandBlock[7] = blockCount >> 8;
 		commandBlock[8] = blockCount;
-		status_t result = usb_disk_operation(lun, commandBlock, 10,
-			data, length, true);
+		status_t result = usb_disk_operation(lun, commandBlock, 10, data, dataLength, true);
+
 		return result;
 	} else {
 		commandBlock[0] = SCSI_READ_16;
@@ -1330,16 +1309,16 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[11] = blockCount >> 16;
 		commandBlock[12] = blockCount >> 8;
 		commandBlock[13] = blockCount;
-		status_t result = usb_disk_operation(lun, commandBlock, 16,
-			data, length, true);
+		status_t result = usb_disk_operation(lun, commandBlock, 16, data, dataLength, true);
+
 		return result;
 	}
 }
 
 
 static status_t
-usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
-	struct transfer_data data, size_t *length)
+usb_disk_block_write(device_lun* lun, uint64 blockPosition, size_t blockCount,
+	struct transfer_data data, size_t* dataLength)
 {
 	if (!lun->media_present)
 		return B_DEV_NO_MEDIA;
@@ -1362,8 +1341,7 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[9] = blockCount;
 
 		status_t result;
-		result = usb_disk_operation(lun, commandBlock, 12,
-			data, length, false);
+		result = usb_disk_operation(lun, commandBlock, 12, data, dataLength, false);
 
 		int retry = 10;
 		err_act action = err_act_ok;
@@ -1375,6 +1353,7 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 
 		if (result == B_OK)
 			lun->should_sync = true;
+
 		return result;
 	} else if (blockPosition + blockCount < 0x100000000LL && blockCount <= 0x10000) {
 		commandBlock[0] = SCSI_WRITE_10;
@@ -1384,10 +1363,10 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[5] = blockPosition;
 		commandBlock[7] = blockCount >> 8;
 		commandBlock[8] = blockCount;
-		status_t result = usb_disk_operation(lun, commandBlock, 10,
-			data, length, false);
+		status_t result = usb_disk_operation(lun, commandBlock, 10, data, dataLength, false);
 		if (result == B_OK)
 			lun->should_sync = true;
+
 		return result;
 	} else {
 		commandBlock[0] = SCSI_WRITE_16;
@@ -1404,10 +1383,10 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[11] = blockCount >> 16;
 		commandBlock[12] = blockCount >> 8;
 		commandBlock[13] = blockCount;
-		status_t result = usb_disk_operation(lun, commandBlock, 16,
-			data, length, false);
+		status_t result = usb_disk_operation(lun, commandBlock, 16, data, dataLength, false);
 		if (result == B_OK)
 			lun->should_sync = true;
+
 		return result;
 	}
 }
@@ -1423,6 +1402,7 @@ usb_disk_init_device(void* _info, void** _cookie)
 {
 	CALLED();
 	*_cookie = _info;
+
 	return B_OK;
 }
 
@@ -1435,7 +1415,7 @@ usb_disk_uninit_device(void* _cookie)
 
 
 static status_t
-usb_disk_open(void *deviceCookie, const char *path, int flags, void **_cookie)
+usb_disk_open(void* deviceCookie, const char* path, int flags, void** _cookie)
 {
 	TRACE("open(%s)\n", path);
 	if (strncmp(path, DEVICE_NAME_BASE, strlen(DEVICE_NAME_BASE)) != 0)
@@ -1455,10 +1435,10 @@ usb_disk_open(void *deviceCookie, const char *path, int flags, void **_cookie)
 	rawName[lastPart + 1] = 0;
 	strcat(rawName, "raw");
 
-	disk_device *device = (disk_device *)deviceCookie;
+	disk_device* device = (disk_device*)deviceCookie;
 	MutexLocker locker(device->lock);
 	for (uint8 i = 0; i < device->lun_count; i++) {
-		device_lun *lun = device->luns[i];
+		device_lun* lun = device->luns[i];
 		if (strncmp(rawName, lun->name, 32) == 0) {
 			// found the matching device/lun
 			if (device->removed)
@@ -1475,11 +1455,11 @@ usb_disk_open(void *deviceCookie, const char *path, int flags, void **_cookie)
 
 
 static status_t
-usb_disk_close(void *cookie)
+usb_disk_close(void* cookie)
 {
 	TRACE("close()\n");
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
+	device_lun* lun = (device_lun*)cookie;
+	disk_device* device = lun->device;
 
 	RecursiveLocker ioLocker(device->io_lock);
 	MutexLocker deviceLocker(device->lock);
@@ -1492,12 +1472,11 @@ usb_disk_close(void *cookie)
 
 
 static status_t
-usb_disk_free(void *cookie)
+usb_disk_free(void* cookie)
 {
 	TRACE("free()\n");
-
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
+	device_lun* lun = (device_lun*)cookie;
+	disk_device* device = lun->device;
 	mutex_lock(&device->lock);
 	device->open_count--;
 	mutex_unlock(&device->lock);
@@ -1508,7 +1487,7 @@ usb_disk_free(void *cookie)
 
 
 static inline void
-normalize_name(char *name, size_t nameLength)
+normalize_name(char* name, size_t nameLength)
 {
 	bool wasSpace = false;
 	size_t insertIndex = 0;
@@ -1529,7 +1508,7 @@ normalize_name(char *name, size_t nameLength)
 
 
 static status_t
-acquire_io_lock(disk_device *device, MutexLocker& locker, RecursiveLocker& ioLocker)
+acquire_io_lock(disk_device* device, MutexLocker& locker, RecursiveLocker& ioLocker)
 {
 	locker.Unlock();
 	ioLocker.SetTo(device->io_lock, false, true);
@@ -1546,7 +1525,7 @@ acquire_io_lock(disk_device *device, MutexLocker& locker, RecursiveLocker& ioLoc
 
 
 static status_t
-handle_media_change(device_lun *lun, MutexLocker& locker)
+handle_media_change(device_lun* lun, MutexLocker& locker)
 {
 	RecursiveLocker ioLocker;
 	status_t result = acquire_io_lock(lun->device, locker, ioLocker);
@@ -1565,10 +1544,10 @@ handle_media_change(device_lun *lun, MutexLocker& locker)
 
 
 static status_t
-usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
+usb_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
+	device_lun* lun = (device_lun*)cookie;
+	disk_device* device = lun->device;
 	MutexLocker locker(&device->lock);
 	if (device->removed)
 		return B_DEV_NOT_READY;
@@ -1598,19 +1577,20 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			for (uint32 tries = 0; tries < 3; tries++) {
 				ready = usb_disk_test_unit_ready(lun, &action);
 				if (ready == B_OK || ready == B_DEV_NO_MEDIA
-					|| (action != err_act_retry
-						&& action != err_act_many_retries)) {
+					|| (action != err_act_retry && action != err_act_many_retries)) {
 					if (IS_USER_ADDRESS(buffer)) {
 						if (user_memcpy(buffer, &ready, sizeof(status_t)) != B_OK)
 							return B_BAD_ADDRESS;
 					} else if (is_called_via_syscall()) {
 						return B_BAD_ADDRESS;
-					} else
-						*(status_t *)buffer = ready;
+					} else {
+						*(status_t*)buffer = ready;
+					}
 					break;
 				}
 				snooze(500000);
 			}
+
 			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", ready);
 			return B_OK;
 		}
@@ -1626,17 +1606,15 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			device_geometry geometry;
-			devfs_compute_geometry_size(&geometry, lun->block_count,
-				lun->block_size);
+			devfs_compute_geometry_size(&geometry, lun->block_count, lun->block_size);
 			geometry.bytes_per_physical_sector = lun->physical_block_size;
 
 			geometry.device_type = lun->device_type;
 			geometry.removable = lun->removable;
 			geometry.read_only = lun->write_protected;
 			geometry.write_once = lun->device_type == B_WORM;
-			TRACE("B_GET_GEOMETRY: %" B_PRId32 " sectors at %" B_PRId32
-				" bytes per sector\n", geometry.cylinder_count,
-				geometry.bytes_per_sector);
+			TRACE("B_GET_GEOMETRY: %" B_PRId32 " sectors at %" B_PRId32 " bytes per sector\n",
+				geometry.cylinder_count, geometry.bytes_per_sector);
 			return user_memcpy(buffer, &geometry, length);
 		}
 
@@ -1664,8 +1642,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			commandBlock[1] = lun->logical_unit_number << 5;
 			commandBlock[4] = 2;
 
-			return usb_disk_operation(lun, commandBlock, 6, NULL, NULL,
-				false);
+			return usb_disk_operation(lun, commandBlock, 6, NULL, NULL, false);
 		}
 
 		case B_LOAD_MEDIA:
@@ -1681,8 +1658,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			commandBlock[1] = lun->logical_unit_number << 5;
 			commandBlock[4] = 3;
 
-			return usb_disk_operation(lun, commandBlock, 6, NULL, NULL,
-				false);
+			return usb_disk_operation(lun, commandBlock, 6, NULL, NULL, false);
 		}
 
 		case B_GET_ICON:
@@ -1692,87 +1668,88 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_GET_ICON_NAME:
 		{
-			const char *iconName = "devices/drive-removable-media-usb";
-			char vendor[sizeof(lun->vendor_name)+1];
-			char product[sizeof(lun->product_name)+1];
-
-			if (device->is_ufi) {
+			const char* iconName = "devices/drive-removable-media-usb";
+			if (device->is_ufi)
 				iconName = "devices/drive-floppy-usb";
-			}
+
+			char vendor[sizeof(lun->vendor_name) + 1];
+			char product[sizeof(lun->product_name) + 1];
 
 			switch (lun->device_type) {
 				case B_CD:
 				case B_OPTICAL:
 					iconName = "devices/drive-optical";
 					break;
+
 				case B_TAPE:	// TODO
 				default:
-					snprintf(vendor, sizeof(vendor), "%.8s",
-						lun->vendor_name);
-					snprintf(product, sizeof(product), "%.16s",
-						lun->product_name);
+					snprintf(vendor, sizeof(vendor), "%.8s", lun->vendor_name);
+					snprintf(product, sizeof(product), "%.16s", lun->product_name);
 					for (int i = 0; kIconMatches[i].icon; i++) {
 						if (kIconMatches[i].vendor != NULL
-							&& strstr(vendor, kIconMatches[i].vendor) == NULL)
+							&& strstr(vendor, kIconMatches[i].vendor) == NULL) {
 							continue;
+						}
+
 						if (kIconMatches[i].product != NULL
-							&& strstr(product, kIconMatches[i].product) == NULL)
+							&& strstr(product, kIconMatches[i].product) == NULL) {
 							continue;
+						}
+
 						iconName = kIconMatches[i].name;
 					}
 					break;
 			}
-			return user_strlcpy((char *)buffer, iconName,
-				B_FILE_NAME_LENGTH);
+
+			return user_strlcpy((char*)buffer, iconName, B_FILE_NAME_LENGTH);
 		}
 
 		case B_GET_VECTOR_ICON:
 		{
-			device_icon *icon = &kKeyIconData;
-			char vendor[sizeof(lun->vendor_name)+1];
-			char product[sizeof(lun->product_name)+1];
+			device_icon* icon = &kKeyIconData;
+			if (device->is_ufi)
+				icon = &kFloppyIconData;
+
+			char vendor[sizeof(lun->vendor_name) + 1];
+			char product[sizeof(lun->product_name) + 1];
 
 			if (length != sizeof(device_icon))
 				return B_BAD_VALUE;
 
-			if (device->is_ufi) {
-				// UFI is specific for floppy drives
-				icon = &kFloppyIconData;
-			} else {
-				switch (lun->device_type) {
-					case B_CD:
-					case B_OPTICAL:
-						icon = &kCDIconData;
-						break;
-					case B_TAPE:	// TODO
-					default:
-						snprintf(vendor, sizeof(vendor), "%.8s",
-								lun->vendor_name);
-						snprintf(product, sizeof(product), "%.16s",
-								lun->product_name);
-						for (int i = 0; kIconMatches[i].icon; i++) {
-							if (kIconMatches[i].vendor != NULL
-									&& strstr(vendor,
-										kIconMatches[i].vendor) == NULL)
-								continue;
-							if (kIconMatches[i].product != NULL
-									&& strstr(product,
-										kIconMatches[i].product) == NULL)
-								continue;
-							icon = kIconMatches[i].icon;
+			switch (lun->device_type) {
+				case B_CD:
+				case B_OPTICAL:
+					icon = &kCDIconData;
+					break;
+
+				case B_TAPE:	// TODO
+				default:
+					snprintf(vendor, sizeof(vendor), "%.8s", lun->vendor_name);
+					snprintf(product, sizeof(product), "%.16s", lun->product_name);
+					for (int i = 0; kIconMatches[i].icon; i++) {
+						if (kIconMatches[i].vendor != NULL
+							&& strstr(vendor, kIconMatches[i].vendor) == NULL) {
+							continue;
 						}
-						break;
-				}
+
+						if (kIconMatches[i].product != NULL
+							&& strstr(product, kIconMatches[i].product) == NULL) {
+							continue;
+						}
+
+						icon = kIconMatches[i].icon;
+					}
+					break;
 			}
 
 			device_icon iconData;
 			if (user_memcpy(&iconData, buffer, sizeof(device_icon)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			if (iconData.icon_size >= icon->icon_size) {
-				if (user_memcpy(iconData.icon_data, icon->icon_data,
-						(size_t)icon->icon_size) != B_OK)
-					return B_BAD_ADDRESS;
+			if (iconData.icon_size >= icon->icon_size
+				&& user_memcpy(iconData.icon_data, icon->icon_data, (size_t)icon->icon_size)
+					!= B_OK) {
+				return B_BAD_ADDRESS;
 			}
 
 			iconData.icon_size = icon->icon_size;
@@ -1790,12 +1767,11 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 			normalize_name(name, nameLength);
 
-			status_t result = user_strlcpy((char *)buffer, name, length);
+			status_t result = user_strlcpy((char*)buffer, name, length);
 			if (result > 0)
 				result = B_OK;
 
-			TRACE_ALWAYS("got device name \"%s\": %s\n", name,
-				strerror(result));
+			TRACE_ALWAYS("got device name \"%s\": %s\n", name, strerror(result));
 			return result;
 		}
 	}
@@ -1808,7 +1784,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 static status_t
 usb_disk_do_io(void* cookie, IOOperation* operation)
 {
-	device_lun *lun = (device_lun *)cookie;
+	device_lun* lun = (device_lun*)cookie;
 
 	RecursiveLocker ioLocker(lun->device->io_lock);
 	MutexLocker deviceLocker(lun->device->lock);
@@ -1827,13 +1803,10 @@ usb_disk_do_io(void* cookie, IOOperation* operation)
 	const size_t blockCount = length / lun->block_size;
 
 	status_t status;
-	if (operation->IsWrite()) {
-		status = usb_disk_block_write(lun,
-			blockPosition, blockCount, data, &length);
-	} else {
-		status = usb_disk_block_read(lun,
-			blockPosition, blockCount, data, &length);
-	}
+	if (operation->IsWrite())
+		status = usb_disk_block_write(lun, blockPosition, blockCount, data, &length);
+	else
+		status = usb_disk_block_read(lun, blockPosition, blockCount, data, &length);
 
 	lun->io_scheduler->OperationCompleted(operation, status, length);
 	return status;
@@ -1841,10 +1814,10 @@ usb_disk_do_io(void* cookie, IOOperation* operation)
 
 
 static status_t
-usb_disk_io(void *cookie, io_request *request)
+usb_disk_io(void* cookie, io_request* request)
 {
 	TRACE("io(%p)\n", request);
-	device_lun *lun = (device_lun *)cookie;
+	device_lun* lun = (device_lun*)cookie;
 
 	MutexLocker deviceLocker(lun->device->lock);
 
@@ -1866,10 +1839,10 @@ usb_disk_io(void *cookie, io_request *request)
 
 
 static float
-usb_disk_supports_device(device_node *parent)
+usb_disk_supports_device(device_node* parent)
 {
 	CALLED();
-	const char *bus;
+	const char* bus;
 
 	// make sure parent is really the usb bus manager
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
@@ -1881,7 +1854,7 @@ usb_disk_supports_device(device_node *parent)
 	if (gDeviceManager->get_attr_uint32(parent, USB_DEVICE_ID_ITEM, &device, true) != B_OK)
 		return -1;
 
-	const usb_configuration_info *configuration = gUSBModule->get_configuration(device);
+	const usb_configuration_info* configuration = gUSBModule->get_configuration(device);
 	if (configuration == NULL)
 		return -1;
 
@@ -1893,7 +1866,7 @@ usb_disk_supports_device(device_node *parent)
 	};
 
 	for (size_t i = 0; i < configuration->interface_count; i++) {
-		usb_interface_info *interface = configuration->interface[i].active;
+		usb_interface_info* interface = configuration->interface[i].active;
 		if (interface == NULL)
 			continue;
 
@@ -1915,7 +1888,7 @@ usb_disk_supports_device(device_node *parent)
 
 
 static status_t
-usb_disk_register_device(device_node *node)
+usb_disk_register_device(device_node* node)
 {
 	CALLED();
 
@@ -1930,7 +1903,7 @@ usb_disk_register_device(device_node *node)
 
 
 static status_t
-usb_disk_init_driver(device_node *node, void **cookie)
+usb_disk_init_driver(device_node* node, void** cookie)
 {
 	CALLED();
 
@@ -1943,10 +1916,10 @@ usb_disk_init_driver(device_node *node, void **cookie)
 
 
 static void
-usb_disk_uninit_driver(void *_cookie)
+usb_disk_uninit_driver(void* _cookie)
 {
 	CALLED();
-	disk_device *device = (disk_device *)_cookie;
+	disk_device* device = (disk_device*)_cookie;
 	mutex_lock(&device->lock);
 
 	if (!device->removed) {
@@ -1964,7 +1937,7 @@ static status_t
 usb_disk_register_child_devices(void* _cookie)
 {
 	CALLED();
-	disk_device *device = (disk_device *)_cookie;
+	disk_device* device = (disk_device*)_cookie;
 
 	device->number = gDeviceManager->create_id(USB_DISK_DEVICE_ID_GENERATOR);
 	if (device->number < 0)
@@ -1985,7 +1958,7 @@ static void
 usb_disk_removed(void* _cookie)
 {
 	CALLED();
-	disk_device *device = (disk_device *)_cookie;
+	disk_device* device = (disk_device*)_cookie;
 	mutex_lock(&device->lock);
 
 	for (uint8 i = 0; i < device->lun_count; i++) {

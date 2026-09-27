@@ -32,63 +32,63 @@ typedef struct disk_device_s {
 	disk_device_s();
 	~disk_device_s();
 
-	int32		number;
-	device_node	*node;
+	int32			number;
+	device_node*	node;
 
-	usb_device	device;
-	bool		removed;
-	uint32		open_count;
-	recursive_lock io_lock;
-	mutex		lock;
+	usb_device		device;
+	bool			removed;
+	uint32			open_count;
+	recursive_lock	io_lock;
+	mutex			lock;
 
 	// device state
-	usb_pipe	bulk_in;
-	usb_pipe	bulk_out;
-	usb_pipe	interrupt;
-	uint8		interface;
-	uint32		current_tag;
-	uint8		sync_support;
-	bool		tur_supported;
-	bool		is_atapi;
-	bool		is_ufi;
+	usb_pipe		bulk_in;
+	usb_pipe		bulk_out;
+	usb_pipe		interrupt;
+	uint8			interface;
+	uint32			current_tag;
+	uint8			sync_support;
+	bool			tur_supported;
+	bool			is_atapi;
+	bool			is_ufi;
 
 	// used to store callback information
-	sem_id		notify;
-	status_t	status;
-	size_t		actual_length;
+	sem_id			notify;
+	status_t		status;
+	size_t			actual_length;
 
 	// used to store interrupt result
-	unsigned char interruptBuffer[2];
-	sem_id interruptLock;
+	unsigned char	interruptBuffer[2];
+	sem_id			interruptLock;
 
 	// logical units of this device
-	uint8		lun_count;
-	device_lun **luns;
+	uint8			lun_count;
+	device_lun**	luns;
 } disk_device;
 
 
 // represents a logical unit on the pointed to device - this gets published
 struct device_lun_s {
-	disk_device *device;
-	char		name[32];
-	uint8		logical_unit_number;
+	disk_device*	device;
+	char			name[32];
+	uint8			logical_unit_number;
 
-	IOScheduler *io_scheduler;
-	bool		should_sync;
+	IOScheduler*	io_scheduler;
+	bool			should_sync;
 
 	// device information through read capacity/inquiry
-	bool		media_present;
-	bool		media_changed;
-	uint64		block_count;
-	uint32		block_size;
-	uint32		physical_block_size;
-	uint8		device_type;
-	bool		removable;
-	bool		write_protected;
+	bool			media_present;
+	bool			media_changed;
+	uint64			block_count;
+	uint32			block_size;
+	uint32			physical_block_size;
+	uint8			device_type;
+	bool			removable;
+	bool			write_protected;
 
-	char		vendor_name[8];
-	char		product_name[16];
-	char		product_revision[4];
+	char			vendor_name[8];
+	char			product_name[16];
+	char			product_revision[4];
 };
 
 
