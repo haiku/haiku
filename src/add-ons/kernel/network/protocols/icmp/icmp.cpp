@@ -662,6 +662,11 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 	// Now prepare the ICMP header
 
 	NetBufferPrepend<icmp_header> icmpHeader(reply);
+	status_t status = icmpHeader.Status();
+	if (status != B_OK) {
+		gBufferModule->free(reply);
+		return status;
+	}
 	icmpHeader->type = icmpType;
 	icmpHeader->code = icmpCode;
 	icmpHeader->zero = 0;
@@ -690,22 +695,23 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 	icmpHeader.Sync();
 
 	// Append IP header + 8 byte of the original datagram
-	status_t status = gBufferModule->append_restored_header(reply, buffer, 0,
+	status = gBufferModule->append_restored_header(reply, buffer, 0,
 		std::min(header.HeaderLength() + 8, (int)header.TotalLength()));
 	if (status == B_OK) {
 		net_domain* domain = get_domain(buffer);
+
 		if (domain == NULL)
-			return B_ERROR;
+			status = B_ERROR;
+		else {
+			*ICMPChecksumField(reply) = gBufferModule->checksum(reply, 0, reply->size, true);
 
-		*ICMPChecksumField(reply)
-			= gBufferModule->checksum(reply, 0, reply->size, true);
+			reply->protocol = IPPROTO_ICMP;
 
-		reply->protocol = IPPROTO_ICMP;
+			TRACE("  send ICMP message %p to %s\n", reply,
+				AddressString(domain->address_module, reply->destination, true).Data());
 
-		TRACE("  send ICMP message %p to %s\n", reply, AddressString(
-				domain->address_module, reply->destination, true).Data());
-
-		status = domain->module->send_data(NULL, reply);
+			status = domain->module->send_data(NULL, reply);
+		}
 	}
 	if (status != B_OK)
 		gBufferModule->free(reply);
