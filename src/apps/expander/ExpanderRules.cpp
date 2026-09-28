@@ -47,15 +47,26 @@ ExpanderRules::ExpanderRules()
 	// built-ins can be overridden, if the files contain matching rules.
 	_LoadRulesFiles();
 
+	// Supported placeholders in rule listing and expand commands:
+	// - %input_file%           The full path of input file. Same as good old %s placeholder
+	// - %input_dir%            The full path of input file's parent directory
+	// - %input_basename%       The filename
+	// - %input_basename_noext% The input filename, without extension, if any
+	// - %output_dir%           The full path to destination directory
+	// - %output_file%          = %output_dir%/%input_basename_noext%
+	//
+	// Values of placeholders are escaped and wrapped in double quote,
+	// except if the placeholder name ends with %xxxxxx|noquote%
+
 	_AddRule("", ".tar.gz", "tar -ztvf %s", "tar -zxf %s");
 	_AddRule("", ".tar.bz2", "tar -jtvf %s", "tar -jxf %s");
 	_AddRule("", ".tar.Z", "tar -Ztvf %s", "tar -Zxf %s");
 	_AddRule("", ".tgz", "tar -ztvf %s", "tar -zxf %s");
 	_AddRule("application/x-tar", ".tar", "tar -tvf %s", "tar -xf %s");
-	_AddRule("application/x-gzip", ".gz", "echo %s | sed 's/.gz$//g'",
-		"gunzip -c %s > `echo %s | sed 's/.gz$//g'`");
-	_AddRule("application/x-bzip2", ".bz2", "echo %s | sed 's/.bz2$//g'",
-		"bunzip2 -k %s");
+	_AddRule("application/x-gzip", ".gz", "echo %input_basename_noext%",
+		"gunzip -kc %s > %output_file%");
+	_AddRule("application/x-bzip2", ".bz2", "echo %input_basename_noext%",
+		"bunzip2 -kc %s > %output_file%");
 	_AddRule("application/zip", ".zip", "unzip -l %s", "unzip -o %s");
 	_AddRule("application/x-zip-compressed", ".zip", "unzip -l %s",
 		"unzip -o %s");

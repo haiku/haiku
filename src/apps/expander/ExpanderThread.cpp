@@ -51,6 +51,9 @@ ExpanderThread::ThreadStartup()
 	entry_ref destRef;
 	BString cmd;
 
+	if ((status = GetDataStore()->FindString("cmd", &cmd)) != B_OK)
+		return status;
+
 	if ((status = GetDataStore()->FindRef("srcRef", &srcRef)) != B_OK)
 		return status;
 
@@ -59,15 +62,7 @@ ExpanderThread::ThreadStartup()
 		chdir(path.Path());
 	}
 
-	if ((status = GetDataStore()->FindString("cmd", &cmd)) != B_OK)
-		return status;
-
-	BPath path(&srcRef);
-	BString pathString(path.Path());
-	pathString.CharacterEscape("\\\"$`", '\\');
-	pathString.Prepend("\"");
-	pathString.Append("\"");
-	cmd.ReplaceAll("%s", pathString.String());
+	ReplacePlaceHolders(cmd, srcRef, destRef);
 
 	int32 argc = 3;
 	const char** argv = new const char * [argc + 1];
@@ -329,4 +324,103 @@ ExpanderThread::WaitOnExternalExpander()
 		return wait_for_thread(fThreadId, &status);
 	else
 		return status;
+}
+
+
+// #pragma mark -
+
+
+/* static */ void
+ExpanderThread::ReplacePlaceHolders(BString& cmd, const entry_ref& srcRef, const entry_ref& destRef)
+{
+	const struct {
+		int id;
+		const char* name;
+	} kPlaceHolders[] = {
+		{ 0, "input_file" },			// full path to input file
+		{ 1, "input_dir" },				// full path of input file's parent dir
+		{ 2, "input_basename" },		// with extension
+		{ 3, "input_basename_noext" },  // without extension
+		{ 4, "output_dir" },  			// full path to destination dir
+		{ 5, "output_file" }			// = output_dir/input_basename_noext
+	};
+	// each %placeHolder% has the following variant:
+	// - %placeHolder|noquote%, for a value NOT in double quote
+
+	BPath inputFile(&srcRef);
+	BPath inputDir;
+	inputFile.GetParent(&inputDir);
+
+	BPath outputDir(&destRef);
+
+	BString placeHolder;
+	BString value;
+
+	bool quote;
+	for (uint32 i = 0; i < B_COUNT_OF(kPlaceHolders); i++) {
+
+		quote = true;
+
+		placeHolder.SetToFormat("%%%s%%", kPlaceHolders[i].name);
+		if (cmd.FindFirst(placeHolder) == B_ERROR) {
+			placeHolder.SetToFormat("%%%s|noquote%%", kPlaceHolders[i].name);
+			if (cmd.FindFirst(placeHolder) == B_ERROR)
+				continue; // let's try next place holder
+			quote = false;
+		}
+
+		switch (kPlaceHolders[i].id) {
+			case 0: // input_file
+			{
+				value.SetTo(inputFile.Path());
+				break;
+			}
+			case 1: // input_dir
+			{
+				value.SetTo(inputDir.Path());
+				break;
+			}
+			case 2: // input_basename
+			{
+				value.SetTo(inputFile.Leaf());
+				break;
+			}
+			case 3: // input_basename_noext
+			{
+				value.SetTo(inputFile.Leaf());
+				int32 extensionPos = value.FindLast('.');
+				if (extensionPos != B_ERROR)
+					value.Remove(extensionPos, value.Length() - extensionPos);
+				break;
+			}
+			case 4: // output_dir
+			{
+				value.SetTo(outputDir.Path());
+				break;
+			}
+			case 5: // output_file
+			{
+				value.SetToFormat("%s/%s", outputDir.Path(), inputFile.Leaf());
+				int32 extensionPos = value.FindLast('.');
+				if (extensionPos != B_ERROR)
+					value.Remove(extensionPos, value.Length() - extensionPos);
+				break;
+			}
+		}
+
+		if (quote) {
+			value.CharacterEscape("\\\"$`", '\\');
+			value.Prepend("\"");
+			value.Append("\"");
+		}
+
+		cmd.ReplaceAll(placeHolder.String(), value.String());
+	}
+
+	// last but not least, the good 'old %s input file default placeholder
+	value.SetTo(inputFile.Path());
+	value.CharacterEscape("\\\"$`", '\\');
+	value.Prepend("\"");
+	value.Append("\"");
+	cmd.ReplaceAll("%s", value.String());
 }

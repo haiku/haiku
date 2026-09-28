@@ -49,6 +49,9 @@ private:
 									int& in, int& out, int& err,
 									const char** envp = (const char**)environ);
 
+	static void 				ReplacePlaceHolders(BString& cmd, const entry_ref& srcRef,
+									const entry_ref& destRef);
+
 			BMessenger*			fWindowMessenger;
 
 			thread_id			fThreadId;
