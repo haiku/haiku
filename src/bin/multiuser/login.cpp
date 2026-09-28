@@ -128,7 +128,7 @@ main(int argc, char *argv[])
 	bool preserveEnvironment = false;
 	const char* fromHost = NULL;
 
-	char c;
+	int c;
 	while ((c = getopt(argc, argv, "fh:p")) != -1) {
 		switch (c) {
 			case 'f':

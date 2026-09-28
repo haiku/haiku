@@ -124,7 +124,7 @@ int main(int argc, char * argv[])
 
 void parse_opts(int argc, char * argv[])
 {
-	char c;
+	int c;
 	int i;
 
 	while ((c = getopt(argc, argv, "hvd:p:i:s:b:o:")) != -1)

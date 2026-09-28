@@ -356,7 +356,7 @@ main(int argc, char** argv)
 	bigtime_t runTime = 1000000;
 	uint32 cpuCount = 1;
 
-	char option;
+	int option;
 	while ((option = getopt_long(argc, argv, "", kOptions, NULL)) != -1) {
 		switch (option) {
 			case 't':
