@@ -114,7 +114,7 @@ private:
 private:
 			sem_id				fAlertSem;
 			int32				fAlertValue;
-			BPrivate::TAlertView* fIconView;
+			::BPrivate::TAlertView* fIconView;
 			BTextView*			fTextView;
 			BGroupLayout*		fButtonLayout;
 			std::vector<BButton*> fButtons;
