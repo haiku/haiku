@@ -32,6 +32,7 @@
 #include <kdevice_manager.h>
 #include <lock.h>
 #include <Notifications.h>
+#include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/fs_trim_support.h>
 #include <vfs.h>
@@ -1672,133 +1673,14 @@ devfs_can_page(fs_volume* _volume, fs_vnode* _vnode, void* cookie)
 
 
 static status_t
-devfs_read_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
-	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
-	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
-
-	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
-
-	if (!S_ISCHR(vnode->stream.type)
-		|| (!vnode->stream.u.dev.device->HasRead()
-			&& !vnode->stream.u.dev.device->HasIO())
-		|| cookie == NULL)
-		return B_NOT_ALLOWED;
-
-	if (pos < 0)
-		return B_BAD_VALUE;
-
-	if (vnode->stream.u.dev.partition != NULL) {
-		if (pos >= vnode->stream.u.dev.partition->info.size)
-			return B_BAD_VALUE;
-
-		translate_partition_access(vnode->stream.u.dev.partition, pos,
-			*_numBytes);
-	}
-
-	if (vnode->stream.u.dev.device->HasIO()) {
-		// TODO: use io_requests for this!
-	}
-
-	// emulate read_pages() using read()
-
-	status_t error = B_OK;
-	size_t bytesTransferred = 0;
-
-	size_t remainingBytes = *_numBytes;
-	for (size_t i = 0; i < count && remainingBytes > 0; i++) {
-		size_t toRead = min_c(vecs[i].iov_len, remainingBytes);
-		size_t length = toRead;
-
-		error = vnode->stream.u.dev.device->Read(cookie->device_cookie, pos,
-			vecs[i].iov_base, &length);
-		if (error != B_OK)
-			break;
-
-		pos += length;
-		bytesTransferred += length;
-		remainingBytes -= length;
-
-		if (length < toRead)
-			break;
-	}
-
-	*_numBytes = bytesTransferred;
-
-	return bytesTransferred > 0 ? B_OK : error;
-}
-
-
-static status_t
-devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
-	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
-	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
-
-	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
-
-	if (!S_ISCHR(vnode->stream.type)
-		|| (!vnode->stream.u.dev.device->HasWrite()
-			&& !vnode->stream.u.dev.device->HasIO())
-		|| cookie == NULL)
-		return B_NOT_ALLOWED;
-
-	if (pos < 0)
-		return B_BAD_VALUE;
-
-	if (vnode->stream.u.dev.partition != NULL) {
-		if (pos >= vnode->stream.u.dev.partition->info.size)
-			return B_BAD_VALUE;
-
-		translate_partition_access(vnode->stream.u.dev.partition, pos,
-			*_numBytes);
-	}
-
-	if (vnode->stream.u.dev.device->HasIO()) {
-		// TODO: use io_requests for this!
-	}
-
-	// emulate write_pages() using write()
-
-	status_t error = B_OK;
-	size_t bytesTransferred = 0;
-
-	size_t remainingBytes = *_numBytes;
-	for (size_t i = 0; i < count && remainingBytes > 0; i++) {
-		size_t toWrite = min_c(vecs[i].iov_len, remainingBytes);
-		size_t length = toWrite;
-
-		error = vnode->stream.u.dev.device->Write(cookie->device_cookie, pos,
-			vecs[i].iov_base, &length);
-		if (error != B_OK)
-			break;
-
-		pos += length;
-		bytesTransferred += length;
-		remainingBytes -= length;
-
-		if (length < toWrite)
-			break;
-	}
-
-	*_numBytes = bytesTransferred;
-
-	return bytesTransferred > 0 ? B_OK : error;
-}
-
-
-static status_t
-devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie,
-	io_request* request)
+devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie, io_request* request)
 {
 	TRACE(("[%d] devfs_io(request: %p)\n", find_thread(NULL), request));
 
 	devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
-	devfs_cookie* cookie = (devfs_cookie*)_cookie;
+	devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
 
-	if (!S_ISCHR(vnode->stream.type) || cookie == NULL) {
+	if (!S_ISCHR(vnode->stream.type)) {
 		request->SetStatusAndNotify(B_NOT_ALLOWED);
 		return B_NOT_ALLOWED;
 	}
@@ -1816,6 +1698,90 @@ devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie,
 	}
 
 	return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
+}
+
+
+static status_t
+devfs_read_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
+	off_t pos, const iovec* _vecs, size_t count, size_t* _numBytes)
+{
+	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
+
+	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+
+	if (!S_ISCHR(vnode->stream.type))
+		return B_NOT_ALLOWED;
+	if (pos < 0)
+		return B_BAD_VALUE;
+	if (!vnode->stream.u.dev.device->HasIO())
+		return B_UNSUPPORTED;
+
+	BStackOrHeapArray<generic_io_vec, 8> vecs(count);
+	if (!vecs.IsValid())
+		return B_NO_MEMORY;
+
+	size_t length = 0;
+	for (size_t i = 0; i < count; i++) {
+		vecs[i].base = (generic_addr_t)_vecs[i].iov_base;
+		vecs[i].length = _vecs[i].iov_len;
+		length += vecs[i].length;
+	}
+
+	IORequest request;
+	status_t status = request.Init(pos, vecs, count, length, false, 0);
+	if (status != B_OK)
+		return status;
+
+	status = devfs_io(_volume, _vnode, _cookie, &request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+
+	*_numBytes = request.TransferredBytes();
+	return *_numBytes > 0 ? B_OK : status;
+}
+
+
+static status_t
+devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
+	off_t pos, const iovec* _vecs, size_t count, size_t* _numBytes)
+{
+	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
+
+	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+
+	if (!S_ISCHR(vnode->stream.type))
+		return B_NOT_ALLOWED;
+	if (pos < 0)
+		return B_BAD_VALUE;
+	if (!vnode->stream.u.dev.device->HasIO())
+		return B_UNSUPPORTED;
+
+	BStackOrHeapArray<generic_io_vec, 8> vecs(count);
+	if (!vecs.IsValid())
+		return B_NO_MEMORY;
+
+	size_t length = 0;
+	for (size_t i = 0; i < count; i++) {
+		vecs[i].base = (generic_addr_t)_vecs[i].iov_base;
+		vecs[i].length = _vecs[i].iov_len;
+		length += vecs[i].length;
+	}
+
+	IORequest request;
+	status_t status = request.Init(pos, vecs, count, length, true, 0);
+	if (status != B_OK)
+		return status;
+
+	status = devfs_io(_volume, _vnode, _cookie, &request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+
+	*_numBytes = request.TransferredBytes();
+	return *_numBytes > 0 ? B_OK : status;
 }
 
 
