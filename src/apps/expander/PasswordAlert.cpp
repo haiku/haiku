@@ -1,138 +1,107 @@
 /*
- * Copyright 2003-2010 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2026 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
+ *		Philippe Houdoin
  */
-
 
 #include "PasswordAlert.h"
 
-#include <string.h>
-
-#include <File.h>
-#include <FindDirectory.h>
+#include <Bitmap.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <ControlLook.h>
 #include <IconUtils.h>
-#include <Path.h>
-#include <Resources.h>
+#include <LayoutBuilder.h>
+#include <Message.h>
 #include <Screen.h>
+#include <StringView.h>
+#include <TextControl.h>
+#include <TextView.h>
 #include <View.h>
 
+#include "StripeView.h"
 
-static const int kWindowIconOffset = 27;
-static const int kIconStripeWidth = 30;
-static const int kTextIconOffset = kWindowIconOffset + kIconStripeWidth - 2;
-static const int kTextTopOffset = 6;
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PasswordAlert"
+
+
 static const int kSemTimeOut = 50000;
 
-
-class TAlertView : public BView {
-public:
-							TAlertView(BRect frame);
-							TAlertView(BMessage* archive);
-							~TAlertView();
-
-	virtual void			Draw(BRect updateRect);
-
-			void			SetBitmap(BBitmap* Icon) { fIconBitmap = Icon; }
-			BBitmap*		Bitmap() { return fIconBitmap; }
-
-private:
-			BBitmap*		fIconBitmap;
-};
-
-
-//	#pragma mark - PasswordAlert
+static const int kWindowMinWidth = 310;
 
 
 PasswordAlert::PasswordAlert(const char* title, const char* text)
 	:
-	BWindow(BRect(0, 0, 450, 45), title, B_MODAL_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE),
+	BWindow(BRect(0, 0, 100, 100), title, B_MODAL_WINDOW,
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
+	fIcon(_IconSize(), B_RGBA32),
 	fTextControl(NULL),
-	fAlertSem(-1)
+	fSemaphore(-1)
 {
-	// Set up the "_master_" view
-	TAlertView* masterView = new TAlertView(Bounds());
-	masterView->SetBitmap(InitIcon());
-	AddChild(masterView);
+	BIconUtils::GetSystemIcon("dialog-warning", &fIcon);
+	BStripeView* stripeView = new BStripeView(fIcon);
 
-	// Set up the text view
-	BRect textControlRect(kTextIconOffset, kTextTopOffset,
-		Bounds().right - 5, Bounds().bottom);
-
-	fTextControl = new BTextControl(textControlRect, "_password_", text,
-		NULL, new BMessage('pass'), B_FOLLOW_ALL);
-	fTextControl->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTextControl = new BTextControl("_password_", "", NULL, new BMessage('pass'));
 	fTextControl->TextView()->HideTyping(true);
-	fTextControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fTextControl->SetDivider(10 + fTextControl->StringWidth(text));
 
-	masterView->AddChild(fTextControl);
+	BButton* cancelButton = new BButton(B_TRANSLATE("Cancel"), new BMessage('cncl'));
+	BButton* okButton = new BButton(B_TRANSLATE("OK"), new BMessage('pass'));
 
-	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
-	BPoint point;
-	point.x = screenFrame.Width() / 2 - Bounds().Width() / 2;
-	point.y = screenFrame.Height() / 2 - Bounds().Height() / 2;
-	if (screenFrame.Contains(point))
-		MoveTo(point);
+	BTextView* textView = new BTextView("_password_text_");
+	textView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	textView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
+	textView->MakeEditable(false);
+	textView->MakeSelectable(false);
+	textView->SetWordWrap(true);
+	textView->SetText(text);
+	textView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
+		.Add(stripeView)
+		.AddGroup(B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+			.SetInsets(B_USE_HALF_ITEM_INSETS)
+			.Add(textView)
+			.Add(fTextControl)
+			.AddGroup(B_HORIZONTAL, B_USE_HALF_ITEM_SPACING)
+				.AddGlue()
+				.Add(cancelButton)
+				.Add(okButton);
 
 	fTextControl->MakeFocus();
+	SetDefaultButton(okButton);
+
+	float fontFactor = be_plain_font->Size() / 11.0f;
+	GetLayout()->SetExplicitMinSize(BSize(kWindowMinWidth * fontFactor, B_SIZE_UNSET));
+
+	ResizeToPreferred();
+
+	// Return early if we've already been moved...
+	if (Frame().left != 0 && Frame().right != 0)
+		return;
+
+	// otherwise center ourselves on-top of parent window/screen
+	BWindow* parent = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	const BRect frame = parent != NULL ? parent->Frame() : BScreen(this).Frame();
+
+	CenterIn(frame);
 }
 
 
-PasswordAlert::~PasswordAlert()
-{
-}
-
-
-BBitmap*
-PasswordAlert::InitIcon()
-{
-	// The alert icons are in the app_server resources
-	BBitmap* icon = NULL;
-	BPath path;
-	if (find_directory(B_BEOS_SERVERS_DIRECTORY, &path) == B_OK) {
-		path.Append("app_server");
-		BFile file;
-		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK) {
-			BResources resources;
-			if (resources.SetTo(&file) == B_OK) {
-				// Which icon are we trying to load?
-				const char* iconName = "warn";
-
-				// Load the raw icon data
-				size_t size;
-				const void* rawIcon
-					= resources.LoadResource(B_VECTOR_ICON_TYPE, iconName,
-						&size);
-
-				if (rawIcon != NULL) {
-					// Now build the bitmap
-					icon = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
-					if (BIconUtils::GetVectorIcon((const uint8*)rawIcon, size,
-							icon) != B_OK) {
-						delete icon;
-						return NULL;
-					}
-				}
-			}
-		}
-	}
-
-	return icon;
-}
-
-
-void
+status_t
 PasswordAlert::Go(BString& password)
 {
-	fAlertSem = create_sem(0, "AlertSem");
-	if (fAlertSem < B_OK) {
+	fSemaphore = create_sem(0, "PasswordAlertSem");
+	if (fSemaphore < B_OK) {
 		Quit();
-		return;
+		return B_NO_MEMORY;
 	}
+
+	fStatus = B_CANCEL;
 
 	// Get the originating window, if it exists
 	BWindow* window
@@ -143,15 +112,14 @@ PasswordAlert::Go(BString& password)
 	// Heavily modified from TextEntryAlert code; the original didn't let the
 	// blocked window ever draw.
 	if (window != NULL) {
-		status_t result;
+		status_t status;
 		for (;;) {
 			do {
-				result = acquire_sem_etc(fAlertSem, 1, B_RELATIVE_TIMEOUT,
-					kSemTimeOut);
+				status = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT, kSemTimeOut);
 				// We've (probably) had our time slice taken away from us
-			} while (result == B_INTERRUPTED);
+			} while (status == B_INTERRUPTED);
 
-			if (result == B_BAD_SEM_ID) {
+			if (status == B_BAD_SEM_ID) {
 				// Semaphore was finally nuked in MessageReceived
 				break;
 			}
@@ -159,59 +127,41 @@ PasswordAlert::Go(BString& password)
 		}
 	} else {
 		// No window to update, so just hang out until we're done.
-		while (acquire_sem(fAlertSem) == B_INTERRUPTED) {
+		while (acquire_sem(fSemaphore) == B_INTERRUPTED) {
 			;
 		}
 	}
 
-	// Have to cache the value since we delete on Quit()
-	password = fTextControl->Text();
+	if (fStatus == B_OK)
+		password = fTextControl->Text();
+
 	if (Lock())
 		Quit();
+
+	return fStatus;
 }
 
 
 void
 PasswordAlert::MessageReceived(BMessage* msg)
 {
-	if (msg->what != 'pass')
-		return BWindow::MessageReceived(msg);
-
-	delete_sem(fAlertSem);
-	fAlertSem = -1;
-}
-
-
-//	#pragma mark - TAlertView
-
-
-TAlertView::TAlertView(BRect frame)
-	:
-	BView(frame, "TAlertView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
-	fIconBitmap(NULL)
-{
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-}
-
-
-TAlertView::~TAlertView()
-{
-	delete fIconBitmap;
-}
-
-
-void
-TAlertView::Draw(BRect updateRect)
-{
-	// Here's the fun stuff
-	if (fIconBitmap != NULL) {
-		BRect stripeRect = Bounds();
-		stripeRect.right = kIconStripeWidth;
-		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		FillRect(stripeRect);
-
-		SetDrawingMode(B_OP_ALPHA);
-		DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
-		SetDrawingMode(B_OP_COPY);
+	switch (msg->what) {
+		case 'cncl':
+		case 'pass':
+		{
+			fStatus = msg->what == 'cncl' ? B_CANCEL : B_OK;
+			delete_sem(fSemaphore);
+			fSemaphore = -1;
+			break;
+		}
+		default:
+			return BWindow::MessageReceived(msg);
 	}
+}
+
+
+BRect
+PasswordAlert::_IconSize()
+{
+	return BRect(BPoint(0, 0), be_control_look->ComposeIconSize(32));
 }

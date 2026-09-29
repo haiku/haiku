@@ -1,33 +1,40 @@
 /*
- * Copyright 2003-2010 Haiku Inc.
+ * Copyright 2003-2026 Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
  */
+
 #ifndef _PASSWORD_ALERT_H
 #define _PASSWORD_ALERT_H
 
 
 #include <Bitmap.h>
+#include <Rect.h>
 #include <String.h>
-#include <TextControl.h>
 #include <Window.h>
+
+class BBitmap;
+class BTextControl;
 
 
 class PasswordAlert : public BWindow {
 public:
-								PasswordAlert(const char* title,
-									const char* text);
-	virtual						~PasswordAlert();
+						PasswordAlert(const char* title,
+							const char* text);
 
-			void				Go(BString& password);
-	virtual void				MessageReceived(BMessage* message);
+	status_t			Go(BString& password);
+	void				MessageReceived(BMessage* message);
 
 private:
-			BBitmap*			InitIcon();
-			BTextControl*		fTextControl;
-			sem_id				fAlertSem;
+	static	BRect		_IconSize();
+
+private:
+	BBitmap				fIcon;
+	BTextControl*		fTextControl;
+	sem_id				fSemaphore;
+	status_t			fStatus;
 };
 
 

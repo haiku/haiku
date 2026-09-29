@@ -433,9 +433,13 @@ ExpanderWindow::MessageReceived(BMessage* message)
 						BString password;
 						PasswordAlert* alert =
 							new PasswordAlert("passwordAlert", string);
-						alert->Go(password);
-						fExpandingThread->ResumeExternalExpander();
-						fExpandingThread->PushInput(password);
+						if (alert->Go(password) == B_OK) {
+							fExpandingThread->ResumeExternalExpander();
+							fExpandingThread->PushInput(password);
+						} else {
+							fExpandingThread->ResumeExternalExpander();
+							StopExpanding();
+						}
 					}
 				}
 			}
@@ -449,11 +453,14 @@ ExpanderWindow::MessageReceived(BMessage* message)
 				if (strstr(string.String(), "password") != NULL) {
 					fExpandingThread->SuspendExternalExpander();
 					BString password;
-					PasswordAlert* alert = new PasswordAlert("passwordAlert",
-						string);
-					alert->Go(password);
-					fExpandingThread->ResumeExternalExpander();
-					fExpandingThread->PushInput(password);
+					PasswordAlert* alert = new PasswordAlert("passwordAlert", string);
+					if (alert->Go(password) == B_OK) {
+						fExpandingThread->ResumeExternalExpander();
+						fExpandingThread->PushInput(password);
+					} else {
+						fExpandingThread->ResumeExternalExpander();
+						StopExpanding();
+					}
 				} else {
 					if (fExpandingIgnoreErrors)
 						break;

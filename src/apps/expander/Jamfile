@@ -14,7 +14,7 @@ Application Expander :
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
 	PasswordAlert.cpp
-	: be tracker localestub [ TargetLibsupc++ ]
+	: be tracker shared localestub [ TargetLibsupc++ ]
 	: Expander.rdef
 ;
 
@@ -25,4 +25,5 @@ DoCatalogs Expander :
 	ExpanderPreferences.cpp
 	ExpanderSettings.cpp
 	DirectoryFilePanel.cpp
+	PasswordAlert.cpp
 ;
