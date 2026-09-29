@@ -124,8 +124,8 @@ InfoCommand::Execute(int argc, const char* const* argv)
 		DIE(error, "searching packages failed");
 
 	if (packages.IsEmpty()) {
-		printf("No matching packages found.\n");
-		return 0;
+		fprintf(stderr, "Could not find a package exactly named: \"%s\".\n", packageName);
+		return 1;
 	}
 
 	// select first exact match by package name
