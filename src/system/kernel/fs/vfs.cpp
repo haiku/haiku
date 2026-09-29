@@ -4105,46 +4105,6 @@ check_write_stat_permissions(gid_t nodeGroupID, uid_t nodeUserID, mode_t nodeMod
 }
 
 
-#if 0
-extern "C" status_t
-read_pages(int fd, off_t pos, const iovec* vecs, size_t count,
-	size_t* _numBytes)
-{
-	struct file_descriptor* descriptor;
-	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, true);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	status_t status = vfs_read_pages(vnode, descriptor->cookie, pos, vecs,
-		count, 0, _numBytes);
-
-	put_fd(descriptor);
-	return status;
-}
-
-
-extern "C" status_t
-write_pages(int fd, off_t pos, const iovec* vecs, size_t count,
-	size_t* _numBytes)
-{
-	struct file_descriptor* descriptor;
-	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, true);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	status_t status = vfs_write_pages(vnode, descriptor->cookie, pos, vecs,
-		count, 0, _numBytes);
-
-	put_fd(descriptor);
-	return status;
-}
-#endif
-
-
 extern "C" status_t
 read_file_io_vec_pages(int fd, const file_io_vec* fileVecs, size_t fileVecCount,
 	const iovec* vecs, size_t vecCount, uint32* _vecIndex, size_t* _vecOffset,

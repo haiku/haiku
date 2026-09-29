@@ -337,10 +337,6 @@ extern status_t check_access_permissions(int accessMode, mode_t mode,
 extern status_t check_write_stat_permissions(gid_t nodeGroupID, uid_t nodeUserID,
 					mode_t nodeMode, uint32 mask, const struct stat* stat);
 
-extern status_t read_pages(int fd, off_t pos, const struct iovec* vecs,
-					size_t count, size_t* _numBytes);
-extern status_t write_pages(int fd, off_t pos, const struct iovec* vecs,
-					size_t count, size_t* _numBytes);
 extern status_t read_file_io_vec_pages(int fd,
 					const struct file_io_vec* fileVecs, size_t fileVecCount,
 					const struct iovec* vecs, size_t vecCount,
