@@ -374,92 +374,7 @@ nfs4_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 
 static status_t
-nfs4_read_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
-		", count = %lu, numBytes = %lu\n", _volume, vti->ID(), _cookie, pos,
-		count, *_numBytes);
-
-	VnodeToInodeLocker _(vti);
-	Inode* inode = vti->Get();
-	if (inode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-
-	status_t result;
-	size_t totalRead = 0;
-	bool eof = false;
-	for (size_t i = 0; i < count && !eof; i++) {
-		size_t bytesLeft = vecs[i].iov_len;
-		char* buffer = reinterpret_cast<char*>(vecs[i].iov_base);
-
-		do {
-			size_t bytesRead = bytesLeft;
-			result = inode->ReadDirect(cookie, pos, buffer, &bytesRead, &eof);
-			if (result != B_OK)
-				return result;
-
-			totalRead += bytesRead;
-			pos += bytesRead;
-			buffer += bytesRead;
-			bytesLeft -= bytesRead;
-		} while (bytesLeft > 0 && !eof);
-	}
-
-	*_numBytes = totalRead;
-
-	TRACE("*numBytes = %lu\n", totalRead);
-
-	return B_OK;
-}
-
-
-static status_t
-nfs4_write_pages(fs_volume* _volume, fs_vnode* vnode, void* _cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
-	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p, pos = %" B_PRIi64 \
-		", count = %lu, numBytes = %lu\n", _volume, vti->ID(), _cookie, pos,
-		count, *_numBytes);
-
-	VnodeToInodeLocker _(vti);
-	Inode* inode = vti->Get();
-	if (inode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	OpenFileCookie* cookie = reinterpret_cast<OpenFileCookie*>(_cookie);
-
-	status_t result;
-	for (size_t i = 0; i < count; i++) {
-		uint64 bytesLeft = vecs[i].iov_len;
-		if (pos + bytesLeft > inode->MaxFileSize())
-			bytesLeft = inode->MaxFileSize() - pos;
-
-		char* buffer = reinterpret_cast<char*>(vecs[i].iov_base);
-
-		do {
-			size_t bytesWritten = bytesLeft;
-
-			result = inode->WriteDirect(cookie, pos, buffer, &bytesWritten);
-			if (result != B_OK)
-				return result;
-
-			bytesLeft -= bytesWritten;
-			pos += bytesWritten;
-			buffer += bytesWritten;
-		} while (bytesLeft > 0);
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-nfs4_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
+nfs4_io(fs_volume* volume, fs_vnode* vnode, void*, io_request* request)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	TRACE("volume = %p, vnode = %" B_PRIi64 ", cookie = %p\n", volume,
@@ -483,14 +398,6 @@ nfs4_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 		notify_io_request(request, result);
 
 	return result;
-}
-
-
-static status_t
-nfs4_get_file_map(fs_volume* volume, fs_vnode* vnode, off_t _offset,
-	size_t size, struct file_io_vec* vecs, size_t* _count)
-{
-	return B_ERROR;
 }
 
 
@@ -1497,13 +1404,13 @@ fs_vnode_ops gNFSv4VnodeOps = {
 
 	/* VM file access */
 	NULL,	// can_page()
-	nfs4_read_pages,
-	nfs4_write_pages,
+	NULL,	// read_pages()
+	NULL,	// write_pages()
 
 	nfs4_io,
 	NULL,	// cancel_io()
 
-	nfs4_get_file_map,
+	NULL,	// get_file_map()
 
 	NULL,	// ioctl()
 	nfs4_set_flags,
