@@ -998,14 +998,17 @@ generic_to_ipv4(int option)
 static net_interface*
 get_multicast_interface(ipv4_protocol* protocol, const in_addr* address)
 {
-	// TODO: this is broken and leaks references
 	sockaddr_in groupAddr;
 	net_route* route = sDatalinkModule->get_route(sDomain,
 		fill_sockaddr_in(&groupAddr, address ? address->s_addr : INADDR_ANY));
 	if (route == NULL)
 		return NULL;
 
-	return route->interface_address->interface;
+	net_interface* interface = sDatalinkModule->get_interface(sDomain,
+		route->interface_address->interface->index);
+
+	sDatalinkModule->put_route(sDomain, route);
+	return interface;
 }
 
 
