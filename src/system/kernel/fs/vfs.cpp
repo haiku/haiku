@@ -774,7 +774,7 @@ get_file_system(const char* fsName)
 	if (strncmp(fsName, "file_systems/", strlen("file_systems/"))) {
 		// construct module name if we didn't get one
 		// (we currently support only one API)
-		snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
+		snprintf(name, sizeof(name), "file_systems/%s" B_CURRENT_FS_API_VERSION, fsName);
 		fsName = NULL;
 	}
 
@@ -3408,7 +3408,7 @@ dump_vnode_caches(int argc, char** argv)
 }
 
 
-int
+static int
 dump_io_context(int argc, char** argv)
 {
 	if (argc > 2 || !strcmp(argv[1], "--help")) {
