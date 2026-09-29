@@ -146,8 +146,21 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 
 	status_t result;
 
-	/* prepare idmapper server */
 	MutexLocker locker(gIdMapperLock);
+	/* prepare workqueue */
+	if (gWorkQueue == NULL) {
+		gWorkQueue = new(std::nothrow) WorkQueue;
+		if (gWorkQueue == NULL)
+			return B_NO_MEMORY;
+
+		result = gWorkQueue->InitStatus();
+		if (result != B_OK) {
+			delete gWorkQueue;
+			gWorkQueue = NULL;
+			return result;
+		}
+	}
+	/* prepare idmapper server */
 	if (gIdMapper == NULL) {
 		gIdMapper = new(std::nothrow) IdMap;
 		if (gIdMapper == NULL)
@@ -1421,14 +1434,7 @@ nfs4_init()
 
 	mutex_init(&gIdMapperLock, "idmapper Init Lock");
 	gIdMapper = NULL;
-
-	gWorkQueue = new(std::nothrow) WorkQueue;
-	if (gWorkQueue == NULL || gWorkQueue->InitStatus() != B_OK) {
-		delete gWorkQueue;
-		mutex_destroy(&gIdMapperLock);
-		delete gRPCServerManager;
-		return B_NO_MEMORY;
-	}
+	gWorkQueue = NULL;
 
 #ifdef _KERNEL_MODE
 	add_debugger_command("nfs4", kprintf_volume, "dump an nfs4 volume");
