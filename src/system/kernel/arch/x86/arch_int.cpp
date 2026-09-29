@@ -133,8 +133,9 @@ x86_unexpected_exception(iframe* frame)
 
 		case 5:		// BOUND Range Exceeded Exception (#BR)
 			type = B_BOUNDS_CHECK_EXCEPTION;
-			signalNumber = SIGTRAP;
-			signalCode = SI_USER;
+			signalNumber = SIGFPE;
+			signalCode = FPE_FLTSUB;
+			signalAddress = frame->ip;
 			break;
 
 		case 6:		// Invalid Opcode Exception (#UD)
@@ -153,8 +154,8 @@ x86_unexpected_exception(iframe* frame)
 
 		case 13: 	// General Protection Exception (#GP)
 			type = B_GENERAL_PROTECTION_FAULT;
-			signalNumber = SIGILL;
-			signalCode = ILL_PRVOPC;	// or ILL_PRVREG
+			signalNumber = SIGBUS;
+			signalCode = BUS_OBJERR;
 			signalAddress = frame->ip;
 			break;
 
