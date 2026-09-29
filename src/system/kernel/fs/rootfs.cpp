@@ -860,29 +860,6 @@ rootfs_ioctl(fs_volume* _volume, fs_vnode* _v, void* _cookie, uint32 op,
 }
 
 
-static bool
-rootfs_can_page(fs_volume* _volume, fs_vnode* _v, void* cookie)
-{
-	return false;
-}
-
-
-static status_t
-rootfs_read_pages(fs_volume* _volume, fs_vnode* _v, void* cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	return B_NOT_ALLOWED;
-}
-
-
-static status_t
-rootfs_write_pages(fs_volume* _volume, fs_vnode* _v, void* cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	return B_NOT_ALLOWED;
-}
-
-
 static status_t
 rootfs_read_link(fs_volume* _volume, fs_vnode* _link, char* buffer,
 	size_t* _bufferSize)
@@ -1233,9 +1210,9 @@ fs_vnode_ops sVnodeOps = {
 	&rootfs_put_vnode,
 	&rootfs_remove_vnode,
 
-	&rootfs_can_page,
-	&rootfs_read_pages,
-	&rootfs_write_pages,
+	NULL,	// can_page()
+	NULL,	// read_pages()
+	NULL,	// write_pages()
 
 	NULL,	// io()
 	NULL,	// cancel_io()

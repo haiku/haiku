@@ -1334,29 +1334,6 @@ fifo_deselect(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 }
 
 
-static bool
-fifo_can_page(fs_volume* _volume, fs_vnode* _node, void* cookie)
-{
-	return false;
-}
-
-
-static status_t
-fifo_read_pages(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	return B_NOT_ALLOWED;
-}
-
-
-static status_t
-fifo_write_pages(fs_volume* _volume, fs_vnode* _node, void* cookie,
-	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
-{
-	return B_NOT_ALLOWED;
-}
-
-
 static status_t
 fifo_get_super_vnode(fs_volume* volume, fs_vnode* vnode, fs_volume* superVolume,
 	fs_vnode* _superVnode)
@@ -1384,9 +1361,9 @@ static fs_vnode_ops sFIFOVnodeOps = {
 	&fifo_put_vnode,
 	&fifo_remove_vnode,
 
-	&fifo_can_page,
-	&fifo_read_pages,
-	&fifo_write_pages,
+	NULL,	// can_page()
+	NULL,	// read_pages()
+	NULL,	// write_pages()
 
 	NULL,	// io()
 	NULL,	// cancel_io()
