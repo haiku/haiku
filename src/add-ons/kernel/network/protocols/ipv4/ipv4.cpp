@@ -1345,6 +1345,8 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			}
 			fill_sockaddr_in(address, sin_addr.s_addr);
 
+			MutexLocker _(sMulticastGroupsLock);
+
 			// Using INADDR_ANY to remove the previous setting.
 			if (address->sin_addr.s_addr == htonl(INADDR_ANY)) {
 				delete address;
@@ -1392,6 +1394,7 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			if (user_memcpy(&mreq, value, sizeof(ip_mreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			MutexLocker _(sMulticastGroupsLock);
 			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
 				&mreq.imr_multiaddr, NULL);
 		}
@@ -1407,6 +1410,7 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			if (user_memcpy(&mreq, value, sizeof(ip_mreq_source)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			MutexLocker _(sMulticastGroupsLock);
 			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
 				&mreq.imr_multiaddr, &mreq.imr_sourceaddr);
 		}
@@ -1419,6 +1423,7 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			if (user_memcpy(&greq, value, sizeof(group_req)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			MutexLocker _(sMulticastGroupsLock);
 			return ipv4_generic_delta_membership(protocol, option,
 				greq.gr_interface, &greq.gr_group, NULL);
 		}
@@ -1434,6 +1439,7 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			if (user_memcpy(&greq, value, sizeof(group_source_req)) != B_OK)
 				return B_BAD_ADDRESS;
 
+			MutexLocker _(sMulticastGroupsLock);
 			return ipv4_generic_delta_membership(protocol, option,
 				greq.gsr_interface, &greq.gsr_group, &greq.gsr_source);
 		}
