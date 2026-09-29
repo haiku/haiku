@@ -88,7 +88,7 @@ struct PackageFile::DataAccessor {
 
 	status_t ReadData(off_t offset, void* buffer, size_t* bufferSize)
 	{
-		return file_cache_read(fFileCache, NULL, offset, buffer, bufferSize);
+		return file_cache_read(fFileCache, offset, buffer, bufferSize);
 	}
 
 	status_t ReadData(io_request* request)

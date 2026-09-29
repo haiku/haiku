@@ -752,7 +752,7 @@ UserlandFS::KernelEmu::file_cache_sync(dev_t mountID, ino_t vnodeID)
 // file_cache_read
 status_t
 UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
-	void *cookie, off_t offset, void *bufferBase, size_t *_size)
+	off_t offset, void *bufferBase, size_t *_size)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -770,7 +770,6 @@ UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
 
 	request->nsid = mountID;
 	request->vnid = vnodeID;
-	request->cookie = cookie;
 	request->pos = offset;
 	request->size = *_size;
 
@@ -805,7 +804,7 @@ UserlandFS::KernelEmu::file_cache_read(dev_t mountID, ino_t vnodeID,
 // file_cache_write
 status_t
 UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
-	void *cookie, off_t offset, const void *buffer, size_t *_size)
+	off_t offset, const void *buffer, size_t *_size)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -823,7 +822,6 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 
 	request->nsid = mountID;
 	request->vnid = vnodeID;
-	request->cookie = cookie;
 	request->size = *_size;
 	request->pos = offset;
 

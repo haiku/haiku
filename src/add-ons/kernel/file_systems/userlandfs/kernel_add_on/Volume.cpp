@@ -648,7 +648,7 @@ Volume::SyncFileCache(ino_t vnodeID)
 
 // ReadFileCache
 status_t
-Volume::ReadFileCache(ino_t vnodeID, void* cookie,
+Volume::ReadFileCache(ino_t vnodeID,
 	off_t offset, void* buffer, size_t* _size)
 {
 	// lookup the node
@@ -665,13 +665,13 @@ Volume::ReadFileCache(ino_t vnodeID, void* cookie,
 	locker.Unlock();
 
 	// read
-	return file_cache_read(fileCache, cookie, offset, buffer, _size);
+	return file_cache_read(fileCache, offset, buffer, _size);
 }
 
 
 // WriteFileCache
 status_t
-Volume::WriteFileCache(ino_t vnodeID, void* cookie,
+Volume::WriteFileCache(ino_t vnodeID,
 	off_t offset, const void* buffer, size_t* _size)
 {
 	// lookup the node
@@ -688,7 +688,7 @@ Volume::WriteFileCache(ino_t vnodeID, void* cookie,
 	locker.Unlock();
 
 	// read
-	return file_cache_write(fileCache, cookie, offset, buffer, _size);
+	return file_cache_write(fileCache, offset, buffer, _size);
 }
 
 

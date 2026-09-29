@@ -358,7 +358,7 @@ Inode::Read(OpenFileCookie* cookie, off_t pos, void* buffer, size_t* _length)
 		return ReadDirect(cookie, pos, buffer, _length, &eof);
 
 	MutexLocker _(fFileCacheLock);
-	return file_cache_read(fFileCache, cookie, pos, buffer, _length);
+	return file_cache_read(fFileCache, pos, buffer, _length);
 }
 
 
@@ -442,7 +442,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 			fMaxFileSize = pos;
 			size_t pageOffset = pos % B_PAGE_SIZE;
 			if (pageOffset != 0)
-				file_cache_write(fFileCache, cookie, pos - pageOffset, NULL, &pageOffset);
+				file_cache_write(fFileCache, pos - pageOffset, NULL, &pageOffset);
 		}
 		fMaxFileSize = fileSize;
 		fMetaCache.GrowFile(fMaxFileSize);
@@ -453,7 +453,7 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 		Commit(cookie->fUid, cookie->fGid);
 	}
 
-	return file_cache_write(fFileCache, cookie, pos, _buffer, _length);
+	return file_cache_write(fFileCache, pos, _buffer, _length);
 }
 
 

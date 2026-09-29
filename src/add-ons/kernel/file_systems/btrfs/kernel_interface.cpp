@@ -254,7 +254,7 @@ btrfs_can_page(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 
 static status_t
-btrfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+btrfs_read_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -298,7 +298,7 @@ btrfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-btrfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+btrfs_io(fs_volume* _volume, fs_vnode* _node, void*,
 	io_request* request)
 {
 	Volume* volume = (Volume*)_volume->private_volume;

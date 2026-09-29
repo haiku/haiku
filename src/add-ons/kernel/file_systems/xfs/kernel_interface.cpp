@@ -179,7 +179,7 @@ xfs_can_page(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-xfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *_cookie,
+xfs_read_pages(fs_volume *_volume, fs_vnode *_node, void *,
 	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return B_NOT_SUPPORTED;

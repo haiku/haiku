@@ -933,7 +933,7 @@ dosfs_can_page(fs_volume* vol, fs_vnode* vnode, void* cookie)
 
 
 static status_t
-dosfs_read_pages(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
+dosfs_read_pages(fs_volume* volume, fs_vnode* vnode, void*, off_t pos, const iovec* vecs,
 	size_t count, size_t* _numBytes)
 {
 	mount* bsdVolume = reinterpret_cast<mount*>(volume->private_volume);
@@ -979,7 +979,7 @@ dosfs_read_pages(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, co
 
 
 static status_t
-dosfs_write_pages(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
+dosfs_write_pages(fs_volume* volume, fs_vnode* vnode, void*, off_t pos, const iovec* vecs,
 	size_t count, size_t* _numBytes)
 {
 	mount* bsdVolume = reinterpret_cast<mount*>(volume->private_volume);
@@ -1028,7 +1028,7 @@ dosfs_write_pages(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, c
 
 
 static status_t
-dosfs_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
+dosfs_io(fs_volume* volume, fs_vnode* vnode, void*, io_request* request)
 {
 #if KDEBUG_RW_LOCK_DEBUG
 	// dosfs_io depends on read-locks being implicitly transferrable across threads.
@@ -2312,7 +2312,7 @@ dosfs_read(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, void* bu
 	}
 #endif
 
-	RETURN_ERROR(file_cache_read(bsdNode->v_cache, fatCookie, pos, buffer, length));
+	RETURN_ERROR(file_cache_read(bsdNode->v_cache, pos, buffer, length));
 }
 
 
@@ -2381,7 +2381,7 @@ dosfs_write(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, const v
 	locker.Unlock();
 	status = file_cache_set_size(bsdNode->v_cache, fatNode->de_FileSize);
 	if (status == B_OK) {
-		status = file_cache_write(bsdNode->v_cache, fatCookie, pos, buffer, length);
+		status = file_cache_write(bsdNode->v_cache, pos, buffer, length);
 		if (status != B_OK) {
 			REPORT_ERROR(status);
 			status = B_OK;

@@ -1816,7 +1816,6 @@ class FileCacheReadRequest : public FileCacheRequest {
 public:
 	FileCacheReadRequest() : FileCacheRequest(FILE_CACHE_READ_REQUEST) {}
 
-	void*		cookie;
 	off_t		pos;
 	size_t		size;
 };
@@ -1837,7 +1836,6 @@ public:
 	FileCacheWriteRequest() : FileCacheRequest(FILE_CACHE_WRITE_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	void*		cookie;
 	Address		buffer;
 	size_t		size;
 	off_t		pos;

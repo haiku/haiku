@@ -148,7 +148,7 @@ file_cache_sync(void *cacheRef)
 
 
 status_t
-file_cache_read(void *cacheRef, void *cookie, off_t offset, void *bufferBase,
+file_cache_read(void *cacheRef, off_t offset, void *bufferBase,
 	size_t *_size)
 {
 	PRINT(("file_cache_read(%p, %p, %" B_PRIdOFF ", %p, %lu)\n",
@@ -157,12 +157,12 @@ file_cache_read(void *cacheRef, void *cookie, off_t offset, void *bufferBase,
 	FileCache* fileCache = (FileCache*)cacheRef;
 
 	return UserlandFS::KernelEmu::file_cache_read(fileCache->mountID,
-		fileCache->vnodeID, cookie, offset, bufferBase, _size);
+		fileCache->vnodeID, offset, bufferBase, _size);
 }
 
 
 status_t
-file_cache_write(void *cacheRef, void *cookie, off_t offset, const void *buffer,
+file_cache_write(void *cacheRef, off_t offset, const void *buffer,
 	size_t *_size)
 {
 	PRINT(("file_cache_write(%p, %p, %" B_PRIdOFF ", %p, %lu)\n",
@@ -171,5 +171,5 @@ file_cache_write(void *cacheRef, void *cookie, off_t offset, const void *buffer,
 	FileCache* fileCache = (FileCache*)cacheRef;
 
 	return UserlandFS::KernelEmu::file_cache_write(fileCache->mountID,
-		fileCache->vnodeID, cookie, offset, buffer, _size);
+		fileCache->vnodeID, offset, buffer, _size);
 }

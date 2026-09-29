@@ -89,9 +89,9 @@ extern status_t file_cache_disable(void *cacheRef);
 extern status_t file_cache_set_size(void *cacheRef, off_t size);
 extern status_t file_cache_sync(void *cache);
 
-extern status_t file_cache_read(void *cacheRef, void *cookie, off_t offset,
+extern status_t file_cache_read(void *cacheRef, off_t offset,
 					void *bufferBase, size_t *_size);
-extern status_t file_cache_write(void *cacheRef, void *cookie, off_t offset,
+extern status_t file_cache_write(void *cacheRef, off_t offset,
 					const void *buffer, size_t *_size);
 
 /* file map */

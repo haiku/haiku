@@ -1063,7 +1063,7 @@ fill_gap_with_zeros(vnode* bsdNode, off_t pos, off_t newSize)
 		else
 			size = newSize - pos;
 
-		status_t status = file_cache_write(bsdNode->v_cache, NULL, pos, NULL, &size);
+		status_t status = file_cache_write(bsdNode->v_cache, pos, NULL, &size);
 		if (status < B_OK)
 			return status;
 

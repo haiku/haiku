@@ -1957,7 +1957,7 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 	status_t error = B_OK;
 
 	if (S_ISREG(node->type) && node->cacheCount > 0) {
-		error = UserlandFS::KernelEmu::file_cache_read(GetID(), node->id, cookie, pos,
+		error = UserlandFS::KernelEmu::file_cache_read(GetID(), node->id, pos,
 			buffer, _bytesRead);
 	} else
 		error = _InternalIO(node, cookie, NULL, pos, (char *)buffer, *_bytesRead, false);
@@ -1989,7 +1989,7 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 	status_t error = B_OK;
 
 	if (S_ISREG(node->type) && node->cacheCount > 0) {
-		error = UserlandFS::KernelEmu::file_cache_write(GetID(), node->id, cookie, pos,
+		error = UserlandFS::KernelEmu::file_cache_write(GetID(), node->id, pos,
 			buffer, _bytesWritten);
 	} else
 		error = _InternalIO(node, cookie, NULL, pos, (char *)buffer, *_bytesWritten, true);

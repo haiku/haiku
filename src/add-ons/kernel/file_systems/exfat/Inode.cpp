@@ -168,7 +168,7 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t *_length)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
-	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
+	return file_cache_read(FileCache(), pos, buffer, _length);
 }
 
 

@@ -66,9 +66,9 @@ public:
 									bool enabled);
 			status_t			SetFileCacheSize(ino_t vnodeID, off_t size);
 			status_t			SyncFileCache(ino_t vnodeID);
-			status_t			ReadFileCache(ino_t vnodeID, void* cookie,
+			status_t			ReadFileCache(ino_t vnodeID,
 									off_t offset, void* buffer, size_t* _size);
-			status_t			WriteFileCache(ino_t vnodeID, void* cookie,
+			status_t			WriteFileCache(ino_t vnodeID,
 									off_t offset, const void* buffer,
 									size_t* _size);
 

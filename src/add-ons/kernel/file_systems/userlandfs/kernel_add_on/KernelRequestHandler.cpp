@@ -685,7 +685,7 @@ KernelRequestHandler::_HandleRequest(FileCacheReadRequest* request)
 
 	// execute the request
 	if (result == B_OK) {
-		result = volume->ReadFileCache(request->vnid, request->cookie,
+		result = volume->ReadFileCache(request->vnid,
 			request->pos, buffer, &size);
 	}
 
@@ -722,7 +722,7 @@ KernelRequestHandler::_HandleRequest(FileCacheWriteRequest* request)
 		}
 
 		if (result == B_OK) {
-			result = volume->WriteFileCache(request->vnid, request->cookie,
+			result = volume->WriteFileCache(request->vnid,
 				request->pos, data, &size);
 		}
 	}

@@ -242,14 +242,14 @@ exfat_put_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 
 
 static bool
-exfat_can_page(fs_volume* _volume, fs_vnode* _node, void* _cookie)
+exfat_can_page(fs_volume* _volume, fs_vnode* _node, void*)
 {
 	return true;
 }
 
 
 static status_t
-exfat_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+exfat_read_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -293,7 +293,7 @@ exfat_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-exfat_io(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+exfat_io(fs_volume* _volume, fs_vnode* _node, void*,
 	io_request* request)
 {
 	Volume* volume = (Volume*)_volume->private_volume;

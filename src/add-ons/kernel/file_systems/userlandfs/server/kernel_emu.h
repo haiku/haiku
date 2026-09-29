@@ -43,9 +43,9 @@ status_t file_cache_set_enabled(dev_t mountID, ino_t vnodeID, bool enabled);
 status_t file_cache_set_size(dev_t mountID, ino_t vnodeID, off_t size);
 status_t file_cache_sync(dev_t mountID, ino_t vnodeID);
 
-status_t file_cache_read(dev_t mountID, ino_t vnodeID, void *cookie,
+status_t file_cache_read(dev_t mountID, ino_t vnodeID,
 	off_t offset, void *bufferBase, size_t *_size);
-status_t file_cache_write(dev_t mountID, ino_t vnodeID, void *cookie,
+status_t file_cache_write(dev_t mountID, ino_t vnodeID,
 	off_t offset, const void *buffer, size_t *_size);
 
 status_t do_iterative_fd_io(dev_t volumeID, int fd, int32 requestID,

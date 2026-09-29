@@ -238,7 +238,7 @@ Inode::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
-	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
+	return file_cache_read(FileCache(), pos, buffer, _length);
 }
 
 
@@ -312,7 +312,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 
 	TRACE("Inode::WriteAt(): Performing write: %p, %" B_PRIdOFF ", %p, %"
 		B_PRIuSIZE "\n", FileCache(), pos, buffer, *_length);
-	status_t status = file_cache_write(FileCache(), NULL, pos, buffer,
+	status_t status = file_cache_write(FileCache(), pos, buffer,
 		_length);
 
 	WriteLockInTransaction(transaction);
@@ -340,8 +340,7 @@ Inode::FillGapWithZeros(off_t start, off_t end)
 		TRACE("Inode::FillGapWithZeros(): Calling file_cache_write(%p, NULL, "
 			"%" B_PRIdOFF ", NULL, &(%" B_PRIuSIZE ") = %p)\n", fCache, start,
 			size, &size);
-		status_t status = file_cache_write(fCache, NULL, start, NULL,
-			&size);
+		status_t status = file_cache_write(fCache, start, NULL, &size);
 		if (status != B_OK)
 			return status;
 

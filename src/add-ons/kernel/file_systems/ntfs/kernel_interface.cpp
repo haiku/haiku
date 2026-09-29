@@ -467,7 +467,7 @@ fs_can_page(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 
 static status_t
-fs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	volume* volume = (struct volume*)_volume->private_volume;
@@ -507,7 +507,7 @@ fs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-fs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+fs_write_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	volume* volume = (struct volume*)_volume->private_volume;
@@ -885,7 +885,7 @@ fs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 	ASSERT((cookie->open_mode & O_RWMASK) == O_RDONLY || (cookie->open_mode & O_RDWR) != 0);
 
-	return file_cache_read(node->file_cache, cookie, pos, buffer, length);
+	return file_cache_read(node->file_cache, pos, buffer, length);
 }
 
 
@@ -928,7 +928,7 @@ fs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 	lock.Unlock();
 
-	status_t status = file_cache_write(node->file_cache, cookie, pos, buffer, _length);
+	status_t status = file_cache_write(node->file_cache, pos, buffer, _length);
 	if (status != B_OK)
 		return status;
 

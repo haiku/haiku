@@ -56,7 +56,7 @@ namespace FSShell {
 
 struct file_cache_ref;
 
-typedef fssh_status_t (*cache_func)(file_cache_ref *ref, void *cookie,
+typedef fssh_status_t (*cache_func)(file_cache_ref *ref,
 	fssh_off_t offset, int32_t pageOffset, fssh_addr_t buffer,
 	fssh_size_t bufferSize);
 
@@ -80,7 +80,7 @@ file_cache_init()
 
 
 static fssh_status_t
-read_from_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
+read_from_file(file_cache_ref *ref, fssh_off_t offset,
 	int32_t pageOffset, fssh_addr_t buffer, fssh_size_t bufferSize)
 {
 	fssh_iovec vec;
@@ -89,7 +89,7 @@ read_from_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 
 	fssh_mutex_unlock(&ref->lock);
 
-	fssh_status_t status = vfs_read_pages(ref->node, cookie,
+	fssh_status_t status = vfs_read_pages(ref->node, NULL,
 		offset + pageOffset, &vec, 1, &bufferSize);
 
 	fssh_mutex_lock(&ref->lock);
@@ -99,7 +99,7 @@ read_from_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 
 
 static fssh_status_t
-write_to_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
+write_to_file(file_cache_ref *ref, fssh_off_t offset,
 	int32_t pageOffset, fssh_addr_t buffer, fssh_size_t bufferSize)
 {
 	fssh_iovec vec;
@@ -108,7 +108,7 @@ write_to_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 
 	fssh_mutex_unlock(&ref->lock);
 
-	fssh_status_t status = vfs_write_pages(ref->node, cookie,
+	fssh_status_t status = vfs_write_pages(ref->node, NULL,
 		offset + pageOffset, &vec, 1, &bufferSize);
 
 	fssh_mutex_lock(&ref->lock);
@@ -118,7 +118,7 @@ write_to_file(file_cache_ref *ref, void *cookie, fssh_off_t offset,
 
 
 static inline fssh_status_t
-satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
+satisfy_cache_io(file_cache_ref *ref, cache_func function,
 	fssh_off_t offset, fssh_addr_t buffer, int32_t &pageOffset,
 	fssh_size_t bytesLeft, fssh_off_t &lastOffset,
 	fssh_addr_t &lastBuffer, int32_t &lastPageOffset, fssh_size_t &lastLeft)
@@ -128,7 +128,7 @@ satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
 
 	fssh_size_t requestSize = buffer - lastBuffer;
 
-	fssh_status_t status = function(ref, cookie, lastOffset, lastPageOffset,
+	fssh_status_t status = function(ref, lastOffset, lastPageOffset,
 		lastBuffer, requestSize);
 	if (status == FSSH_B_OK) {
 		lastBuffer = buffer;
@@ -142,7 +142,7 @@ satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
 
 
 static fssh_status_t
-cache_io(void *_cacheRef, void *cookie, fssh_off_t offset, fssh_addr_t buffer,
+cache_io(void *_cacheRef, fssh_off_t offset, fssh_addr_t buffer,
 	fssh_size_t *_size, bool doWrite)
 {
 	if (_cacheRef == NULL)
@@ -207,7 +207,7 @@ cache_io(void *_cacheRef, void *cookie, fssh_off_t offset, fssh_addr_t buffer,
 		offset += FSSH_B_PAGE_SIZE;
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
-			fssh_status_t status = satisfy_cache_io(ref, cookie, function,
+			fssh_status_t status = satisfy_cache_io(ref, function,
 				offset, buffer, pageOffset, bytesLeft, lastOffset,
 				lastBuffer, lastPageOffset, lastLeft);
 			if (status != FSSH_B_OK)
@@ -217,7 +217,7 @@ cache_io(void *_cacheRef, void *cookie, fssh_off_t offset, fssh_addr_t buffer,
 
 	// fill the last remaining bytes of the request (either write or read)
 
-	return function(ref, cookie, lastOffset, lastPageOffset, lastBuffer,
+	return function(ref, lastOffset, lastPageOffset, lastBuffer,
 		lastLeft);
 }
 
@@ -334,7 +334,7 @@ fssh_file_cache_sync(void *_cacheRef)
 
 
 fssh_status_t
-fssh_file_cache_read(void *_cacheRef, void *cookie, fssh_off_t offset,
+fssh_file_cache_read(void *_cacheRef, fssh_off_t offset,
 	void *bufferBase, fssh_size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
@@ -342,17 +342,17 @@ fssh_file_cache_read(void *_cacheRef, void *cookie, fssh_off_t offset,
 	TRACE(("file_cache_read(ref = %p, offset = %lld, buffer = %p, size = %u)\n",
 		ref, offset, bufferBase, *_size));
 
-	return cache_io(ref, cookie, offset, (fssh_addr_t)bufferBase, _size, false);
+	return cache_io(ref, offset, (fssh_addr_t)bufferBase, _size, false);
 }
 
 
 fssh_status_t
-fssh_file_cache_write(void *_cacheRef, void *cookie, fssh_off_t offset,
+fssh_file_cache_write(void *_cacheRef, fssh_off_t offset,
 	const void *buffer, fssh_size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	fssh_status_t status = cache_io(ref, cookie, offset,
+	fssh_status_t status = cache_io(ref, offset,
 		(fssh_addr_t)const_cast<void *>(buffer), _size, true);
 	TRACE(("file_cache_write(ref = %p, offset = %lld, buffer = %p, size = %u) = %d\n",
 		ref, offset, buffer, *_size, status));

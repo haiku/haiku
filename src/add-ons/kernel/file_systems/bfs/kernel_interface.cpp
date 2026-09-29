@@ -409,7 +409,7 @@ bfs_can_page(fs_volume* _volume, fs_vnode* _v, void* _cookie)
 
 
 static status_t
-bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -451,7 +451,7 @@ bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void*,
 	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	Volume* volume = (Volume*)_volume->private_volume;

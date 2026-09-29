@@ -1744,7 +1744,7 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset) const
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
-	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
+	return file_cache_read(FileCache(), pos, buffer, _length);
 }
 
 
@@ -1820,7 +1820,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	if (length == 0)
 		return B_OK;
 
-	status_t status = file_cache_write(FileCache(), NULL, pos, buffer, _length);
+	status_t status = file_cache_write(FileCache(), pos, buffer, _length);
 
 	if (transaction.IsStarted())
 		WriteLockInTransaction(transaction);
@@ -1845,7 +1845,7 @@ Inode::FillGapWithZeros(off_t pos, off_t newSize)
 		else
 			size = newSize - pos;
 
-		status_t status = file_cache_write(FileCache(), NULL, pos, NULL, &size);
+		status_t status = file_cache_write(FileCache(), pos, NULL, &size);
 		if (status < B_OK)
 			return status;
 

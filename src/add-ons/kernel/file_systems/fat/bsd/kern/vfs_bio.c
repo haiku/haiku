@@ -133,7 +133,7 @@ _bwrite(struct buf* buf)
 		ASSERT_ALWAYS((u_long)(fileOffset + buf->b_bufsize) <= fatNode->de_FileSize);
 
 		bytesWritten = (size_t)buf->b_bufsize;
-		status = file_cache_write(bsdNode->v_cache, NULL, fileOffset, buf->b_data, &bytesWritten);
+		status = file_cache_write(bsdNode->v_cache, fileOffset, buf->b_data, &bytesWritten);
 		if (bytesWritten != (size_t)buf->b_bufsize)
 			return EIO;
 	} else if (buf->b_owned == false) {
@@ -395,7 +395,7 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 
 		ASSERT(size <= (int)newBuf->b_bufsize);
 		bytesRead = (size_t)size;
-		status = file_cache_read(vp->v_cache, NULL, fileOffset, newBuf->b_data, &bytesRead);
+		status = file_cache_read(vp->v_cache, fileOffset, newBuf->b_data, &bytesRead);
 		if (status != B_OK) {
 			put_buf(newBuf);
 			return B_TO_POSIX_ERROR(status);

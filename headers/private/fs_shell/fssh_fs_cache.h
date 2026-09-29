@@ -106,10 +106,10 @@ extern fssh_status_t	fssh_file_cache_set_size(void *_cacheRef,
 							fssh_off_t size);
 extern fssh_status_t	fssh_file_cache_sync(void *_cache);
 
-extern fssh_status_t	fssh_file_cache_read(void *_cacheRef, void *cookie,
+extern fssh_status_t	fssh_file_cache_read(void *_cacheRef,
 							fssh_off_t offset, void *bufferBase,
 							fssh_size_t *_size);
-extern fssh_status_t	fssh_file_cache_write(void *_cacheRef, void *cookie,
+extern fssh_status_t	fssh_file_cache_write(void *_cacheRef,
 							fssh_off_t offset, const void *buffer,
 							fssh_size_t *_size);
 

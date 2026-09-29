@@ -1760,7 +1760,7 @@ cdda_can_page(fs_volume* _volume, fs_vnode* _node, void* cookie)
 
 
 static status_t
-cdda_read_pages(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
+cdda_read_pages(fs_volume* _volume, fs_vnode* _node, void*, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;
@@ -1768,7 +1768,7 @@ cdda_read_pages(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
 
 
 static status_t
-cdda_write_pages(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
+cdda_write_pages(fs_volume* _volume, fs_vnode* _node, void*, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;

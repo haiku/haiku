@@ -421,7 +421,7 @@ fs_release_vnode(fs_volume* /*_volume*/, fs_vnode* _node, bool /*reenter*/)
 
 
 static status_t
-fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*  _cookie, off_t pos,
+fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*, off_t pos,
 	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
@@ -452,7 +452,7 @@ fs_read_pages(fs_volume* _volume, fs_vnode* _node, void*  _cookie, off_t pos,
 
 
 static status_t
-fs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
+fs_io(fs_volume* _volume, fs_vnode* _node, void*, io_request* request)
 {
 	iso9660_volume* volume = (iso9660_volume*)_volume->private_volume;
 	iso9660_inode* node = (iso9660_inode*)_node->private_node;
@@ -529,7 +529,7 @@ fs_read(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
 	if ((node->flags & ISO_IS_DIR) != 0)
 		return EISDIR;
 
-	return file_cache_read(node->cache, NULL, pos, buffer, _length);
+	return file_cache_read(node->cache, pos, buffer, _length);
 }
 
 
