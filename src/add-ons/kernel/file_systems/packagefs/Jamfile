@@ -28,6 +28,8 @@ local subDirs =
 SEARCH_SOURCE += $(subDirs:D=$(SUBDIR)) ;
 
 
+DEFINES += DEBUG_APP="\\\"packagefs\\\"" ;
+
 HAIKU_PACKAGE_FS_SOURCES =
 	AttributeCookie.cpp
 	AttributeDirectoryCookie.cpp
