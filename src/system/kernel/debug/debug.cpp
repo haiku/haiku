@@ -89,6 +89,7 @@ static debug_page_fault_info sPageFaultInfo;
 
 static bool sSerialDebugEnabled = true;
 static bool sSyslogOutputEnabled = true;
+static bool sLogTimeStamps = false;
 static bool sBlueScreenEnabled = false;
 	// must always be false on startup
 static bool sDebugScreenEnabled = false;
@@ -1238,8 +1239,6 @@ syslog_sender(void* data)
 			// the semaphore anyway. A better solution would be a flag + a
 			// condition variable.
 
-		sSyslogMessage->when = real_time_clock();
-
 		if (!bufferPending) {
 			// We need to have exclusive access to our syslog buffer
 			MutexLocker mutexLocker(sOutputLock);
@@ -1424,6 +1423,7 @@ syslog_init_post_vm(struct kernel_args* args)
 
 	// initialize syslog message
 	sSyslogMessage->from = 0;
+	sSyslogMessage->when = -1;
 	sSyslogMessage->options = LOG_KERN;
 	sSyslogMessage->priority = LOG_DEBUG;
 	sSyslogMessage->ident[0] = '\0';
@@ -1643,24 +1643,33 @@ check_pending_repeats(void* /*data*/, int /*iteration*/)
 static void
 dprintf_args(const char* format, va_list args, bool notifySyslog)
 {
-	if (are_interrupts_enabled()) {
-		MutexLocker locker(sOutputLock);
+	MutexLocker mutexLocker;
+	InterruptsSpinLocker interruptsLocker;
 
-		int32 length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format,
-			args);
-		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
+	if (are_interrupts_enabled())
+		mutexLocker.SetTo(sOutputLock, false);
+	else
+		interruptsLocker.SetTo(sSpinlock, false);
 
-		InterruptsSpinLocker _(sSpinlock);
-		debug_output(sOutputBuffer, length, notifySyslog);
-	} else {
-		InterruptsSpinLocker _(sSpinlock);
-
-		int32 length = vsnprintf(sInterruptOutputBuffer, OUTPUT_BUFFER_SIZE,
-			format, args);
-		length = std::min(length, (int32)OUTPUT_BUFFER_SIZE - 1);
-
-		debug_output(sInterruptOutputBuffer, length, notifySyslog);
+	char* outputBuffer = sOutputBuffer;
+	int32 prefixLength = 0;
+	if (sLogTimeStamps) {
+		const bigtime_t time = system_time();
+		bigtime_t seconds = time / (1000 * 1000);
+		bigtime_t milliseconds = (time / 1000) % 1000;
+		prefixLength = snprintf(outputBuffer, OUTPUT_BUFFER_SIZE,
+			"[%" B_PRIdBIGTIME ".%03" B_PRIdBIGTIME "] ",
+			seconds, milliseconds);
+		outputBuffer += prefixLength;
 	}
+
+	int32 length = vsnprintf(outputBuffer, OUTPUT_BUFFER_SIZE - prefixLength,
+		format, args);
+	length = std::min(prefixLength + length, (int32)OUTPUT_BUFFER_SIZE - 1);
+
+	if (are_interrupts_enabled())
+		interruptsLocker.SetTo(sSpinlock, false);
+	debug_output(sOutputBuffer, length, notifySyslog);
 }
 
 
@@ -1756,6 +1765,7 @@ debug_init_post_settings(struct kernel_args* args)
 		sSerialDebugEnabled);
 	sSyslogOutputEnabled = get_safemode_boolean("syslog_debug_output",
 		sSyslogOutputEnabled);
+	sLogTimeStamps = get_safemode_boolean("syslog_time_stamps", sLogTimeStamps);
 	sBlueScreenOutput = get_safemode_boolean("bluescreen", true);
 	sEmergencyKeysEnabled = get_safemode_boolean("emergency_keys",
 		sEmergencyKeysEnabled);
