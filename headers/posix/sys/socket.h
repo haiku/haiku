@@ -82,7 +82,7 @@ typedef uint8_t sa_family_t;
 #define SHUT_WR			1
 #define SHUT_RDWR		2
 
-#define SOMAXCONN		32		/* Max listen queue for a socket */
+#define SOMAXCONN		4096		/* Max listen queue for a socket */
 
 struct linger {
 	int			l_onoff;
