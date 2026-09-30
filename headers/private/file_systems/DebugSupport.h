@@ -10,17 +10,7 @@
 #include <string.h>
 
 
-#if !USER
-#	include <KernelExport.h>
-#	include <OS.h>
-#endif
-#include <SupportDefs.h>
-
-
 // define all macros we work with -- undefined macros are set to defaults
-#ifndef USER
-#	define USER 0
-#endif
 #ifndef DEBUG
 #	define DEBUG 0
 #endif
@@ -39,17 +29,7 @@
 #endif
 
 
-// define the debug output function
-#if USER
-#	include <stdio.h>
-#	if DEBUG_PRINT
-#		define __out dbg_printf
-#		define __outv dbg_vprintf
-#	else
-#		define __out printf
-#		define __outv vprintf
-#	endif
-#else
+#if defined(_KERNEL_MODE) || defined(_BOOT_MODE)
 #	include <KernelExport.h>
 #	if DEBUG_PRINT
 #		define __out dbg_printf
@@ -58,15 +38,28 @@
 #		define __out dprintf
 #		define __outv dvprintf
 #	endif
-#endif
-
-
-// define the PANIC() macro
-#ifndef PANIC
-#	if USER
-#		define PANIC(str)	debugger(str)
-#	else
+#	ifndef PANIC
 #		define PANIC(str)	panic(str)
+#	endif
+
+#	ifndef DEBUG_INCLUDE_TIME
+#		define DEBUG_INCLUDE_TIME 0
+#	endif
+#else
+#	include <stdio.h>
+#	if DEBUG_PRINT
+#		define __out dbg_printf
+#		define __outv dbg_vprintf
+#	else
+#		define __out printf
+#		define __outv vprintf
+#	endif
+#	ifndef PANIC
+#		define PANIC(str)	debugger(str)
+#	endif
+
+#	ifndef DEBUG_INCLUDE_TIME
+#		define DEBUG_INCLUDE_TIME 1
 #	endif
 #endif
 
@@ -105,6 +98,8 @@ void dbg_printf_end();
 
 
 #define DEBUG_THREAD	find_thread(NULL)
+
+#if DEBUG_INCLUDE_TIME
 #define DEBUG_CONTEXT(x)													\
 {																			\
 	dbg_printf_begin();														\
@@ -129,6 +124,32 @@ void dbg_printf_end();
 	x;																		\
 	dbg_printf_end();														\
 }
+#else
+#define DEBUG_CONTEXT(x)													\
+{																			\
+	dbg_printf_begin();														\
+	__out(DEBUG_APP ": [%5" B_PRId32 "] ",				\
+		DEBUG_THREAD);														\
+	x;																		\
+	dbg_printf_end();														\
+}
+#define DEBUG_CONTEXT_FUNCTION(prefix, x)									\
+{																			\
+	dbg_printf_begin();														\
+	__out(DEBUG_APP ": [%5" B_PRId32 "] %s" prefix,		\
+		DEBUG_THREAD, __PRETTY_FUNCTION__);									\
+	x;																		\
+	dbg_printf_end();														\
+}
+#define DEBUG_CONTEXT_LINE(x)												\
+{																			\
+	dbg_printf_begin();														\
+	__out(DEBUG_APP ": [%5" B_PRId32 "] %s:%d: ",		\
+		DEBUG_THREAD, __PRETTY_FUNCTION__, __LINE__);						\
+	x;																		\
+	dbg_printf_end();														\
+}
+#endif
 
 #define TPRINT(x...)			DEBUG_CONTEXT( __out(x) )
 #define TPRINTV(format, args)	DEBUG_CONTEXT( __outv(format, args) )
@@ -153,25 +174,25 @@ void dbg_printf_end();
 #define TFUNCTION_END()		DEBUG_CONTEXT_FUNCTION( " done\n",  )
 
 #if DEBUG
-	#define PRINT(x...)				TPRINT(x)
-	#define REPORT_ERROR(status)	TREPORT_ERROR(status)
-	#define RETURN_ERROR(err)		TRETURN_ERROR(err)
-	#define SET_ERROR(var, err)		TSET_ERROR(var, err)
-	#define FUNCTION(x...)			TFUNCTION(x)
-	#define FUNCTION_START()		TFUNCTION_START()
-	#define FUNCTION_END()			TFUNCTION_END()
-	#define DARG(x)					x
-	#define D(x)					{x;};
+#	define PRINT(x...)			TPRINT(x)
+#	define REPORT_ERROR(status)	TREPORT_ERROR(status)
+#	define RETURN_ERROR(err)	TRETURN_ERROR(err)
+#	define SET_ERROR(var, err)	TSET_ERROR(var, err)
+#	define FUNCTION(x...)		TFUNCTION(x)
+#	define FUNCTION_START()		TFUNCTION_START()
+#	define FUNCTION_END()		TFUNCTION_END()
+#	define DARG(x)				x
+#	define D(x)					{x;};
 #else
-	#define PRINT(x...)				;
-	#define REPORT_ERROR(status)	;
-	#define RETURN_ERROR(status)	return status;
-	#define SET_ERROR(var, err)		var = err;
-	#define FUNCTION(x...)			;
-	#define FUNCTION_START()		;
-	#define FUNCTION_END()			;
-	#define DARG(x)
-	#define D(x)					;
+#	define PRINT(x...)			;
+#	define REPORT_ERROR(status)	;
+#	define RETURN_ERROR(status)	return status;
+#	define SET_ERROR(var, err)	var = err;
+#	define FUNCTION(x...)		;
+#	define FUNCTION_START()		;
+#	define FUNCTION_END()		;
+#	define DARG(x)
+#	define D(x)					;
 #endif
 
 #define FATAL(x...)				TPRINT(x)
