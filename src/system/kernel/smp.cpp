@@ -817,7 +817,8 @@ invoke_smp_msg(struct smp_msg* msg, int currentCPU, bool* haltCPU)
 		case SMP_MSG_CALL_FUNCTION:
 		{
 			smp_call_func func = (smp_call_func)msg->data_ptr;
-			func(msg->data, currentCPU, msg->data2, msg->data3);
+			if (func != NULL)
+				func(msg->data, currentCPU, msg->data2, msg->data3);
 			break;
 		}
 		case SMP_MSG_RESCHEDULE:
@@ -1411,7 +1412,8 @@ call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie, bool s
 
 	if (targetCPU == (uint32)smp_get_current_cpu()) {
 		cpu_status state = disable_interrupts();
-		func(cookie, smp_get_current_cpu());
+		if (func != NULL)
+			func(cookie, smp_get_current_cpu());
 		restore_interrupts(state);
 		thread_unpin_from_current_cpu(thread_get_current_thread());
 		return;
@@ -1453,7 +1455,8 @@ call_all_cpus(void (*function)(void*, int), void* cookie, bool sync)
 {
 	if (sNumCPUs == 1) {
 		cpu_status state = disable_interrupts();
-		function(cookie, 0);
+		if (function != NULL)
+			function(cookie, 0);
 		restore_interrupts(state);
 		return;
 	}

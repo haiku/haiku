@@ -541,15 +541,10 @@ os_ipi_broadcast(void (*func)(void *, int), void *arg)
 	call_all_cpus_sync(func, arg);
 }
 
-static void
-haiku_dummy_ipi(void*, int)
-{
-}
-
 static inline void
 os_ipi_kickall(void)
 {
-	os_ipi_broadcast(haiku_dummy_ipi, NULL);
+	os_ipi_broadcast(NULL, NULL);
 }
 
 int haiku_thread_pin();
