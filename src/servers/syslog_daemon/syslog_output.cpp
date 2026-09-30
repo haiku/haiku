@@ -133,7 +133,7 @@ syslog_output(syslog_message &message)
 	int32 headerLength;
 	int32 pos = 0;
 
-	if (sLogTimeStamps) {
+	if (sLogTimeStamps && message.when > 0) {
 		// parse & nicely print the time stamp from the message
 		struct tm when;
 		localtime_r(&message.when, &when);
