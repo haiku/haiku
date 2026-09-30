@@ -1372,6 +1372,21 @@ has_permission_to_signal(Team* team)
 }
 
 
+/*!	Interrupts a thread (even a running one) for signal delivery.
+*/
+static void
+signal_interrupt_thread(Thread* thread, bool kill)
+{
+	if (thread->state == B_THREAD_RUNNING) {
+		// Send a dummy ICI to interrupt the running thread
+		call_single_cpu(thread->cpu->cpu_num, NULL, NULL);
+	} else {
+		// Interrupt waiting thread (if it is waiting interruptibly)
+		thread_interrupt(thread, kill);
+	}
+}
+
+
 /*!	Delivers a signal to the \a thread, but doesn't handle the signal -- it just
 	makes sure the thread gets the signal, i.e. unblocks it if needed.
 
@@ -1420,6 +1435,8 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 	else
 		thread->AddPendingSignal(signalNumber);
 
+	update_thread_signals_flag(thread);
+
 	// the thread has the signal reference, now
 	signalReference.Detach();
 
@@ -1434,15 +1451,13 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 
 				// wake up main thread
 				thread->going_to_suspend = false;
+				update_thread_signals_flag(mainThread);
 
 				SpinLocker locker(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
-					thread_interrupt(mainThread, true);
-				locker.Unlock();
-
-				update_thread_signals_flag(mainThread);
+					signal_interrupt_thread(mainThread, true);
 			}
 
 			// supposed to fall through
@@ -1456,7 +1471,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else
-				thread_interrupt(thread, true);
+				signal_interrupt_thread(thread, true);
 
 			break;
 		}
@@ -1469,7 +1484,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else
-				thread_interrupt(thread, false);
+				signal_interrupt_thread(thread, false);
 
 			break;
 		}
@@ -1502,19 +1517,15 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 			break;
 		}
 		default:
-			// If the signal is not masked, interrupt the thread, if it is
-			// currently waiting (interruptibly).
+			// If the signal is not masked, interrupt the thread.
 			if ((thread->AllPendingSignals()
 						& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD)))
 					!= 0) {
-				// Interrupt thread if it was waiting
 				SpinLocker locker(thread->scheduler_lock);
-				thread_interrupt(thread, false);
+				signal_interrupt_thread(thread, false);
 			}
 			break;
 	}
-
-	update_thread_signals_flag(thread);
 
 	return B_OK;
 }
@@ -1643,6 +1654,8 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 	else
 		team->AddPendingSignal(signalNumber);
 
+	update_team_threads_signal_flag(team);
+
 	// the team has the signal reference, now
 	signalReference.Detach();
 
@@ -1660,11 +1673,11 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 				// wake up main thread
 				mainThread->going_to_suspend = false;
 
-				SpinLocker _(mainThread->scheduler_lock);
+				SpinLocker locker(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
-					thread_interrupt(mainThread, true);
+					signal_interrupt_thread(mainThread, true);
 			}
 			break;
 		}
@@ -1712,21 +1725,18 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 
 			// fall through to interrupt threads
 		default:
-			// Interrupt all interruptibly waiting threads, if the signal is
-			// not masked.
+			// Interrupt all interruptable threads, if the signal is not masked.
 			for (Thread* thread = team->thread_list.First(); thread != NULL;
 					thread = team->thread_list.GetNext(thread)) {
 				sigset_t nonBlocked = ~thread->sig_block_mask
 					| SIGNAL_TO_MASK(SIGCHLD);
 				if ((thread->AllPendingSignals() & nonBlocked) != 0) {
-					SpinLocker _(thread->scheduler_lock);
-					thread_interrupt(thread, false);
+					SpinLocker locker(thread->scheduler_lock);
+					signal_interrupt_thread(thread, false);
 				}
 			}
 			break;
 	}
-
-	update_team_threads_signal_flag(team);
 
 	return B_OK;
 }
