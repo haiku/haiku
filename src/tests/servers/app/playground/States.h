@@ -40,7 +40,7 @@ class State {
 
 			void			SetEditing(bool editing);
 
-			BRect			Bounds() const;
+	virtual	BRect			Bounds() const;
 	virtual	void			Draw(BView* view) const;
 	virtual	bool			SupportsFill() const
 								{ return true; }

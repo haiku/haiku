@@ -226,7 +226,13 @@ class RoundRectState : public State {
  public:
 					RoundRectState()
 						: State() {}
-
+	virtual BRect   Bounds() const
+					{
+						BRect r = State::Bounds();
+						float padding = fPenSize + 5.0;
+						r.InsetBy(-padding,-padding);
+						return r;
+					}
 	virtual	void	Draw(BView* view) const
 					{
 						if (fValid) {
