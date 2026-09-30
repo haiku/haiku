@@ -1,22 +1,25 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems bindfs ;
 
-
 UsePrivateKernelHeaders ;
-# UsePrivateHeaders shared ;
+UsePrivateHeaders file_systems ;
 
+DEFINES += DEBUG_APP="\\\"bindfs\\\"" ;
 
 HAIKU_BIND_FS_SOURCES =
-	DebugSupport.cpp
 	kernel_interface.cpp
 	Node.cpp
 	Volume.cpp
 ;
 
+HAIKU_BIND_FS_SHARED_SOURCES =
+	DebugSupport.cpp
+;
 
 KernelAddon bindfs
 	:
 	$(HAIKU_BIND_FS_SOURCES)
+	$(HAIKU_BIND_FS_SHARED_SOURCES)
 ;
 
-
-#HaikuSubInclude userland ;
+SEARCH on [ FGristFiles $(HAIKU_BIND_FS_SHARED_SOURCES) ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
