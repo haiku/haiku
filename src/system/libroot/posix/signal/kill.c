@@ -23,6 +23,9 @@ kill(pid_t pid, int sig)
 		return -1;
 	}
 
+	if (pid == 0)
+		pid = -getpgrp();
+
 	status = _kern_send_signal(pid, sig, NULL, 0);
 	if (status != B_OK) {
 		// translate B_BAD_THREAD_ID/B_BAD_TEAM_ID to ESRCH
