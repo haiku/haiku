@@ -1836,24 +1836,31 @@ send_signal_to_process_group_locked(ProcessGroup* group, const Signal& signal,
 {
 	T(SendSignal(-group->id, signal.Number(), flags));
 
-	bool firstTeam = true;
+	bool found = false;
+	bool sent = false;
+	status_t status = B_OK;
 
 	for (Team* team = group->teams.First(); team != NULL; team = group->teams.GetNext(team)) {
 		status_t error = send_signal_to_team(team, signal,
 			flags | B_DO_NOT_RESCHEDULE);
-		// If sending to the first team in the group failed, let the whole call
-		// fail.
-		if (firstTeam) {
-			if (error != B_OK)
-				return error;
-			firstTeam = false;
-		}
+		// B_BAD_TEAM_ID means the team couldn't be found or is invisible
+		if (error != B_BAD_TEAM_ID)
+			found = true;
+		// B_OK means at least one team could be signaled
+		if (error == B_OK)
+			sent = true;
+		// save the first error returned
+		if (status == B_OK && error != EPERM && error != B_BAD_TEAM_ID)
+			status = error;
 	}
 
 	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 		scheduler_reschedule_if_necessary();
 
-	return B_OK;
+	if (status == B_OK && !sent)
+		status = found ? EPERM : B_BAD_TEAM_ID;
+
+	return status;
 }
 
 
