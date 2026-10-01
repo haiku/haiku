@@ -15,7 +15,6 @@
 #include <AutoDeleter.h>
 #include <AutoDeleterDrivers.h>
 
-#include <socket_defs.h>
 #include <syscall_utils.h>
 
 #include <fd.h>
@@ -388,27 +387,16 @@ static int
 create_socket_fd(net_socket* socket, int flags, bool kernel)
 {
 	int oflags = 0;
+	int32 nonBlock = 0;
 	if ((flags & SOCK_CLOEXEC) != 0)
 		oflags |= O_CLOEXEC;
 	if ((flags & SOCK_CLOFORK) != 0)
 		oflags |= O_CLOFORK;
-	if ((flags & SOCK_INHERIT) != 0) {
-		// Get the socket's non-blocking flag, so we can set the respective
-		// open mode flag.
-		int32 nonBlock;
-		socklen_t nonBlockLen = sizeof(nonBlock);
-		status_t error = sStackInterface->getsockopt(socket, SOL_SOCKET,
-			SO_NONBLOCK, &nonBlock, &nonBlockLen);
-		if (error != B_OK)
-			return error;
-		if (nonBlock)
-			oflags |= O_NONBLOCK;
-	} else if ((flags & SOCK_NONBLOCK) != 0) {
+	if ((flags & SOCK_NONBLOCK) != 0) {
 		oflags |= O_NONBLOCK;
-		int32 nonBlock = 1;
-		sStackInterface->setsockopt(socket, SOL_SOCKET,
-			SO_NONBLOCK, &nonBlock, sizeof(nonBlock));
+		nonBlock = 1;
 	}
+	sStackInterface->setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &nonBlock, sizeof(nonBlock));
 
 	// allocate a file descriptor
 	file_descriptor* descriptor = alloc_fd();
@@ -528,7 +516,7 @@ common_accept(int fd, struct sockaddr *address, socklen_t *_addressLength, int f
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	if ((flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK | SOCK_INHERIT)) != 0)
+	if ((flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK | SOCK_CLOFORK)) != 0)
 		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
 
 	net_socket* acceptedSocket;

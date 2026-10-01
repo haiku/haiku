@@ -18,7 +18,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include <socket_defs.h>
 #include <syscall_utils.h>
 
 #include <syscalls.h>
@@ -230,7 +229,7 @@ _accept(int socket, struct sockaddr *_address, socklen_t *_addressLength, int fl
 extern "C" int
 accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 {
-	return _accept(socket, _address, _addressLength, SOCK_INHERIT);
+	return _accept(socket, _address, _addressLength, 0);
 }
 
 
