@@ -1909,6 +1909,59 @@ send_signal_to_process_group(pid_t groupID, const Signal& signal, uint32 flags)
 }
 
 
+/*!	Sends the given signal to all teams except the one specified by the given ID.
+
+	Interrupts must be enabled.
+
+	\param exceptTeam The ID of the team the signal shall not be sent to.
+	\param signal The signal to be delivered. If the signal's number is \c 0, no
+		actual signal will be delivered. Only delivery checks will be performed.
+		The given object will be copied. The caller retains ownership.
+	\param flags A bitwise combination of any number of the following:
+		- \c B_CHECK_PERMISSION: Check the caller's permission to send the
+			target thread the signal.
+		- \c B_DO_NOT_RESCHEDULE: If clear and a higher level thread has been
+			woken up, the scheduler will be invoked. If set that will not be
+			done explicitly, but rescheduling can still happen, e.g. when the
+			current thread's time slice runs out.
+	\return \c B_OK, when the signal was delivered successfully, another error
+		code otherwise.
+*/
+status_t
+send_signal_to_all_teams(pid_t exceptTeam, const Signal& signal, uint32 flags)
+{
+	T(SendSignal(-1, signal.Number(), flags));
+
+	status_t status = B_OK;
+	bool found = false;
+	bool sent = false;
+
+	int32 cookie = 0;
+	team_info info;
+	while (get_next_team_info(&cookie, &info) == B_OK) {
+		if (info.team == B_SYSTEM_TEAM || info.team == exceptTeam)
+			continue;
+		status_t error = send_signal_to_team_id(info.team, signal, flags | B_DO_NOT_RESCHEDULE);
+		// B_BAD_TEAM_ID means the team couldn't be found or is invisible
+		if (error != B_BAD_TEAM_ID)
+			found = true;
+		// B_OK means at least one team could be signaled
+		if (error == B_OK)
+			sent = true;
+		// save the first error returned
+		if (status == B_OK && error != EPERM && error != B_BAD_TEAM_ID)
+			status = error;
+	}
+
+	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
+		scheduler_reschedule_if_necessary();
+
+	if (status == B_OK && !sent)
+		status = found ? EPERM : B_BAD_TEAM_ID;
+	return status;
+}
+
+
 static status_t
 send_signal_internal(pid_t id, uint signalNumber, union sigval userValue,
 	uint32 flags)
@@ -1934,12 +1987,9 @@ send_signal_internal(pid_t id, uint signalNumber, union sigval userValue,
 		return send_signal_to_thread(thread, signal, flags);
 
 	// If id == -1, send the signal to all teams the calling team has permission
-	// to send signals to.
-	if (id == -1) {
-		// TODO: Implement correctly!
-		// currently only send to the current team
-		return send_signal_to_team_id(thread->team->id, signal, flags);
-	}
+	// to send signals to, except the current team.
+	if (id == -1)
+		return send_signal_to_all_teams(thread->team->id, signal, flags);
 
 	// Send a signal to the specified process group (the absolute value of the
 	// id).
