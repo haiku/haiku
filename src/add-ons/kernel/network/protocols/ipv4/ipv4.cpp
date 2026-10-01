@@ -885,7 +885,7 @@ receiving_protocol(uint8 protocol)
 status_t
 IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 {
-	MutexLocker _(sMulticastGroupsLock);
+	ASSERT_LOCKED_MUTEX(&sMulticastGroupsLock);
 
 	sockaddr_in groupAddr;
 	status_t status = sDatalinkModule->join_multicast(state->Interface(),
@@ -901,7 +901,7 @@ IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 status_t
 IPv4Multicast::LeaveGroup(IPv4GroupInterface* state)
 {
-	MutexLocker _(sMulticastGroupsLock);
+	ASSERT_LOCKED_MUTEX(&sMulticastGroupsLock);
 
 	sMulticastState->Remove(state);
 
