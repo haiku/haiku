@@ -122,7 +122,7 @@ public:
 		// We need to use write_pages (if it exists and is supported) to bypass any caches.
 
 		if (fWrite) {
-			status_t status = B_OK;
+			status_t status = B_UNSUPPORTED;
 			if (HAS_FS_CALL(fVnode, write_pages))
 				status = FS_CALL(fVnode, write_pages, fCookie, offset, &vec, 1, length);
 			if (status == B_UNSUPPORTED)
@@ -130,7 +130,7 @@ public:
 			return status;
 		}
 
-		status_t status = B_OK;
+		status_t status = B_UNSUPPORTED;
 		if (HAS_FS_CALL(fVnode, read_pages))
 			status = FS_CALL(fVnode, read_pages, fCookie, offset, &vec, 1, length);
 		if (status == B_UNSUPPORTED)
