@@ -236,11 +236,6 @@ status_t check_access_permissions_internal(int accessMode, mode_t mode, gid_t no
 void mode_bits(const vnode* bsdNode, mode_t* mode);
 
 //**************************************
-// MIME
-
-status_t set_mime_type(vnode* bsdNode, bool update);
-
-//**************************************
 // libiconv
 
 status_t iconv_init(msdosfsmount* fatVolume, const char* oemPreference);

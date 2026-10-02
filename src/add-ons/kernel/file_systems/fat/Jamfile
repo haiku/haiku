@@ -9,8 +9,4 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 KernelAddon fat :
 	$(commonSource)
-	mime_ext_table.c
 	;
-
-SEARCH on [ FGristFiles mime_ext_table.c ]
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

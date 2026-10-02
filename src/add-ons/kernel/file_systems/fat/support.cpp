@@ -65,7 +65,6 @@
 #include <SupportDefs.h>
 
 #include <AutoDeleter.h>
-#include <file_systems/mime_ext_table.h>
 #include <kernel.h>
 #include <real_time_clock.h>
 #include <util/AutoLock.h>
@@ -1197,43 +1196,16 @@ mode_bits(const vnode* bsdNode, mode_t* mode)
 
 	// In FAT, there is no place to store an executable flag on disk. FreeBSD makes all FAT files
 	// executable, but Tracker will complain if, for example, a text file is executable.
-	// To avoid that, we go by the MIME type.
+	// To avoid that, only list files without extensions as executable.
 	if (bsdNode->v_type == VDIR
-		|| (bsdNode->v_type == VREG && bsdNode->v_mime != NULL
-			&& strcmp(bsdNode->v_mime, "application/octet-stream") == 0)) {
+		|| (bsdNode->v_type == VREG
+			&& !(fatNode->de_Name[7] == ' ' && memcmp(&fatNode->de_Name[8], "  ", 3) != 0))) {
 		*mode |= S_IXUSR | S_IXGRP | S_IXOTH;
 	}
 
 	*mode &= (bsdNode->v_type == VDIR) ? fatVolume->pm_dirmask : fatVolume->pm_mask;
 
 	return;
-}
-
-
-/*! Set the mime type of a node; has no effect in fat_shell.
-	@param update True if this is an update to a pre-existing mime setting.
-*/
-status_t
-set_mime_type(vnode* bsdNode, bool update)
-{
-#ifndef FS_SHELL
-	mount* bsdVolume = reinterpret_cast<mount*>(bsdNode->v_mount);
-	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
-	msdosfsmount* fatVolume = reinterpret_cast<msdosfsmount*>(fatNode->de_pmp);
-
-	if (bsdNode->v_type == VREG) {
-		char unixShortname[SHORTNAME_CSTRING + 1];
-			// +1 for the period added by dos2unixfn
-		dos2unixfn(fatNode->de_Name, reinterpret_cast<u_char*>(unixShortname), 0, fatVolume);
-
-		set_mime(&bsdNode->v_mime, unixShortname);
-
-		notify_attribute_changed(bsdVolume->mnt_fsvolume->id, bsdNode->v_parent, fatNode->de_inode,
-			"BEOS:TYPE", update ? B_ATTR_CHANGED : B_ATTR_CREATED);
-	}
-#endif // FS_SHELL
-
-	return B_OK;
 }
 
 

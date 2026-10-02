@@ -111,7 +111,6 @@ getnewvnode(const char* tag, struct mount* mp, struct vop_vector* vops, struct v
 	rw_lock_init(&newBsdNode->v_vnlock->haikuRW, "fat vnode");
 	newBsdNode->v_bufobj.bo_flag = 0;
 	newBsdNode->v_parent = 0;
-	newBsdNode->v_mime = NULL;
 	newBsdNode->v_cache = NULL;
 	newBsdNode->v_file_map = NULL;
 	newBsdNode->v_resizing = false;

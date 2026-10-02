@@ -108,7 +108,6 @@ struct vnode {
 
 	// Members added for Haiku port
 	ino_t v_parent; /* v inode of parent directory */
-	const char* v_mime; /* v mime type for VREG nodes, otherwise NULL */
 	void* v_cache; /* v file cache for VREG nodes, otherwise NULL */
 	void* v_file_map; /* v file map for VREG nodes, otherwise NULL */
 	bool v_resizing; /* v disable IO (see comment in dosfs_wstat) */
