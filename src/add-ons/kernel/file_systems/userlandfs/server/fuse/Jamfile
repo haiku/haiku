@@ -34,10 +34,6 @@ SharedLibrary libuserlandfs_fuse.so
 	FUSEFileSystem.cpp
 	FUSELowLevel.cpp
 	FUSEVolume.cpp
-	mime_ext_table.c
 	:
 	<nogrist>userlandfs_server shared be [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
-
-SEARCH on [ FGristFiles mime_ext_table.c ]
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

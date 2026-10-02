@@ -6,7 +6,6 @@
 #include "FUSEVolume.h"
 
 #include <dirent.h>
-#include <file_systems/mime_ext_table.h>
 
 #include <algorithm>
 
@@ -2520,21 +2519,6 @@ FUSEVolume::OpenAttr(void* _node, const char* name, int openMode,
 		locker.Unlock();
 
 		attrSize = fuse_fs_getxattr(fFS, path, name, NULL, 0);
-	}
-
-	if (attrSize < 0) {
-		if (strcmp(name, kAttrMimeTypeName) == 0) {
-			// Return a fake MIME type attribute based on the file extension
-			const char* mimeType = NULL;
-			error = set_mime(&mimeType, S_ISDIR(node->type) ? NULL : &path[0]);
-			if (error != B_OK)
-				return error;
-			*_cookie = new(std::nothrow)AttrCookie(name, mimeType);
-			return B_OK;
-		}
-
-		// Reading attribute failed
-		return attrSize;
 	}
 
 	AttrCookie* cookie = new(std::nothrow)AttrCookie(name);
