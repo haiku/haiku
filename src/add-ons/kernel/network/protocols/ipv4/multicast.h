@@ -209,6 +209,7 @@ public:
 	status_t GetState(const AddressType &groupAddress,
 		net_interface *interface, GroupInterface* &state, bool create);
 	void ReturnState(GroupInterface *state);
+	void ClearStates();
 
 private:
 	typedef typename GroupInterface::HashDefinition HashDefinition;

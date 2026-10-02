@@ -169,11 +169,7 @@ struct ipv4_protocol : net_protocol {
 	{
 	}
 
-	~ipv4_protocol()
-	{
-		delete raw;
-		delete multicast_address;
-	}
+	~ipv4_protocol();
 
 	RawSocket*			raw;
 	uint8				service_type;
@@ -1093,6 +1089,16 @@ ipv4_uninit_protocol(net_protocol* _protocol)
 	delete protocol;
 
 	return B_OK;
+}
+
+
+ipv4_protocol::~ipv4_protocol()
+{
+	delete raw;
+	delete multicast_address;
+
+	MutexLocker _(sMulticastGroupsLock);
+	multicast_filter.ClearStates();
 }
 
 
