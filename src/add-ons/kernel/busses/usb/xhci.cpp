@@ -662,7 +662,8 @@ XHCI::Start()
 		eec = ReadCapReg32(eecp);
 		if (XECP_ID(eec) != XHCI_SUPPORTED_PROTOCOLS_CAPID)
 			continue;
-		if (XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(eec) > 3)
+		uint32 protocolMajorVersion = XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(eec);
+		if (protocolMajorVersion > 3)
 			continue;
 		uint32 temp = ReadCapReg32(eecp + 8);
 		uint32 offset = XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(temp);
@@ -671,13 +672,13 @@ XHCI::Start()
 			continue;
 		offset--;
 		for (uint32 i = offset; i < offset + count; i++) {
-			if (XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(eec) == 0x3)
+			if (protocolMajorVersion == 3)
 				fPortSpeeds[i] = USB_SPEED_SUPERSPEED;
 			else
 				fPortSpeeds[i] = USB_SPEED_HIGHSPEED;
 
-			TRACE("speed for port %" B_PRId32 " is %s\n", i,
-				fPortSpeeds[i] == USB_SPEED_SUPERSPEED ? "super" : "high");
+			TRACE("speed for port %" B_PRIu32 " is %" B_PRIx32 "\n",
+				i, protocolMajorVersion);
 		}
 		portFound += count;
 	}
@@ -2347,11 +2348,11 @@ XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
 	switch (PS_SPEED_GET(portStatus)) {
-		case 2:
-			*speed = USB_SPEED_LOWSPEED;
-			break;
 		case 1:
 			*speed = USB_SPEED_FULLSPEED;
+			break;
+		case 2:
+			*speed = USB_SPEED_LOWSPEED;
 			break;
 		case 3:
 			*speed = USB_SPEED_HIGHSPEED;
