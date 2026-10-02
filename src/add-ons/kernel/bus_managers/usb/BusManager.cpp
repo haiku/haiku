@@ -206,7 +206,7 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE("creating new hub\n");
 		Hub *hub = new(std::nothrow) Hub(parent, hubAddress, hubPort,
-			deviceDescriptor, deviceAddress, speed, false);
+			deviceDescriptor, deviceAddress, speed, parent->Depth() + 1);
 		if (!hub) {
 			TRACE_ERROR("no memory to allocate hub\n");
 			FreeAddress(deviceAddress);
@@ -227,7 +227,7 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	TRACE("creating new device\n");
 	Device *device = new(std::nothrow) Device(parent, hubAddress, hubPort,
-		deviceDescriptor, deviceAddress, speed, false);
+		deviceDescriptor, deviceAddress, speed, parent->Depth() + 1);
 	if (!device) {
 		TRACE_ERROR("no memory to allocate device\n");
 		FreeAddress(deviceAddress);

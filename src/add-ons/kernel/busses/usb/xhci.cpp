@@ -1861,11 +1861,11 @@ XHCI::AllocateDevice(Hub* parent, int8 hubAddress, uint8 hubPort, usb_speed spee
 		}
 
 		deviceObject = new(std::nothrow) Hub(parent, hubAddress, hubPort,
-			deviceDescriptor, device->address + 1, speed, false, device);
+			deviceDescriptor, device->address + 1, speed, parent->Depth() + 1, device);
 	} else {
 		TRACE("creating new device\n");
 		deviceObject = new(std::nothrow) Device(parent, hubAddress, hubPort,
-			deviceDescriptor, device->address + 1, speed, false, device);
+			deviceDescriptor, device->address + 1, speed, parent->Depth() + 1, device);
 	}
 	if (deviceObject == NULL || deviceObject->InitCheck() != B_OK) {
 		if (deviceObject == NULL) {

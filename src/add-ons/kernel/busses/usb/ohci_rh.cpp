@@ -127,7 +127,7 @@ static ohci_root_hub_string_s sOHCIRootHubStrings[3] = {
 
 OHCIRootHub::OHCIRootHub(Object *rootObject, int8 deviceAddress)
 	:	Hub(rootObject, 0, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
-			sOHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED, true)
+			sOHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED, 0)
 {
 }
 

@@ -17,9 +17,9 @@
 
 Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor &desc, int8 deviceAddress, usb_speed speed,
-	bool isRootHub, void *controllerCookie)
+	uint8 depth, void *controllerCookie)
 	:	Device(parent, hubAddress, hubPort, desc, deviceAddress, speed,
-			isRootHub, controllerCookie),
+			depth, controllerCookie),
 		fInterruptPipe(NULL)
 {
 	TRACE("creating hub\n");
@@ -80,7 +80,7 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 		object->ReleaseReference();
 
 	// Wait some time before powering up the ports
-	if (!isRootHub)
+	if (depth > 0)
 		snooze(USB_DELAY_HUB_POWER_UP);
 
 	// Enable port power on all ports
