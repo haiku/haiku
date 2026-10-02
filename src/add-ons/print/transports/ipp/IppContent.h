@@ -8,6 +8,8 @@
 #include <list>
 #include <string>
 
+#include <SupportDefs.h>
+
 #if (!__MWERKS__)
 using namespace std;
 #else 
@@ -401,12 +403,12 @@ public:
 	{
 		return ic.output(os);
 	}
-	void setVersion(unsigned short);
-	unsigned short getVersion() const;
+	void setVersion(uint16);
+	uint16 getVersion() const;
 	void setOperationId(IPP_OPERATION_ID);
 	IPP_OPERATION_ID getOperationId() const;
-	void setRequestId(unsigned long);
-	unsigned long getRequestId() const;
+	void setRequestId(uint32);
+	uint32 getRequestId() const;
 	IPP_STATUS_CODE getStatusCode() const;
 	const char *getStatusMessage() const;
 
@@ -438,9 +440,9 @@ public:
 
 private:
 	list<IppAttribute *> attrs;
-	unsigned short version;
-	unsigned short operation_id;
-	unsigned long  request_id;
+	uint16 version;
+	uint16 operation_id;
+	uint32  request_id;
 	string file_path;
 	istream *is;
 	int size;
