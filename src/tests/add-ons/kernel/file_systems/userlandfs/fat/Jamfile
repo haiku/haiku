@@ -20,11 +20,7 @@ include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat JamCommon ] 
 
 Addon <userland>fat :
 	$(commonSource)
-	mime_ext_table.c
 	:
 	libiconv.a
 	libuserlandfs_haiku_kernel.so
 ;
-
-SEARCH on [ FGristFiles mime_ext_table.c ]
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

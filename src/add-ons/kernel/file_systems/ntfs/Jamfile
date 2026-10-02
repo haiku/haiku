@@ -15,7 +15,6 @@ KernelAddon ntfs :
 	lowntfs.c
 
 	DeviceOpener.cpp
-	#mime_ext_table.c
 
 	attrdef.c
 	sd.c
@@ -26,7 +25,7 @@ KernelAddon ntfs :
 	libntfs.a
 	;
 
-SEARCH on [ FGristFiles DeviceOpener.cpp mime_ext_table.c ]
+SEARCH on [ FGristFiles DeviceOpener.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
