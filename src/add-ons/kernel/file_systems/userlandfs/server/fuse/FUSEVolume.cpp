@@ -351,7 +351,7 @@ public:
 private:
 	void _SetType(const char* name)
 	{
-		if (strcmp(name, kAttrMimeTypeName) == 0)
+		if (strcmp(name, "BEOS:TYPE") == 0)
 			fType = B_MIME_STRING_TYPE;
 		else
 			fType = B_RAW_TYPE;
