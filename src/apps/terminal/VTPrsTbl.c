@@ -3604,7 +3604,7 @@ CASE_SJIS_INSTRING,
 
 /* DEC Special Graphic Character Set - mix of xterm
    definitions and ncurses extended characters (ACS_)  */
-const char* gLineDrawGraphSet[96] =
+const char* gLineDrawCharacterSet[96] =
 {
 //	SP		!		"		#
 NULL,

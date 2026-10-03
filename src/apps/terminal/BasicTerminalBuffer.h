@@ -122,6 +122,8 @@ public:
 
 	inline	Attributes			GetAttributes();
 	inline	void				SetAttributes(const Attributes& attributes);
+			void				SaveAttributes();
+			void				RestoreAttributes();
 
 			// snapshots and data capture for debugging
 			void				MakeLinesSnapshots(time_t timeStamp,
@@ -173,12 +175,20 @@ public:
 			// scroll region
 	inline	void				ScrollBy(int32 numLines);
 			void				SetScrollRegion(int32 top, int32 bottom);
+			int32				GetScrollRegionTop();
+			int32				GetScrollRegionBottom();
+
+			// modes
 			void				SetOriginMode(bool enabled);
+			bool				IsOriginMode();
 			void				SaveOriginMode();
 			void				RestoreOriginMode();
+
+			// tab stops
 			void				SetTabStop(int32 x);
 			void				ClearTabStop(int32 x);
 			void				ClearAllTabStops();
+			status_t			SetDefaultTabStops(int32 width);
 
 protected:
 	virtual	void				NotifyListener();
@@ -203,8 +213,6 @@ protected:
 									int32 historyCapacity);
 			status_t			_ResizeRewrap(int32 width, int32 height,
 									int32 historyCapacity);
-			status_t			_ResetTabStops(int32 width);
-
 			void				_Scroll(int32 top, int32 bottom,
 									int32 numLines);
 			void				_SoftBreakLine();
@@ -237,6 +245,7 @@ protected:
 			HistoryBuffer*		fHistory;
 
 			Attributes			fAttributes;
+			Attributes			fSavedAttributes;
 
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;

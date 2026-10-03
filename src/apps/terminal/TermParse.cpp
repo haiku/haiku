@@ -50,7 +50,7 @@ extern int gIgnoreTable[];			/* ignore table */
 extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
 
-extern const char* gLineDrawGraphSet[]; /* may be used for G0, G1, G2, G3 */
+extern const char* gLineDrawCharacterSet[]; /* may be used for G0, G1, G2, G3 */
 
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
@@ -77,6 +77,10 @@ TermParse::_NextParseChar()
 
 TermParse::TermParse(int fd)
 	:
+	fCurrentGL(0),
+	fCurrentGR(0),
+	fSavedGL(0),
+	fSavedGR(0),
 	fFd(fd),
 	fParseThread(-1),
 	fReaderThread(-1),
@@ -89,6 +93,10 @@ TermParse::TermParse(int fd)
 	fBuffer(NULL),
 	fQuitting(true)
 {
+	for (int i = 0; i < 4; i++) {
+		fCharacterSets[i] = NULL;
+		fSavedCharacterSets[i] = NULL;
+	}
 	memset(fReadBuffer, 0, READ_BUF_SIZE);
 	memset(fParserBuffer, 0, ESC_PARSER_BUFFER_SIZE);
 }
@@ -383,11 +391,6 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = gUTF8GroundTable;
 
-	// handle alternative character sets G0 - G4
-	const char** graphSets[4] = { NULL, NULL, NULL, NULL };
-	int curGL = 0;
-	int curGR = 0;
-
 	BAutolock locker(fBuffer);
 
 	while (!fQuitting) {
@@ -411,13 +414,12 @@ TermParse::EscParse()
 			switch (parsestate[c]) {
 				case CASE_PRINT:
 				{
-					int curGS = c < 128 ? curGL : curGR;
-					const char** curGraphSet = graphSets[curGS];
-					if (curGraphSet != NULL) {
+					int curGS = c < 128 ? fCurrentGL : fCurrentGR;
+					const char** curCharacterSet = fCharacterSets[curGS];
+					if (curCharacterSet != NULL) {
 						int offset = c - (c < 128 ? 0x20 : 0xA0);
-						if (offset >= 0 && offset < 96
-							&& curGraphSet[offset] != 0) {
-							fBuffer->InsertChar(curGraphSet[offset]);
+						if (offset >= 0 && offset < 96 && curCharacterSet[offset] != 0) {
+							fBuffer->InsertChar(curCharacterSet[offset]);
 							break;
 						}
 					}
@@ -557,10 +559,10 @@ TermParse::EscParse()
 						char page = _NextParseChar();
 						switch (page) {
 							case '0':
-								graphSets[set] = gLineDrawGraphSet;
+								fCharacterSets[set] = gLineDrawCharacterSet;
 								break;
 							default:
-								graphSets[set] = NULL;
+								fCharacterSets[set] = NULL;
 								break;
 						}
 					}
@@ -607,13 +609,13 @@ TermParse::EscParse()
 
 				case CASE_LS1:
 					/* select G1 into GL */
-					curGL = 1;
+					fCurrentGL = 1;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS0:
 					/* select G0 into GL */
-					curGL = 0;
+					fCurrentGL = 0;
 					parsestate = groundtable;
 					break;
 
@@ -1084,13 +1086,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					fBuffer->SaveCursor();
+					_SaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					fBuffer->RestoreCursor();
+					_RestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -1186,35 +1188,40 @@ TermParse::EscParse()
 					}
 
 				case CASE_RIS:		// ESC c ... Reset terminal.
+					_DecSoftTerminalReset();
+
+					// Additional things reset that are not changed by soft terminal reset.
+					fBuffer->Clear(true);
+					fBuffer->SetDefaultTabStops(TAB_WIDTH);
 					break;
 
 				case CASE_LS2:
 					/* select G2 into GL */
-					curGL = 2;
+					fCurrentGL = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3:
 					/* select G3 into GL */
-					curGL = 3;
+					fCurrentGL = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS3R:
 					/* select G3 into GR */
-					curGR = 3;
+					fCurrentGR = 3;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS2R:
 					/* select G2 into GR */
-					curGR = 2;
+					fCurrentGR = 2;
 					parsestate = groundtable;
 					break;
 
 				case CASE_LS1R:
 					/* select G1 into GR */
-					curGR = 1;
+					fCurrentGR = 1;
 					parsestate = groundtable;
 					break;
 
@@ -1312,10 +1319,10 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
-				case CASE_DECSTR:	// DECSTR - soft terminal reset
+				case CASE_DECSTR:
 					if (nparam == 2 && param[1] == '!') {
-						Attributes attributes;
-						fBuffer->SetAttributes(attributes);
+						// DECSTR - soft terminal reset
+						_DecSoftTerminalReset();
 					}
 					parsestate = groundtable;
 					break;
@@ -1329,6 +1336,40 @@ TermParse::EscParse()
 	}
 
 	return B_OK;
+}
+
+
+void
+TermParse::_DecSoftTerminalReset()
+{
+	// DEC STD 070 04 page 31 describes DECSTR. It behaves differently than RIS.
+	// At this level of VT102 conformance it does not: reset tab stops, clear
+	// the display, change screen mode (normal/reverse), scrolling mode
+	// (jump/slow), or 80/132 column selection.
+	Attributes attributes;
+	fBuffer->SetAttributes(attributes);
+	fBuffer->SaveAttributes();
+	fBuffer->SetCursor(0, 0);
+	fBuffer->SaveCursor();
+	fBuffer->SetOriginMode(false);
+	fBuffer->SaveOriginMode();
+	fBuffer->SetInsertMode(MODE_OVER);
+	fBuffer->UseAlternateScreenBuffer(false);
+	fBuffer->SetScrollRegion(0, fBuffer->Height() - 1);
+	fBuffer->ResetMode(MODE_CURSOR_HIDDEN);
+	fBuffer->ResetMode(MODE_APPLICATION_CURSOR_KEYS);
+	fCharacterSets[0] = NULL;
+	fCharacterSets[1] = NULL;
+	fCharacterSets[2] = NULL;
+	fCharacterSets[3] = NULL;
+	fSavedCharacterSets[0] = NULL;
+	fSavedCharacterSets[1] = NULL;
+	fSavedCharacterSets[2] = NULL;
+	fSavedCharacterSets[3] = NULL;
+	fCurrentGL = 0;
+	fCurrentGR = 0;
+	fSavedGL = 0;
+	fSavedGR = 0;
 }
 
 
@@ -1403,6 +1444,45 @@ TermParse::_ReadParserBuffer()
 
 
 void
+TermParse::_SaveCursor()
+{
+	fBuffer->SaveCursor();
+	fBuffer->SaveAttributes();
+	fBuffer->SaveOriginMode();
+	fSavedCharacterSets[0] = fCharacterSets[0];
+	fSavedCharacterSets[1] = fCharacterSets[1];
+	fSavedCharacterSets[2] = fCharacterSets[2];
+	fSavedCharacterSets[3] = fCharacterSets[3];
+	fSavedGL = fCurrentGL;
+	fSavedGR = fCurrentGR;
+}
+
+
+void
+TermParse::_RestoreCursor()
+{
+	fBuffer->RestoreCursor();
+	fBuffer->RestoreAttributes();
+	fBuffer->RestoreOriginMode();
+	fCharacterSets[0] = fSavedCharacterSets[0];
+	fCharacterSets[1] = fSavedCharacterSets[1];
+	fCharacterSets[2] = fSavedCharacterSets[2];
+	fCharacterSets[3] = fSavedCharacterSets[3];
+	fCurrentGL = fSavedGL;
+	fCurrentGR = fSavedGR;
+
+	// STD 070 -05 page 5-190 describes how origin mode restore works with the
+	// scrolling region.
+	if (fBuffer->IsOriginMode()) {
+		if (fBuffer->Cursor().y < fBuffer->GetScrollRegionTop())
+			fBuffer->SetCursorY(fBuffer->GetScrollRegionTop());
+		if (fBuffer->Cursor().y > fBuffer->GetScrollRegionBottom())
+			fBuffer->SetCursorY(fBuffer->GetScrollRegionBottom());
+	}
+}
+
+
+void
 TermParse::_DeviceStatusReport(int n)
 {
 	char sbuf[16] ;
@@ -1419,9 +1499,9 @@ TermParse::_DeviceStatusReport(int n)
 			}
 		case 6:
 			// Cursor position report requested
-			len = snprintf(sbuf, sizeof(sbuf),
-				"\033[%" B_PRId32 ";%" B_PRId32 "R",
-				fBuffer->Cursor().y + 1,
+			len = snprintf(sbuf, sizeof(sbuf), "\033[%" B_PRId32 ";%" B_PRId32 "R",
+				fBuffer->Cursor().y - (fBuffer->IsOriginMode() ? fBuffer->GetScrollRegionTop() : 0)
+					+ 1,
 				fBuffer->Cursor().x + 1);
 			write(fFd, sbuf, len);
 			break ;
@@ -1462,6 +1542,14 @@ TermParse::_DecPrivateModeSet(int value)
 		case 1:
 			// Select Application Cursor Keys.
 			fBuffer->SetMode(MODE_APPLICATION_CURSOR_KEYS);
+			break;
+		case 3:
+			// Select 132 Column mode.
+			// We don't support the actual mode change, but the side effects should be honored:
+			// clear screen, reset scrolling region, home cursor.
+			fBuffer->EraseAll();
+			fBuffer->SetCursor(0, 0);
+			fBuffer->SetScrollRegion(0, fBuffer->Height() - 1);
 			break;
 		case 5:
 			// Reverse Video (inverses colors for the complete screen
@@ -1541,8 +1629,12 @@ TermParse::_DecPrivateModeReset(int value)
 			fBuffer->ResetMode(MODE_APPLICATION_CURSOR_KEYS);
 			break;
 		case 3:
-			// 80 Column Mode.
-			// Not supported yet.
+			// Select 80 Column mode.
+			// We don't support the actual mode change, but the side effects should be honored:
+			// clear screen, reset scrolling region, home cursor.
+			fBuffer->EraseAll();
+			fBuffer->SetCursor(0, 0);
+			fBuffer->SetScrollRegion(0, fBuffer->Height() - 1);
 			break;
 		case 4:
 			// Jump (Fast) Scroll.
@@ -1624,9 +1716,27 @@ TermParse::_DecPrivateModeRequest(int value)
 			reply.SetToFormat("\033[?1;%u$y",
 				fBuffer->IsMode(MODE_APPLICATION_CURSOR_KEYS) ? 1 : 2);
 			break;
+		case 2:
+			// ANSI Compatibility mode. Report this as permanently set: currently we do not support
+			// VT52 sub-mode.
+			reply.SetTo("\033[?2;3$y");
+			break;
+		case 3:
+			// 80/132 Columns mode. Report this as permanently reset: currently we do not support
+			// switching to 132 column mode.
+			reply.SetTo("\033[?3;4$y");
+			break;
+		case 6:
+			// Request Origin mode
+			reply.SetToFormat("\033[?6;%u$y", fBuffer->IsOriginMode() ? 1 : 2);
+			break;
 		case 12:
 			// Request cursor blinking mode
 			reply.SetToFormat("\033[?12;%u$y", fBuffer->IsMode(MODE_CURSOR_BLINKING) ? 1 : 2);
+			break;
+		case 25:
+			// Request hidden cursor mode
+			reply.SetToFormat("\033[?25;%u$y", fBuffer->IsMode(MODE_CURSOR_HIDDEN) ? 1 : 2);
 			break;
 		case 1006:
 			// Request extended mouse coordinates with SGR scheme
