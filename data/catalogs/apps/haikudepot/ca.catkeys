@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	697720495
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2041052641
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		Instal·la %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Actualització de les condicions d'ús
+Details: %Details%	PackageKitUtils		Detalls: %Details%
 No usage conditions	UserUsageConditions		Sense condicions d'ús
 Active	PackageListView		Actiu
 Login or Create account	MainWindow		Entreu o creeu-ne un compte
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
 Logout	ToLatestUserUsageConditionsWindow		Tanca la sessió
 Password requirements	UserLoginWindow		Requisits de la contrasenya
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		Resultat de la transacció: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		S'han de fer els canvis addicionals de paquet següents:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% es comunica amb un component de servidor anomenat HaikuDepotServer. Aquestes són les condicions d'ús que l'usuari %Nickname% va acceptar  (%AgreedToTimestamp%) en relació amb l'ús del servei del Servidor del dipòsit del Haiku.
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
@@ -43,6 +45,7 @@ Available	PackageListView		Disponible
 Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació.
 Cancel	UserLoginWindow		Cancel·la
 Rating not possible	MainWindow		La puntuació no és possible.
+Install failure	InstallPackageProcess		Error d'instal·lació
 Package update error	MainWindow		Error d'actualització de paquet
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Cliqueu aquí
 No screenshot available.	PackageInfoView		No hi ha cap captura de pantalla disponible.
@@ -76,6 +79,7 @@ All categories	FilterView		Totes les categories
 Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
 ignore problem for now	PackageProblem		Ignora el problema per ara.
 n/a	PackageInfoView		n/d
+Error: %Errstr% (%Errno%)	PackageKitUtils		Error: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		Comprovació de les dades de l'usuari
 Cancel	MainWindow		Cancel·la
 Refresh repositories	MainWindow		Actualitza els repositoris
@@ -135,8 +139,8 @@ Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni 
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
 <no info>	PackageInfoView		<cap informació>
 Usage conditions download problem	UserUsageConditions		Problema de baixada de les condicions d'ús
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hi ha hagut un error en baixar els requisits de la contrasenya necessaris per crear un usuari nou. Comproveu el registre per obtenir més informació i torneu-ho a provar.\nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari de Haiku.
 Fetching screenshot	CacheScreenshotProcess		S'obté la captura
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hi ha hagut un error en baixar els requisits de la contrasenya necessaris per crear un usuari nou. Comproveu el registre per obtenir més informació i torneu-ho a provar.\nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari de Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
@@ -198,6 +202,7 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Repositories	MainWindow		Repositoris
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		En actualitzar les dades del paquet, s’ha produït un problema que pot fer que les dades quedin obsoletes o que faltin a la visualització de l’aplicació. És possible que es puguin obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
 This rating is visible to other users	RatePackageWindow		Aquesta puntuació és visible per a altres usuaris.
+Uninstall failure	UninstallPackageAction		Error de desinstal·lació
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		S'ha produït un error en baixar les condicions d'ús. Comproveu el registre per obtenir-ne més informació i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari del Haiku.
 Stop network use	ServerHelper		Atura l'ús de la xarxa
 View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús acordades...

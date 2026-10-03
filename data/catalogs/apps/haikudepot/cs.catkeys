@@ -135,8 +135,8 @@ Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčk
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
 <no info>	PackageInfoView		<bez informací>
 Usage conditions download problem	UserUsageConditions		Problém se stažením podmínek použití
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování požadavků na heslo. Požadavky jsou potřeba k vytvoření nového uživatele. Zkontrolujte záznamy a opakujte. \nJak zobrazit podrobnější záznamy se dozvíte z uživatelské příručky Haiku v části HaikuDepot.
 Fetching screenshot	CacheScreenshotProcess		Fotím obrazovku
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování požadavků na heslo. Požadavky jsou potřeba k vytvoření nového uživatele. Zkontrolujte záznamy a opakujte. \nJak zobrazit podrobnější záznamy se dozvíte z uživatelské příručky Haiku v části HaikuDepot.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
 Rating	PackageListView		Hodnocení
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony

@@ -129,8 +129,8 @@ Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:
 No user ratings available.	PackageInfoView		未发现用户评分。
 <no info>	PackageInfoView		<无信息>
 Usage conditions download problem	UserUsageConditions		使用条款下载问题
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下载创建新用户所需的密码要求时出现错误。请查看日志查看详细信息，然后重试。\n 关于如何查看日志的信息可以在Haiku用户指南的HaikuDepot部分中找到。
 Fetching screenshot	CacheScreenshotProcess		正在获取屏幕截图
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		下载创建新用户所需的密码要求时出现错误。请查看日志查看详细信息，然后重试。\n 关于如何查看日志的信息可以在Haiku用户指南的HaikuDepot部分中找到。
 A network transport error has arisen communicating with the server system: %s	ServerHelper		与服务器系统通信时出现网络传输错误：%s
 Rating	PackageListView		评级
 Synchronizing icons	ServerIconExportUpdateProcess		正在同步图标

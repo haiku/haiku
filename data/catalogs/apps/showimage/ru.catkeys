@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	2342181025
+1	russian	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Настройка печати…
 Previous file	Menus		Предыдущий файл
 View	Menus		Вид
@@ -25,6 +25,7 @@ Zoom in	Menus		Увеличить
 Last page	Menus		Последняя страница
 Cancel	ClosePrompt		Отменить
 Attributes	Menus		Атрибуты
+Show boundaries marks	Menus		Показать маркеры границ изображения
 High-quality zooming	Menus		Высококачественное масштабирование
 Close	Menus		Закрыть
 Selection mode	Menus		Режим выделения
@@ -51,7 +52,6 @@ Previous page	Menus		Предыдущая страница
 Fit to window	Menus		Подогнать под размер окна
 Go to page	Menus		Перейти к странице
 Browse	Menus		Просмотр
-Progress monitor	ProgressWindow		Монитор состояния
 Edit	Menus		Правка
 Move to Trash	Menus		Переместить в корзину
 Use as background…	Menus		Сделать фоном рабочего стола…

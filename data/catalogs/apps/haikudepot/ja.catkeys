@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	697720495
+1	japanese	x-vnd.Haiku-HaikuDepot	2041052641
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		%PackageTitle% をインストール
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		使用条件の更新
+Details: %Details%	PackageKitUtils		詳細: %Details%
 No usage conditions	UserUsageConditions		使用条件なし
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
 Logout	ToLatestUserUsageConditionsWindow		ログアウト
 Password requirements	UserLoginWindow		パスワードの要件
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		トランザクションの結果: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% は、HaikuDepotServer と呼ばれるサーバーコンポーネントと通信します。ユーザー '%Nickname%' が %AgreedToTimestamp% にHaikuDepotServer サービスの利用に関して同意した使用条件があります。
 No changelog available.	PackageInfoView		変更記録はありません。
@@ -43,6 +45,7 @@ Available	PackageListView		利用可能
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
 Cancel	UserLoginWindow		中止
 Rating not possible	MainWindow		評価不能
+Install failure	InstallPackageProcess		インストール失敗
 Package update error	MainWindow		パッケージアップデートエラー
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	ここをクリック
 No screenshot available.	PackageInfoView		スクリーンショットは利用できません。
@@ -76,6 +79,7 @@ All categories	FilterView		すべての分類
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 ignore problem for now	PackageProblem		今は問題を無視する
 n/a	PackageInfoView		評価待ち
+Error: %Errstr% (%Errno%)	PackageKitUtils		エラー: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		ユーザーの詳細を確認中
 Cancel	MainWindow		中止
 Refresh repositories	MainWindow		リポジトリの更新
@@ -135,8 +139,8 @@ Starting the package daemon failed:\n\n%Error%	App		パッケージデーモン�
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
 <no info>	PackageInfoView		<情報無し>
 Usage conditions download problem	UserUsageConditions		使用条件のダウンロードで問題
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要なパスワード要件のダウンロードの際にエラーを生じました。詳しくはログを確認して再度試してみてください。 \nログを見るための情報は Haiku ユーザーガイドの HaikuDepot の章で得られます。
 Fetching screenshot	CacheScreenshotProcess		スクリーンショットを取得中
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要なパスワード要件のダウンロードの際にエラーを生じました。詳しくはログを確認して再度試してみてください。 \nログを見るための情報は Haiku ユーザーガイドの HaikuDepot の章で得られます。
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
@@ -198,6 +202,7 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Repositories	MainWindow		リポジトリ
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		パッケージデータの更新中に問題が発生しました。そのためデータが期限切れに、つまりアプリケーションの表示から消えてしまいます。この問題の詳細は、アプリケーションのログから得られるでしょう。\nログの見方についての情報は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 This rating is visible to other users	RatePackageWindow		この評価はほかのユーザーからも見られます
+Uninstall failure	UninstallPackageAction		アンインストール失敗
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 Stop network use	ServerHelper		ネットワークの使用を中止
 View agreed usage conditions…	MainWindow		同意した使用条件を見る...

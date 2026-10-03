@@ -1,16 +1,20 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	4180661143
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	530464078
 Cancel	Remote devices		Скасувати
 Laptop	Settings view		Ноутбук
 Only from trusted devices	Settings view		Тільки від довірених пристроїв
 15 secs	Settings view		15 сек
 Quit	main		Вийти
+Scan finished	Inquiry panel		Сканування завершено
 Manufacturer: 	Device View		Виробник: 
+Scan	Inquiry panel		Сканувати
+%secs% remaining	Inquiry panel		Залишилося %secs% с.
 Desktop	Settings view		Робочий стіл
 Server	Window		Сервер
 Identify host as:	Settings view		Визначити хост як:
 Local devices found on system:	Settings view		Локальні пристрої знайдені в системі:
 Service classes: 	Device View		Класи сервісу: 
 Remote devices	Window		Віддалені пристрої
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Схоже, цей комп'ютер не підтримує Bluetooth.
 Settings	Window		Налаштування
 Stop bluetooth services…	Window		Зупинити служби bluetooth…
 61 secs	Settings view		61 сек
@@ -18,12 +22,14 @@ Add…	Remote devices		Додати…
 Revert	Window		Відкат змін
 Refresh local devices…	Window		Оновлення локальних пристроїв…
 Disconnect	Remote devices		Роз’єднати
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Перед початком сканування переконайтеся, що функції Bluetooth на віддаленому пристрої увімкнені.
 Defaults	Window		Типові настройки
 From all devices	Settings view		Для всіх пристроїв
 Start bluetooth services…	Window		Запуск служб bluetooth…
 Cancel	Inquiry panel		Скасувати
 Launch now	main		Запустити
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Отримання назви «%1»
 Remove	Remote devices		Вилучити
 Pick device…	Settings view		Оберіть пристрій…
 Always ask	Settings view		Завжди питати
@@ -32,13 +38,16 @@ Help	Window		Довідка
 Pair…	Remote devices		Пара…
 Incoming connections policy:	Settings view		Політики вхідних з'єднань:
 Retrieving names…	Inquiry panel		Отримую назви…
+Canceling scan…	Inquiry panel		Сканування скасовується…
 Show name	Extended local device view		Показати назву
 Add device to list	Inquiry panel		Додати пристрій до списку
-The Bluetooth services are not currently running on this system.	main		Служби Bluetooth не запущені у системі.
+Scanning progress:	Inquiry panel		Хід сканування:
+The Bluetooth services are not currently running on this system.	main		Наразі служби Bluetooth у цій системі не працюють.
 Discoverable	Extended local device view		Видимий
 Authenticate	Extended local device view		Автентифікувати
 Smart phone	Settings view		Смартфон
 Default inquiry time:	Settings view		Час запиту за замовчуванням:
+Friendly name:	Settings view		Зручна назва:
 Server	Settings view		Сервер
 Handheld	Settings view		Переносний
  packets: 	Device View		 пакетів: 

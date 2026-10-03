@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3146103429
+1	ukrainian	x-vnd.Haiku-HaikuDepot	4208417580
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні умов використання
 User ratings loading…	PackageInfoView		Завантажуються оцінки користувачів…
 Available packages	MainWindow		Доступні пакети
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		Інсталяція %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Під час отримання списку пакетів сталася помилка: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Оновити умови користування
+Details: %Details%	PackageKitUtils		Подробиці: %Details%
 No usage conditions	UserUsageConditions		Без умов користування
 Active	PackageListView		Активний
 Login or Create account	MainWindow		Авторизуватись або зареєструватись
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
 Logout	ToLatestUserUsageConditionsWindow		Вийти
 Password requirements	UserLoginWindow		Вимоги до пароля
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		Результат транзакції: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		Додатково необхідно встановити/замінити наступні пакети:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% взаємодіє з серверним компонентом HaikuDepotServer. Нижче наведено умови використання, з якими користувач «%Nickname%» погодився у %AgreedToTimestamp% щодо користування сервісом HaikuDepotServer.
 No changelog available.	PackageInfoView		Історія змін недоступна
@@ -43,6 +45,7 @@ Available	PackageListView		Доступний
 Click a package to view information	PackageInfoView		Клікніть по пакету, для перегляду інформації про нього
 Cancel	UserLoginWindow		Скасувати
 Rating not possible	MainWindow		Оцінка неможлива
+Install failure	InstallPackageProcess		Збій інсталяції
 Package update error	MainWindow		Помилка оновлення пакета
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Клікніть тут
 No screenshot available.	PackageInfoView		Доступні знімки екрана відсутні.
@@ -50,6 +53,7 @@ No screenshot available.	PackageInfoView		Доступні знімки екра
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Отримання оцінки користувачів для пакету
 Reboot required	PackageManager		Потрібне перезавантаження
 All packages	PackageListView		Усі пакети
+Checking server information	ServerRuntimeInformationVerifierProcess		Перевірка інформації сервера
 Send	RatePackageWindow		Надіслати
 Creating package list…	FeaturedPackagesView		Створення списку пакетів…
 Start package daemon	App		Запустити демон пакетів
@@ -75,6 +79,7 @@ All categories	FilterView		Усі категорії
 Your rating was updated.	RatePackageWindow		Ваша оцінка оновлена.
 ignore problem for now	PackageProblem		тимчасово ігнорувати проблему
 n/a	PackageInfoView		н/д
+Error: %Errstr% (%Errno%)	PackageKitUtils		Помилка: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		Перевірка даних користувача
 Cancel	MainWindow		Скасувати
 Refresh repositories	MainWindow		Оновити репозитарії
@@ -133,13 +138,14 @@ Starting the package daemon failed:\n\n%Error%	App		Запуск демона п
 No user ratings available.	PackageInfoView		Оцінювання користувачем недоступно.
 <no info>	PackageInfoView		<немає інформації>
 Usage conditions download problem	UserUsageConditions		Проблеми при завантаженні умов використання
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot посібника користувача Haiku.
 Fetching screenshot	CacheScreenshotProcess		Отримую знімок екрана
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot посібника користувача Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм
 No, quit	App		Ні, вийти
 Show	MainWindow		Показати
+Timestamp discrepancy	ServerRuntimeInformationVerifierProcess		Розбіжність у часових мітках
 No contents available.	PackageInfoView		Вміст пакета недоступний.
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ця програма записує та зчитує деякі робочі файли на Вашому комп’ютері, щоб функціонувати. Здається, що запис тестового файлу до [%TestFilePath%] викликає проблеми. Переконайтеся, що все гаразд з Вашим локальним диском або дозволами, які могли б перешкодити цій програмі записувати файли в згадану папку. Ви можете визнати цю проблему та продовжити, але деякі функції можуть бути відключені.
 Settings…	MainWindow		Налаштування…
@@ -195,6 +201,7 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Repositories	MainWindow		Репозитарії
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакету виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах програми.\nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot посібника користувача Haiku.
 This rating is visible to other users	RatePackageWindow		Оцінку видно і іншим користувачам
+Uninstall failure	UninstallPackageAction		Збій деінсталяції
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		При завантаженні умов користування виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі HaikuDepot посібника користувача Haiku.
 Stop network use	ServerHelper		Припинити використання мережі
 View agreed usage conditions…	MainWindow		Погоджені умови користування…
@@ -219,6 +226,7 @@ The nickname is required.	UserLoginWindow		Псевдонім обов'язко�
 Apply changes	PackageResult		Застосувати
 Server error	ServerHelper		Помилка серверу
 Rate package	RatePackageWindow		Оцінка пакету
+The server and this computer have a discrepancy in the current timestamp of around %DiscrepancySeconds% seconds. This may cause issues for HaikuDepot communicating with the server. Check your computer's clock settings and correct the current time if necessary.	ServerRuntimeInformationVerifierProcess		Між сервером і цим комп’ютером існує розбіжність між часовими мітками, що становить близько %DiscrepancySeconds% секунд. Це може спричинити проблеми взаємодії HaikuDepot із сервером. Перевірте годинник на своєму комп’ютері та за потреби скоригуйте час.
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Перегляд запису \«%PackageName%\»
 Sending anonymous usage data	MainWindow		Відправка анонімних даних про використання
 Log in	UserLoginWindow		Авторизація

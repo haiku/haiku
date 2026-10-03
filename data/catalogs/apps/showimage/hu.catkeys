@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	2342181025
+1	hungarian	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Oldalbeállítás…
 Previous file	Menus		Előző fájl
 View	Menus		Nézet
@@ -25,6 +25,7 @@ Zoom in	Menus		Nagyítás
 Last page	Menus		Utolsó oldal
 Cancel	ClosePrompt		Mégse
 Attributes	Menus		Jellemzők
+Show boundaries marks	Menus		Határjelzések
 High-quality zooming	Menus		Magas minőségű nagyítás
 Close	Menus		Bezárás
 Selection mode	Menus		Kijelölés mód
@@ -51,7 +52,6 @@ Previous page	Menus		Előző oldal
 Fit to window	Menus		Illesztés az ablakhoz
 Go to page	Menus		Oldalra ugrás
 Browse	Menus		Tallózás
-Progress monitor	ProgressWindow		Folyamatjelző
 Edit	Menus		Szerkesztés
 Move to Trash	Menus		Szemetesbe
 Use as background…	Menus		Beállítás háttérnek…

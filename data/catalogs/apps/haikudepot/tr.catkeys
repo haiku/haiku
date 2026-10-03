@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	697720495
+1	turkish	x-vnd.Haiku-HaikuDepot	2041052641
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		Kur: %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Paket listesi alınırken bir hata oluştu: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını güncelle
+Details: %Details%	PackageKitUtils		Ayrıntılar: %Details%
 No usage conditions	UserUsageConditions		Kullanım koşulları yok
 Active	PackageListView		Etkin
 Login or Create account	MainWindow		Oturum aç veya hesap oluştur
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
 Logout	ToLatestUserUsageConditionsWindow		Çıkış yap
 Password requirements	UserLoginWindow		Parola gereklilikleri
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		İşlem sonucu: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		Aşağıdaki ek paket değişikliklerinin yapılması gerekiyor:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname%, HaikuDepotServer adındaki bir sunucu ile iletişim kurar. Bunlar, HaikuDepotServer hizmetinin kullanımına ilişkin, “%Nickname%” kullanıcısının %AgreedToTimestamp% tarihinde kabul ettiği kullanım koşullarıdır.
 No changelog available.	PackageInfoView		Kullanılabilir bir değişiklik günlüğü yok.
@@ -43,6 +45,7 @@ Available	PackageListView		Kullanılabilir
 Click a package to view information	PackageInfoView		Paket bilgisini görmek için üzerine tıklayın
 Cancel	UserLoginWindow		Vazgeç
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
+Install failure	InstallPackageProcess		Kurulum başarısız
 Package update error	MainWindow		Paket güncelleme hatası
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Tüm paketlerde arama yapmak için
 No screenshot available.	PackageInfoView		Kullanılabilir ekran görüntüsü yok
@@ -76,6 +79,7 @@ All categories	FilterView		Tüm kategoriler
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
 ignore problem for now	PackageProblem		Sorunu şimdilik yok say
 n/a	PackageInfoView		yok
+Error: %Errstr% (%Errno%)	PackageKitUtils		Hata: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		Kullanıcı ayrıntıları denetleniyor…
 Cancel	MainWindow		Vazgeç
 Refresh repositories	MainWindow		Depoları yenile
@@ -135,8 +139,8 @@ Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamad
 No user ratings available.	PackageInfoView		Kullanıcı derecelendirmesi yok.
 <no info>	PackageInfoView		<bilgi yok>
 Usage conditions download problem	UserUsageConditions		Kullanım koşullarını indirme sorunu
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gereken parola gereksinimleri indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlükleri görüntüleme ile ilgili bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Fetching screenshot	CacheScreenshotProcess		Ekran görüntüsü getiriliyor…
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gereken parola gereksinimleri indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlükleri görüntüleme ile ilgili bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşzamanlanıyor…
@@ -198,6 +202,7 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Repositories	MainWindow		Depolar
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
+Uninstall failure	UninstallPackageAction		Kurulumu kaldırma başarısız
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 Stop network use	ServerHelper		Ağ kullanımını durdur
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…

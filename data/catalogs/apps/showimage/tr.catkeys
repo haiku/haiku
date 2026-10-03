@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ShowImage	2342181025
+1	turkish	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Sayfa yapısı…
 Previous file	Menus		Önceki dosya
 View	Menus		Görüntü
@@ -25,6 +25,7 @@ Zoom in	Menus		Yakınlaştır
 Last page	Menus		Son sayfa
 Cancel	ClosePrompt		Vazgeç
 Attributes	Menus		Öznitelikler
+Show boundaries marks	Menus		Sınır imlerini göster
 High-quality zooming	Menus		Yüksek kalite yakınlaştırma
 Close	Menus		Kapat
 Selection mode	Menus		Seçim kipi
@@ -51,7 +52,6 @@ Previous page	Menus		Önceki sayfa
 Fit to window	Menus		Pencereye sığdır
 Go to page	Menus		Sayfaya git
 Browse	Menus		Göz at
-Progress monitor	ProgressWindow		İlerleme monitörü
 Edit	Menus		Düzen
 Move to Trash	Menus		Çöpe at
 Use as background…	Menus		Arka plan olarak kullan…

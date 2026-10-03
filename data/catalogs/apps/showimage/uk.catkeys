@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	2342181025
+1	ukrainian	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Налаштування сторінки…
 Previous file	Menus		Попередній файл
 View	Menus		Режим перегляду
@@ -25,6 +25,7 @@ Zoom in	Menus		Збільшити
 Last page	Menus		Остання сторінка
 Cancel	ClosePrompt		Скасувати
 Attributes	Menus		Атрибути
+Show boundaries marks	Menus		Показати позначки меж зображення
 High-quality zooming	Menus		Високоякісна зміна розміру
 Close	Menus		Закрити
 Selection mode	Menus		Режим виділення
@@ -51,7 +52,6 @@ Previous page	Menus		Попередня сторінка
 Fit to window	Menus		Припасувати до вікна
 Go to page	Menus		Перейти до сторінки
 Browse	Menus		Перегляд
-Progress monitor	ProgressWindow		Монітор виконання
 Edit	Menus		Коректив
 Move to Trash	Menus		Перемістити до смітника
 Use as background…	Menus		Використати як фон…

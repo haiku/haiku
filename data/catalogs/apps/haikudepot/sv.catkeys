@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	697720495
+1	swedish	x-vnd.Haiku-HaikuDepot	2041052641
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		Installera %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Ett fel inträffade vid hämtning av paketlistan: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Uppdatera användningsvillkor
+Details: %Details%	PackageKitUtils		Detaljer: %Details%
 No usage conditions	UserUsageConditions		Inga användningsvillkor
 Active	PackageListView		Aktiv
 Login or Create account	MainWindow		Logga in eller skapa konto
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
 Logout	ToLatestUserUsageConditionsWindow		Logga ut
 Password requirements	UserLoginWindow		Lösenordskrav
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		Transaktionsresultat: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		Följande ytterligare paketändringar måste göras:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% kommunicerar med en serverkomponent som heter HaikuDepotServer. Dessa är de användningsvillkor som användaren '%Nickname%' godkände vid %AgreedToTimestamp% i relation till användningen av HaikuDepotServer-tjänsten.
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
@@ -43,6 +45,7 @@ Available	PackageListView		Tillgänglig
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 Cancel	UserLoginWindow		Avbryt
 Rating not possible	MainWindow		Betyg ej möjligt
+Install failure	InstallPackageProcess		Installationen misslyckades
 Package update error	MainWindow		Paketuppdateringsfel
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Klicka här
 No screenshot available.	PackageInfoView		Ingen skärmdump tillgänglig.
@@ -76,6 +79,7 @@ All categories	FilterView		Alla kategorier
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
 ignore problem for now	PackageProblem		ignorera problemet för tillfället
 n/a	PackageInfoView		oviktigt
+Error: %Errstr% (%Errno%)	PackageKitUtils		Fel: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		Kontrollerar användarinformation
 Cancel	MainWindow		Avbryt
 Refresh repositories	MainWindow		Ladda om repositorier
@@ -135,8 +139,8 @@ Starting the package daemon failed:\n\n%Error%	App		Starta package daemon missly
 No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 <no info>	PackageInfoView		<Ingen information>
 Usage conditions download problem	UserUsageConditions		Nedladdningsproblem för användningsvillkor
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av lösenordskraven som krävs för att skapa en ny användare. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 Fetching screenshot	CacheScreenshotProcess		Hämtar skärmdump
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av lösenordskraven som krävs för att skapa en ny användare. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ett nättransportfel har uppstått vid kommunikation med serversystemet: %s
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner
@@ -198,6 +202,7 @@ The user %Nickname% has been successfully created in the HaikuDepotServer system
 Repositories	MainWindow		Repositorier
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Under uppdateringen av paketdata har ett problem uppstått som kan leda till att data är föråldrade eller saknas från programmets skärm. Ytterligare information om detta problem kan hämtas från applikationsloggarna.\nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
 This rating is visible to other users	RatePackageWindow		Detta betyg är synligt för andra användare
+Uninstall failure	UninstallPackageAction		Misslyckad avinstallation
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Ett fel har uppstått vid nedladdning av användningsvillkoren. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
 Stop network use	ServerHelper		Stoppa nätverksanvändning
 View agreed usage conditions…	MainWindow		Visa godkända användarvillkor…

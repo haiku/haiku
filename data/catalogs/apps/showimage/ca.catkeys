@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ShowImage	2342181025
+1	catalan; valencian	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Configuració de la pàgina...
 Previous file	Menus		Fitxer anterior
 View	Menus		Visualització
@@ -25,6 +25,7 @@ Zoom in	Menus		Amplia
 Last page	Menus		Darrera pàgina
 Cancel	ClosePrompt		Cancel·la
 Attributes	Menus		Atributs
+Show boundaries marks	Menus		Mostra les marques dels límits
 High-quality zooming	Menus		Ampliació d'alta qualitat
 Close	Menus		Tanca
 Selection mode	Menus		Mode de selecció
@@ -51,7 +52,6 @@ Previous page	Menus		Pàgina anterior
 Fit to window	Menus		Ajusta a la finestra
 Go to page	Menus		Ves a la pàgina
 Browse	Menus		Navega
-Progress monitor	ProgressWindow		Monitor del progrés
 Edit	Menus		Edita
 Move to Trash	Menus		Mou a la paperera
 Use as background…	Menus		Usa com a fons...

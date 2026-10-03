@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	2342181025
+1	japanese	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		ページ設定...
 Previous file	Menus		前のファイル
 View	Menus		表示
@@ -25,6 +25,7 @@ Zoom in	Menus		拡大
 Last page	Menus		最後のページ
 Cancel	ClosePrompt		中止
 Attributes	Menus		属性
+Show boundaries marks	Menus		境界線を表示
 High-quality zooming	Menus		高画質拡大縮小
 Close	Menus		閉じる
 Selection mode	Menus		選択モード
@@ -51,7 +52,6 @@ Previous page	Menus		前のページ
 Fit to window	Menus		ウィンドウに合わせる
 Go to page	Menus		指定ページへ
 Browse	Menus		閲覧
-Progress monitor	ProgressWindow		進捗状況モニター
 Edit	Menus		編集
 Move to Trash	Menus		ごみ箱に移動する
 Use as background…	Menus		背景にする...

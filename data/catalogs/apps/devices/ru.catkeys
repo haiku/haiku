@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	1230536917
+1	russian	x-vnd.Haiku-Devices	2344199970
 ACPI bus	DevicesView		Шина ACPI
 USB bus	DevicesView		Шина USB
 Class info	DevicePCI		Информация о классе
@@ -6,12 +6,16 @@ USB bus	Device		Шина USB
 Communications	DeviceSCSI		Устройства связи
 Mass storage controller	Device		Контроллер накопителей
 Printer	DeviceSCSI		Принтер
+Enable driver	DevicesView		Подключить драйвер
 Manufacturer	Device		Производитель
 Memory controller	Device		Контроллер памяти
 Unknown device	DevicesView		Неизвестное устройство
 Name	PropertyList		Название
+Graphics peripheral	DeviceSCSI		Графическая периферия
 Manufacturer	DeviceSCSI		Производитель
+unknown	DeviceACPI		неизвестно
 Satellite communications controller	Device		Контроллер спутниковой связи
+OK	DevicesView		ОК
 PCI bus	DevicesView		Шина PCI
 Device	Device		Устройство
 Changer	DeviceSCSI		Changer
@@ -22,49 +26,72 @@ Unknown device	Device		Неизвестное устройство
 Value	PropertyList		Значение
 Generic system peripheral	Device		Общая системная периферия
 Devices	DevicesView		Устройства
+Optical drive	DeviceSCSI		Оптический привод
 Display controller	Device		Контроллер дисплея
 Bus	DevicesView		типу шины
 Device name	DevicePCI		Название устройства
 Other	DeviceSCSI		Другие
 Order by:	DevicesView		Сортировать по:
 Intelligent controller	Device		Интеллектуальный контроллер
+ACPI processor namespace '%2'	DeviceACPI		Пространство имён процессора ACPI «%2»
+The driver path is not in a package volume: 	DevicesView		Путь к драйверу не указывает на том пакета: 
 Multimedia controller	Device		Мультимедийный контроллер
 Quit	DevicesView		Выйти
+Filter:	DevicesView		Фильтр:
 Processor	DeviceSCSI		Процессор
+Disabling non-packaged drivers is not supported.	DevicesView		Отключение драйверов типа «non-packaged» не поддерживается.
+Card reader	DeviceSCSI		Устройство чтения карт
 Bridge	Device		Мост
+ACPI button '%1'	DeviceACPI		ACPI кнопка «%1»
 Attributes	PropertyList		Атрибуты
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		Компакт диск
+ACPI system bus	DeviceACPI		Системная шина ACPI
 Signal processing controller	Device		Контроллер обработки сигналов
 Docking station	Device		Док-станция
 Unclassified device	Device		Неклассифицированные устройства
+Error	DevicesView		Ошибка
 ACPI controller	Device		Контроллер ACPI
 ACPI bus	Device		Шина ACPI
 Encryption controller	Device		Контроллер шифрования
 Devices	System name		Устройства
 Generate system information	DevicesView		Сгенерировать информацию о системе
 Processor	Device		Процессор
+Disable driver	DevicesView		Отключить драйвер
+Reboot needed	DevicesView		Требуется перезагрузка
 Computer	DevicesView		Компьютер
+ACPI thermal zone	DeviceACPI		Тепловая зона ACPI
 Connection	DevicesView		подключению
+Failed to write to the settings file.	DevicesView		Сбой во время записи в файл настроек.
 Scanner	DeviceSCSI		Сканер
 ACPI node '%1'	DeviceACPI		ACPI нода «%1»
+Clear	DevicesView		Очистить
 Device name	Device		Название устройства
 Device class	DeviceSCSI		Класс устройства
 Input device controller	Device		Контроллер устройств ввода
+Restart computer	DevicesView		Перезапуск компьютера
 Serial bus controller	Device		Контроллер последовательной шины
 RBC	DeviceSCSI		RBC
 Wireless controller	Device		Беспроводной контроллер
 Device name	DeviceACPI		Название устройства
+Shutdown failed with error: 	DevicesView		Сбой выключения из-за ошибки: 
+unknown	DevicePCI		неизвестно
 ACPI <unknown>	DeviceACPI		ACPI <неизвестно>
 Report compatibility	DevicesView		Отчёт о совместимости
 Computer	Device		Компьютер
+Tape drive	DeviceSCSI		Ленточный накопитель
 Enclosure	DeviceSCSI		Enclosure
 PCI bus	Device		Шина PCI
+none	Device		пусто
+Disabling critical system drivers is not allowed.	DevicesView		Отключение критически важных системных драйверов не разрешено.
+Driver disabled	DevicesView		Драйвер отключен
 ISA bus	Device		Шина ISA
 Basic information	PropertyList		Общая информация
 ISA bus	DevicesView		Шина ISA
+Disk drive	DeviceSCSI		Дисковый накопитель
 Manufacturer	DevicePCI		Производитель
 Bridge	DeviceSCSI		Мост
+ACPI system indicator	DeviceACPI		Системный индикатор ACPI
 Device name	DeviceSCSI		Название устройства
 Array	DeviceSCSI		Массив
 Manufacturer	DeviceACPI		Производитель

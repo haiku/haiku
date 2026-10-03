@@ -47,7 +47,7 @@ Don't quit	SoftwareUpdaterWindow		Не виходити
 Checking for updates	SoftwareUpdaterWindow		Перевірка оновлень
 Updates completed	UpdateManager		Оновлення завершені
 Reboot	SoftwareUpdaterWindow		Перезавантажити
-Show more details	SoftwareUpdaterWindow		Показати деталі
+Show more details	SoftwareUpdaterWindow		Показати більш детальну інформацію
 Installing version	SoftwareUpdaterWindow	List item text	Встановлення версії
 Checking for updates	CheckManager		Перевірка оновлень
 No remote repositories are available	UpdateManager	Error message	Віддалені репозитарії недоступні

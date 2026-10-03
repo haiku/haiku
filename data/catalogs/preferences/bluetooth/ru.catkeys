@@ -1,15 +1,20 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	420387731
+1	russian	x-vnd.Haiku-BluetoothPrefs	1561566434
+Cancel	Remote devices		Отменить
 Laptop	Settings view		Ноутбук
 Only from trusted devices	Settings view		Только от доверенных устройств
 15 secs	Settings view		15 сек
 Quit	main		Выход
+Scan finished	Inquiry panel		Сканирование завершено
 Manufacturer: 	Device View		Производитель: 
+Scan	Inquiry panel		Сканировать
+%secs% remaining	Inquiry panel		Осталось %secs% с.
 Desktop	Settings view		Рабочий стол
 Server	Window		Сервер
 Identify host as:	Settings view		Идентифицировать как:
 Local devices found on system:	Settings view		Локальные устройства, найденные в системе:
 Service classes: 	Device View		Служебные классы: 
 Remote devices	Window		Удалённые устройства
+This computer doesn't seem to have Bluetooth support.	Inquiry panel		Похоже, этот компьютер не поддерживает Bluetooth.
 Settings	Window		Настройки
 Stop bluetooth services…	Window		Остановить службу bluetooth…
 61 secs	Settings view		61 сек
@@ -17,12 +22,14 @@ Add…	Remote devices		Добавить…
 Revert	Window		Откатить
 Refresh local devices…	Window		Обновить локальные устройства…
 Disconnect	Remote devices		Отключить
+Make sure Bluetooth capabilities of the remote device are activated before starting the scan.	Inquiry panel		Перед началом сканирования убедитесь, что на удалённом устройстве активирован Bluetooth.
 Defaults	Window		По умолчанию
 From all devices	Settings view		От всех устройств
 Start bluetooth services…	Window		Запуск службы bluetooth…
 Cancel	Inquiry panel		Отменить
 Launch now	main		Запустить сейчас
 Bluetooth	System name		Bluetooth
+Retrieving name of '%1'	Inquiry panel		Получение названия «%1»
 Remove	Remote devices		Удалить
 Pick device…	Settings view		Выбрать устройство…
 Always ask	Settings view		Всегда спрашивать
@@ -31,6 +38,7 @@ Help	Window		Помощь
 Pair…	Remote devices		Пара…
 Incoming connections policy:	Settings view		Политика входящих соединений:
 Retrieving names…	Inquiry panel		Получение названий…
+Canceling scan…	Inquiry panel		Сканирование отменяется…
 Show name	Extended local device view		Показывать название
 Add device to list	Inquiry panel		Добавить устройство в список
 The Bluetooth services are not currently running on this system.	main		Службы Bluetooth не запущены на этой системе.
@@ -38,6 +46,7 @@ Discoverable	Extended local device view		Видимый
 Authenticate	Extended local device view		Аутентифицировать
 Smart phone	Settings view		Смартфон
 Default inquiry time:	Settings view		Время запроса по умолчанию:
+Friendly name:	Settings view		Понятное название:
 Server	Settings view		Сервер
 Handheld	Settings view		Переносной
  packets: 	Device View		 пакетов: 

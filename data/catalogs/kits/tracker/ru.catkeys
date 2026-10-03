@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	798058031
+1	russian	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Распознать
 Create link	ContainerWindow		Создать ссылку в
 starts with	FindPanel		начинается на
 Replace	FSUtils		Заменить
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		В функции %func \nсбой find_directory(). \nПричина: %error
 ?+* follows nothing.	libtracker		?+* ничего не следует
 Include Trash	FindPanel		Включить поиск в Корзине
 Rectangle	AttributesView		Прямоугольник
@@ -171,6 +172,7 @@ Preferences…	ContainerWindow		Настройки…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \«%document\» поскольку программа \«%app\» находится в корзине. 
 Work Phone	Person Query Columns		Рабочий телефон
 Select folders	FindPanel		Выбор папок…
+OK	TrackerInitialState		ОК
 Close	ContainerWindow		Закрыть
 Get info	ContainerWindow		Информация
 MIME Type	AttributesView		MIME тип
@@ -287,6 +289,7 @@ Execute	FilePermissionsView		Исполнение
 no	AttributesView		нет
 Show volumes on Desktop	SettingsView		Показывать значки разделов
 Recent folders	ContainerWindow		Недавнюю папку
+Error deleting items: %error	FSUtils		Ошибка удаления элементов: %error
 Desktop	Model		Рабочий стол
 Select all	ContainerWindow		Выделить все
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
@@ -425,6 +428,7 @@ Move here	ContainerWindow		Переместить сюда
 the config folder	FSUtils		папку настроек
 Sorry, could not create a new folder.	FSUtils		Извините, невозможно создать новую папку.
 MIME Signature	AttributesView		MIME Сигнатура
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Переименовать
 Clean up all	ContainerWindow		Выстроить все
 Add current folder	FilePanelPriv		Добавить текущую папку

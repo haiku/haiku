@@ -123,8 +123,8 @@ Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käyn
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 <no info>	PackageInfoView		<ei tietoja>
 Usage conditions download problem	UserUsageConditions		Käyttöehtojen latauspulma
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Tapahtui virhe ladattaessa salasanavaatimuksia uudelle käyttäjälle. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTietoa siitä, kuinka lokitiedostojen katselu onnistuu löytyy Haiku-käyttöohjeen HaikuVarasto-kohdasta.
 Fetching screenshot	CacheScreenshotProcess		Noudetaan näytönkaappaus
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Tapahtui virhe ladattaessa salasanavaatimuksia uudelle käyttäjälle. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTietoa siitä, kuinka lokitiedostojen katselu onnistuu löytyy Haiku-käyttöohjeen HaikuVarasto-kohdasta.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet

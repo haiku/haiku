@@ -1,7 +1,8 @@
-1	ukrainian	x-vnd.Haiku-Expander	2735024965
+1	ukrainian	x-vnd.Haiku-Expander	1987011430
 Destination	ExpanderWindow		Куди розпакувати
 Other	ExpanderPreferences		Інше
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
+Ignore all	ExpanderWindow		Ігнорувати все
 Expander	System name		Expander
 Set source…	ExpanderMenu		Що розпакувати…
 OK	ExpanderWindow		ОК
@@ -14,6 +15,7 @@ Create	ExpanderWindow		Створити
 Creating listing for '%s'…	ExpanderWindow		Створення списку для «%s»…
 Show contents	ExpanderMenu		Показати вміст
 %appname% settings	ExpanderPreferences		Налаштування %appname%
+Ignore	ExpanderWindow		Ігнорувати
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені що бажаєте зупинити розпаковку архіву? Деякі розпаковані елементи можуть бути неповними.
 Settings	ExpanderMenu		Налаштування
 Expand	ExpanderWindow		Розпакувати

@@ -123,8 +123,8 @@ Starting the package daemon failed:\n\n%Error%	App		Pornirea serviciului de pach
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări ale utilizatorilor.
 <no info>	PackageInfoView		<no info>
 Usage conditions download problem	UserUsageConditions		Problemă la descărcarea condițiilor de utilizare
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea cerințelor de parolă necesare pentru a crea un utilizator nou. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 Fetching screenshot	CacheScreenshotProcess		Se aduce captura de ecran
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea cerințelor de parolă necesare pentru a crea un utilizator nou. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport în rețea la comunicarea cu sistemul de server: %s
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează pictogramele

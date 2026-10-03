@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	2342181025
+1	german	x-vnd.Haiku-ShowImage	1447180906
 Page setup…	Menus		Seite einrichten …
 Previous file	Menus		Vorherige Datei
 View	Menus		Ansicht
@@ -25,6 +25,7 @@ Zoom in	Menus		Vergrößern
 Last page	Menus		Letzte Seite
 Cancel	ClosePrompt		Abbrechen
 Attributes	Menus		Attribute
+Show boundaries marks	Menus		Umriss-Markierungen anzeigen
 High-quality zooming	Menus		Zoomen mit hoher Qualität
 Close	Menus		Schließen
 Selection mode	Menus		Auswahlmodus
@@ -51,7 +52,6 @@ Previous page	Menus		Vorherige Seite
 Fit to window	Menus		An Fenstergröße anpassen
 Go to page	Menus		Gehe zu Seite
 Browse	Menus		Blättern
-Progress monitor	ProgressWindow		Fortschrittsanzeige
 Edit	Menus		Bearbeiten
 Move to Trash	Menus		In Papierkorb verschieben
 Use as background…	Menus		Als Hintergrund verwenden …

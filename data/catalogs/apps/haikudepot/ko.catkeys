@@ -121,8 +121,8 @@ Starting the package daemon failed:\n\n%Error%	App		데몬을 시작할 수 없�
 No user ratings available.	PackageInfoView		사용자 평가를 사용할 수 없습니다.
 <no info>	PackageInfoView		<정보 없음>
 Usage conditions download problem	UserUsageConditions		사용자 역관 다운로드 문제
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		새 사용자를 생성하는데 필요한 비밀번호 조건을 받아오는 데 오류가 발생했습니다. 로그를 통해 상세 사항을 확인하고 다시 시도하십시오.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 설명서의 HaikuDepot 항목에서 볼 수 있습니다.
 Fetching screenshot	CacheScreenshotProcess		스크린샷 가져오는 중
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		새 사용자를 생성하는데 필요한 비밀번호 조건을 받아오는 데 오류가 발생했습니다. 로그를 통해 상세 사항을 확인하고 다시 시도하십시오.\n로그를 보는 방법에 대한 정보는 Haiku 사용자 설명서의 HaikuDepot 항목에서 볼 수 있습니다.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		서버 시스템과 통신 중 네트워크 전송 오류가 발생하였습니다: %s
 Rating	PackageListView		평가
 Synchronizing icons	ServerIconExportUpdateProcess		아이콘 동기화 중

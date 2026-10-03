@@ -130,8 +130,8 @@ Starting the package daemon failed:\n\n%Error%	App		Avvio del demone dei pacchet
 No user ratings available.	PackageInfoView		Nessuna valutazione utente è disponibile.
 <no info>	PackageInfoView		<nessuna informazione>
 Usage conditions download problem	UserUsageConditions		Problema di download delle condizioni di utilizzo
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Si è verificato un errore durante il download dei requisiti della password richiesti per creare un nuovo utente. Controlla il registro per i dettagli e riprova.\nLe informazioni su come visualizzare i log sono disponibili nella sezione HaikuDepot della Guida Utente di Haiku.
 Fetching screenshot	CacheScreenshotProcess		Recupero dello screenshot in corso
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Si è verificato un errore durante il download dei requisiti della password richiesti per creare un nuovo utente. Controlla il registro per i dettagli e riprova.\nLe informazioni su come visualizzare i log sono disponibili nella sezione HaikuDepot della Guida Utente di Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Si è verificato un errore di rete nel tentativo di connettersi al server: %s
 Rating	PackageListView		Valutazione
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizzazione icone

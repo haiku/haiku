@@ -46,7 +46,7 @@ OK	MediaConverter-FileInfo		ОК
 Video encoding:	MediaConverter		Кодування відео:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка : 
 Error	MediaConverter		Помилка
-File details	MediaConverter		Деталі файлу
+File details	MediaConverter		Параметри файлу
 No audio	Audio codecs list		Без аудіо
 Drop media files onto this window	MediaConverter		Перенесіть медіафайли у це вікно
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадрів}}

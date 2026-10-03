@@ -123,8 +123,8 @@ Starting the package daemon failed:\n\n%Error%	App		Kunne ikke starte pakke-daem
 No user ratings available.	PackageInfoView		Ingen brukervurderinger tilgjengelig.
 <no info>	PackageInfoView		<ingen info>
 Usage conditions download problem	UserUsageConditions		Problem med nedlasting av bruksbetingelser
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Det har oppstått en feil ved nedlasting av passordkravene som kreves for å opprette en ny bruker. Sjekk loggen for detaljer og prøv igjen.\nInformasjon om hvordan du viser loggene er tilgjengelig i HaikuDepot-delen av Haiku-brukerveiledningen.
 Fetching screenshot	CacheScreenshotProcess		Henter skjermdump
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Det har oppstått en feil ved nedlasting av passordkravene som kreves for å opprette en ny bruker. Sjekk loggen for detaljer og prøv igjen.\nInformasjon om hvordan du viser loggene er tilgjengelig i HaikuDepot-delen av Haiku-brukerveiledningen.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		En nettverkstransportfeil har oppstått under kommunikasjon med serversystemet: %s
 Rating	PackageListView		Vurdering
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner

@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-desklink	748898679
+1	ukrainian	x-vnd.Haiku-desklink	378743223
 desklink	MediaReplicant	Title of an alert box	desklink
+Mute	MediaReplicant		Вимкнути звук
 Muted	MediaReplicant		Без звуку
 %g dB	MediaReplicant		%g дБ
 OK	MediaReplicant		ОК
@@ -9,4 +10,5 @@ Volume	VolumeControl		Гучність
 Media preferences…	MediaReplicant		Налаштування медіа…
 Beep	MediaReplicant		Сигнал
 Open %name	DeskButton	Don't translate variable %name	Відкрити %name
+Remove replicant	VolumeControl		Прибрати реплікант
 No media server running	VolumeControl		Не запущено медіа-сервер

@@ -129,8 +129,8 @@ Starting the package daemon failed:\n\n%Error%	App		Η έναρξη του πρ�
 No user ratings available.	PackageInfoView		Δεν υπάρχουν διαθέσιμες αξιολογήσεις χρήστη.
 <no info>	PackageInfoView		<καμία πληροφορία>
 Usage conditions download problem	UserUsageConditions		Σφάλμα λήψης όρων χρήσης
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Προέκυψε ένα σφάλμα κατά τη λήψη των απαιτήσεων κωδικού πρόσβασης που απαιτούνται για τη δημιουργία νέου χρήστη. Ελέγξτε το αρχείο καταγραφής για λεπτομέρειες και δοκιμάστε ξανά. \nΠληροφορίες σχετικά με τον τρόπο προβολής των αρχείων καταγραφής είναι διαθέσιμες στην ενότητα HaikuDepot του Οδηγού χρήσης Haiku.
 Fetching screenshot	CacheScreenshotProcess		Λήψη στιγμιοτύπου σε εξέλιξη
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Προέκυψε ένα σφάλμα κατά τη λήψη των απαιτήσεων κωδικού πρόσβασης που απαιτούνται για τη δημιουργία νέου χρήστη. Ελέγξτε το αρχείο καταγραφής για λεπτομέρειες και δοκιμάστε ξανά. \nΠληροφορίες σχετικά με τον τρόπο προβολής των αρχείων καταγραφής είναι διαθέσιμες στην ενότητα HaikuDepot του Οδηγού χρήσης Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ένα δικτυακό σφάλμα μεταφοράς προέκυψε κατά την επικοινωνία με τον εξυπηρετητή: %s
 Rating	PackageListView		Αξιολόγηση
 Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
