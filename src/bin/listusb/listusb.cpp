@@ -185,7 +185,7 @@ DumpInfo(BUSBDevice& device, bool verbose)
 	printf("    Protocol ............... 0x%02x %s\n", device.Protocol(), classInfo);
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
 	uint32_t version = device.USBVersion();
-	printf("    USB Version ............ %d.%d\n", version >> 8, version & 0xFF);
+	printf("    USB Version ............ %x.%x\n", version >> 8, version & 0xFF);
 	printf("    Vendor ID .............. 0x%04x", device.VendorID());
 	if (vendorName != NULL)
 		printf(" (%s)", vendorName);
@@ -206,7 +206,8 @@ DumpInfo(BUSBDevice& device, bool verbose)
 		return;
 
 	usb_hub_descriptor hubDescriptor;
-	size_t size = device.GetDescriptor(USB_DESCRIPTOR_HUB, 0, 0,
+	uint8 descriptorType = version >= 0x0300 ? USB_DESCRIPTOR_HUB_SS : USB_DESCRIPTOR_HUB;
+	size_t size = device.GetDescriptor(descriptorType, 0, 0,
 		(void*)&hubDescriptor, sizeof(usb_hub_descriptor));
 	if (size == sizeof(usb_hub_descriptor)) {
 		printf("    Hub ports count ........ %d\n", hubDescriptor.num_ports);
@@ -226,6 +227,7 @@ DumpInfo(BUSBDevice& device, bool verbose)
 				padding = ".....";
 			else
 				padding = "......";
+			// TODO handle SS descriptors correctly
 			printf("      Port %d status %s %04x.%04x%s%s%s%s%s%s%s%s\n",
 				index, padding, portStatus.status, portStatus.change,
 				portStatus.status & PORT_STATUS_CONNECTION ? " Connect": "",
