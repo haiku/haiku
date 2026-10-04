@@ -679,7 +679,8 @@ private:
 		status_t						_DebouncePort(uint8 index);
 
 		InterruptPipe *					fInterruptPipe;
-		usb_hub_descriptor				fHubDescriptor;
+		uint8							fPortCount;
+		uint8							fPowerOnToPowerGood;
 
 		usb_port_status					fInterruptStatus[USB_MAX_PORT_COUNT];
 		usb_port_status					fPortStatus[USB_MAX_PORT_COUNT];

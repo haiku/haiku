@@ -38,6 +38,7 @@
 #define USB_REQUEST_GET_INTERFACE			10
 #define USB_REQUEST_SET_INTERFACE			11
 #define USB_REQUEST_SYNCH_FRAME				12
+#define USB_REQUEST_SS_SET_HUB_DEPTH		12
 
 /* Used by {set|get}_descriptor() */
 #define USB_DESCRIPTOR_DEVICE				0x01

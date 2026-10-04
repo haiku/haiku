@@ -69,7 +69,20 @@ struct usb_hub_descriptor {
 	uint8 power_control_mask;	//Deprecated
 } _PACKED;
 
+struct usb_hub_ss_descriptor {
+	uint8 length;
+	uint8 descriptor_type;
+	uint8 num_ports;
+	uint16 characteristics;
+	uint8 power_on_to_power_good;
+	uint8 max_power;
+	uint8 decode_latency;
+	uint16 delay;
+	uint16 device_removeable;
+} _PACKED;
+
 #define USB_DESCRIPTOR_HUB 0x29
+#define USB_DESCRIPTOR_HUB_SS 0x2A
 
 
 struct usb_endpoint_ss_companion_descriptor {

@@ -36,7 +36,7 @@ struct xhci_root_hub_configuration_s {
 	usb_interface_descriptor		interface;
 	usb_endpoint_descriptor			endpoint;
 	usb_endpoint_ss_companion_descriptor endpoint_ss_companion;
-	usb_hub_descriptor				hub;
+	usb_hub_ss_descriptor			hub;
 } _PACKED;
 
 
@@ -84,15 +84,16 @@ static xhci_root_hub_configuration_s sXHCIRootHubConfig =
 	},
 
 	{ // hub descriptor
-		9,								// Descriptor length (including
+		12,								// Descriptor length (including
 										// deprecated power control mask)
-		USB_DESCRIPTOR_HUB,				// Descriptor type
+		USB_DESCRIPTOR_HUB_SS,			// Descriptor type
 		0x0f,							// Number of ports
 		0x0000,							// Hub characteristics
-		10,								// Power on to power good (in 2ms units)
+		50,								// Power on to power good (in 2ms units)
 		0,								// Maximum current (in mA)
-		0x00,							// All ports are removable
-		0xff							// Deprecated power control mask
+		0,								// Decode latency
+		0,								// Delay
+		0x00							// All ports are removable
 	}
 };
 
@@ -148,24 +149,30 @@ XHCIRootHub::ProcessTransfer(XHCI *xhci, Transfer *transfer)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
-	TRACE_MODULE("request: %d\n", request->Request);
+	TRACE_MODULE("request: %x %x\n", request->Request, request->RequestType);
 
 	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
-	switch (request->Request) {
-		case USB_REQUEST_GET_STATUS: {
-			if (request->Index == 0) {
-				// get hub status
-				actualLength = MIN(sizeof(usb_port_status),
-					transfer->DataLength());
-				// the hub reports whether the local power failed (bit 0)
-				// and if there is a over-current condition (bit 1).
-				// everything as 0 means all is ok.
-				memset(transfer->Data(), 0, actualLength);
-				status = B_OK;
-				break;
-			}
+#define	T(request, requestType) ((request) | ((requestType) << 8))
+	switch (T(request->Request, request->RequestType)) {
+		case T(USB_REQUEST_GET_STATUS, USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_GET_STATUS, USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_GET_STATUS, USB_REQTYPE_ENDPOINT_IN | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_GET_STATUS, USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS):
+			// get hub status
+			actualLength = MIN(sizeof(usb_port_status),
+				transfer->DataLength());
+			// the hub reports whether the local power failed (bit 0)
+			// and if there is a over-current condition (bit 1).
+			// everything as 0 means all is ok.
+			memset(transfer->Data(), 0, actualLength);
+			status = B_OK;
+			break;
 
+		case T(USB_REQUEST_GET_STATUS, USB_REQTYPE_OTHER_IN | USB_REQTYPE_CLASS):
+		{
+			if (request->Index == 0)
+				break;
 			usb_port_status portStatus;
 			if (xhci->GetPortStatus(request->Index - 1, &portStatus) >= B_OK) {
 				actualLength = MIN(sizeof(usb_port_status), transfer->DataLength());
@@ -176,19 +183,15 @@ XHCIRootHub::ProcessTransfer(XHCI *xhci, Transfer *transfer)
 			break;
 		}
 
-		case USB_REQUEST_SET_ADDRESS:
-			if (request->Value >= 128) {
-				status = B_TIMED_OUT;
+		case T(USB_REQUEST_SET_ADDRESS, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD):
+			if (request->Value >= XHCI_MAX_DEVICES)
 				break;
-			}
 
 			TRACE_MODULE("set address: %d\n", request->Value);
 			status = B_OK;
 			break;
 
-		case USB_REQUEST_GET_DESCRIPTOR:
-			TRACE_MODULE("get descriptor: %d\n", request->Value >> 8);
-
+		case T(USB_REQUEST_GET_DESCRIPTOR, USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD):
 			switch (request->Value >> 8) {
 				case USB_DESCRIPTOR_DEVICE: {
 					actualLength = MIN(sizeof(usb_device_descriptor),
@@ -221,48 +224,50 @@ XHCIRootHub::ProcessTransfer(XHCI *xhci, Transfer *transfer)
 					status = B_OK;
 					break;
 				}
-
-				case USB_DESCRIPTOR_HUB: {
-					actualLength = MIN(sizeof(usb_hub_descriptor),
-						transfer->DataLength());
-					sXHCIRootHubConfig.hub.num_ports = xhci->PortCount();
-					memcpy(transfer->Data(), (void *)&sXHCIRootHubConfig.hub,
-						actualLength);
-					status = B_OK;
-					break;
-				}
 			}
 			break;
 
-		case USB_REQUEST_SET_CONFIGURATION:
+		case T(USB_REQUEST_GET_DESCRIPTOR, USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS):
+			actualLength = MIN(sizeof(usb_hub_ss_descriptor),
+				transfer->DataLength());
+			sXHCIRootHubConfig.hub.num_ports = xhci->PortCount();
+			memcpy(transfer->Data(), (void *)&sXHCIRootHubConfig.hub,
+				actualLength);
 			status = B_OK;
 			break;
 
-		case USB_REQUEST_CLEAR_FEATURE: {
-			if (request->Index == 0) {
-				// we don't support any hub changes
-				TRACE_MODULE_ERROR("clear feature: no hub changes\n");
-				break;
-			}
+		case T(USB_REQUEST_SET_CONFIGURATION, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD):
+			status = B_OK;
+			break;
 
+		case T(USB_REQUEST_CLEAR_FEATURE, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_CLEAR_FEATURE, USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_CLEAR_FEATURE, USB_REQTYPE_ENDPOINT_OUT | USB_REQTYPE_STANDARD):
+			break;
+
+		case T(USB_REQUEST_CLEAR_FEATURE, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_CLASS):
+			status = B_OK;
+			break;
+		case T(USB_REQUEST_CLEAR_FEATURE, USB_REQTYPE_OTHER_OUT | USB_REQTYPE_CLASS):
 			TRACE_MODULE("clear feature: %d\n", request->Value);
 			if (xhci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
-		}
 
-		case USB_REQUEST_SET_FEATURE: {
-			if (request->Index == 0) {
-				// we don't support any hub changes
-				TRACE_MODULE_ERROR("set feature: no hub changes\n");
-				break;
-			}
+		case T(USB_REQUEST_SET_FEATURE, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_SET_FEATURE, USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_STANDARD):
+		case T(USB_REQUEST_SET_FEATURE, USB_REQTYPE_ENDPOINT_OUT | USB_REQTYPE_STANDARD):
+			break;
 
+		case T(USB_REQUEST_SET_FEATURE, USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_CLASS):
+			status = B_OK;
+			break;
+
+		case T(USB_REQUEST_SET_FEATURE, USB_REQTYPE_OTHER_OUT | USB_REQTYPE_CLASS):
 			TRACE_MODULE("set feature: %d\n", request->Value);
 			if (xhci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
-		}
 	}
 
 	transfer->Finished(status, actualLength);
