@@ -4825,14 +4825,18 @@ vm_memcpy_physical_page(phys_addr_t to, phys_addr_t from)
 static inline bool
 validate_memory_range(const void* addr, size_t size)
 {
+	if (size == 0)
+		return true;
+
 	addr_t address = (addr_t)addr;
+	addr_t addressEnd = address + size - 1;
 
 	// Check for overflows on all addresses.
-	if ((address + size) < address)
+	if (addressEnd < address)
 		return false;
 
 	// Validate that the address range does not cross the kernel/user boundary.
-	return IS_USER_ADDRESS(address) == IS_USER_ADDRESS(address + size - 1);
+	return IS_USER_ADDRESS(address) == IS_USER_ADDRESS(addressEnd);
 }
 
 
