@@ -1017,6 +1017,7 @@ BAbstractSpinner::AttachedToWindow()
 	BControl::SetValue(Value());
 		// sets the text and enables or disables the arrows
 
+	AdoptParentColors();
 	_UpdateTextViewColors(IsEnabled());
 	fTextView->MakeEditable(IsEnabled());
 
