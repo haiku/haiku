@@ -771,15 +771,17 @@ SimpleListView::Draw(BRect updateRect)
 			item = ItemAt(i);
 			if (item == NULL)
 				continue;
+
 			itemFrame = ItemFrame(i);
 			item->DrawItem(this, itemFrame, (i % 2) == 0);
-
-			// drop indicator
-			if (i == fDropIndex) {
-				SetHighColor(kDropIndicatorColor);
-				StrokeLine(fDropRect.LeftTop(), fDropRect.RightTop());
-			}
 		}
+
+		// drop indicator
+		if (fDropRect.IsValid()) {
+			SetHighColor(kDropIndicatorColor);
+			StrokeLine(fDropRect.LeftTop(), fDropRect.RightTop());
+		}
+
 		emptyRect.top = itemFrame.bottom + 1;
 	}
 
