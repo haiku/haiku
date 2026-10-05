@@ -77,8 +77,9 @@ AppMenuItem::AppMenuItem(const char* appSig, int category)
 	fIsValid(false)
 {
 	if (be_roster->FindApp(appSig, &fAppRef) == B_NO_ERROR) {
-		fIcon = new BBitmap(BRect(0.0, 0.0, 15.0, 15.0), B_RGBA32);
-		if (BNodeInfo::GetTrackerIcon(&fAppRef, fIcon, B_MINI_ICON) == B_OK) {
+		fIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)),
+			B_RGBA32);
+		if (BNodeInfo::GetTrackerIcon(&fAppRef, fIcon, (icon_size)-1) == B_OK) {
 			BEntry appEntry(&fAppRef);
 			if (appEntry.InitCheck() == B_OK) {
 				char name[B_FILE_NAME_LENGTH];
