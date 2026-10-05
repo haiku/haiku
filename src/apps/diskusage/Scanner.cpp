@@ -37,6 +37,13 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 	fBusy(false),
 	fQuitRequested(false)
 {
+	char volumeName[B_FILE_NAME_LENGTH];
+	fVolume->GetName(volumeName);
+
+	BString name(B_TRANSLATE("%volume_name% volume scanner"));
+	name.ReplaceAll("%volume_name%", volumeName);
+	SetName(name.String());
+
 	Run();
 }
 
