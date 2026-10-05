@@ -262,6 +262,7 @@ inline	uint32						ReadCapReg32(uint32 reg);
 		thread_id					fInterruptPollThread;
 		uint32						fIRQ;
 		bool						fUseMSI;
+		spinlock					fInterruptLock;
 };
 
 

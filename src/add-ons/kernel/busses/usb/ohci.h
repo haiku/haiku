@@ -222,6 +222,7 @@ inline	uint32						_ReadReg(uint32 reg);
 
 		uint32						fIRQ;
 		bool						fUseMSI;
+		spinlock					fInterruptLock;
 };
 
 

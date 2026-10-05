@@ -302,6 +302,8 @@ OHCI::OHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stac
 	TRACE("constructing new OHCI host controller driver\n");
 	fInitOK = false;
 
+	B_INITIALIZE_SPINLOCK(&fInterruptLock);
+
 	mutex_init(&fEndpointLock, "ohci endpoint lock");
 
 	// enable busmaster and memory mapped access
@@ -921,8 +923,7 @@ OHCI::_InterruptHandler(void *data)
 int32
 OHCI::_Interrupt()
 {
-	static spinlock lock = B_SPINLOCK_INITIALIZER;
-	acquire_spinlock(&lock);
+	acquire_spinlock(&fInterruptLock);
 
 	uint32 status = 0;
 	uint32 acknowledge = 0;
@@ -949,7 +950,7 @@ OHCI::_Interrupt()
 			& ~OHCI_WRITEBACK_DONE_HEAD;
 		if (status == 0) {
 			// Nothing to be done (PCI shared interrupt)
-			release_spinlock(&lock);
+			release_spinlock(&fInterruptLock);
 			return B_UNHANDLED_INTERRUPT;
 		}
 	}
@@ -990,7 +991,7 @@ OHCI::_Interrupt()
 	if (acknowledge != 0)
 		_WriteReg(OHCI_INTERRUPT_STATUS, acknowledge);
 
-	release_spinlock(&lock);
+	release_spinlock(&fInterruptLock);
 
 	if (finishTransfers)
 		release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
