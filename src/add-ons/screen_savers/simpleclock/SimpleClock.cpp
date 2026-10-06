@@ -145,9 +145,10 @@ Clock::Draw(BView *view, int32)
 void
 Clock::_drawBlock(BView *view, float x, float y, float alpha, float size)
 {
-	float blockAngles[4] = {alpha - (M_PI / 12), alpha + (M_PI / 12),
-		alpha + M_PI - (M_PI / 12), alpha + M_PI + (M_PI / 12)};
-	
+	const float pi = M_PI;
+	float blockAngles[4] = {alpha - (pi / 12), alpha + (pi / 12), alpha + pi - (pi / 12),
+		alpha + pi + (pi / 12)};
+
 	BPoint blockPoints[4];
 	for (int index = 0; index < 4; index++) {
 		blockPoints[index].x = x + size * cos(blockAngles[index]);
@@ -168,8 +169,8 @@ Clock::_drawArrow(BView *view, float x0, float y0, float angle, float length,
 
 	float size = length * coeff;
 
-	float blockAngles[4] = {angle - alpha, angle + alpha,
-		angle + M_PI - alpha, angle + M_PI + alpha};
+	const float pi = M_PI;
+	float blockAngles[4] = {angle - alpha, angle + alpha, angle + pi - alpha, angle + pi + alpha};
 
 	BPoint blockPoints[4];
 	for(int index = 0; index < 4; index++) {
