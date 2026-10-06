@@ -39,7 +39,8 @@ Screenshot::Screenshot()
 	:
 	BApplication("application/x-vnd.haiku-screenshot-cli"),
 	fUtility(new Utility()),
-	fLaunchGui(true)
+	fLaunchGui(true),
+	fSelectArea(false)
 {
 }
 
