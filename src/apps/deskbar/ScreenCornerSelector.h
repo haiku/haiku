@@ -15,6 +15,7 @@
 
 
 static const int32 kExpandBit = 1 << 3;
+static const int32 kMiniBit = 2 << 3;
 
 
 class ScreenCornerSelector : public BControl {

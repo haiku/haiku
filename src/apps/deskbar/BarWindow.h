@@ -69,8 +69,8 @@ public:
 			void 				GetLocation(BMessage* message);
 			deskbar_location 	DeskbarLocation() const;
 			void				SetLocation(BMessage* message);
-			void				SetDeskbarLocation(deskbar_location location,
-									bool expand);
+			void				SetDeskbarLocation(deskbar_location location, bool expand,
+									bool mini);
 
 			void				IsExpanded(BMessage* message);
 			void				Expand(BMessage* message);

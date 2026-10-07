@@ -404,7 +404,7 @@ TBarWindow::GetLocation(BMessage* message)
 
 
 void
-TBarWindow::SetDeskbarLocation(deskbar_location location, bool newExpandState)
+TBarWindow::SetDeskbarLocation(deskbar_location location, bool newExpandState, bool newMiniState)
 {
 	// left top and right top are the only two that
 	// currently pay attention to expand, ignore for all others
@@ -429,28 +429,28 @@ TBarWindow::SetDeskbarLocation(deskbar_location location, bool newExpandState)
 		case B_DESKBAR_LEFT_TOP:
 			left = true;
 			top = true;
-			vertical = true;
+			vertical = !newMiniState;
 			expand = newExpandState;
 			break;
 
 		case B_DESKBAR_RIGHT_TOP:
 			left = false;
 			top = true;
-			vertical = true;
+			vertical = !newMiniState;
 			expand = newExpandState;
 			break;
 
 		case B_DESKBAR_LEFT_BOTTOM:
 			left = true;
 			top = false;
-			vertical = true;
+			vertical = !newMiniState;
 			expand = false;
 			break;
 
 		case B_DESKBAR_RIGHT_BOTTOM:
 			left = false;
 			top = false;
-			vertical = true;
+			vertical = !newMiniState;
 			expand = false;
 			break;
 
@@ -470,10 +470,11 @@ void
 TBarWindow::SetLocation(BMessage* message)
 {
 	deskbar_location location;
-	bool expand;
+	bool expand, mini;
 	if (message->FindInt32("location", (int32*)&location) == B_OK
-		&& message->FindBool("expand", &expand) == B_OK)
-		SetDeskbarLocation(location, expand);
+		&& message->FindBool("expand", &expand) == B_OK
+		&& message->FindBool("mini", &mini) == B_OK)
+		SetDeskbarLocation(location, expand, mini);
 }
 
 

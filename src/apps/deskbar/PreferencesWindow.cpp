@@ -500,14 +500,14 @@ PreferencesWindow::_SetWindowLocation(bool vertical, bool left, bool top, int32 
 			// horizontal mini-mode
 			if (top) {
 				if (left)
-					fWindowLocation->SetValue(B_DESKBAR_LEFT_TOP);
+					fWindowLocation->SetValue(B_DESKBAR_LEFT_TOP | kMiniBit);
 				else
-					fWindowLocation->SetValue(B_DESKBAR_RIGHT_TOP);
+					fWindowLocation->SetValue(B_DESKBAR_RIGHT_TOP | kMiniBit);
 			} else {
 				if (left)
-					fWindowLocation->SetValue(B_DESKBAR_LEFT_BOTTOM);
+					fWindowLocation->SetValue(B_DESKBAR_LEFT_BOTTOM | kMiniBit);
 				else
-					fWindowLocation->SetValue(B_DESKBAR_RIGHT_BOTTOM);
+					fWindowLocation->SetValue(B_DESKBAR_RIGHT_BOTTOM | kMiniBit);
 			}
 		}
 	}

@@ -125,8 +125,9 @@ ScreenCornerSelector::Invoke(BMessage* message)
 		message = Message();
 
 	BMessage clone(*message);
-	clone.AddInt32("location", Value() & ~kExpandBit);
+	clone.AddInt32("location", Value() & ~kExpandBit & ~kMiniBit);
 	clone.AddBool("expand", (Value() & kExpandBit) != 0);
+	clone.AddBool("mini", (Value() & kMiniBit) != 0);
 		// TODO add support for "expand" values as well
 
 	return BInvoker::Invoke(&clone);
@@ -156,6 +157,10 @@ ScreenCornerSelector::SetValue(int32 corner)
 		case B_DESKBAR_LEFT_BOTTOM | kExpandBit:
 		case B_DESKBAR_RIGHT_BOTTOM | kExpandBit:
 #endif
+		case B_DESKBAR_LEFT_TOP | kMiniBit:
+		case B_DESKBAR_RIGHT_TOP | kMiniBit:
+		case B_DESKBAR_LEFT_BOTTOM | kMiniBit:
+		case B_DESKBAR_RIGHT_BOTTOM | kMiniBit:
 			break;
 
 		default:
@@ -173,7 +178,7 @@ ScreenCornerSelector::SetValue(int32 corner)
 deskbar_location
 ScreenCornerSelector::Corner() const
 {
-	return (deskbar_location)(fCurrentCorner & ~kExpandBit);
+	return (deskbar_location)(fCurrentCorner & ~kExpandBit & ~kMiniBit);
 }
 
 
@@ -188,8 +193,6 @@ ScreenCornerSelector::SetCorner(deskbar_location corner)
 void
 ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 {
-	// TODO: support horizontal mini-mode
-
 	switch (fCurrentCorner) {
 		case B_DESKBAR_TOP:
 			innerFrame.bottom = innerFrame.top + kArrowSize / 2;
@@ -239,6 +242,26 @@ ScreenCornerSelector::_DrawArrow(BRect innerFrame)
 			innerFrame.top = innerFrame.bottom - 2 * kArrowSize;
 			break;
 #endif
+		case B_DESKBAR_LEFT_TOP | kMiniBit:
+			innerFrame.right = innerFrame.left + kArrowSize;
+			innerFrame.bottom = innerFrame.top + kArrowSize / 2;
+			break;
+
+		case B_DESKBAR_RIGHT_TOP | kMiniBit:
+			innerFrame.left = innerFrame.right - kArrowSize;
+			innerFrame.bottom = innerFrame.top + kArrowSize / 2;
+			break;
+
+		case B_DESKBAR_LEFT_BOTTOM | kMiniBit:
+			innerFrame.right = innerFrame.left + kArrowSize;
+			innerFrame.top = innerFrame.bottom - kArrowSize / 2;
+			break;
+
+		case B_DESKBAR_RIGHT_BOTTOM | kMiniBit:
+			innerFrame.left = innerFrame.right - kArrowSize;
+			innerFrame.top = innerFrame.bottom - kArrowSize / 2;
+			break;
+
 	}
 
 	innerFrame.InsetBy(1, 1);
@@ -258,13 +281,19 @@ ScreenCornerSelector::_ScreenCorner(BPoint point) const
 	float topY = innerFrame.top + innerFrame.Height() / 3;
 	float centerY = innerFrame.top + innerFrame.Height() / 2;
 	float bottomY = innerFrame.top + 2 * innerFrame.Height() / 3;
-
-	// TODO: support horizontal mini-mode
+	float miniTopY = topY / 2;
+	float miniBottomY = bottomY + topY / 2;
 
 	// Note: expanded mode from the bottom is not supported at the moment
 	if (point.x < leftX) {
+		if (point.y < miniTopY)
+			return B_DESKBAR_LEFT_TOP | kMiniBit;
+
 		if (point.y < topY)
 			return B_DESKBAR_LEFT_TOP;
+
+		if (point.y > miniBottomY)
+			return B_DESKBAR_LEFT_BOTTOM | kMiniBit;
 
 		if (point.y > bottomY)
 			return B_DESKBAR_LEFT_BOTTOM;
@@ -273,8 +302,14 @@ ScreenCornerSelector::_ScreenCorner(BPoint point) const
 	}
 
 	if (point.x > rightX) {
+		if (point.y < miniTopY)
+			return B_DESKBAR_RIGHT_TOP | kMiniBit;
+
 		if (point.y < topY)
 			return B_DESKBAR_RIGHT_TOP;
+
+		if (point.y > miniBottomY)
+			return B_DESKBAR_RIGHT_BOTTOM | kMiniBit;
 
 		if (point.y > bottomY)
 			return B_DESKBAR_RIGHT_BOTTOM;
