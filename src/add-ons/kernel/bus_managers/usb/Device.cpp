@@ -304,6 +304,13 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 				}
 
 				case USB_DESCRIPTOR_ENDPOINT_SS_COMPANION: {
+					if (currentInterface == NULL || currentInterface->endpoint_count == 0) {
+						TRACE_ERROR("found endpoint companion descriptor before any "
+									"valid %s descriptor, ignoring!\n",
+							currentInterface == NULL ? "interface" : "endpoint");
+						break;
+					}
+
 					if (currentInterface != NULL) {
 						usb_endpoint_descriptor* desc
 							= currentInterface->endpoint[
