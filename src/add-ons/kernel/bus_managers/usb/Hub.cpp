@@ -433,6 +433,11 @@ status_t
 Hub::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 	void *data, size_t dataLength, size_t *actualLength)
 {
+	if (descriptorType != USB_DESCRIPTOR_HUB_SS && descriptorType != USB_DESCRIPTOR_HUB) {
+		return Device::GetDescriptor(descriptorType, index, languageID, data, dataLength,
+			actualLength);
+	}
+
 	return DefaultPipe()->SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_CLASS,			// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
