@@ -38,7 +38,6 @@
 #define USB_REQUEST_GET_INTERFACE			10
 #define USB_REQUEST_SET_INTERFACE			11
 #define USB_REQUEST_SYNCH_FRAME				12
-#define USB_REQUEST_SS_SET_HUB_DEPTH		12
 
 /* Used by {set|get}_descriptor() */
 #define USB_DESCRIPTOR_DEVICE				0x01
@@ -46,6 +45,13 @@
 #define USB_DESCRIPTOR_STRING				0x03
 #define USB_DESCRIPTOR_INTERFACE			0x04
 #define USB_DESCRIPTOR_ENDPOINT				0x05
+
+/* USB 3.x descriptors types */
+#define USB_DESCRIPTOR_BOS									0x0f
+#define USB_DESCRIPTOR_DEVICE_CAPABILITY					0x10
+#define USB_DESCRIPTOR_ENDPOINT_SS_COMPANION				0x30
+#define USB_DESCRIPTOR_ISOCHRONOUS_ENDPOINT_SS_COMPANION	0x31
+
 /* conventional class-specific descriptors */
 #define USB_DESCRIPTOR_CS_DEVICE			0x21
 #define USB_DESCRIPTOR_CS_CONFIGURATION		0x22
@@ -130,6 +136,22 @@ typedef struct usb_endpoint_descriptor {
 	uint16	max_packet_size;
 	uint8	interval;
 } _PACKED usb_endpoint_descriptor;
+
+typedef struct usb_endpoint_ss_companion_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	max_burst;
+	uint8	attributes;
+	uint16	bytes_per_interval;
+} _PACKED usb_endpoint_ss_companion_descriptor;
+
+typedef struct usb_isochronous_endpoint_ss_companion_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	max_burst;
+	uint8	attributes;
+	uint32	bytes_per_interval;
+} _PACKED usb_isochronous_endpoint_ss_companion_descriptor;
 
 typedef struct usb_string_descriptor {
 	uint8	length;

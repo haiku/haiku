@@ -7,8 +7,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers usb ] ;
 Application listusb :
 	listusb.cpp
 	usb_audio.cpp
-	usb_video.cpp
 	usb_cdc.cpp
+	usb_hub.cpp
+	usb_video.cpp
 	: be libdevice.so ;
 
 # Manually reference generated headers

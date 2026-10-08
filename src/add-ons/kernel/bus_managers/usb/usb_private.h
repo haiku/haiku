@@ -13,6 +13,9 @@
 #include <device_manager.h>
 #include <bus/USB.h>
 
+#include <USB_spec.h>
+#include <usb/USB_hub.h>
+
 #include "usbspec_private.h"
 #include <lock.h>
 #include <Referenceable.h>

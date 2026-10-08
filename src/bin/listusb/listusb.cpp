@@ -14,9 +14,9 @@
 
 #include <usb/USB_audio.h>
 #include <usb/USB_cdc.h>
+#include <usb/USB_hub.h>
 #include <usb/USB_video.h>
 
-#include "usbspec_private.h"
 #include "usb-utils.h"
 
 #include "listusb.h"
@@ -44,11 +44,22 @@ DumpEndpointSSCompanionDescriptor(
 {
 	printf("                    Type .............. 0x%02x Endpoint SuperSpeed Companion\n",
 		descriptor->descriptor_type);
-	printf("                    MaxBurst .......... 0x%02x\n",
-		descriptor->max_burst);
-	printf("                    Attributes ........ 0x%02x\n",
-		descriptor->attributes);
+	printf("                    MaxBurst .......... 0x%02x\n", descriptor->max_burst);
+	printf("                    Attributes ........ 0x%02x\n", descriptor->attributes);
 	printf("                    Bytes per Interval  0x%02x\n",
+		descriptor->bytes_per_interval);
+}
+
+
+void
+DumpIsochronousEndpointSSCompanionDescriptor(
+	const usb_isochronous_endpoint_ss_companion_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x Endpoint SuperSpeed Companion\n",
+		descriptor->descriptor_type);
+	printf("                    MaxBurst .......... 0x%02x\n", descriptor->max_burst);
+	printf("                    Attributes ........ 0x%02x\n", descriptor->attributes);
+	printf("                    Bytes per Interval  0x%08" B_PRIx32 "\n",
 		descriptor->bytes_per_interval);
 }
 
@@ -58,6 +69,12 @@ DumpDescriptor(const usb_generic_descriptor* descriptor, const BUSBInterface* in
 {
 	if (descriptor->descriptor_type == USB_DESCRIPTOR_ENDPOINT_SS_COMPANION) {
 		DumpEndpointSSCompanionDescriptor((const usb_endpoint_ss_companion_descriptor*)descriptor);
+		return;
+	}
+
+	if (descriptor->descriptor_type == USB_DESCRIPTOR_ISOCHRONOUS_ENDPOINT_SS_COMPANION) {
+		DumpIsochronousEndpointSSCompanionDescriptor(
+			(const usb_isochronous_endpoint_ss_companion_descriptor*)descriptor);
 		return;
 	}
 
@@ -202,44 +219,8 @@ DumpInfo(BUSBDevice& device, bool verbose)
 		DumpConfiguration(device.ConfigurationAt(i));
 	}
 
-	if (device.Class() != 0x09)
-		return;
-
-	usb_hub_descriptor hubDescriptor;
-	uint8 descriptorType = version >= 0x0300 ? USB_DESCRIPTOR_HUB_SS : USB_DESCRIPTOR_HUB;
-	size_t size = device.GetDescriptor(descriptorType, 0, 0,
-		(void*)&hubDescriptor, sizeof(usb_hub_descriptor));
-	if (size == sizeof(usb_hub_descriptor)) {
-		printf("    Hub ports count ........ %d\n", hubDescriptor.num_ports);
-		printf("    Hub Controller Current . %dmA\n", hubDescriptor.max_power);
-
-		for (int index = 1; index <= hubDescriptor.num_ports; index++) {
-			usb_port_status portStatus;
-			size_t actualLength = device.ControlTransfer(USB_REQTYPE_CLASS
-				| USB_REQTYPE_OTHER_IN, USB_REQUEST_GET_STATUS, 0,
-				index, sizeof(portStatus), (void*)&portStatus);
-			if (actualLength != sizeof(portStatus))
-				continue;
-			const char* padding;
-			if (index >= 100)
-				padding = "....";
-			else if (index >= 10)
-				padding = ".....";
-			else
-				padding = "......";
-			// TODO handle SS descriptors correctly
-			printf("      Port %d status %s %04x.%04x%s%s%s%s%s%s%s%s\n",
-				index, padding, portStatus.status, portStatus.change,
-				portStatus.status & PORT_STATUS_CONNECTION ? " Connect": "",
-				portStatus.status & PORT_STATUS_ENABLE ? " Enable": "",
-				portStatus.status & PORT_STATUS_SUSPEND ? " Suspend": "",
-				portStatus.status & PORT_STATUS_OVER_CURRENT ? " Overcurrent": "",
-				portStatus.status & PORT_STATUS_RESET ? " Reset": "",
-				portStatus.status & PORT_STATUS_POWER ? " Power": "",
-				portStatus.status & PORT_STATUS_TEST ? " Test": "",
-				portStatus.status & PORT_STATUS_INDICATOR ? " Indicator": "");
-		}
-	}
+	if (device.IsHub())
+		DumpHubDescriptor(device);
 }
 
 

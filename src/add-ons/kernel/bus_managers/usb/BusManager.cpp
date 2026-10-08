@@ -203,7 +203,7 @@ BusManager::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	TRACE("\tmax_packet_size_0:...%d\n", deviceDescriptor.max_packet_size_0);
 
 	// Create a new instance based on the type (Hub or Device)
-	if (deviceDescriptor.device_class == 0x09) {
+	if (deviceDescriptor.device_class == USB_HUB_DEVICE_CLASS) {
 		TRACE("creating new hub\n");
 		Hub *hub = new(std::nothrow) Hub(parent, hubAddress, hubPort,
 			deviceDescriptor, deviceAddress, speed, parent->Depth() + 1);

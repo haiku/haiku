@@ -53,7 +53,7 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 		status_t status;
 		if (depth > 0) {
 			status = DefaultPipe()->SendRequest(USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_CLASS,
-				USB_REQUEST_SS_SET_HUB_DEPTH, depth - 1, 0, 0, NULL, 0, NULL);
+				USB_REQUEST_SET_HUB_DEPTH, depth - 1, 0, 0, NULL, 0, NULL);
 			if (status < B_OK) {
 				TRACE_ERROR("error setting hub depth %s\n", strerror(status));
 				return;
