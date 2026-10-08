@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku Inc. All rights reserved.
+ * Copyright 2006-2026, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,11 +26,11 @@
 #endif
 
 
-PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
-	size_t minSize, size_t maxSize, uint32 minCountPerBlock)
-	:	fOverhead(0),
-		fStatus(B_NO_INIT),
-		fMemoryWaitersCount(0)
+PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char* name, size_t minSize, size_t maxSize,
+	uint32 minCountPerBlock)
+	:
+	fOverhead(0),
+	fStatus(B_NO_INIT)
 {
 	fName = strdup(name);
 	mutex_init_etc(&fLock, fName, MUTEX_FLAG_CLONE_NAME);
@@ -199,24 +199,20 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 			}
 		}
 
-		// no slot found, we need to wait
+		// no slot found, we need to wait some being Deallocate()'d
 
 		ConditionVariableEntry entry;
 		fNoMemoryCondition.Add(&entry);
-		fMemoryWaitersCount++;
 
 		locker.Unlock();
 
-		TRACE_ERROR(("PMA: found no free slot to store %ld bytes, waiting\n",
-			size));
+		TRACE_ERROR(("PMA: found no free slot to store %ld bytes, waiting\n", size));
 
 		if (entry.Wait(B_RELATIVE_TIMEOUT, 1 * 1000 * 1000) == B_TIMED_OUT)
 			break;
 
 		if (!locker.Lock())
 			return B_ERROR;
-
-		fMemoryWaitersCount--;
 	} while (system_time() < limit);
 
 	TRACE_ERROR(("PMA: timed out waiting for a free slot, giving up\n"));
@@ -265,14 +261,15 @@ PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 	}
 
 	TRACE(("PMA: will use array %ld (index: %ld) to deallocate %ld bytes\n", arrayToUse, index, size));
+
+	MutexLocker locker(&fLock);
+	if (!locker.IsLocked())
+		return B_ERROR;
+
 	if (fArray[arrayToUse][index] == 0) {
 		TRACE_ERROR(("PMA: address was not allocated!\n"));
 		return B_BAD_VALUE;
 	}
-
-	MutexLocker _(&fLock);
-	if (!_.IsLocked())
-		return B_ERROR;
 
 	// clear upwards to the smallest block
 	uint32 fillSize = 1;
@@ -293,8 +290,7 @@ PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 		arrayIndex >>= 1;
 	}
 
-	if (fMemoryWaitersCount > 0)
-		fNoMemoryCondition.NotifyAll();
+	fNoMemoryCondition.NotifyAll();
 
 	return B_OK;
 }
