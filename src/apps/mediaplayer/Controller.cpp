@@ -626,6 +626,9 @@ Controller::Stop()
 
 	BAutolock _(this);
 
+	if (InitCheck() != B_OK)
+		return;
+
 	StopPlaying();
 	SetPosition(0.0);
 

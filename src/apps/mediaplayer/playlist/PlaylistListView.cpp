@@ -458,6 +458,8 @@ PlaylistListView::SkipForward()
 void
 PlaylistListView::_Wind(bigtime_t howMuch, int64 frames)
 {
+	if (fController->InitCheck() != B_OK)
+		return;
 	if (!fController->Lock())
 		return;
 
