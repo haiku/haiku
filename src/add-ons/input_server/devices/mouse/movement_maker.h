@@ -84,6 +84,7 @@ private:
 									mouse_movement *movement);
 	inline	bool				_CheckScrollingToMovement(const touchpad_movement *event,
 									mouse_movement *movement);
+	inline	void				_CheckTapStarted(const touchpad_movement *event);
 
 
 			bool				fMovementStarted;
@@ -93,6 +94,7 @@ private:
 			int32				fTapDeltaX;
 			int32				fTapDeltaY;
 			int32				fTapClicks;
+			int32				fTapFingers;
 			bool				fTapdragStarted;
 
 			bool				fValidEdgeMotion;

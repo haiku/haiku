@@ -347,10 +347,18 @@ TouchpadMovement::EventToMovement(const touchpad_movement* _event, mouse_movemen
 		}
 	}
 
+	if (fTapStarted) {
+		if (fTapFingers < 2 && two_fingers(event))
+			fTapFingers = 2;
+		else if (fTapFingers < 3 && three_fingers(event))
+			fTapFingers = 3;
+	}
+
 	if (event->buttons || two_or_more_fingers(event)) {
 		fTapClicks = 0;
 		fTapdragStarted = false;
-		fTapStarted = false;
+		if (event->buttons)
+			fTapStarted = false;
 		if ((fSettings.edge_motion
 			& (B_EDGE_MOTION_ON_BUTTON_CLICK_MOVE | B_EDGE_MOTION_ON_BUTTON_CLICK_DRAG)) != 0)
 			fValidEdgeMotion = false;
@@ -580,10 +588,17 @@ TouchpadMovement::_NoTouchToMovement(const touchpad_movement *event,
 			fTapClicks = 0;
 			fDoubleClick = true;
 		} else {
-			buttons = kLeftButton;
+			if (fTapFingers == 2) {
+				buttons = kRightButton;
+			} else if (fTapFingers == 3) {
+				buttons = kMiddleButton;
+			} else {
+				buttons = kLeftButton;
+				fTapdragStarted = true;
+			}
 			fTapStarted = false;
-			fTapdragStarted = true;
 			fDoubleClick = false;
+			fTapFingers = 0;
 		}
 	}
 
@@ -598,7 +613,6 @@ TouchpadMovement::_MoveToMovement(const touchpad_movement *event, mouse_movement
 	CALLED();
 
 	bool isStartOfMovement = false;
-	float pressure = 0;
 
 	TRACE("TouchpadMovement: movement event\n");
 	if (!fMovementStarted) {
@@ -632,20 +646,8 @@ TouchpadMovement::_MoveToMovement(const touchpad_movement *event, mouse_movement
 		movement->buttons = event->buttons;
 	}
 
-	// use only a fraction of pressure range, the max pressure seems to be
-	// to high
-	pressure = 20 * (event->zPressure - fSpecs.minPressure)
-		/ (fSpecs.realMaxPressure - fSpecs.minPressure);
-	if (!fTapStarted
-		&& isStartOfMovement
-		&& fSettings.tapgesture_sensibility > 0.
-		&& fSettings.tapgesture_sensibility > (20 - pressure)) {
-		TRACE("TouchpadMovement: tap started\n");
-		fTapStarted = true;
-		fTapTime = system_time();
-		fTapDeltaX = 0;
-		fTapDeltaY = 0;
-	}
+	if (isStartOfMovement)
+		_CheckTapStarted(event);
 
 	_UpdateButtons(movement);
 }
@@ -675,14 +677,28 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 			|| fSettings.scroll_rightrange > 0.999999) {
 		isSideScrollingV = true;
 	}
+
 	if ((fSpecs.areaStartY + fAreaHeight * fSettings.scroll_bottomrange
 				> event->yPosition && !fMovementStarted
 			&& fSettings.scroll_bottomrange > 0.000001)
 				|| fSettings.scroll_bottomrange > 0.999999) {
 		isSideScrollingH = true;
 	}
+
+	if (!isSideScrollingV && !isSideScrollingH) {
+		if (!two_or_more_fingers(event))
+			return false;
+
+		if (!fMovementStarted) {
+			fMovementStarted = true;
+			StartNewMovment();
+			_CheckTapStarted(event);
+		}
+	}
+
 	bool isTwoFingerScrolling = two_fingers(event)
 		&& fSettings.scroll_twofinger;
+
 	if (isTwoFingerScrolling) {
 		// two finger scrolling is enabled
 		isSideScrollingV = true;
@@ -691,19 +707,16 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 
 	if (!isSideScrollingV && !isSideScrollingH) {
 		fScrollingStarted = false;
-		return false;
+		return true;
 	}
 
 	TRACE("TouchpadMovement: scroll event\n");
 
-	fTapStarted = false;
-	fTapClicks = 0;
-	fTapdragStarted = false;
-	fValidEdgeMotion = false;
 	if (!fScrollingStarted) {
 		fScrollingStarted = true;
 		StartNewMovment();
 	}
+
 	GetScrolling(event->xPosition, event->yPosition, isTwoFingerScrolling
 			? fSettings.scroll_twofinger_natural_scrolling
 			: fSettings.scroll_reverse);
@@ -715,7 +728,39 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 	else if (isSideScrollingH && !isSideScrollingV)
 		movement->wheel_ydelta = 0;
 
+	if (movement->wheel_xdelta != 0 || movement->wheel_ydelta != 0) {
+		fTapStarted = false;
+		fTapClicks = 0;
+		fTapdragStarted = false;
+		fValidEdgeMotion = false;
+	}
+
 	fButtonsState = movement->buttons;
 
 	return true;
+}
+
+
+void
+TouchpadMovement::_CheckTapStarted(const touchpad_movement *event)
+{
+	// use only a fraction of pressure range, the max pressure seems to be
+	// to high
+	float pressure = 20 * (event->zPressure - fSpecs.minPressure)
+		/ (fSpecs.realMaxPressure - fSpecs.minPressure);
+	if (!fTapStarted
+		&& fSettings.tapgesture_sensibility > 0.
+		&& fSettings.tapgesture_sensibility > (20 - pressure)) {
+		TRACE("TouchpadMovement: tap started\n");
+		fTapStarted = true;
+		fTapTime = system_time();
+		fTapDeltaX = 0;
+		fTapDeltaY = 0;
+		fTapFingers = 0;
+
+		if (two_fingers(event))
+			fTapFingers = 2;
+		else if (three_fingers(event))
+			fTapFingers = 3;
+	}
 }
