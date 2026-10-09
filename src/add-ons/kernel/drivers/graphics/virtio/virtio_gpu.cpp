@@ -218,7 +218,11 @@ virtio_gpu_create_2d(virtio_gpu_driver_info* info, int resourceId, int width, in
 
 	resource.hdr.type = VIRTIO_GPU_CMD_RESOURCE_CREATE_2D;
 	resource.resource_id = resourceId;
+#if __HAIKU_BIG_ENDIAN
+	resource.format = VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM;
+#else
 	resource.format = VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM;
+#endif
 	resource.width = width;
 	resource.height = height;
 
