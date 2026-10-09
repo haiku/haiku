@@ -494,7 +494,7 @@ void
 Settings::VSWrite(const char* format, va_list arg)
 {
 	char buffer[2048];
-	vsprintf(buffer, format, arg);
+	vsnprintf(buffer, sizeof buffer, format, arg);
 	ASSERT(fCurrentSettings && fCurrentSettings->InitCheck() == B_OK);
 	fCurrentSettings->Write(buffer, strlen(buffer));
 }
