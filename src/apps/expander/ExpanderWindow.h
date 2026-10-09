@@ -57,6 +57,7 @@ private:
 			void				StartListing();
 			void				StopListing();
 			bool				ValidateDest();
+			void				UpdateControls();
 
 private:
 			BFilePanel*			fSourcePanel;
@@ -66,6 +67,8 @@ private:
 			entry_ref			fSourceRef;
 			entry_ref			fDestRef;
 			bool				fSourceChanged;
+			bool				fSourceValid;
+			bool				fDestValid;
 
 			BButton*			fSourceButton;
 			BButton*			fDestButton;
