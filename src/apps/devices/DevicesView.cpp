@@ -365,10 +365,24 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			case B_UINT64_TYPE:
 				attrString << attr.value.ui64;
 				break;
+			case B_RAW_TYPE:
+			{
+				const uint8* bytes = (const uint8*)attr.value.raw.data;
+				for (size_t i = 0; i < attr.value.raw.length; i++) {
+					char hex[4];
+					snprintf(hex, sizeof(hex), "%02x ", bytes[i]);
+					attrString << hex;
+				}
+				attrString.Trim();
+				break;
+			}
 			default:
-				attrString << "Raw data";
+				attrString << "Unknown type";
 		}
 		attributes.push_back(Attribute(attr.name, attrString));
+
+		attr.value.raw.data = data;
+		attr.value.raw.length = sizeof(data);
 	}
 
 	// Determine what type of device it is and create it

@@ -469,12 +469,21 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 					else
 						attrInfo.value.string[0] = '\0';
 					break;
-				/*case B_RAW_TYPE:
-					if (attr.value.raw.length > attr_info->attr.value.raw.length)
-						attr.value.raw.length = attr_info->attr.value.raw.length;
-					user_memcpy(attr.value.raw.data, attr_info->attr.value.raw.data,
-						attr.value.raw.length);
-					break;*/
+				case B_RAW_TYPE:
+				{
+					size_t userLength = attrInfo.value.raw.length;
+					attrInfo.value.raw.length = min_c(userLength, attr->value.raw.length);
+					if (attrInfo.value.raw.length > 0) {
+						if (!IS_USER_ADDRESS(attrInfo.value.raw.data))
+							return B_BAD_ADDRESS;
+						if (user_memcpy(attrInfo.value.raw.data, attr->value.raw.data,
+								attrInfo.value.raw.length)
+							< B_OK) {
+							return B_BAD_ADDRESS;
+						}
+					}
+					break;
+				}
 			}
 
 			// copy back to user space

@@ -107,8 +107,16 @@ dump_attribute(struct device_attr_info *attr, int32 level)
 			printf("uint64 : %" B_PRIu64 " (%#" B_PRIx64 ")", attr->value.ui64,
 				attr->value.ui64);
 			break;
+		case B_RAW_TYPE:
+		{
+			printf("raw (%zu bytes) : ", attr->value.raw.length);
+			const uint8* bytes = (const uint8*)attr->value.raw.data;
+			for (size_t i = 0; i < attr->value.raw.length; i++)
+				printf("%02x ", bytes[i]);
+			break;
+		}
 		default:
-			printf("raw data");
+			printf("unknown type");
 	}
 	printf("\n");
 }
@@ -128,6 +136,9 @@ dump_device(device_node_cookie *node, uint8 level)
 	printf("(%d)\n", level);
 	while (dm_get_next_attr(&attr) == B_OK) {
 		dump_attribute(&attr, level);
+
+		attr.value.raw.data = data;
+		attr.value.raw.length = sizeof(data);
 	}
 }
 
