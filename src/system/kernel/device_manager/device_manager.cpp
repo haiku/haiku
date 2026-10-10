@@ -144,6 +144,8 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			bool			IsProbed() const { return fLastUpdateCycle != 0; }
 			uint32			Flags() const { return fFlags; }
 
+			uint32			ID() const { return fID; }
+
 			void			Acquire();
 			bool			Release();
 
@@ -186,6 +188,7 @@ private:
 	uint32					fFlags;
 	float					fSupportsParent;
 	uint32					fLastUpdateCycle;
+	uint32					fID;
 
 	const char*				fModuleName;
 
@@ -210,7 +213,28 @@ enum node_flags {
 
 static device_node *sRootNode;
 static recursive_lock sLock;
+static int32 sNextNodeID = 1;
 static const char* sGenericContextPath;
+
+
+static device_node*
+find_node(uint32 id, device_node* parent = sRootNode)
+{
+	if (id == 0 || parent == NULL)
+		return NULL;
+
+	if (parent->ID() == id)
+		return parent;
+
+	NodeList::ConstIterator iterator = parent->Children().GetIterator();
+	while (iterator.HasNext()) {
+		device_node* node = find_node(id, iterator.Next());
+		if (node != NULL)
+			return node;
+	}
+
+	return NULL;
+}
 
 
 //	#pragma mark -
@@ -341,9 +365,8 @@ static status_t
 control_device_manager(const char* subsystem, uint32 function, void* buffer,
 	size_t bufferSize)
 {
-	// TODO: this function passes pointers to userland, and uses pointers
-	// to device nodes that came from userland - this is completely unsafe
-	// and should be changed.
+	RecursiveLocker _(sLock);
+
 	switch (function) {
 		case DM_GET_ROOT:
 		{
@@ -352,7 +375,11 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 				return B_BAD_ADDRESS;
 			if (bufferSize != sizeof(device_node_cookie))
 				return B_BAD_VALUE;
-			cookie = (device_node_cookie)sRootNode;
+
+			if (sRootNode == NULL)
+				return B_ENTRY_NOT_FOUND;
+
+			cookie = (device_node_cookie)sRootNode->ID();
 
 			// copy back to user space
 			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
@@ -369,14 +396,17 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&cookie, buffer, sizeof(device_node_cookie)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			device_node* node = (device_node*)cookie;
+			device_node* node = find_node((uint32)cookie);
+			if (node == NULL)
+				return B_ENTRY_NOT_FOUND;
+
 			NodeList::ConstIterator iterator = node->Children().GetIterator();
 
 			if (!iterator.HasNext()) {
 				return B_ENTRY_NOT_FOUND;
 			}
 			node = iterator.Next();
-			cookie = (device_node_cookie)node;
+			cookie = (device_node_cookie)node->ID();
 
 			// copy back to user space
 			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
@@ -393,8 +423,8 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&cookie, buffer, sizeof(device_node_cookie)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			device_node* last = (device_node*)cookie;
-			if (!last->Parent())
+			device_node* last = find_node((uint32)cookie);
+			if (last == NULL || last->Parent() == NULL)
 				return B_ENTRY_NOT_FOUND;
 
 			NodeList::ConstIterator iterator
@@ -411,7 +441,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (!iterator.HasNext())
 				return B_ENTRY_NOT_FOUND;
 			device_node* node = iterator.Next();
-			cookie = (device_node_cookie)node;
+			cookie = (device_node_cookie)node->ID();
 
 			// copy back to user space
 			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
@@ -427,15 +457,15 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&attrInfo, buffer, sizeof(device_attr_info)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			device_node* node = (device_node*)attrInfo.node_cookie;
-			device_attr* last = (device_attr*)attrInfo.cookie;
-			AttributeList::Iterator iterator = node->Attributes().GetIterator();
-			// skip those we already traversed
-			while (iterator.HasNext() && last != NULL) {
-				device_attr* attr = iterator.Next();
+			device_node* node = find_node((uint32)attrInfo.node_cookie);
+			if (node == NULL)
+				return B_ENTRY_NOT_FOUND;
 
-				if (attr == last)
-					break;
+			AttributeList::Iterator iterator = node->Attributes().GetIterator();
+			uint32 index = 0;
+			while (iterator.HasNext() && index < attrInfo.cookie) {
+				iterator.Next();
+				index++;
 			}
 
 			if (!iterator.HasNext()) {
@@ -444,7 +474,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			}
 
 			device_attr* attr = iterator.Next();
-			attrInfo.cookie = (device_node_cookie)attr;
+			attrInfo.cookie++;
 			if (attr->name != NULL)
 				strlcpy(attrInfo.name, attr->name, 254);
 			else
@@ -500,9 +530,9 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&attrInfo, buffer, sizeof(device_attr_info)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			device_node* node = (device_node*)attrInfo.node_cookie;
+			device_node* node = find_node((uint32)attrInfo.node_cookie);
 			if (node == NULL)
-				return B_BAD_VALUE;
+				return B_ENTRY_NOT_FOUND;
 
 			const char* driverPath = NULL;
 			if (node->ModuleName() != NULL)
@@ -1297,6 +1327,9 @@ device_node::device_node(const char* moduleName, const device_attr* attrs)
 
 	get_attr_uint32(this, B_DEVICE_FLAGS, &fFlags, false);
 	fFlags &= NODE_FLAG_PUBLIC_MASK;
+
+	// Create ID
+	fID = atomic_add(&sNextNodeID, 1);
 }
 
 
