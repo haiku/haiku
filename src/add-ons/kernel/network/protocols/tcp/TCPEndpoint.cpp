@@ -484,13 +484,13 @@ TCPEndpoint::~TCPEndpoint()
 		put_endpoint_manager(fManager);
 	}
 
-	mutex_destroy(&fLock);
-
 	// we need to wait for all timers to return
 	gStackModule->wait_for_timer(&fRetransmitTimer);
 	gStackModule->wait_for_timer(&fPersistTimer);
 	gStackModule->wait_for_timer(&fDelayedAcknowledgeTimer);
 	gStackModule->wait_for_timer(&fTimeWaitTimer);
+
+	mutex_destroy(&fLock);
 
 	gDatalinkModule->put_route(Domain(), fRoute);
 }
