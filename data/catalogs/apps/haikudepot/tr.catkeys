@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2041052641
+1	turkish	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		Kurulum başarısız
 Package update error	MainWindow		Paket güncelleme hatası
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Tüm paketlerde arama yapmak için
 No screenshot available.	PackageInfoView		Kullanılabilir ekran görüntüsü yok
+Try installing anyway	MainWindow		Yine de kurmayı dene
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor…
 Reboot required	PackageManager		Yeniden başlatma gerekli
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		Yorum dili:
 The password has been incorrectly repeated.	UserLoginWindow		İkinci parola girişinde yanlış(lar) var.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Önceden [%Nickname%] kullanıcısına ait olan parola şu anda geçerli değil. Uygulamadan çıkış yapılacaktır; güncellenmiş parola ile yeniden giriş yapmanız gerekmektedir.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını görüntüle
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		%PackageName% paketini kurmak için %PackageBytesDescription% boş disk alanı gerekiyor; ancak yalnızca %FreeBytesDescription% kullanılabilir. Kurulum başarısız olacaktır.
 OK	ServerHelper		Tamam
 Reading repository data	LocalPkgDataLoadProcess		Depo bilgisi okunuyor…
 Native desktop packages only	MainWindow		Yalnızca Haiku’ya özel masaüstü paketleri
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		Aradığınızı bulamadınız mı?
 User creation error	UserLoginWindow		Kullanıcı oluşturma hatası
 You need to be logged into an account before you can rate packages.	MainWindow		Paketleri derecelendirmek için giriş yapmalısınız.
 Cleaning up…	ShuttingDownWindow		Toparlanıyor…
+Insufficient storage capacity	MainWindow		Yetersiz depolama sığası
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname%, çıkmadan önce durduruluyor veya çalışan işlemleri tamamlıyor.
 Repeat password:	UserLoginWindow		Parolayı yineleyin:

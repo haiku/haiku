@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2041052641
+1	swedish	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		Installationen misslyckades
 Package update error	MainWindow		Paketuppdateringsfel
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Klicka här
 No screenshot available.	PackageInfoView		Ingen skärmdump tillgänglig.
+Try installing anyway	MainWindow		Prova att installera ändå
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
 Reboot required	PackageManager		Omstart krävs
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		Kommentarspråk:
 The password has been incorrectly repeated.	UserLoginWindow		Lösenordet upprepades felaktigt.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Lösenordet som du tidigare skrev för användaren [%Nickname%] är för närvarande inte giltigt. Användaren kommer att loggas ut från den här applikationen och du bör logga in igen med ditt uppdaterade lösenord.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Se användningsvillkoren
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		Installation av paketet %PackageName% kräver %PackageBytesDescription% ledigt diskutrymme, men endast %FreeBytesDescription% finns tillgängligt. Installationen kan misslyckas.
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Läser repositoriedata
 Native desktop packages only	MainWindow		Endast inbyggda skrivbordspaket
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		Inga resultat?
 User creation error	UserLoginWindow		Användarskapande-fel
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
 Cleaning up…	ShuttingDownWindow		Städar upp…
+Insufficient storage capacity	MainWindow		Otillräcklig lagringskapacitet
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% stoppar eller slutför pågående åtgärder innan de avslutas.
 Repeat password:	UserLoginWindow		Repetera lösenord:

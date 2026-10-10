@@ -1,23 +1,23 @@
 1	romanian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# files}}
-Scanning %refName%	Scanner		Se scanează %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fișiere
-Size	Info Window		Dimensiune
-Rescan	Pie View		Rescanează
-Kind	Info Window		Fel
-file unavailable	Pie View		fișier indisponibil
-no supporting apps	Pie View		fără aplicații suport
 Path	Info Window		Cale
-Scan	Status View		Scanează
-Rescan	Status View		Rescanează
-file unavailable	Status View		fișier indisponibil
-Get info	Pie View		Obține informații
-DiskUsage	System name		DiskUsage
-Created	Info Window		Creat
-Modified	Info Window		Modificat
-Abort	Status View		Întrerupe
 Open with	Pie View		Deschide cu
-Open	Pie View		Deschide
+file unavailable	Pie View		fișier indisponibil
+DiskUsage	System name		DiskUsage
+file unavailable	Status View		fișier indisponibil
+Scanning %refName%	Scanner		Se scanează %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
+Size	Info Window		Dimensiune
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fișiere
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Scanează
+Abort	Status View		Întrerupe
+Open	Pie View		Deschide
+Rescan	Pie View		Rescanează
+no supporting apps	Pie View		fără aplicații suport
+Modified	Info Window		Modificat
+Rescan	Status View		Rescanează
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# files}}
+Created	Info Window		Creat
 Free on %refName%	Scanner		Liber pe %refName%
+Get info	Pie View		Obține informații
+Kind	Info Window		Fel

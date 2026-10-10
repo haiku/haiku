@@ -1,20 +1,20 @@
 1	lithuanian	x-vnd.Haiku-DiskUsage	4268917316
+Path	Info Window		Kelias
+Open with	Pie View		Atverti naudojant
+file unavailable	Pie View		failas nepasiekiamas
+DiskUsage	System name		Disko naudojimas
+file unavailable	Status View		failas nepasiekiamas
 Scanning %refName%	Scanner		Žvalgomas skirsnis „%refName%“
 Size	Info Window		Dydis
-Rescan	Pie View		Peržvalgyti
-Kind	Info Window		Tipas
-file unavailable	Pie View		failas nepasiekiamas
-no supporting apps	Pie View		palaikančių programų nėra
-Path	Info Window		Kelias
-Scan	Status View		Žvalgyti
-Rescan	Status View		Peržvalgyti
-file unavailable	Status View		failas nepasiekiamas
-Get info	Pie View		Savybės
-DiskUsage	System name		Disko naudojimas
-Created	Info Window		Sukurtas
-Modified	Info Window		Modifikuotas
-Abort	Status View		Nutraukti
-Open with	Pie View		Atverti naudojant
-Open	Pie View		Atverti
 %a, %d %b %Y, %r	Info Window		%a, %Y %b %d, %T
+Scan	Status View		Žvalgyti
+Abort	Status View		Nutraukti
+Open	Pie View		Atverti
+Rescan	Pie View		Peržvalgyti
+no supporting apps	Pie View		palaikančių programų nėra
+Modified	Info Window		Modifikuotas
+Rescan	Status View		Peržvalgyti
+Created	Info Window		Sukurtas
 Free on %refName%	Scanner		Laisva vieta skirsnyje „%refName%“
+Get info	Pie View		Savybės
+Kind	Info Window		Tipas

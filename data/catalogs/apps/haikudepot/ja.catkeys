@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2041052641
+1	japanese	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		インストール失敗
 Package update error	MainWindow		パッケージアップデートエラー
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	ここをクリック
 No screenshot available.	PackageInfoView		スクリーンショットは利用できません。
+Try installing anyway	MainWindow		とにかくインストールを試みる
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		パッケージのユーザー評価を取得中
 Reboot required	PackageManager		再起動が必要です
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		コメント言語:
 The password has been incorrectly repeated.	UserLoginWindow		パスワードが間違って再入力されています。
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		以前にユーザー [%Nickname%] に提供されたパスワードは現在期限切れです。ユーザーはこのアプリケーションをログアウトして、新しいパスワードで再ログインする必要があります。
 View the usage conditions	ToLatestUserUsageConditionsWindow		使用条件を見る
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		パッケージ%PackageName%のインストールのために%PackageBytesDescription% のディスク空き容量が必要です。しかし、%FreeBytesDescription%しか利用できません。インストールは失敗するかもしれません。
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		リポジトリのデータを読み込み中
 Native desktop packages only	MainWindow		ネイティブデスクトップパッケージのみ
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		見つかりませんか?
 User creation error	UserLoginWindow		ユーザー作成エラー
 You need to be logged into an account before you can rate packages.	MainWindow		パッケージの評価前にアカウントにログインする必要があります。
 Cleaning up…	ShuttingDownWindow		クリーンアップしています…
+Insufficient storage capacity	MainWindow		不十分なストレージ容量
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% は終了前に停止しているか、オペレーションを完了しています。
 Repeat password:	UserLoginWindow		パスワードの再入力:

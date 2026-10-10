@@ -1,20 +1,20 @@
 1	belarusian	x-vnd.Haiku-DiskUsage	4268917316
+Path	Info Window		Пуць
+Open with	Pie View		Адкрыць з дапамогай
+file unavailable	Pie View		файл недаступны
+DiskUsage	System name		Статыстыка дыскаў
+file unavailable	Status View		файл недаступны
 Scanning %refName%	Scanner		Сканаванне %refName%
 Size	Info Window		Памер
-Rescan	Pie View		Перасканаваць
-Kind	Info Window		Тып
-file unavailable	Pie View		файл недаступны
-no supporting apps	Pie View		няма падтрымліваючых праграм
-Path	Info Window		Пуць
-Scan	Status View		Скан
-Rescan	Status View		Перасканаваць
-file unavailable	Status View		файл недаступны
-Get info	Pie View		Узяць інфу
-DiskUsage	System name		Статыстыка дыскаў
-Created	Info Window		Створаны
-Modified	Info Window		Мадыфікаваны
-Abort	Status View		Перарваць
-Open with	Pie View		Адкрыць з дапамогай
-Open	Pie View		Адкрыць
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Скан
+Abort	Status View		Перарваць
+Open	Pie View		Адкрыць
+Rescan	Pie View		Перасканаваць
+no supporting apps	Pie View		няма падтрымліваючых праграм
+Modified	Info Window		Мадыфікаваны
+Rescan	Status View		Перасканаваць
+Created	Info Window		Створаны
 Free on %refName%	Scanner		Вольна на %refName%
+Get info	Pie View		Узяць інфу
+Kind	Info Window		Тып

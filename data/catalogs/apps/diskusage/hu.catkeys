@@ -1,23 +1,23 @@
 1	hungarian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% {0, plural, one{# fájl} other{# fájl}}
-Scanning %refName%	Scanner		%refName% elemzése
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fájl
-Size	Info Window		Méret
-Rescan	Pie View		Újraelemzés
-Kind	Info Window		Típus
-file unavailable	Pie View		fájl nem elérhető
-no supporting apps	Pie View		nincs használható program
 Path	Info Window		Útvonal
-Scan	Status View		Elemzés
-Rescan	Status View		Újraelemzés
-file unavailable	Status View		fájl nem elérhető
-Get info	Pie View		Információ
-DiskUsage	System name		Lemezhasználat
-Created	Info Window		Létrehozva
-Modified	Info Window		Módosítva
-Abort	Status View		Megszakítás
 Open with	Pie View		Megnyitás ezzel
-Open	Pie View		Megnyitás
+file unavailable	Pie View		fájl nem elérhető
+DiskUsage	System name		Lemezhasználat
+file unavailable	Status View		fájl nem elérhető
+Scanning %refName%	Scanner		%refName% elemzése
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fájl} other{# fájl}}
+Size	Info Window		Méret
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fájl
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Elemzés
+Abort	Status View		Megszakítás
+Open	Pie View		Megnyitás
+Rescan	Pie View		Újraelemzés
+no supporting apps	Pie View		nincs használható program
+Modified	Info Window		Módosítva
+Rescan	Status View		Újraelemzés
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% {0, plural, one{# fájl} other{# fájl}}
+Created	Info Window		Létrehozva
 Free on %refName%	Scanner		%refName% szabad területe
+Get info	Pie View		Információ
+Kind	Info Window		Típus

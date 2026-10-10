@@ -1,23 +1,23 @@
 1	portuguese (brazil)	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% em {0, plural, one{# arquivo} other{# arquivos}}
-Scanning %refName%	Scanner		Analisando %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d arquivos
-Size	Info Window		Tamanho
-Rescan	Pie View		Re-analisar
-Kind	Info Window		Tipo
-file unavailable	Pie View		arquivo não disponível
-no supporting apps	Pie View		sem suporte a apps
 Path	Info Window		Caminho
-Scan	Status View		Analisar
-Rescan	Status View		Re-analisar
-file unavailable	Status View		arquivo não disponível
-Get info	Pie View		Obter informação
-DiskUsage	System name		Uso de Disco
-Created	Info Window		Criado
-Modified	Info Window		Modificado
-Abort	Status View		Cancelar
 Open with	Pie View		Abrir com
-Open	Pie View		Abrir
+file unavailable	Pie View		arquivo não disponível
+DiskUsage	System name		Uso de Disco
+file unavailable	Status View		arquivo não disponível
+Scanning %refName%	Scanner		Analisando %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# arquivo} other{# arquivos}}
+Size	Info Window		Tamanho
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d arquivos
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Analisar
+Abort	Status View		Cancelar
+Open	Pie View		Abrir
+Rescan	Pie View		Re-analisar
+no supporting apps	Pie View		sem suporte a apps
+Modified	Info Window		Modificado
+Rescan	Status View		Re-analisar
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% em {0, plural, one{# arquivo} other{# arquivos}}
+Created	Info Window		Criado
 Free on %refName%	Scanner		Livre em %refName%
+Get info	Pie View		Obter informação
+Kind	Info Window		Tipo

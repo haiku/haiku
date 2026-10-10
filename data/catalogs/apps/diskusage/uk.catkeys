@@ -1,23 +1,23 @@
 1	ukrainian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% у {0, plural, one{# файлі} few{# файлах} other{# файлах}}
-Scanning %refName%	Scanner		Сканування %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлів
-Size	Info Window		Розмір
-Rescan	Pie View		Пересканувати
-Kind	Info Window		Різновид
-file unavailable	Pie View		файл недоступний
-no supporting apps	Pie View		відсутні підтримувані програми
 Path	Info Window		Шлях
-Scan	Status View		Сканувати
-Rescan	Status View		Пересканувати
-file unavailable	Status View		файл недоступний
-Get info	Pie View		Дивитись інфо
-DiskUsage	System name		DiskUsage
-Created	Info Window		Створено
-Modified	Info Window		Змінено
-Abort	Status View		Перервати
 Open with	Pie View		Відкрити в
-Open	Pie View		Відкрити
+file unavailable	Pie View		файл недоступний
+DiskUsage	System name		DiskUsage
+file unavailable	Status View		файл недоступний
+Scanning %refName%	Scanner		Сканування %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# файл} few{# файли} other{# файлів}}
+Size	Info Window		Розмір
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлів
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Сканувати
+Abort	Status View		Перервати
+Open	Pie View		Відкрити
+Rescan	Pie View		Пересканувати
+no supporting apps	Pie View		відсутні підтримувані програми
+Modified	Info Window		Змінено
+Rescan	Status View		Пересканувати
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% у {0, plural, one{# файлі} few{# файлах} other{# файлах}}
+Created	Info Window		Створено
 Free on %refName%	Scanner		Вільно на %refName%
+Get info	Pie View		Дивитись інфо
+Kind	Info Window		Різновид

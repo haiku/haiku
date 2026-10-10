@@ -1,23 +1,23 @@
 1	swedish	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# fil} other{# filer}}
-Scanning %refName%	Scanner		Skannar %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
-Size	Info Window		Storlek
-Rescan	Pie View		Skanna om
-Kind	Info Window		Typ
-file unavailable	Pie View		fil ej tillgänglig
-no supporting apps	Pie View		applikationsstöd saknas
 Path	Info Window		Sökväg
-Scan	Status View		Skanna
-Rescan	Status View		Skanna om
-file unavailable	Status View		fil ej tillgänglig
-Get info	Pie View		Hämta information
-DiskUsage	System name		DiskAnvändning
-Created	Info Window		Skapad
-Modified	Info Window		Modifierad
-Abort	Status View		Avbryt
 Open with	Pie View		Öppna med
-Open	Pie View		Öppna
+file unavailable	Pie View		fil ej tillgänglig
+DiskUsage	System name		DiskAnvändning
+file unavailable	Status View		fil ej tillgänglig
+Scanning %refName%	Scanner		Skannar %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fil} other{# filer}}
+Size	Info Window		Storlek
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d filer
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Skanna
+Abort	Status View		Avbryt
+Open	Pie View		Öppna
+Rescan	Pie View		Skanna om
+no supporting apps	Pie View		applikationsstöd saknas
+Modified	Info Window		Modifierad
+Rescan	Status View		Skanna om
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# fil} other{# filer}}
+Created	Info Window		Skapad
 Free on %refName%	Scanner		Ledigt på %refName%
+Get info	Pie View		Hämta information
+Kind	Info Window		Typ

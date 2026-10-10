@@ -1,23 +1,23 @@
 1	french	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% dans {0, plural, one{# fichier} other{# fichiers}}
-Scanning %refName%	Scanner		Examen de %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fichiers
-Size	Info Window		Taille
-Rescan	Pie View		Réexaminer
-Kind	Info Window		Nature
-file unavailable	Pie View		fichier indisponible
-no supporting apps	Pie View		aucun support applicatif
 Path	Info Window		Chemin
-Scan	Status View		Examiner
-Rescan	Status View		Réexaminer
-file unavailable	Status View		fichier indisponible
-Get info	Pie View		Collecter les informations
-DiskUsage	System name		Utilisation des disques
-Created	Info Window		Créé
-Modified	Info Window		Modifié
-Abort	Status View		Abandonner
 Open with	Pie View		Ouvrir avec
-Open	Pie View		Ouvrir
+file unavailable	Pie View		fichier indisponible
+DiskUsage	System name		Utilisation des disques
+file unavailable	Status View		fichier indisponible
+Scanning %refName%	Scanner		Examen de %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fichier} other{# fichiers}}
+Size	Info Window		Taille
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fichiers
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %R
+Scan	Status View		Examiner
+Abort	Status View		Abandonner
+Open	Pie View		Ouvrir
+Rescan	Pie View		Réexaminer
+no supporting apps	Pie View		aucun support applicatif
+Modified	Info Window		Modifié
+Rescan	Status View		Réexaminer
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% dans {0, plural, one{# fichier} other{# fichiers}}
+Created	Info Window		Créé
 Free on %refName%	Scanner		Libre sur %refName%
+Get info	Pie View		Collecter les informations
+Kind	Info Window		Nature

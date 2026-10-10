@@ -1,23 +1,23 @@
 1	english	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% 於 {0, plural, one{# 檔案} other{# 檔案}}
-Scanning %refName%	Scanner		掃描 %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d 檔案
-Size	Info Window		尺寸
-Rescan	Pie View		重新掃描
-Kind	Info Window		種類
-file unavailable	Pie View		檔案不可用
-no supporting apps	Pie View		沒有支援的應用程式
 Path	Info Window		路徑
-Scan	Status View		掃描
-Rescan	Status View		重新掃描
-file unavailable	Status View		檔案不可用
-Get info	Pie View		獲取資訊
-DiskUsage	System name		磁碟使用情況
-Created	Info Window		創建
-Modified	Info Window		修改
-Abort	Status View		中止
 Open with	Pie View		開啓以
-Open	Pie View		開啓
+file unavailable	Pie View		檔案不可用
+DiskUsage	System name		磁碟使用情況
+file unavailable	Status View		檔案不可用
+Scanning %refName%	Scanner		掃描 %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# 檔案} other{# 檔案}}
+Size	Info Window		尺寸
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d 檔案
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		掃描
+Abort	Status View		中止
+Open	Pie View		開啓
+Rescan	Pie View		重新掃描
+no supporting apps	Pie View		沒有支援的應用程式
+Modified	Info Window		修改
+Rescan	Status View		重新掃描
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% 於 {0, plural, one{# 檔案} other{# 檔案}}
+Created	Info Window		創建
 Free on %refName%	Scanner		空間於 %refName%
+Get info	Pie View		獲取資訊
+Kind	Info Window		種類

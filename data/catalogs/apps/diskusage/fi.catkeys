@@ -1,23 +1,23 @@
 1	finnish	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% {0, plural, one{# tiedostossa} other{# tiedostoissa}
-Scanning %refName%	Scanner		Tutkitaan %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d tiedostoa
-Size	Info Window		Koko
-Rescan	Pie View		Tutki uudelleen
-Kind	Info Window		Tyyppi
-file unavailable	Pie View		tiedosto ei ole saatavilla
-no supporting apps	Pie View		ei tukevia sovelluksia
 Path	Info Window		Polku
-Scan	Status View		Tutki
-Rescan	Status View		Tutki uudelleen
-file unavailable	Status View		tiedosto ei ole saatavilla
-Get info	Pie View		Hae tiedot
-DiskUsage	System name		Levyasemakäyttö
-Created	Info Window		Luotu
-Modified	Info Window		Muokattu
-Abort	Status View		Keskeytä
 Open with	Pie View		Avaa sovelluksella
-Open	Pie View		Avaa
+file unavailable	Pie View		tiedosto ei ole saatavilla
+DiskUsage	System name		Levyasemakäyttö
+file unavailable	Status View		tiedosto ei ole saatavilla
+Scanning %refName%	Scanner		Tutkitaan %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, monikko, one{# tiedosto} other{# tiedostoa}}
+Size	Info Window		Koko
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d tiedostoa
 %a, %d %b %Y, %r	Info Window		%a, %d. %Bta %Y, %r
+Scan	Status View		Tutki
+Abort	Status View		Keskeytä
+Open	Pie View		Avaa
+Rescan	Pie View		Tutki uudelleen
+no supporting apps	Pie View		ei tukevia sovelluksia
+Modified	Info Window		Muokattu
+Rescan	Status View		Tutki uudelleen
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% {0, plural, one{# tiedostossa} other{# tiedostoissa}
+Created	Info Window		Luotu
 Free on %refName%	Scanner		Vapaata levyasemalla %refName%
+Get info	Pie View		Hae tiedot
+Kind	Info Window		Tyyppi

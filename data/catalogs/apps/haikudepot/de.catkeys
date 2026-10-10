@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2041052641
+1	german	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		Installation fehlgeschlagen
 Package update error	MainWindow		Fehler bei Paketaktualisierung
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Hier klicken
 No screenshot available.	PackageInfoView		Kein Screenshot verfügbar.
+Try installing anyway	MainWindow		Installation probieren
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
 Reboot required	PackageManager		Neustart erforderlich
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		Kommentarsprache:
 The password has been incorrectly repeated.	UserLoginWindow		Das Kennwort wurde falsch wiederholt.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Das für den Benutzer [%Nickname%] hinterlegte Kennwort ist ungültig. Der Benutzer wird daher von dieser Anwendung abgemeldet. Bitte erneut mit dem aktualisierten Kennwort anmelden.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen anzeigen
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		Für die Installation des Pakets %PackageName% werden %PackageBytesDescription% freier Speicherplatz benötigt. Die Installation wird wohl fehlschlagen, da nur %FreeBytesDescription% verfügbar sind.
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Einlesen von Paketquellendaten
 Native desktop packages only	MainWindow		Nur native Desktop Pakete
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		Keine Ergebnisse?
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
 Cleaning up…	ShuttingDownWindow		Aufräumarbeiten…
+Insufficient storage capacity	MainWindow		Ungenügende Speicherkapazität
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% schließt vor dem Beenden noch laufende Aufgaben ab.
 Repeat password:	UserLoginWindow		Kennwort wiederholen:

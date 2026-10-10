@@ -1,4 +1,5 @@
-1	japanese	x-vnd.Haiku-Expander	1987011430
+1	japanese	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		キャンセル
 Destination	ExpanderWindow		解凍先
 Other	ExpanderPreferences		その他
 Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
@@ -40,6 +41,7 @@ Expansion	ExpanderPreferences		解凍
 Set destination…	ExpanderMenu		解凍先の指定...
 Continue	ExpanderWindow		続ける
  is not supported	ExpanderWindow		はサポートされていません
+OK	PasswordAlert		OK
 Cancel	ExpanderPreferences		中止
 Use:	ExpanderPreferences		パスの指定:
 Destination folder	ExpanderPreferences		解凍先フォルダー

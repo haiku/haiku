@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2041052641
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		Error d'instal·lació
 Package update error	MainWindow		Error d'actualització de paquet
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Cliqueu aquí
 No screenshot available.	PackageInfoView		No hi ha cap captura de pantalla disponible.
+Try installing anyway	MainWindow		Intenta la instal·lació tanmateix
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		S'obtenen les valoracions dels usuaris per al paquet.
 Reboot required	PackageManager		Cal reiniciar
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		Llengua del comentari:
 The password has been incorrectly repeated.	UserLoginWindow		La contrasenya no s'ha repetit bé.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La contrasenya proporcionada prèviament per a l'usuari [%Nickname%] actualment no és vàlida. L'usuari quedarà fora d'aquesta aplicació i haureu de tornar a iniciar la sessió amb la contrasenya actualitzada.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Consulteu les condicions d'ús
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		La instal·lació del paquet %PackageName% requereix %PackageBytesDescription% d'espai lliure al disc, però només hi ha %FreeBytesDescription% disponibles. És possible que la instal·lació falli.
 OK	ServerHelper		D'acord
 Reading repository data	LocalPkgDataLoadProcess		Es llegeixen les dades del repositori.
 Native desktop packages only	MainWindow		Només paquets d'escriptori nadius
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		Cap resultat?
 User creation error	UserLoginWindow		Error de creació d'usuari
 You need to be logged into an account before you can rate packages.	MainWindow		Per poder valorar els paquets, heu d’iniciar sessió en un compte.
 Cleaning up…	ShuttingDownWindow		Es neteja...
+Insufficient storage capacity	MainWindow		Capacitat d'emmagatzematge insuficient
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% s'atura o completa les operacions en execució abans de tancar-se.
 Repeat password:	UserLoginWindow		Repetiu la contrasenya:

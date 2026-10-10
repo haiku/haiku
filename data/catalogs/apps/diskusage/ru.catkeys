@@ -1,23 +1,23 @@
 1	russian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% в {0, plural, one{# файле} few{# файлах} other{# файлах}}
-Scanning %refName%	Scanner		Сканируется раздел %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлов
-Size	Info Window		Размер
-Rescan	Pie View		Пересканировать
-Kind	Info Window		Тип
-file unavailable	Pie View		файл недоступен
-no supporting apps	Pie View		нет поддерживающих программ
 Path	Info Window		Путь
-Scan	Status View		Сканировать
-Rescan	Status View		Пересканировать
-file unavailable	Status View		файл недоступен
-Get info	Pie View		Информация
-DiskUsage	System name		Использование диска
-Created	Info Window		Создан
-Modified	Info Window		Изменен
-Abort	Status View		Прервать
 Open with	Pie View		Открыть в
-Open	Pie View		Открыть
+file unavailable	Pie View		файл недоступен
+DiskUsage	System name		Использование диска
+file unavailable	Status View		файл недоступен
+Scanning %refName%	Scanner		Сканируется раздел %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# файл} few{# файла} other{# файлов}}
+Size	Info Window		Размер
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d файлов
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Сканировать
+Abort	Status View		Прервать
+Open	Pie View		Открыть
+Rescan	Pie View		Пересканировать
+no supporting apps	Pie View		нет поддерживающих программ
+Modified	Info Window		Изменен
+Rescan	Status View		Пересканировать
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% в {0, plural, one{# файле} few{# файлах} other{# файлах}}
+Created	Info Window		Создан
 Free on %refName%	Scanner		Свободно на разделе %refName%
+Get info	Pie View		Информация
+Kind	Info Window		Тип

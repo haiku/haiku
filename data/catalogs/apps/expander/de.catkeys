@@ -1,4 +1,5 @@
-1	german	x-vnd.Haiku-Expander	1987011430
+1	german	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		Abbrechen
 Destination	ExpanderWindow		Ziel
 Other	ExpanderPreferences		Allgemeines
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
@@ -40,6 +41,7 @@ Expansion	ExpanderPreferences		Entpacken
 Set destination…	ExpanderMenu		Ziel auswählen …
 Continue	ExpanderWindow		Fortsetzen
  is not supported	ExpanderWindow		wird nicht unterstützt
+OK	PasswordAlert		OK
 Cancel	ExpanderPreferences		Abbrechen
 Use:	ExpanderPreferences		Benutzerdefiniert:
 Destination folder	ExpanderPreferences		Zielordner

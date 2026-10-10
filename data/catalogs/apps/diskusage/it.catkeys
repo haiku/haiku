@@ -1,23 +1,23 @@
 1	italian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# file}}
-Scanning %refName%	Scanner		Scansione %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d file
-Size	Info Window		Dimensione
-Rescan	Pie View		Riscansiona
-Kind	Info Window		Tipo
-file unavailable	Pie View		file non disponibile
-no supporting apps	Pie View		nessuna applicazione di supporto
 Path	Info Window		Percorso
-Scan	Status View		Scansione
-Rescan	Status View		Riscansiona
-file unavailable	Status View		file non disponibile
-Get info	Pie View		Ottieni informazioni
-DiskUsage	System name		Utilizzo Disco
-Created	Info Window		Creato
-Modified	Info Window		Modificato
-Abort	Status View		Termina
 Open with	Pie View		Apri con
-Open	Pie View		Apri
+file unavailable	Pie View		file non disponibile
+DiskUsage	System name		Utilizzo Disco
+file unavailable	Status View		file non disponibile
+Scanning %refName%	Scanner		Scansione %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# file}}
+Size	Info Window		Dimensione
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d file
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Scansione
+Abort	Status View		Termina
+Open	Pie View		Apri
+Rescan	Pie View		Riscansiona
+no supporting apps	Pie View		nessuna applicazione di supporto
+Modified	Info Window		Modificato
+Rescan	Status View		Riscansiona
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# file}}
+Created	Info Window		Creato
 Free on %refName%	Scanner		Liberi su %refName%
+Get info	Pie View		Ottieni informazioni
+Kind	Info Window		Tipo

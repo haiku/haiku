@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2041052641
+1	hungarian	x-vnd.Haiku-HaikuDepot	967787019
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -49,6 +49,7 @@ Install failure	InstallPackageProcess		Telepítési hiba
 Package update error	MainWindow		Csomag frissítési hiba
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Kattints ide
 No screenshot available.	PackageInfoView		Képernyőkép nem érhető el.
+Try installing anyway	MainWindow		Mindenképp próbálja meg telepíteni
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# folyamat} other{# folyamat}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Felhasználói értékelések lekérése a csomaghoz
 Reboot required	PackageManager		Újraindítás szükséges
@@ -217,6 +218,7 @@ Comment language:	RatePackageWindow		Hozzászólás nyelve:
 The password has been incorrectly repeated.	UserLoginWindow		A megismételt jelszó téves.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		A felhasználó [%Nickname%] előzőleg megadott jelszava évrénytelen. A felhasználó ki lesz léptetve az alkalmazásból majd újra be kell jelentkezni az érvényes jelszóval.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási feltételek megtekintése
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		%PackageName% csomag telepítéséhez %PackageBytesDescription% szabad terület szükséges, de csak %FreeBytesDescription% áll rendelkezésre. A telepítés valószínűleg sikertelen lesz.
 OK	ServerHelper		Rendben
 Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
 Native desktop packages only	MainWindow		Csak natív aszali csomagok
@@ -245,5 +247,6 @@ No results? 	FeaturedPackagesView		Nincs találat?
 User creation error	UserLoginWindow		Felhasználó létrehozási hiba
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
 Cleaning up…	ShuttingDownWindow		Rendrakás…
+Insufficient storage capacity	MainWindow		Nincs elegendő lemez-kapacitás
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		A %appname% éppen leáll vagy befejezi a folyamatban lévő munkákat kilépés előtt.
 Repeat password:	UserLoginWindow		Jelszó ismétlése:

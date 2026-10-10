@@ -1,23 +1,23 @@
 1	polish	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% w {0, plural, one{# pliku} few{# plikach} many{# plikach} other{# pliku}}
-Scanning %refName%	Scanner		Skanowanie %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d plików
-Size	Info Window		Rozmiar
-Rescan	Pie View		Skanuj ponownie
-Kind	Info Window		Rodzaj
-file unavailable	Pie View		plik niedostępny
-no supporting apps	Pie View		brak wspierających aplikacji
 Path	Info Window		Ścieżka
-Scan	Status View		Skanuj
-Rescan	Status View		Przeskanuj
-file unavailable	Status View		plik niedostępny
-Get info	Pie View		Pobierz informacje
-DiskUsage	System name		DiskUsage
-Created	Info Window		Utworzony
-Modified	Info Window		Zmodyfikowany
-Abort	Status View		Przerwij
 Open with	Pie View		Otwórz za pomocą
-Open	Pie View		Otwórz
+file unavailable	Pie View		plik niedostępny
+DiskUsage	System name		DiskUsage
+file unavailable	Status View		plik niedostępny
+Scanning %refName%	Scanner		Skanowanie %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# plik} few{# pliki} many{# plików} other{# pliku}}
+Size	Info Window		Rozmiar
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d plików
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Skanuj
+Abort	Status View		Przerwij
+Open	Pie View		Otwórz
+Rescan	Pie View		Skanuj ponownie
+no supporting apps	Pie View		brak wspierających aplikacji
+Modified	Info Window		Zmodyfikowany
+Rescan	Status View		Przeskanuj
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% w {0, plural, one{# pliku} few{# plikach} many{# plikach} other{# pliku}}
+Created	Info Window		Utworzony
 Free on %refName%	Scanner		Wolne na %refName%
+Get info	Pie View		Pobierz informacje
+Kind	Info Window		Rodzaj

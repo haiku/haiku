@@ -1,4 +1,5 @@
-1	swedish	x-vnd.Haiku-Expander	1987011430
+1	swedish	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		Avbryt
 Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Andra
 Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
@@ -40,6 +41,7 @@ Expansion	ExpanderPreferences		Expansion
 Set destination…	ExpanderMenu		Ange mål…
 Continue	ExpanderWindow		Fortsätt
  is not supported	ExpanderWindow		 stöds inte
+OK	PasswordAlert		OK
 Cancel	ExpanderPreferences		Avbryt
 Use:	ExpanderPreferences		Använd:
 Destination folder	ExpanderPreferences		Målmapp

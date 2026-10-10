@@ -1,23 +1,23 @@
 1	czech	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% v {0, plural, one{# souboru} other{# souborech}}
-Scanning %refName%	Scanner		Průzkum %refName%
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d souborů
-Size	Info Window		Velikost
-Rescan	Pie View		Přezkoumat
-Kind	Info Window		Typ
-file unavailable	Pie View		soubor nedostupný
-no supporting apps	Pie View		bez podpůrných aplikací
 Path	Info Window		Cesta
-Scan	Status View		Průzkum
-Rescan	Status View		Přezkoumat
-file unavailable	Status View		soubor nedostupný
-Get info	Pie View		Získat informace
-DiskUsage	System name		Využití disku
-Created	Info Window		Vytvořen
-Modified	Info Window		Změněn
-Abort	Status View		Zrušit
 Open with	Pie View		Otevřít pomocí
-Open	Pie View		Otevřít
+file unavailable	Pie View		soubor nedostupný
+DiskUsage	System name		Využití disku
+file unavailable	Status View		soubor nedostupný
+Scanning %refName%	Scanner		Průzkum %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# soubor} few{# soubory} other{# souborů}}
+Size	Info Window		Velikost
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d souborů
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Scan	Status View		Průzkum
+Abort	Status View		Zrušit
+Open	Pie View		Otevřít
+Rescan	Pie View		Přezkoumat
+no supporting apps	Pie View		bez podpůrných aplikací
+Modified	Info Window		Změněn
+Rescan	Status View		Přezkoumat
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% v {0, plural, one{# souboru} other{# souborech}}
+Created	Info Window		Vytvořen
 Free on %refName%	Scanner		Volných na %refName%
+Get info	Pie View		Získat informace
+Kind	Info Window		Typ
