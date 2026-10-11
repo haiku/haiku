@@ -246,7 +246,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 			}
 			case R_SPARC_RELATIVE:
 			{
-				write_word32(P, B + A);
+				write_word64(P, B + A);
 				break;
 			}
 			case R_SPARC_64:
