@@ -1769,8 +1769,8 @@ AboutView::_CreateCreditsView()
 	AddCopyrightEntry("The FreeBSD Project",
 		B_TRANSLATE("Contains software from the FreeBSD Project, "
 		"released under the BSD license:\n"
-		"ftpd, ping, telnet, telnetd, traceroute\n"
-		COPYRIGHT_STRING "1994-2008 The FreeBSD Project. "
+		"ftpd, ping, telnet, telnetd, traceroute, and various network drivers\n"
+		COPYRIGHT_STRING "1994-2024 The FreeBSD Project. "
 		"All rights reserved."),
 		StringVector(kBSDTwoClause, kBSDThreeClause, kBSDFourClause,
 			NULL),
@@ -1890,7 +1890,7 @@ AboutView::_CreateCreditsView()
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("ACPI Component Architecture (ACPICA)")
-		.SetCopyright(COPYRIGHT_STRING "1999-2018 Intel Corp.")
+		.SetCopyright(COPYRIGHT_STRING "1999-2026 Intel Corp.")
 		.SetLicense("Intel (ACPICA)")
 		.SetURL("https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/overview.html"));
 
