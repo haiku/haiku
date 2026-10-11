@@ -22,7 +22,6 @@ const char *kUsage =
 "       %s ( --help | -h )\n"
 ;
 
-// print_usage
 static
 void
 print_usage(bool error = false)
@@ -35,7 +34,6 @@ print_usage(bool error = false)
 }
 
 
-// parse_size
 static
 bool
 parse_size(const char *str, off_t *_size)

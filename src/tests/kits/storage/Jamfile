@@ -8,7 +8,6 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 UnitTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
 		AppFileInfoTest.cpp
-		BasicTest.cpp
 		DataIOTest.cpp
 		DirectoryTest.cpp
 		EntryTest.cpp
@@ -17,15 +16,13 @@ UnitTestLib libstoragetest.so
 		MimeSnifferTest.cpp
 		# MimeTypeTest.cpp
 		NodeInfoTest.cpp
-		NodeTest.cpp
 		PathTest.cpp
-		QueryTest.cpp
+		# QueryTest.cpp # gets stuck on TestApp destruction (Lock)
 		ResourcesTest.cpp
 		ResourceStringsTest.cpp
-		StatableTest.cpp
 		SymLinkTest.cpp
 		TestApp.cpp
-		VolumeTest.cpp
+		# VolumeTest.cpp # gets stuck on TestApp destruction (Lock)
 	: be [ TargetLibstdc++ ]
 ;
 

@@ -1,53 +1,184 @@
-// BasicTest.h
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#ifndef __sk_basic_test_h__
-#define __sk_basic_test_h__
 
-#include <SupportDefs.h>
-#include <TestCase.h>
-#include <TestShell.h>
+#ifndef _STORAGE_BASIC_TEST_H_
+#define _STORAGE_BASIC_TEST_H_
+
+
+#include <cstddef>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <iostream>
+#include <sstream>
+
+#include <DiskDevice.h>
+#include <DiskDeviceRoster.h>
+#include <DiskDeviceTypes.h>
+#include <fs_volume.h>
+#include <Partition.h>
+#include <SupportDefs.h>
+
+#include <TestShell.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
 
 #include <set>
-using std::set;
 #include <string>
-using std::string;
 
 
-class BasicTest : public BTestCase
-{
+class BasicTest : public CppUnit::TestFixture {
 public:
-	BasicTest();
+	BasicTest()
+		:
+		fAvailableFDs(0),
+		fValidCWD(false)
+	{
+	}
 
-	// This function called before *each* test added in Suite()
-	void setUp();
-	
-	// This function called after *each* test added in Suite()
-	void tearDown();
+	virtual ~BasicTest() {}
 
-	// helper functions
+	void setUp() {
 
-//	void nextSubTest();
-//	void nextSubTestBlock();
+		fAvailableFDs = count_available_fds();
+		SaveCWD();
+	}
 
-	static void execCommand(const string &command);
+	void tearDown() {
+		RestoreCWD();
+		int32 availableFDs = count_available_fds();
+		if (availableFDs != fAvailableFDs) {
+			printf("WARNING: Number of available file descriptors has changed "
+				   "during test: %d -> %d\n", (int)fAvailableFDs, (int)availableFDs);
+			fAvailableFDs = availableFDs;
+		}
+	}
 
-	static void dumpStat(struct stat &st);
+	static void execCommand(const std::string &cmdLine)
+	{
+		system(cmdLine.c_str());
+	}
 
-	static void createVolume(string imageFile, string mountPoint, int32 megs,
-							 bool makeMountPoint = true);
-	static void deleteVolume(string imageFile, string mountPoint,
-							 bool deleteMountPoint = true);
-
-protected:	
-	int32 fSubTestNumber;
+protected:
 	int32 fAvailableFDs;
+	bool fValidCWD;
+	char fCurrentWorkingDir[B_PATH_NAME_LENGTH+1];
+
+	void RestoreCWD(const char *alternate = NULL)
+	{
+		if (fValidCWD)
+			chdir(fCurrentWorkingDir);
+		else if (alternate != NULL)
+			chdir(alternate);
+	}
+
+	void SaveCWD() {
+		fValidCWD = getcwd(fCurrentWorkingDir, B_PATH_NAME_LENGTH);
+	}
+
+	BPartition* GetPartitionForPath(const char* imageFile, BDiskDevice &device)
+	{
+		BDiskDeviceRoster roster;
+		BPartition* partition;
+		partition_id id = roster.RegisterFileDevice(imageFile);
+		if (id < 0) {
+			return NULL;
+		}
+		if (roster.GetPartitionWithID(id, &device, &partition) != B_OK) {
+			roster.UnregisterFileDevice(id);
+			return NULL;
+		}
+		return partition;
+	}
+
+	std::string CreateVolume(const char* mountPoint, int32 megs, bool makeMountPoint = true)
+	{
+		std::string imageFile = CreateTemporaryFile(1024 * megs);
+
+		if (makeMountPoint)
+			mkdir(mountPoint, S_IRWXU | S_IRWXG | S_IRWXO);
+#if 0
+		std::stringstream str;
+		str << "mkfs -q -t bfs " << imageFile << " StorageTest;";
+		str << "sync;";
+		str << "mount " << imageFile << " " << mountPoint;
+
+		execCommand(str.str());
+#else
+		BDiskDevice device;
+		BPartition* partition = GetPartitionForPath(imageFile.c_str(), device);
+
+		device.PrepareModifications();
+		partition->Initialize(kPartitionTypeBFS, "StorageTest", "");
+		device.CommitModifications();
+
+		partition = GetPartitionForPath(imageFile.c_str(), device);
+		partition->Mount(mountPoint);
+#endif
+		return imageFile;
+	}
+
+	void DeleteVolume(std::string imageFile, const char* mountPoint, bool deleteMountPoint = true)
+	{
+#if 0
+		std::stringstream str;
+		str << "umount " << mountPoint;
+
+		execCommand(str.str());
+#else
+		BDiskDeviceRoster roster;
+		BDiskDevice device;
+		BPartition* partition = GetPartitionForPath(imageFile.c_str(), device);
+		partition->Unmount(B_FORCE_UNMOUNT);
+		roster.UnregisterFileDevice(imageFile.c_str());
+#endif
+		if (deleteMountPoint)
+			rmdir(mountPoint);
+		unlink(imageFile.c_str());
+	}
+
+	std::string CreateTemporaryFile(ssize_t sizeInK = 0) {
+		char tpl[] = "/tmp/UnitTester_storage_XXXXXX";
+		int fd = mkstemp(tpl);
+		if (fd < 0) {
+			return std::string();
+		}
+		if (sizeInK > 0) {
+			const int zero[256] = {};
+			for (int i = 0; i < sizeInK; i++) {
+				ssize_t written = write(fd, zero, sizeof(zero));
+				if (written < static_cast<ssize_t>(sizeof(zero))) {
+					close(fd);
+					return std::string();
+				}
+			}
+		}
+		close(fd);
+			// we don't need this file open
+		return std::string(tpl);
+	}
+
+	int32
+	count_available_fds()
+	{
+		std::set<int> fds;
+		int fd;
+		while ((fd = dup(1)) != -1)
+			fds.insert(fd);
+		for (std::set<int>::iterator it = fds.begin(); it != fds.end(); it++)
+			close(*it);
+		return fds.size();
+	}
 };
+
 
 
 // Some other helpful stuff.
 
-// == for struct stat
 static
 inline
 bool
@@ -83,20 +214,20 @@ equals(const A &a, const B &b, const C &c)
 // are marked tested or untested.
 class TestSet {
 public:
-	typedef set<string> nameset;
+	typedef std::set<string> nameset;
 
 public:
 	TestSet()
 	{
 	}
 
-	void add(string name)
+	void add(std::string name)
 	{
 		if (fTestedNames.find(name) == fTestedNames.end())
 			fUntestedNames.insert(name);
 	}
 
-	void remove(string name)
+	void remove(std::string name)
 	{
 		if (fUntestedNames.find(name) != fUntestedNames.end())
 			fUntestedNames.erase(name);
@@ -104,19 +235,17 @@ public:
 			fTestedNames.erase(name);
 	}
 
-	void clear()
-	{
+	void clear() {
 		fUntestedNames.clear();
 		fTestedNames.clear();
 	}
 
-	void rewind()
-	{
+	void rewind() {
 		fUntestedNames.insert(fTestedNames.begin(), fTestedNames.end());
 		fTestedNames.clear();
 	}
 
-	bool test(string name, bool dump = BTestShell::GlobalBeVerbose())
+	bool test(std::string name, bool dump = BTestShell::GlobalBeVerbose())
 	{
 		bool result = (fUntestedNames.find(name) != fUntestedNames.end());
 		if (result) {
@@ -145,5 +274,4 @@ private:
 	nameset	fTestedNames;
 };
 
-
-#endif	// __sk_basic_test_h__
+#endif // _STORAGE_BASIC_TEST_H_

@@ -1,13 +1,17 @@
-// TestApp.h
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#ifndef _beos_test_app_h_
-#define _beos_test_app_h_
+
+#ifndef _STORAGE_TEST_APP_H_
+#define _STORAGE_TEST_APP_H_
+
 
 #include <Application.h>
 #include <ObjectList.h>
 #include <MessageQueue.h>
 
-// TestHandler
 
 class BTestHandler : public BHandler {
 public:
@@ -18,8 +22,6 @@ private:
 	BMessageQueue	fQueue;
 };
 
-
-// TestApp
 
 class BTestApp : public BApplication {
 public:
@@ -46,4 +48,4 @@ private:
 	TestHandlers	fHandlers;
 };
 
-#endif	// _beos_test_app_h_
+#endif

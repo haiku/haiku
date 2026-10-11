@@ -24,7 +24,7 @@ getTestSuite()
 	UrlTest::AddTests(*suite);
 //	HttpTest::AddTests(*suite);
 	DataTest::AddTests(*suite);
-	FileTest::AddTests(*suite);
+	ServiceFileTest::AddTests(*suite);
 //	GeolocationTest::AddTests(*suite); // FIXME
 
 	return suite;

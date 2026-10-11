@@ -1,4 +1,10 @@
-// TestApp.cpp
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "TestApp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,11 +12,6 @@
 
 #include <Autolock.h>
 
-#include <TestApp.h>
-
-// TestHandler
-
-// MessageReceived
 void
 BTestHandler::MessageReceived(BMessage *message)
 {
@@ -21,7 +22,7 @@ BTestHandler::MessageReceived(BMessage *message)
 	fQueue.Unlock();
 }
 
-// Queue
+
 BMessageQueue &
 BTestHandler::Queue()
 {
@@ -29,11 +30,9 @@ BTestHandler::Queue()
 }
 
 
-// TestApp
-
 static status_t sInitError;
 
-// constructor
+
 BTestApp::BTestApp(const char *signature)
 	   : BApplication(signature, &sInitError),
 		 fAppThread(B_ERROR),
@@ -49,7 +48,7 @@ BTestApp::BTestApp(const char *signature)
 	Unlock();
 }
 
-// destructor
+
 BTestApp::~BTestApp()
 {
 	int32 count = fHandlers.CountItems();
@@ -57,7 +56,7 @@ BTestApp::~BTestApp()
 		DeleteTestHandler(TestHandlerAt(i));
 }
 
-// Init
+
 status_t
 BTestApp::Init()
 {
@@ -76,7 +75,7 @@ BTestApp::Init()
 	return error;
 }
 
-// Terminate
+
 void
 BTestApp::Terminate()
 {
@@ -91,7 +90,7 @@ BTestApp::ReadyToRun()
 {
 }
 
-// CreateTestHandler
+
 BTestHandler *
 BTestApp::CreateTestHandler()
 {
@@ -103,7 +102,7 @@ BTestApp::CreateTestHandler()
 	return handler;
 }
 
-// DeleteTestHandler
+
 bool
 BTestApp::DeleteTestHandler(BTestHandler *handler)
 {
@@ -118,7 +117,7 @@ BTestApp::DeleteTestHandler(BTestHandler *handler)
 	return result;
 }
 
-// Handler
+
 BTestHandler &
 BTestApp::Handler()
 {
@@ -127,7 +126,7 @@ BTestApp::Handler()
 	return *TestHandlerAt(0);
 }
 
-// TestHandlerAt
+
 BTestHandler *
 BTestApp::TestHandlerAt(int32 index)
 {
@@ -135,7 +134,7 @@ BTestApp::TestHandlerAt(int32 index)
 	return (BTestHandler*)fHandlers.ItemAt(index);
 }
 
-// _AppThreadStart
+
 int32
 BTestApp::_AppThreadStart(void *data)
 {
@@ -145,4 +144,3 @@ BTestApp::_AppThreadStart(void *data)
 	}
 	return 0;
 }
-

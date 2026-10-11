@@ -18,9 +18,9 @@
 #include "TestServer.h"
 
 
-class FileTest : public BThreadedTestCase {
+class ServiceFileTest : public BThreadedTestCase {
 public:
-						FileTest() {};
+						ServiceFileTest() {};
 
 			void		StopTest();
 

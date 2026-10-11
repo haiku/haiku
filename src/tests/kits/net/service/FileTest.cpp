@@ -46,7 +46,7 @@ private:
 
 
 void
-FileTest::StopTest()
+ServiceFileTest::StopTest()
 {
 	StopTestListener listener;
 	char tmpl[] = "/tmp/filestoptestXXXXXX";
@@ -90,12 +90,12 @@ FileTest::StopTest()
 
 
 /* static */ void
-FileTest::AddTests(BTestSuite& parent)
+ServiceFileTest::AddTests(BTestSuite& parent)
 {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("FileTest");
+	CppUnit::TestSuite *suite = new CppUnit::TestSuite("ServiceFileTest");
 
-	suite->addTest(new CppUnit::TestCaller<FileTest>("FileTest: Stop requests",
-		&FileTest::StopTest));
+	suite->addTest(new CppUnit::TestCaller<ServiceFileTest>("ServiceFileTest: Stop requests",
+		&ServiceFileTest::StopTest));
 
-	parent.addTest("FileTest", suite);
+	parent.addTest("ServiceFileTest", suite);
 }

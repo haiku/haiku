@@ -116,7 +116,6 @@ unlock_driver()
 }
 
 
-// is_valid_device_index
 static inline
 bool
 is_valid_device_index(int32 index)
@@ -125,7 +124,6 @@ is_valid_device_index(int32 index)
 }
 
 
-// is_valid_data_device_index
 static inline
 bool
 is_valid_data_device_index(int32 index)
@@ -134,7 +132,6 @@ is_valid_data_device_index(int32 index)
 }
 
 
-// dev_index_for_path
 static
 int
 dev_index_for_path(const char *path)
@@ -148,7 +145,6 @@ dev_index_for_path(const char *path)
 }
 
 
-// clear_device_info
 static
 void
 clear_device_info(int32 index)
@@ -167,7 +163,6 @@ clear_device_info(int32 index)
 }
 
 
-// init_device_info
 static
 status_t
 init_device_info(int32 index, virtual_drive_info *initInfo)
@@ -280,7 +275,6 @@ init_device_info(int32 index, virtual_drive_info *initInfo)
 }
 
 
-// uninit_device_info
 static
 status_t
 uninit_device_info(int32 index)

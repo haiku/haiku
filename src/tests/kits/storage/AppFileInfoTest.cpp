@@ -1,5 +1,10 @@
-// AppFileInfoTest.cpp
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
+
+#include <sstream>
 #include <stdio.h>
 #include <string>
 #include <unistd.h>
@@ -14,33 +19,19 @@
 #include <Path.h>
 #include <Resources.h>
 #include <Roster.h>
+#include <StorageDefs.h>
 #include <String.h>
+#include <SupportDefs.h>
 #include <TypeConstants.h>
 
-#include <cppunit/Test.h>
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-#include <TestShell.h>
-#include <TestUtils.h>
-#include <cppunit/TestAssert.h>
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
-#include "AppFileInfoTest.h"
-#include "../app/bmessenger/Helpers.h"
+#include "InfoTest.h"
+#include "MimeType.h"
 
-// test dirs/files/types
-static const char *testDir			= "/tmp/testDir";
-static const char *testFile1		= "/tmp/testDir/file1";
-static const char *testFile2		= "/tmp/testDir/file2";
-static const char *testFile3		= "/tmp/testDir/file3";
-static const char *testFile4		= "/tmp/testDir/file4";
-static const char *testType1
-	= "application/x-vnd.obos.app-file-info-test1";
-static const char *testType2
-	= "application/x-vnd.obos.app-file-info-test2";
-static const char *testType3
-	= "application/x-vnd.obos.app-file-info-test3";
-static const char *testType4
-	= "application/x-vnd.obos.app-file-info-test4";
+
 static const char *invalidTestType	= "invalid/mime/type";
 static const char *tooLongTestType	=
 "0123456789012345678901234567890123456789012345678901234567890123456789"
@@ -48,13 +39,6 @@ static const char *tooLongTestType	=
 "0123456789012345678901234567890123456789012345678901234567890123456789"
 "0123456789012345678901234567890123456789012345678901234567890123456789"
 ;
-static const char *testAppSignature1
-	= "application/x-vnd.obos.app-file-info-test-app1";
-static const char *testAppSignature2
-	= "application/x-vnd.obos.app-file-info-test-app2";
-static const char *testAppSignature3
-	= "application/x-vnd.obos.app-file-info-test-app3";
-
 
 // attributes
 static const char *kTypeAttribute				= "BEOS:TYPE";
@@ -78,46 +62,12 @@ static const int32 kVersionInfoResourceID		= 1;
 static const int32 kMiniIconForTypeResourceID	= 0;
 static const int32 kLargeIconForTypeResourceID	= 0;
 
-
 enum {
 	APP_FLAGS_TYPE				= 'APPF',
-	MINI_ICON_TYPE				= 'MICN',
-	LARGE_ICON_TYPE				= 'ICON',
 	VERSION_INFO_TYPE			= 'APPV',
 };
 
-// create_test_icon
-static
-BBitmap *
-create_test_icon(icon_size size, int fill)
-{
-	BBitmap *icon = NULL;
-	// create
-	switch (size) {
-		case B_MINI_ICON:
-			icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-			break;
-		case B_LARGE_ICON:
-			icon = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
-			break;
-	}
-	// fill
-	if (icon)
-		memset(icon->Bits(), fill, icon->BitsLength());
-	return icon;
-}
 
-// icon_equal
-static
-bool
-icon_equal(const BBitmap *icon1, const BBitmap *icon2)
-{
-	return (icon1->Bounds() == icon2->Bounds()
-			&& icon1->BitsLength() == icon2->BitsLength()
-			&& memcmp(icon1->Bits(), icon2->Bits(), icon1->BitsLength()) == 0);
-}
-
-// == (version_info)
 static
 bool
 operator==(const version_info &info1, const version_info &info2)
@@ -131,98 +81,9 @@ operator==(const version_info &info1, const version_info &info2)
 			&& !strcmp(info1.long_info, info2.long_info));
 }
 
+class BApplication;
+class BBitmap;
 
-// Suite
-CppUnit::Test*
-AppFileInfoTest::Suite() {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
-	typedef CppUnit::TestCaller<AppFileInfoTest> TC;
-		
-	suite->addTest( new TC("BAppFileInfo::Init Test1",
-						   &AppFileInfoTest::InitTest1) );
-	suite->addTest( new TC("BAppFileInfo::Init Test2",
-						   &AppFileInfoTest::InitTest2) );
-	suite->addTest( new TC("BAppFileInfo::Type Test",
-						   &AppFileInfoTest::TypeTest) );
-	suite->addTest( new TC("BAppFileInfo::Signature Test",
-						   &AppFileInfoTest::SignatureTest) );
-	suite->addTest( new TC("BAppFileInfo::App Flags Test",
-						   &AppFileInfoTest::AppFlagsTest) );
-//	suite->addTest( new TC("BAppFileInfo::Supported Types Test",
-//						   &AppFileInfoTest::SupportedTypesTest) );
-	suite->addTest( new TC("BAppFileInfo::Icon Test",
-						   &AppFileInfoTest::IconTest) );
-	suite->addTest( new TC("BAppFileInfo::Version Info Test",
-						   &AppFileInfoTest::VersionInfoTest) );
-	suite->addTest( new TC("BAppFileInfo::Icon For Type Test",
-						   &AppFileInfoTest::IconForTypeTest) );
-//	suite->addTest( new TC("BAppFileInfo::Info Location Test",
-//						   &AppFileInfoTest::InfoLocationTest) );
-
-	return suite;
-}		
-
-// setUp
-void
-AppFileInfoTest::setUp()
-{
-	BasicTest::setUp();
-	// create test dir and files
-	execCommand(
-		string("mkdir ") + testDir
-		+ "; touch " + testFile1
-			   + " " + testFile2
-			   + " " + testFile3
-			   + " " + testFile4
-	);
-	// create app
-	fApplication
-		= new BApplication("application/x-vnd.obos.app-file-info-test");
-	// create icons
-	fIconM1 = create_test_icon(B_MINI_ICON, 1);
-	fIconM2 = create_test_icon(B_MINI_ICON, 2);
-	fIconM3 = create_test_icon(B_MINI_ICON, 3);
-	fIconM4 = create_test_icon(B_MINI_ICON, 4);
-	fIconL1 = create_test_icon(B_LARGE_ICON, 1);
-	fIconL2 = create_test_icon(B_LARGE_ICON, 2);
-	fIconL3 = create_test_icon(B_LARGE_ICON, 3);
-	fIconL4 = create_test_icon(B_LARGE_ICON, 4);
-}
-	
-// tearDown
-void
-AppFileInfoTest::tearDown()
-{
-	// delete the icons
-	delete fIconM1;
-	delete fIconM2;
-	delete fIconM3;
-	delete fIconM4;
-	delete fIconL1;
-	delete fIconL2;
-	delete fIconL3;
-	delete fIconL4;
-	fIconM1 = fIconM2 = fIconL1 = fIconL2 = NULL;
-	// delete the application
-	delete fApplication;
-	fApplication = NULL;
-	// remove the types we've added
-	const char * const testTypes[] = {
-		testType1, testType2, testType3, testType4,
-		testAppSignature1, testAppSignature2, testAppSignature3
-	};
-	for (uint32 i = 0; i < sizeof(testTypes) / sizeof(const char*); i++) {
-		BMimeType type(testTypes[i]);
-		type.Delete();
-	}
-
-	// delete the test dir
-	execCommand(string("rm -rf ") + testDir);
-
-	BasicTest::tearDown();
-}
-
-// SyncResources
 static
 void
 SyncResources(BAppFileInfo &info)
@@ -246,93 +107,65 @@ SyncResources(BAppFileInfo &info)
 		resources->Sync();
 }
 
-// ReadAttr
 static
 char*
 ReadAttr(BNode &node, const char *name, type_code type, size_t &size)
 {
 	attr_info info;
-	CHK(node.GetAttrInfo(name, &info) == B_OK);
-	CHK(info.type == type);
+	CPPUNIT_ASSERT_EQUAL(B_OK, node.GetAttrInfo(name, &info));
+	CPPUNIT_ASSERT(info.type == type);
 	char *buffer = new char[info.size];
 	if (node.ReadAttr(name, type, 0, buffer, info.size) == info.size)
 		size = info.size;
 	else {
 		delete[] buffer;
-		CHK(false);
+		CPPUNIT_ASSERT(false);
 	}
 	return buffer;
 }
 
-// ReadResource
 static
 char*
 ReadResource(BFile &file, const char *name, int32 id, type_code type,
 			 size_t &size)
 {
 	BResources resources;
-	CHK(resources.SetTo(&file) == B_OK);
+	CPPUNIT_ASSERT_EQUAL(B_OK, resources.SetTo(&file));
 	int32 idFound;
-	CHK(resources.GetResourceInfo(type, name, &idFound, &size) == true);
-	CHK(idFound == id);
+	CPPUNIT_ASSERT(resources.GetResourceInfo(type, name, &idFound, &size) == true);
+	CPPUNIT_ASSERT(idFound == id);
 	const void *resourceData = resources.LoadResource(type, name, &size);
-	CHK(resourceData != NULL);
+	CPPUNIT_ASSERT(resourceData != NULL);
 	char *buffer = new char[size];
 	memcpy(buffer, resourceData, size);
 	return buffer;
 }
 
-// CheckAttr
-static
-void
-CheckAttr(BNode &node, const char *name, type_code type, const void *data,
-		  int32 dataSize)
-{
-	attr_info info;
-	CHK(node.GetAttrInfo(name, &info) == B_OK);
-	CHK(info.type == type);
-	CHK(info.size == dataSize);
-	char *buffer = new char[dataSize];
-	AutoDeleter<char> deleter(buffer, true);
-	CHK(node.ReadAttr(name, type, 0, buffer, dataSize) == dataSize);
-	CHK(memcmp(buffer, data, dataSize) == 0);
-}
-
-// CheckResource
 static
 void
 CheckResource(BFile &file, const char *name, int32 id, type_code type,
 			  const void *data, size_t dataSize)
 {
 	BResources resources;
-	CHK(resources.SetTo(&file) == B_OK);
+	CPPUNIT_ASSERT_EQUAL(B_OK, resources.SetTo(&file));
 	int32 idFound;
 	size_t size;
-	CHK(resources.GetResourceInfo(type, name, &idFound, &size) == true);
-	CHK(idFound == id);
-	CHK(size == dataSize);
+	CPPUNIT_ASSERT(resources.GetResourceInfo(type, name, &idFound, &size) == true);
+	CPPUNIT_ASSERT(idFound == id);
+	CPPUNIT_ASSERT(size == dataSize);
 	const void *resourceData = resources.LoadResource(type, name, &size);
-	CHK(resourceData != NULL);
-	CHK(size == dataSize);
-	CHK(memcmp(resourceData, data, dataSize) == 0);
+	CPPUNIT_ASSERT(resourceData != NULL);
+	CPPUNIT_ASSERT(size == dataSize);
+	CPPUNIT_ASSERT(memcmp(resourceData, data, dataSize) == 0);
 }
 
-// CheckNoAttr
-static
-void
-CheckNoAttr(BNode &node, const char *name)
-{
-	attr_info info;
-	CHK(node.GetAttrInfo(name, &info) == B_ENTRY_NOT_FOUND);
-}
 
-// CheckNoResource
 static
 void
 CheckNoResource(BFile &file, const char *name)
 {
 	BResources resources;
-	CHK(resources.SetTo(&file) == B_OK);
+	CPPUNIT_ASSERT_EQUAL(B_OK, resources.SetTo(&file));
 	type_code typeFound;
 	int32 idFound;
 	const char *nameFound;
@@ -344,7 +177,7 @@ CheckNoResource(BFile &file, const char *name)
 		 i++) {
 		found = !strcmp(nameFound, name);
 	}
-	CHK(!found);
+	CPPUNIT_ASSERT(!found);
 }
 
 // TypeValue
@@ -358,7 +191,7 @@ struct TypeValue
 		return (type == value.type);
 	}
 
-	string type;
+	std::string type;
 };
 
 // TypeSetter
@@ -388,7 +221,7 @@ struct TypeChecker
 {
 	static void CheckAttribute(BNode &file, const TypeValue &value)
 	{
-		CheckAttr(file, kTypeAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
+		InfoTest::CheckAttr(file, kTypeAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
 				  value.type.length() + 1);
 	}
 
@@ -429,7 +262,7 @@ struct SignatureChecker
 {
 	static void CheckAttribute(BNode &file, const SignatureValue &value)
 	{
-		CheckAttr(file, kSignatureAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
+		InfoTest::CheckAttr(file, kSignatureAttribute, B_MIME_STRING_TYPE, value.type.c_str(),
 				  value.type.length() + 1);
 	}
 
@@ -478,7 +311,7 @@ struct AppFlagsChecker
 {
 	static void CheckAttribute(BNode &file, const AppFlagsValue &value)
 	{
-		CheckAttr(file, kAppFlagsAttribute, APP_FLAGS_TYPE, &value.flags,
+		InfoTest::CheckAttr(file, kAppFlagsAttribute, APP_FLAGS_TYPE, &value.flags,
 				  sizeof(value.flags));
 	}
 
@@ -508,7 +341,7 @@ struct SupportedTypesValue
 		bool equal = (types.GetInfo("types", &type1, &count1) == B_OK
 					  && value.types.GetInfo("types", &type2, &count2) == B_OK
 					  && type1 == type2 && count1 == count2);
-		
+
 		for (int32 i = 0; equal && i < count1; i++) {
 			BString str1, str2;
 			equal = types.FindString("types", i, &str1) == B_OK
@@ -547,11 +380,11 @@ struct SupportedTypesChecker
 		size_t size;
 		char *buffer = ReadAttr(file, kSupportedTypesAttribute,
 								B_MESSAGE_TYPE, size);
-		AutoDeleter<char> deleter(buffer, true);
+		BPrivate::ArrayDeleter<char> deleter(buffer);
 		BMessage storedTypes;
-		CHK(storedTypes.Unflatten(buffer) == B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, storedTypes.Unflatten(buffer));
 		SupportedTypesValue storedValue(storedTypes);
-		CHK(storedValue == value);
+		CPPUNIT_ASSERT(storedValue == value);
 	}
 
 	static void CheckResource(BFile &file, const SupportedTypesValue &value)
@@ -560,11 +393,11 @@ struct SupportedTypesChecker
 		char *buffer = ReadResource(file, kSupportedTypesAttribute,
 									kSupportedTypesResourceID, B_MESSAGE_TYPE,
 									size);
-		AutoDeleter<char> deleter(buffer, true);
+		BPrivate::ArrayDeleter<char> deleter(buffer);
 		BMessage storedTypes;
-		CHK(storedTypes.Unflatten(buffer) == B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, storedTypes.Unflatten(buffer));
 		SupportedTypesValue storedValue(storedTypes);
-		CHK(storedValue == value);
+		CPPUNIT_ASSERT(storedValue == value);
 	}
 };
 
@@ -585,8 +418,8 @@ struct IconValue
 
 	bool operator==(const IconValue &value)
 	{
-		return (icon_equal(&mini, &value.mini)
-				&& icon_equal(&large, &value.large));
+		return (InfoTest::IconEqual(&mini, &value.mini)
+				&& InfoTest::IconEqual(&large, &value.large));
 	}
 
 	BBitmap mini;
@@ -622,19 +455,19 @@ struct IconChecker
 {
 	static void CheckAttribute(BNode &file, const IconValue &value)
 	{
-		CheckAttr(file, kMiniIconAttribute, MINI_ICON_TYPE, value.mini.Bits(),
+		InfoTest::CheckAttr(file, kMiniIconAttribute, B_MINI_ICON_TYPE, value.mini.Bits(),
 				  value.mini.BitsLength());
-		CheckAttr(file, kLargeIconAttribute, LARGE_ICON_TYPE,
+		InfoTest::CheckAttr(file, kLargeIconAttribute, B_LARGE_ICON_TYPE,
 				  value.large.Bits(), value.large.BitsLength());
 	}
 
 	static void CheckResource(BFile &file, const IconValue &value)
 	{
 		::CheckResource(file, kMiniIconAttribute, kMiniIconResourceID,
-						MINI_ICON_TYPE, value.mini.Bits(),
+						B_MINI_ICON_TYPE, value.mini.Bits(),
 						value.mini.BitsLength());
 		::CheckResource(file, kLargeIconAttribute, kLargeIconResourceID,
-						LARGE_ICON_TYPE, value.large.Bits(),
+						B_LARGE_ICON_TYPE, value.large.Bits(),
 						value.large.BitsLength());
 	}
 };
@@ -685,7 +518,7 @@ struct VersionInfoChecker
 	static void CheckAttribute(BNode &file, const VersionInfoValue &value)
 	{
 		version_info infos[] = { value.app, value.system };
-		CheckAttr(file, kVersionInfoAttribute, VERSION_INFO_TYPE,
+		InfoTest::CheckAttr(file, kVersionInfoAttribute, VERSION_INFO_TYPE,
 				  infos, sizeof(infos));
 	}
 
@@ -704,9 +537,9 @@ struct IconForTypeValue : public IconValue
 //	IconForTypeValue() : type() {}
 //	IconForTypeValue(const BBitmap *mini, const BBitmap *large,
 //					 const char *type) : IconValue(mini, large), type(type) {}
-	IconForTypeValue() : type(testType1) {}
+	IconForTypeValue() : type("application/x-vnd.obos.app-file-info-test1") {}
 	IconForTypeValue(const BBitmap *mini, const BBitmap *large)
-		: IconValue(mini, large), type(testType1) {}
+		: IconValue(mini, large), type("application/x-vnd.obos.app-file-info-test1") {}
 
 	string	type;
 };
@@ -746,42 +579,33 @@ struct IconForTypeChecker
 {
 	static void CheckAttribute(BNode &file, const IconForTypeValue &value)
 	{
-		string attrNameM(kMiniIconForTypeAttribute);
+		std::string attrNameM(kMiniIconForTypeAttribute);
 		attrNameM += value.type;
-		CheckAttr(file, attrNameM.c_str(), MINI_ICON_TYPE, value.mini.Bits(),
+		InfoTest::CheckAttr(file, attrNameM.c_str(), B_MINI_ICON_TYPE, value.mini.Bits(),
 				  value.mini.BitsLength());
-		string attrNameL(kLargeIconForTypeAttribute);
+		std::string attrNameL(kLargeIconForTypeAttribute);
 		attrNameL += value.type;
-		CheckAttr(file, attrNameL.c_str(), LARGE_ICON_TYPE,
+		InfoTest::CheckAttr(file, attrNameL.c_str(), B_LARGE_ICON_TYPE,
 				  value.large.Bits(), value.large.BitsLength());
 	}
 
 	static void CheckResource(BFile &file, const IconForTypeValue &value)
 	{
-		string attrNameM(kMiniIconForTypeAttribute);
+		std::string attrNameM(kMiniIconForTypeAttribute);
 		attrNameM += value.type;
 		::CheckResource(file, attrNameM.c_str(), kMiniIconForTypeResourceID,
-						MINI_ICON_TYPE, value.mini.Bits(),
+						B_MINI_ICON_TYPE, value.mini.Bits(),
 						value.mini.BitsLength());
-		string attrNameL(kLargeIconForTypeAttribute);
+		std::string attrNameL(kLargeIconForTypeAttribute);
 		attrNameL += value.type;
 		::CheckResource(file, attrNameL.c_str(), kLargeIconForTypeResourceID,
-						LARGE_ICON_TYPE, value.large.Bits(),
+						B_LARGE_ICON_TYPE, value.large.Bits(),
 						value.large.BitsLength());
 	}
 };
 
 
-// CheckTypeAttr
-static
-void
-CheckTypeAttr(BNode &node, const char *data)
-{
-	CheckAttr(node, kTypeAttribute, B_MIME_STRING_TYPE, data,
-			  strlen(data) + 1);
-}
 
-// CheckTypeResource
 static
 void
 CheckTypeResource(BFile &file, const char *data)
@@ -790,16 +614,14 @@ CheckTypeResource(BFile &file, const char *data)
 				  data, strlen(data) + 1);
 }
 
-// CheckSignatureAttr
 static
 void
 CheckSignatureAttr(BNode &node, const char *data)
 {
-	CheckAttr(node, kSignatureAttribute, B_MIME_STRING_TYPE, data,
+	InfoTest::CheckAttr(node, kSignatureAttribute, B_MIME_STRING_TYPE, data,
 			  strlen(data) + 1);
 }
 
-// CheckSignatureResource
 static
 void
 CheckSignatureResource(BFile &file, const char *data)
@@ -808,15 +630,13 @@ CheckSignatureResource(BFile &file, const char *data)
 				  B_MIME_STRING_TYPE, data, strlen(data) + 1);
 }
 
-// CheckAppFlagsAttr
 static
 void
 CheckAppFlagsAttr(BNode &node, uint32 flags)
 {
-	CheckAttr(node, kAppFlagsAttribute, APP_FLAGS_TYPE, &flags, sizeof(flags));
+	InfoTest::CheckAttr(node, kAppFlagsAttribute, APP_FLAGS_TYPE, &flags, sizeof(flags));
 }
 
-// CheckAppFlagsResource
 static
 void
 CheckAppFlagsResource(BFile &file, uint32 flags)
@@ -825,7 +645,6 @@ CheckAppFlagsResource(BFile &file, uint32 flags)
 				  APP_FLAGS_TYPE, &flags, sizeof(flags));
 }
 
-// CheckSupportedTypesAttr
 static
 void
 CheckSupportedTypesAttr(BNode &node, const BMessage *data)
@@ -833,7 +652,6 @@ CheckSupportedTypesAttr(BNode &node, const BMessage *data)
 	SupportedTypesChecker::CheckAttribute(node, SupportedTypesValue(*data));
 }
 
-// CheckSupportedTypesResource
 static
 void
 CheckSupportedTypesResource(BFile &file, const BMessage *data)
@@ -841,30 +659,6 @@ CheckSupportedTypesResource(BFile &file, const BMessage *data)
 	SupportedTypesChecker::CheckResource(file, SupportedTypesValue(*data));
 }
 
-// CheckIconAttr
-static
-void
-CheckIconAttr(BNode &node, BBitmap *data)
-{
-	const char *attribute = NULL;
-	uint32 type = 0;
-	switch (data->Bounds().IntegerWidth()) {
-		case 15:
-			attribute = kMiniIconAttribute;
-			type = MINI_ICON_TYPE;
-			break;
-		case 31:
-			attribute = kLargeIconAttribute;
-			type = LARGE_ICON_TYPE;
-			break;
-		default:
-			CHK(false);
-			break;
-	}
-	CheckAttr(node, attribute, type, data->Bits(), data->BitsLength());
-}
-
-// CheckIconResource
 static
 void
 CheckIconResource(BFile &file, BBitmap *data)
@@ -876,31 +670,29 @@ CheckIconResource(BFile &file, BBitmap *data)
 		case 15:
 			attribute = kMiniIconAttribute;
 			resourceID = kMiniIconResourceID;
-			type = MINI_ICON_TYPE;
+			type = B_MINI_ICON_TYPE;
 			break;
 		case 31:
 			attribute = kLargeIconAttribute;
 			resourceID = kLargeIconResourceID;
-			type = LARGE_ICON_TYPE;
+			type = B_LARGE_ICON_TYPE;
 			break;
 		default:
-			CHK(false);
+			CPPUNIT_ASSERT(false);
 			break;
 	}
 	CheckResource(file, attribute, resourceID, type, data->Bits(),
 				  data->BitsLength());
 }
 
-// CheckVersionInfoAttr
 static
 void
 CheckVersionInfoAttr(BNode &node, version_info *data)
 {
-	CheckAttr(node, kVersionInfoAttribute, VERSION_INFO_TYPE, data,
+	InfoTest::CheckAttr(node, kVersionInfoAttribute, VERSION_INFO_TYPE, data,
 			  2 * sizeof(version_info));
 }
 
-// CheckVersionInfoResource
 static
 void
 CheckVersionInfoResource(BFile &file, version_info *data)
@@ -909,57 +701,52 @@ CheckVersionInfoResource(BFile &file, version_info *data)
 				  VERSION_INFO_TYPE, data, 2 * sizeof(version_info));
 }
 
-// CheckIconForTypeAttr
 static
 void
 CheckIconForTypeAttr(BNode &node, const char *type, BBitmap *data)
 {
-	string attribute;
-	int32 resourceID = 0;
+	std::string attribute;
 	uint32 iconType = 0;
 	switch (data->Bounds().IntegerWidth()) {
 		case 15:
 			attribute = kMiniIconForTypeAttribute;
-			resourceID = kMiniIconForTypeResourceID;
-			iconType = MINI_ICON_TYPE;
+			iconType = B_MINI_ICON_TYPE;
 			break;
 		case 31:
 			attribute = kLargeIconForTypeAttribute;
-			resourceID = kLargeIconForTypeResourceID;
-			iconType = LARGE_ICON_TYPE;
+			iconType = B_LARGE_ICON_TYPE;
 			break;
 		default:
-			CHK(false);
+			CPPUNIT_ASSERT(false);
 			break;
 	}
 	attribute += type;
-	CheckAttr(node, attribute.c_str(), iconType, data->Bits(),
+	InfoTest::CheckAttr(node, attribute.c_str(), iconType, data->Bits(),
 			  data->BitsLength());
 }
 
-// CheckIconForTypeResource
 static
 void
 CheckIconForTypeResource(BFile &file, const char *type, BBitmap *data,
 						 int32 resourceID = -1)
 {
-	string attribute;
+	std::string attribute;
 	uint32 iconType = 0;
 	switch (data->Bounds().IntegerWidth()) {
 		case 15:
 			attribute = kMiniIconForTypeAttribute;
 			if (resourceID < 0)
 				resourceID = kMiniIconForTypeResourceID;
-			iconType = MINI_ICON_TYPE;
+			iconType = B_MINI_ICON_TYPE;
 			break;
 		case 31:
 			attribute = kLargeIconForTypeAttribute;
 			if (resourceID < 0)
 				resourceID = kLargeIconForTypeResourceID;
-			iconType = LARGE_ICON_TYPE;
+			iconType = B_LARGE_ICON_TYPE;
 			break;
 		default:
-			CHK(false);
+			CPPUNIT_ASSERT(false);
 			break;
 	}
 	attribute += type;
@@ -967,12 +754,11 @@ CheckIconForTypeResource(BFile &file, const char *type, BBitmap *data,
 				  data->BitsLength());
 }
 
-// CheckNoIconForTypeAttr
 static
 void
 CheckNoIconForTypeAttr(BNode &node, const char *type, icon_size iconSize)
 {
-	string attribute;
+	std::string attribute;
 	switch (iconSize) {
 		case B_MINI_ICON:
 			attribute = kMiniIconForTypeAttribute;
@@ -981,19 +767,18 @@ CheckNoIconForTypeAttr(BNode &node, const char *type, icon_size iconSize)
 			attribute = kLargeIconForTypeAttribute;
 			break;
 		default:
-			CHK(false);
+			CPPUNIT_ASSERT(false);
 			break;
 	}
 	attribute += type;
-	CheckNoAttr(node, attribute.c_str());
+	InfoTest::CheckNoAttr(node, attribute.c_str());
 }
 
-// CheckNoIconForTypeResource
 static
 void
 CheckNoIconForTypeResource(BFile &file, const char *type, icon_size iconSize)
 {
-	string attribute;
+	std::string attribute;
 	switch (iconSize) {
 		case B_MINI_ICON:
 			attribute = kMiniIconForTypeAttribute;
@@ -1002,1812 +787,1861 @@ CheckNoIconForTypeResource(BFile &file, const char *type, icon_size iconSize)
 			attribute = kLargeIconForTypeAttribute;
 			break;
 		default:
-			CHK(false);
+			CPPUNIT_ASSERT(false);
 			break;
 	}
 	attribute += type;
 	CheckNoResource(file, attribute.c_str());
 }
 
-
-// InitTest1
-void
-AppFileInfoTest::InitTest1()
-{
-#ifdef TEST_R5
-	const bool hasInitialLocation = false;
-#else
-	const bool hasInitialLocation = true;
-#endif
-	// BAppFileInfo()
-	// * InitCheck() == B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.InitCheck() == B_NO_INIT);
-		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
-		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
-	}
-
-	// BAppFileInfo(BFile *file)
-	// * NULL file => InitCheck() == B_BAD_VALUE
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo(NULL);
-		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
-		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
-	}
-	// * invalid file => InitCheck() == B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file;
-		BAppFileInfo appFileInfo(&file);
-		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
-		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
-	}
-	// * valid file => InitCheck() == B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo(&file);
-		CHK(appFileInfo.InitCheck() == B_OK);
-		CHK(appFileInfo.IsUsingAttributes() == true);
-		CHK(appFileInfo.IsUsingResources() == true);
-	}
-}
-
-// InitTest2
-void
-AppFileInfoTest::InitTest2()
-{
-#ifdef TEST_R5
-	const bool hasInitialLocation = false;
-#else
-	const bool hasInitialLocation = true;
-#endif
-	// status_t SetTo(BFile *file)
-	// * NULL file => InitCheck() == B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(NULL) == B_BAD_VALUE);
-		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
-		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
-	}
-	// * invalid file => InitCheck() == B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file;
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_BAD_VALUE);
-		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == hasInitialLocation);
-		CHK(appFileInfo.IsUsingResources() == hasInitialLocation);
-	}
-	// * valid file => InitCheck() == B_OK
-	// * reinitialize invalid/valid => InitCheck() == B_BAD_VALUE/B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.InitCheck() == B_OK);
-		CHK(appFileInfo.IsUsingAttributes() == true);
-		CHK(appFileInfo.IsUsingResources() == true);
-		off_t size;
-		CHK(file.GetSize(&size) == B_OK);
-		CHK(size == 0);
-		CheckNoAttr(file, kTypeAttribute);
-		CheckNoAttr(file, kMiniIconAttribute);
-		CheckNoAttr(file, kLargeIconAttribute);
-		// reinit with NULL file
-		CHK(appFileInfo.SetTo(NULL) == B_BAD_VALUE);
-		CHK(appFileInfo.InitCheck() == B_BAD_VALUE);
-		CHK(appFileInfo.IsUsingAttributes() == true);
-		CHK(appFileInfo.IsUsingResources() == true);
-		CHK(file.GetSize(&size) == B_OK);
-		CHK(size == 0);
-		CheckNoAttr(file, kTypeAttribute);
-		CheckNoAttr(file, kMiniIconAttribute);
-		CheckNoAttr(file, kLargeIconAttribute);
-		// reinit with valid file
-		BFile file2(testFile2, B_READ_WRITE);
-		CHK(appFileInfo.SetTo(&file2) == B_OK);
-		CHK(appFileInfo.InitCheck() == B_OK);
-		CHK(appFileInfo.IsUsingAttributes() == true);
-		CHK(appFileInfo.IsUsingResources() == true);
-	}
-}
-
-// TypeTest
-void
-AppFileInfoTest::TypeTest()
-{
-	// status_t GetType(char *type) const
-	// * NULL type => B_BAD_ADDRESS/B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(equals(appFileInfo.GetType(NULL), B_BAD_ADDRESS, B_BAD_VALUE));
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		char type[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetType(type) == B_NO_INIT);
-	}
-	// * has no type => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		char type[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetType(type) == B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		CHK(appFileInfo.SetType(testType1) == B_OK);
-		// get
-		char type[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetType(type) == B_OK);
-		CHK(strcmp(testType1, type) == 0);
-		CheckTypeAttr(file, testType1);
-		SyncResources(appFileInfo);
-		CheckTypeResource(file, testType1);
-		// reset
-		CHK(appFileInfo.SetType(testType2) == B_OK);
-		// get
-		CHK(appFileInfo.GetType(type) == B_OK);
-		CHK(strcmp(testType2, type) == 0);
-		CheckTypeAttr(file, testType2);
-		SyncResources(appFileInfo);
-		CheckTypeResource(file, testType2);
-	}
-
-	// status_t SetType(const char *type)
-	// * NULL type => B_OK, unsets the type
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetType(NULL) == B_OK);
-		// get
-		char type[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetType(type) == B_ENTRY_NOT_FOUND);
-		CheckNoAttr(file, kTypeAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kTypeAttribute);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetType(testType1) == B_NO_INIT);
-	}
-	// * invalid MIME type => B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetType(invalidTestType) == B_OK);
-		// get
-		char type[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetType(type) == B_OK);
-		CHK(strcmp(invalidTestType, type) == 0);
-		CheckTypeAttr(file, invalidTestType);
-		SyncResources(appFileInfo);
-		CheckTypeResource(file, invalidTestType);
-	}
-	// * type string too long => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// remove attr first
-		CHK(appFileInfo.SetType(NULL) == B_OK);
-		// try to set the too long type
-		CHK(appFileInfo.SetType(tooLongTestType) == B_BAD_VALUE);
-		CheckNoAttr(file, kTypeAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kTypeAttribute);
-	}
-}
-
-// SignatureTest
-void
-AppFileInfoTest::SignatureTest()
-{
-	// status_t GetSignature(char *signature) const
-	// * NULL signature => B_BAD_ADDRESS/B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(equals(appFileInfo.GetSignature(NULL), B_BAD_ADDRESS, B_BAD_VALUE));
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		char signature[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetSignature(signature) == B_NO_INIT);
-	}
-	// * has no signature => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		char signature[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetSignature(signature) == B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		CHK(BMimeType(testAppSignature1).IsInstalled() == false);
-		// get
-		char signature[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetSignature(signature) == B_OK);
-		CHK(strcmp(testAppSignature1, signature) == 0);
-		CheckSignatureAttr(file, testAppSignature1);
-		SyncResources(appFileInfo);
-		CheckSignatureResource(file, testAppSignature1);
-		// reset
-		CHK(appFileInfo.SetSignature(testAppSignature2) == B_OK);
-		CHK(BMimeType(testAppSignature2).IsInstalled() == false);
-		// get
-		CHK(appFileInfo.GetSignature(signature) == B_OK);
-		CHK(strcmp(testAppSignature2, signature) == 0);
-		CheckSignatureAttr(file, testAppSignature2);
-		SyncResources(appFileInfo);
-		CheckSignatureResource(file, testAppSignature2);
-	}
-
-	// status_t SetSignature(const char *signature)
-	// * NULL signature => B_OK, unsets the signature
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(NULL) == B_OK);
-		// get
-		char signature[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetSignature(signature) == B_ENTRY_NOT_FOUND);
-		CheckNoAttr(file, kSignatureAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSignatureAttribute);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_NO_INIT);
-	}
-	// * invalid MIME signature => B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(invalidTestType) == B_OK);
-		// get
-		char signature[B_MIME_TYPE_LENGTH];
-		CHK(appFileInfo.GetSignature(signature) == B_OK);
-		CHK(strcmp(invalidTestType, signature) == 0);
-		CheckSignatureAttr(file, invalidTestType);
-		SyncResources(appFileInfo);
-		CheckSignatureResource(file, invalidTestType);
-	}
-	// * signature string too long => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// remove attr first
-		CHK(appFileInfo.SetSignature(NULL) == B_OK);
-		// try to set the too long signature
-		CHK(appFileInfo.SetSignature(tooLongTestType) == B_BAD_VALUE);
-		CheckNoAttr(file, kSignatureAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSignatureAttribute);
-	}
-}
-
-// AppFlagsTest
-void
-AppFileInfoTest::AppFlagsTest()
-{
-	// status_t GetAppFlags(uint32 *flags) const
-	// * NULL flags => B_BAD_ADDRESS/B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(equals(appFileInfo.GetAppFlags(NULL), B_BAD_ADDRESS, B_BAD_VALUE));
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		uint32 flags;
-		CHK(appFileInfo.GetAppFlags(&flags) == B_NO_INIT);
-	}
-	// * has no flags => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		uint32 flags;
-		CHK(appFileInfo.GetAppFlags(&flags) == B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		uint32 testFlags1 = B_SINGLE_LAUNCH | B_BACKGROUND_APP;
-		uint32 testFlags2 = B_MULTIPLE_LAUNCH | B_ARGV_ONLY;
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		CHK(appFileInfo.SetAppFlags(testFlags1) == B_OK);
-		// get
-		uint32 flags;
-		CHK(appFileInfo.GetAppFlags(&flags) == B_OK);
-		CHK(flags == testFlags1);
-		CheckAppFlagsAttr(file, testFlags1);
-		SyncResources(appFileInfo);
-		CheckAppFlagsResource(file, testFlags1);
-		// reset
-		CHK(appFileInfo.SetAppFlags(testFlags2) == B_OK);
-		// get
-		CHK(appFileInfo.GetAppFlags(&flags) == B_OK);
-		CHK(flags == testFlags2);
-		CheckAppFlagsAttr(file, testFlags2);
-		SyncResources(appFileInfo);
-		CheckAppFlagsResource(file, testFlags2);
-	}
-
-	// status_t SetAppFlags(uint32 flags)
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetAppFlags(B_SINGLE_LAUNCH) == B_NO_INIT);
-	}
-}
-
-// IsSupportingApp
 static
 bool
 IsSupportingApp(const char *type, const char *signature)
 {
 	BMessage apps;
-//	CHK(BMimeType(type).GetSupportingApps(&apps) == B_OK);
+//	CPPUNIT_ASSERT_EQUAL(B_OK, BMimeType(type).GetSupportingApps(&apps));
 	BMimeType(type).GetSupportingApps(&apps);
 	bool found = false;
 	BString app;
-	for (int32 i = 0;
-		 !found && apps.FindString("applications", i, &app) == B_OK;
-		 i++) {
-		found = (app == signature);
+	for (int32 i = 0; apps.FindString("applications", i, &app) == B_OK; i++) {
+		if (app == signature) {
+			found = true;
+			break;
+		}
 	}
 	return found;
 }
 
-// SupportedTypesTest
-void
-AppFileInfoTest::SupportedTypesTest()
-{
-	// test data
-	BMessage testTypes1;
-	CHK(testTypes1.AddString("types", testType1) == B_OK);
-	CHK(testTypes1.AddString("types", testType2) == B_OK);
-	BMessage testTypes2;
-	CHK(testTypes2.AddString("types", testType3) == B_OK);
-	CHK(testTypes2.AddString("types", testType4) == B_OK);
-	BMimeType mimeTestType1(testType1);
-	BMimeType mimeTestType2(testType2);
-	BMimeType mimeTestType3(testType3);
-	BMimeType mimeTestType4(testType4);
-	// add and install the app signature
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		CHK(BMimeType(testAppSignature1).Install() == B_OK);
-	}
 
-	// status_t GetSupportedTypes(BMessage *types) const;
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_NO_INIT);
-	}
-	// * has no supported types => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
-		CHK(appFileInfo.IsSupportedType(testType1) == true);
-		CHK(appFileInfo.IsSupportedType(testType2) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == true);
-		CHK(appFileInfo.Supports(&mimeTestType2) == true);
-		CheckSupportedTypesAttr(file, &testTypes1);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes1);
-		CHK(BMimeType(testType1).IsInstalled() == true);
-		CHK(BMimeType(testType2).IsInstalled() == true);
-		// reset
-		CHK(BMimeType(testType3).IsInstalled() == false);
-		CHK(BMimeType(testType4).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
-		// get
-		BMessage types2;
-		CHK(appFileInfo.GetSupportedTypes(&types2) == B_OK);
-		CHK(SupportedTypesValue(types2) == SupportedTypesValue(testTypes2));
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.IsSupportedType(testType3) == true);
-		CHK(appFileInfo.IsSupportedType(testType4) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType3) == true);
-		CHK(appFileInfo.Supports(&mimeTestType4) == true);
-		CheckSupportedTypesAttr(file, &testTypes2);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes2);
-		CHK(BMimeType(testType3).IsInstalled() == true);
-		CHK(BMimeType(testType4).IsInstalled() == true);
-	}
-	// * partially filled types => types is cleared beforehand
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BMessage types2;
-		CHK(types2.AddString("types", testType1) == B_OK);
-		CHK(types2.AddString("dummy", "Hello") == B_OK);
-		CHK(appFileInfo.GetSupportedTypes(&types2) == B_OK);
-		CHK(SupportedTypesValue(types2) == SupportedTypesValue(testTypes2));
-		const char *dummy;
-		CHK(types2.FindString("dummy", &dummy) != B_OK);
-	}
-	// * NULL types => B_BAD_VALUE
-// R5: crashes when passing NULL types
-#ifndef TEST_R5
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.GetSupportedTypes(NULL) == B_BAD_VALUE);
-	}
-#endif
-
-	// status_t SetSupportedTypes(const BMessage *types, bool syncAll);
-	// status_t SetSupportedTypes(const BMessage *types);
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BMessage types;
-		CHK(appFileInfo.SetSupportedTypes(&types) == B_NO_INIT);
-	}
-	// * NULL types => unsets supported types
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		CHK(appFileInfo.SetSupportedTypes(NULL) == B_OK);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.IsSupportedType(testType3) == false);
-		CHK(appFileInfo.IsSupportedType(testType4) == false);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType3) == false);
-		CHK(appFileInfo.Supports(&mimeTestType4) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-		// set: syncAll = true
-// R5: crashes when passing NULL types
-#ifndef TEST_R5
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
-		CHK(appFileInfo.SetSupportedTypes(NULL, true) == B_OK);
-		// get
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.IsSupportedType(testType3) == false);
-		CHK(appFileInfo.IsSupportedType(testType4) == false);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType3) == false);
-		CHK(appFileInfo.Supports(&mimeTestType4) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-#endif
-	}
-	// * cross check with BMimeType::GetSupportingApps(): no syncAll
-	NextSubTest();
-	{
-		// clean up
-		CHK(BMimeType(testType1).Delete() == B_OK);
-		CHK(BMimeType(testType2).Delete() == B_OK);
-		CHK(BMimeType(testType3).Delete() == B_OK);
-		CHK(BMimeType(testType4).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Install() == B_OK);
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		// reset
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
-	}
-	// * cross check with BMimeType::GetSupportingApps(): syncAll == false
-	NextSubTest();
-	{
-		// clean up
-		CHK(BMimeType(testType1).Delete() == B_OK);
-		CHK(BMimeType(testType2).Delete() == B_OK);
-		CHK(BMimeType(testType3).Delete() == B_OK);
-		CHK(BMimeType(testType4).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Install() == B_OK);
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1, false) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		// reset
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2, false) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
-	}
-	// * cross check with BMimeType::GetSupportingApps(): syncAll == true
-	NextSubTest();
-	{
-		// clean up
-		CHK(BMimeType(testType1).Delete() == B_OK);
-		CHK(BMimeType(testType2).Delete() == B_OK);
-		CHK(BMimeType(testType3).Delete() == B_OK);
-		CHK(BMimeType(testType4).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Install() == B_OK);
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		// reset
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2, true) == B_OK);
-		// get
-		CHK(IsSupportingApp(testType1, testAppSignature1) == false);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == false);
-		CHK(IsSupportingApp(testType3, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType4, testAppSignature1) == true);
-	}
-	// * types contains invalid MIME types
-// R5: doesn't fail
-#ifndef TEST_R5
-	NextSubTest();
-	{
-		// init
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set
-		BMessage invalidTestTypes;
-		CHK(invalidTestTypes.AddString("types", invalidTestType) == B_OK);
-		CHK(appFileInfo.SetSupportedTypes(NULL, true) == B_OK);
-		CHK(appFileInfo.SetSupportedTypes(&invalidTestTypes, false)
-			== B_BAD_VALUE);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(invalidTestType) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-	}
-#endif
-
-	// bool IsSupportedType(const char *type) const;
-	// bool Supports(BMimeType *type) const;
-	// * NULL type => false
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.IsSupportedType(NULL) == false);
-// R5: crashes when passing a NULL type
-#ifndef TEST_R5
-		CHK(appFileInfo.Supports(NULL) == false);
-#endif
-	}
-	// * supports "application/octet-stream"
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BMimeType gifType("image/gif");
-		CHK(appFileInfo.IsSupportedType(gifType.Type()) == false);
-		CHK(appFileInfo.Supports(&gifType) == false);
-		BMessage types;
-		CHK(types.AddString("types", "application/octet-stream") == B_OK);
-		CHK(appFileInfo.SetSupportedTypes(&types) == B_OK);
-		CHK(appFileInfo.IsSupportedType(gifType.Type()) == true);
-		CHK(appFileInfo.Supports(&gifType) == false);
-		BMessage noTypes;
-		CHK(appFileInfo.SetSupportedTypes(&noTypes, true) == B_OK);
-	}
-
-	// various
-	// * signature not installed, syncAll = true
-	NextSubTest();
-	{
-		// clean up
-		CHK(BMimeType(testType1).Delete() == B_OK);
-		CHK(BMimeType(testType2).Delete() == B_OK);
-		CHK(BMimeType(testType3).Delete() == B_OK);
-		CHK(BMimeType(testType4).Delete() == B_OK);
-		CHK(BMimeType(testAppSignature1).Delete() == B_OK);
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true) == B_OK);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
-		CHK(appFileInfo.IsSupportedType(testType1) == true);
-		CHK(appFileInfo.IsSupportedType(testType2) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == true);
-		CHK(appFileInfo.Supports(&mimeTestType2) == true);
-		CheckSupportedTypesAttr(file, &testTypes1);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes1);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		// set
-		CHK(BMimeType(testType3).IsInstalled() == false);
-		CHK(BMimeType(testType4).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2, true) == B_OK);
-		// get
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes2));
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.IsSupportedType(testType3) == true);
-		CHK(appFileInfo.IsSupportedType(testType4) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType3) == true);
-		CHK(appFileInfo.Supports(&mimeTestType4) == true);
-		CheckSupportedTypesAttr(file, &testTypes2);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes2);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(BMimeType(testType3).IsInstalled() == false);
-// R5: returns true. In fact the last SetSupportedTypes() installed testType4
-// in the database, but not testType3. Certainly a bug
-#ifndef TEST_R5
-		CHK(BMimeType(testType4).IsInstalled() == false);
-#endif
-	}
-	// * signature not installed, no syncAll
-	NextSubTest();
-	{
-		// clean up
-		BMimeType(testType1).Delete();
-		BMimeType(testType2).Delete();
-		BMimeType(testType3).Delete();
-		BMimeType(testType4).Delete();
-		BMimeType(testAppSignature1).Delete();
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
-//     fail.
-#ifdef TEST_R5
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_ENTRY_NOT_FOUND);
-#else
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
-#endif
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
-		CHK(appFileInfo.IsSupportedType(testType1) == true);
-		CHK(appFileInfo.IsSupportedType(testType2) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == true);
-		CHK(appFileInfo.Supports(&mimeTestType2) == true);
-		CheckSupportedTypesAttr(file, &testTypes1);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes1);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		// set
-		CHK(BMimeType(testType3).IsInstalled() == false);
-		CHK(BMimeType(testType4).IsInstalled() == false);
-// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
-//     fail.
-#ifdef TEST_R5
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_ENTRY_NOT_FOUND);
-#else
-		CHK(appFileInfo.SetSupportedTypes(&testTypes2) == B_OK);
-#endif
-		// get
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes2));
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.IsSupportedType(testType3) == true);
-		CHK(appFileInfo.IsSupportedType(testType4) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType3) == true);
-		CHK(appFileInfo.Supports(&mimeTestType4) == true);
-		CheckSupportedTypesAttr(file, &testTypes2);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes2);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(BMimeType(testType3).IsInstalled() == false);
-// R5: returns true. In fact the last SetSupportedTypes() installed testType4
-// in the database, but not testType3. Certainly a bug
-#ifndef TEST_R5
-		CHK(BMimeType(testType4).IsInstalled() == false);
-#endif
-	}
-	// * no signature
-	NextSubTest();
-	{
-		// clean up
-		BMimeType(testType1).Delete();
-		BMimeType(testType2).Delete();
-		BMimeType(testType3).Delete();
-		BMimeType(testType4).Delete();
-		BMimeType(testAppSignature1).Delete();
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set, syncAll = true
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1, true)
-			== B_ENTRY_NOT_FOUND);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		// set, no syncAll
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_ENTRY_NOT_FOUND);
-		// get
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		CHK(BMimeType(testType2).IsInstalled() == false);
-	}
-	// * set supported types, remove file, create file, get supported types
-	NextSubTest();
-	{
-		// clean up
-		BMimeType(testType1).Delete();
-		BMimeType(testType2).Delete();
-		BMimeType(testType3).Delete();
-		BMimeType(testType4).Delete();
-		BMimeType(testAppSignature1).Delete();
-		CHK(BMimeType(testAppSignature1).Install() == B_OK);
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		BFile file(testFile1, B_READ_WRITE | B_CREATE_FILE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// set
-		CHK(appFileInfo.SetSupportedTypes(&testTypes1) == B_OK);
-		// get
-		BMessage types;
-		CHK(appFileInfo.GetSupportedTypes(&types) == B_OK);
-		CHK(SupportedTypesValue(types) == SupportedTypesValue(testTypes1));
-		CHK(appFileInfo.IsSupportedType(testType1) == true);
-		CHK(appFileInfo.IsSupportedType(testType2) == true);
-		CHK(appFileInfo.Supports(&mimeTestType1) == true);
-		CHK(appFileInfo.Supports(&mimeTestType2) == true);
-		CheckSupportedTypesAttr(file, &testTypes1);
-		SyncResources(appFileInfo);
-		CheckSupportedTypesResource(file, &testTypes1);
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-		// remove the file
-		appFileInfo.SetTo(NULL);
-		file.Unset();
-		CHK(BEntry(testFile1).Remove() == B_OK);
-		// init
-		CHK(file.SetTo(testFile1, B_READ_WRITE | B_CREATE_FILE) == B_OK);
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		// get
-		BMessage types2;
-		CHK(appFileInfo.GetSupportedTypes(&types2) == B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.IsSupportedType(testType1) == false);
-		CHK(appFileInfo.IsSupportedType(testType2) == false);
-		CHK(appFileInfo.Supports(&mimeTestType1) == false);
-		CHK(appFileInfo.Supports(&mimeTestType2) == false);
-		CheckNoAttr(file, kSupportedTypesAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kSupportedTypesAttribute);
-		CHK(IsSupportingApp(testType1, testAppSignature1) == true);
-		CHK(IsSupportingApp(testType2, testAppSignature1) == true);
-	}
-}
-
-// IconTest
-void
-AppFileInfoTest::IconTest()
-{
-	// status_t GetIcon(BBitmap *icon, icon_size k) const
-	// * NULL icon => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.GetIcon(NULL, B_MINI_ICON) == B_BAD_VALUE);
-		CHK(appFileInfo.GetIcon(NULL, B_LARGE_ICON) == B_BAD_VALUE);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_NO_INIT);
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon2, B_LARGE_ICON) == B_NO_INIT);
-	}
-	// * icon dimensions != icon size => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_BAD_VALUE);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon2, B_LARGE_ICON) == B_BAD_VALUE);
-	}
-	// * has no icon => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		// set
-		CHK(appFileInfo.SetIcon(fIconM1, B_MINI_ICON) == B_OK);
-		// get
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		CheckIconAttr(file, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconM1);
-		// reset
-		CHK(appFileInfo.SetIcon(fIconM2, B_MINI_ICON) == B_OK);
-		// get
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon2, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM2, &icon2));
-		CheckIconAttr(file, fIconM2);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconM2);
-		// large
-		// set
-		CHK(appFileInfo.SetIcon(fIconL1, B_LARGE_ICON) == B_OK);
-		// get
-		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon3, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL1, &icon3));
-		CheckIconAttr(file, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconL1);
-		// reset
-		CHK(appFileInfo.SetIcon(fIconL2, B_LARGE_ICON) == B_OK);
-		// get
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon4, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL2, &icon4));
-		CheckIconAttr(file, fIconL2);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconL2);
-	}
-#if 0
-	// * bitmap color_space != B_CMAP8 => B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_OK);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
-		// SetBits() can be used, since there's no row padding for 16x16.
-		icon2.SetBits(fIconM2->Bits(), fIconM2->BitsLength(), 0, B_CMAP8);
-		CHK(icon_equal(&icon, &icon2));
-		// large
-// R5: Crashes for some weird reason in GetIcon().
-#ifndef TEST_R5
-		BBitmap icon3(BRect(0, 0, 31, 31), B_RGB32);
-		CHK(appFileInfo.GetIcon(&icon3, B_LARGE_ICON) == B_OK);
-		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
-		// SetBits() can be used, since there's no row padding for 32x32.
-		icon4.SetBits(fIconL2->Bits(), fIconL2->BitsLength(), 0, B_CMAP8);
-		CHK(icon_equal(&icon3, &icon4));
-#endif
-	}
-#endif
-
-	// status_t SetIcon(const BBitmap *icon, icon_size k)
-	// * NULL icon => unsets icon, B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		// set
-		CHK(appFileInfo.SetIcon(NULL, B_MINI_ICON) == B_OK);
-		// get
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_ENTRY_NOT_FOUND);
-		CheckNoAttr(file, kMiniIconAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kMiniIconAttribute);
-		// large
-		// set
-		CHK(appFileInfo.SetIcon(NULL, B_LARGE_ICON) == B_OK);
-		// get
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon2, B_LARGE_ICON) == B_ENTRY_NOT_FOUND);
-		CheckNoAttr(file, kLargeIconAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kLargeIconAttribute);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.SetIcon(&icon, B_MINI_ICON) == B_NO_INIT);
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.SetIcon(&icon2, B_LARGE_ICON) == B_NO_INIT);
-	}
-	// * icon dimensions != icon size => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.SetIcon(&icon, B_MINI_ICON) == B_BAD_VALUE);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.SetIcon(&icon2, B_LARGE_ICON) == B_BAD_VALUE);
-	}
-	// * file has app signature, set an icon => the icon is also set on the
-	//   MIME type
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// uninstalled signature
-		BMimeType mimeType(testAppSignature1);
-		CHK(mimeType.IsInstalled() == false);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		CHK(appFileInfo.SetIcon(fIconM1, B_MINI_ICON) == B_OK);
-		CHK(appFileInfo.SetIcon(fIconL1, B_LARGE_ICON) == B_OK);
-		CHK(mimeType.IsInstalled() == true);
-		// get mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(mimeType.GetIcon(&icon, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		// get large
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(mimeType.GetIcon(&icon2, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL1, &icon2));
-		// installed signature
-		CHK(appFileInfo.SetIcon(fIconM2, B_MINI_ICON) == B_OK);
-		CHK(appFileInfo.SetIcon(fIconL2, B_LARGE_ICON) == B_OK);
-		// get mini
-		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(mimeType.GetIcon(&icon3, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM2, &icon3));
-		// get large
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(mimeType.GetIcon(&icon4, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL2, &icon4));
-	}
-}
-
-// VersionInfoTest
-void
-AppFileInfoTest::VersionInfoTest()
-{
-//	status_t GetVersionInfo(version_info *info, version_kind kind) const;
-//	status_t SetVersionInfo(const version_info *info, version_kind kind);
-	version_info testInfo1 = { 1, 1, 1, 1, 1, "short1", "long1" };
-	version_info testInfo2 = { 2, 2, 2, 2, 2, "short2", "long2" };
-	version_info testInfo3 = { 3, 3, 3, 3, 3, "short3", "long3" };
-	version_info testInfo4 = { 4, 4, 4, 4, 4, "short4", "long4" };
-
-
-	// status_t GetVersionInfo(version_info *info, version_kind kind) const
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		version_info info;
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND)
-			== B_NO_INIT);
-		version_info info2;
-		CHK(appFileInfo.GetVersionInfo(&info2, B_SYSTEM_VERSION_KIND)
-			== B_NO_INIT);
-	}
-	// * has no version info => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		version_info info;
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-		version_info info2;
-		CHK(appFileInfo.GetVersionInfo(&info2, B_SYSTEM_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set app info
-		CHK(appFileInfo.SetVersionInfo(&testInfo1, B_APP_VERSION_KIND)
-			== B_OK);
-		// get both infos
-		version_info info;
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND) == B_OK);
-		CHK(info == testInfo1);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND) == B_OK);
-		// set app info
-		CHK(appFileInfo.SetVersionInfo(&testInfo2, B_SYSTEM_VERSION_KIND)
-			== B_OK);
-		// get
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND) == B_OK);
-		CHK(info == testInfo1);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND) == B_OK);
-		CHK(info == testInfo2);
-		version_info testInfos1[] = { testInfo1, testInfo2 };
-		CheckVersionInfoAttr(file, testInfos1);
-		SyncResources(appFileInfo);
-		CheckVersionInfoResource(file, testInfos1);
-		// reset app info
-		CHK(appFileInfo.SetVersionInfo(&testInfo3, B_APP_VERSION_KIND)
-			== B_OK);
-		// get
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND) == B_OK);
-		CHK(info == testInfo3);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND) == B_OK);
-		CHK(info == testInfo2);
-		version_info testInfos2[] = { testInfo3, testInfo2 };
-		CheckVersionInfoAttr(file, testInfos2);
-		SyncResources(appFileInfo);
-		CheckVersionInfoResource(file, testInfos2);
-		// reset system info
-		CHK(appFileInfo.SetVersionInfo(&testInfo4, B_SYSTEM_VERSION_KIND)
-			== B_OK);
-		// get
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND) == B_OK);
-		CHK(info == testInfo3);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND) == B_OK);
-		CHK(info == testInfo4);
-		version_info testInfos3[] = { testInfo3, testInfo4 };
-		CheckVersionInfoAttr(file, testInfos3);
-		SyncResources(appFileInfo);
-		CheckVersionInfoResource(file, testInfos3);
-	}
-	// * NULL info => B_BAD_VALUE
-// R5: crashes when passing a NULL version_info
-#ifndef TEST_R5
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(equals(appFileInfo.GetVersionInfo(NULL, B_APP_VERSION_KIND),
-				   B_BAD_ADDRESS, B_BAD_VALUE));
-		CHK(equals(appFileInfo.GetVersionInfo(NULL, B_SYSTEM_VERSION_KIND),
-				   B_BAD_ADDRESS, B_BAD_VALUE));
-	}
-#endif
-
-	// status_t SetVersionInfo(const version_info *info, version_kind kind)
-	// * NULL info => unsets both infos, B_OK
-// R5: crashes when passing a NULL version_info
-#ifndef TEST_R5
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// unset app info
-		CHK(appFileInfo.SetVersionInfo(NULL, B_APP_VERSION_KIND)
-			== B_OK);
-		// try to get
-		version_info info;
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-		// check
-		CheckNoAttr(file, kVersionInfoAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kVersionInfoAttribute);
-		// reset the infos
-		CHK(appFileInfo.SetVersionInfo(&testInfo1, B_APP_VERSION_KIND)
-			== B_OK);
-		CHK(appFileInfo.SetVersionInfo(&testInfo1, B_SYSTEM_VERSION_KIND)
-			== B_OK);
-		// unset system info
-		CHK(appFileInfo.SetVersionInfo(NULL, B_SYSTEM_VERSION_KIND) == B_OK);
-		// try to get
-		CHK(appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-		CHK(appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND)
-			== B_ENTRY_NOT_FOUND);
-		// check
-		CheckNoAttr(file, kVersionInfoAttribute);
-		SyncResources(appFileInfo);
-		CheckNoResource(file, kVersionInfoAttribute);
-	}
-#endif
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetVersionInfo(&testInfo1, B_APP_VERSION_KIND)
-			== B_NO_INIT);
-		CHK(appFileInfo.GetVersionInfo(&testInfo1, B_SYSTEM_VERSION_KIND)
-			== B_NO_INIT);
-	}
-}
-
-// IconForTypeTest
-void
-AppFileInfoTest::IconForTypeTest()
-{
-	// status_t GetIconForType(const char *type, BBitmap *icon,
-	//						   icon_size which) const
-	// * NULL icon => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.GetIconForType(testType1, NULL, B_MINI_ICON)
-			== B_BAD_VALUE);
-		CHK(appFileInfo.GetIconForType(testType1, NULL, B_LARGE_ICON)
-			== B_BAD_VALUE);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_NO_INIT);
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_NO_INIT);
-	}
-	// * icon dimensions != icon size => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_BAD_VALUE);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_BAD_VALUE);
-	}
-	// * has no icon => B_ENTRY_NOT_FOUND
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_ENTRY_NOT_FOUND);
-	}
-	// * set, get, reset, get
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		// set
-		CHK(appFileInfo.SetIconForType(testType1, fIconM1, B_MINI_ICON)
-			== B_OK);
-		// get
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		CheckIconForTypeAttr(file, testType1, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconM1);
-		// reset
-		CHK(appFileInfo.SetIconForType(testType1, fIconM2, B_MINI_ICON)
-			== B_OK);
-		// get
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon2, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM2, &icon2));
-		CheckIconForTypeAttr(file, testType1, fIconM2);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconM2);
-		// large
-		// set
-		CHK(appFileInfo.SetIconForType(testType1, fIconL1, B_LARGE_ICON)
-			== B_OK);
-		// get
-		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon3, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL1, &icon3));
-		CheckIconForTypeAttr(file, testType1, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconL1);
-		// reset
-		CHK(appFileInfo.SetIconForType(testType1, fIconL2, B_LARGE_ICON)
-			== B_OK);
-		// get
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon4, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL2, &icon4));
-		CheckIconForTypeAttr(file, testType1, fIconL2);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconL2);
-	}
-#if 0
-	// * bitmap color_space != B_CMAP8 => B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON) == B_OK);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
-		// SetBits() can be used, since there's no row padding for 16x16.
-		icon2.SetBits(fIconM2->Bits(), fIconM2->BitsLength(), 0, B_CMAP8);
-		CHK(icon_equal(&icon, &icon2));
-		// large
-// R5: Crashes for some weird reason in GetIconForType().
-#ifndef TEST_R5
-		BBitmap icon3(BRect(0, 0, 31, 31), B_RGB32);
-		CHK(appFileInfo.GetIconForType(testType1, &icon3, B_LARGE_ICON)
-			== B_OK);
-		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
-		// SetBits() can be used, since there's no row padding for 32x32.
-		icon4.SetBits(fIconL2->Bits(), fIconL2->BitsLength(), 0, B_CMAP8);
-		CHK(icon_equal(&icon3, &icon4));
-#endif
-	}
-#endif
-
-	// status_t SetIconForType(const char *type, const BBitmap *icon,
-	//						   icon_size which)
-	// * NULL icon => unsets icon, B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// mini
-		// set
-		CHK(appFileInfo.SetIconForType(testType1, NULL, B_MINI_ICON) == B_OK);
-		// get
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_ENTRY_NOT_FOUND);
-		CheckNoIconForTypeAttr(file, testType1, B_MINI_ICON);
-		SyncResources(appFileInfo);
-		CheckNoIconForTypeResource(file, testType1, B_MINI_ICON);
-		// large
-		// set
-		CHK(appFileInfo.SetIconForType(testType1, NULL, B_LARGE_ICON) == B_OK);
-		// get
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_ENTRY_NOT_FOUND);
-		CheckNoIconForTypeAttr(file, testType1, B_LARGE_ICON);
-		SyncResources(appFileInfo);
-		CheckNoIconForTypeResource(file, testType1, B_LARGE_ICON);
-	}
-	// * uninitialized => B_NO_INIT
-	NextSubTest();
-	{
-		BAppFileInfo appFileInfo;
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.SetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_NO_INIT);
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.SetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_NO_INIT);
-	}
-	// * icon dimensions != icon size => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.SetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_BAD_VALUE);
-		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.SetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_BAD_VALUE);
-	}
-	// * NULL type => set standard icon
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetIconForType(NULL, fIconM1, B_MINI_ICON) == B_OK);
-		CHK(appFileInfo.SetIconForType(NULL, fIconL1, B_LARGE_ICON) == B_OK);
-		// get mini icon via GetIcon()
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		CheckIconAttr(file, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconM1);
-		// get large via GetIcon()
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIcon(&icon2, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL1, &icon2));
-		CheckIconAttr(file, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconL1);
-		// get mini icon via GetIconForType()
-		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(NULL, &icon3, B_MINI_ICON) == B_OK);
-		CHK(icon_equal(fIconM1, &icon3));
-		CheckIconAttr(file, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconM1);
-		// get large via GetIconForType()
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(NULL, &icon4, B_LARGE_ICON) == B_OK);
-		CHK(icon_equal(fIconL1, &icon4));
-		CheckIconAttr(file, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconResource(file, fIconL1);
-	}
-	// * set icons for two types
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// set icons for both types
-		CHK(appFileInfo.SetIconForType(testType1, fIconM1, B_MINI_ICON)
-			== B_OK);
-		CHK(appFileInfo.SetIconForType(testType1, fIconL1, B_LARGE_ICON)
-			== B_OK);
-		CHK(appFileInfo.SetIconForType(testType2, fIconM2, B_MINI_ICON)
-			== B_OK);
-		CHK(appFileInfo.SetIconForType(testType2, fIconL2, B_LARGE_ICON)
-			== B_OK);
-		// check first type
-		// get mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		CheckIconForTypeAttr(file, testType1, fIconM1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconM1);
-		// get large
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL1, &icon2));
-		CheckIconForTypeAttr(file, testType1, fIconL1);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType1, fIconL1);
-		// check second type
-		// get mini
-		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType2, &icon3, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM2, &icon3));
-		CheckIconForTypeAttr(file, testType2, fIconM2);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType2, fIconM2,
-								 kMiniIconForTypeResourceID + 1);
-		// get large
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(testType2, &icon4, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL2, &icon4));
-		CheckIconForTypeAttr(file, testType2, fIconL2);
-		SyncResources(appFileInfo);
-		CheckIconForTypeResource(file, testType2, fIconL2,
-								 kLargeIconForTypeResourceID + 1);
-		// unset both icons
-		CHK(appFileInfo.SetIconForType(testType1, NULL, B_MINI_ICON) == B_OK);
-		CHK(appFileInfo.SetIconForType(testType1, NULL, B_LARGE_ICON) == B_OK);
-		CHK(appFileInfo.SetIconForType(testType2, NULL, B_MINI_ICON) == B_OK);
-		CHK(appFileInfo.SetIconForType(testType2, NULL, B_LARGE_ICON) == B_OK);
-	}
-	// * invalid type => B_OK
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetIconForType(invalidTestType, fIconM1, B_MINI_ICON)
-			== B_BAD_VALUE);
-		CHK(appFileInfo.SetIconForType(invalidTestType, fIconL1, B_LARGE_ICON)
-			== B_BAD_VALUE);
-		// get mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(invalidTestType, &icon, B_MINI_ICON)
-			== B_BAD_VALUE);
-		CheckNoIconForTypeAttr(file, invalidTestType, B_LARGE_ICON);
-		CheckNoIconForTypeResource(file, invalidTestType, B_LARGE_ICON);
-		// get large
-		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(appFileInfo.GetIconForType(invalidTestType, &icon3, B_LARGE_ICON)
-			== B_BAD_VALUE);
-		CheckNoIconForTypeAttr(file, invalidTestType, B_MINI_ICON);
-		CheckNoIconForTypeResource(file, invalidTestType, B_MINI_ICON);
-	}
-	// * too long type => B_BAD_VALUE
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetIconForType(tooLongTestType, fIconM1, B_MINI_ICON)
-			== B_BAD_VALUE);
-		CHK(appFileInfo.SetIconForType(tooLongTestType, fIconL1, B_LARGE_ICON)
-			== B_BAD_VALUE);
-	}
-	// * file has app signature, set an icon => the icon is also set on the
-	//   MIME type
-	NextSubTest();
-	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		// uninstalled signature
-		BMimeType mimeType(testAppSignature1);
-		CHK(mimeType.IsInstalled() == false);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		CHK(appFileInfo.SetIconForType(testType1, fIconM1, B_MINI_ICON)
-			== B_OK);
-		CHK(appFileInfo.SetIconForType(testType1, fIconL1, B_LARGE_ICON)
-			== B_OK);
-		CHK(mimeType.IsInstalled() == true);
-		CHK(BMimeType(testType1).IsInstalled() == false);
-		// get mini
-		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(mimeType.GetIconForType(testType1, &icon, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM1, &icon));
-		// get large
-		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(mimeType.GetIconForType(testType1, &icon2, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL1, &icon2));
-		// installed signature
-		CHK(appFileInfo.SetIconForType(testType1, fIconM2, B_MINI_ICON)
-			== B_OK);
-		CHK(appFileInfo.SetIconForType(testType1, fIconL2, B_LARGE_ICON)
-			== B_OK);
-		// get mini
-		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
-		CHK(mimeType.GetIconForType(testType1, &icon3, B_MINI_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconM2, &icon3));
-		// get large
-		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
-		CHK(mimeType.GetIconForType(testType1, &icon4, B_LARGE_ICON)
-			== B_OK);
-		CHK(icon_equal(fIconL2, &icon4));
-	}
-}
-
-
-// InfoLocationTester
 template<typename Value, typename Setter, typename Getter, typename Checker>
-static
-void
-InfoLocationTester(const Value &testValue1, const Value &testValue2,
+static void
+InfoLocationTester(BFile &file, const Value &testValue1, const Value &testValue2,
 				   const Value &testValue3)
 {
-	BFile file(testFile1, B_READ_WRITE);
 	BAppFileInfo appFileInfo;
-	CHK(appFileInfo.SetTo(&file) == B_OK);
-	CHK(appFileInfo.InitCheck() == B_OK);
-	CHK(appFileInfo.IsUsingAttributes() == true);
-	CHK(appFileInfo.IsUsingResources() == true);
+	CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+	CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.InitCheck());
+	CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
 	// set value
-	CHK(Setter::Set(appFileInfo, testValue1) == B_OK);
-	CHK(appFileInfo.IsUsingAttributes() == true);
-	CHK(appFileInfo.IsUsingResources() == true);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Setter::Set(appFileInfo, testValue1));
+	CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
 	// force resources synchronization
 	SyncResources(appFileInfo);
 	// get value
 	Value value;
-	CHK(Getter::Get(appFileInfo, value) == B_OK);
-	CHK(value == testValue1);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Getter::Get(appFileInfo, value));
+	CPPUNIT_ASSERT(value == testValue1);
 	// check attribute/resource
 	Checker::CheckAttribute(file, testValue1);
 	Checker::CheckResource(file, testValue1);
 	// set on B_USE_ATTRIBUTES
 	appFileInfo.SetInfoLocation(B_USE_ATTRIBUTES);
-	CHK(appFileInfo.IsUsingAttributes() == true);
-	CHK(appFileInfo.IsUsingResources() == false);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == false);
 	// set value
-	CHK(Setter::Set(appFileInfo, testValue2) == B_OK);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Setter::Set(appFileInfo, testValue2));
 	// force resources synchronization
 	SyncResources(appFileInfo);
 	// get value
 	Value value1;
-	CHK(Getter::Get(appFileInfo, value1) == B_OK);
-	CHK(value1 == testValue2);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Getter::Get(appFileInfo, value1));
+	CPPUNIT_ASSERT(value1 == testValue2);
 	// check attribute/resource -- resource should be old
 	Checker::CheckAttribute(file, testValue2);
 	Checker::CheckResource(file, testValue1);
 	// set on B_USE_BOTH_LOCATIONS
 	appFileInfo.SetInfoLocation(B_USE_BOTH_LOCATIONS);
-	CHK(appFileInfo.IsUsingAttributes() == true);
-	CHK(appFileInfo.IsUsingResources() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
 	// get value -- the attribute is preferred
 	Value value2;
-	CHK(Getter::Get(appFileInfo, value2) == B_OK);
-	CHK(value2 == testValue2);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Getter::Get(appFileInfo, value2));
+	CPPUNIT_ASSERT(value2 == testValue2);
 	// set on B_USE_RESOURCES
 	appFileInfo.SetInfoLocation(B_USE_RESOURCES);
-	CHK(appFileInfo.IsUsingAttributes() == false);
-	CHK(appFileInfo.IsUsingResources() == true);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == false);
+	CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
 	// set value
-	CHK(Setter::Set(appFileInfo, testValue3) == B_OK);
+	CPPUNIT_ASSERT_EQUAL(B_OK, Setter::Set(appFileInfo, testValue3));
 	// force resources synchronization
 	SyncResources(appFileInfo);
 	// get value
 	Value value3;
-	CHK(Getter::Get(appFileInfo, value3) == B_OK);
-	CHK(value3 == testValue3);
-	// check attribute/resource -- attribute should be old
+	CPPUNIT_ASSERT_EQUAL(B_OK, Getter::Get(appFileInfo, value3));
+	CPPUNIT_ASSERT(value3 == testValue3);
 	Checker::CheckAttribute(file, testValue2);
 	Checker::CheckResource(file, testValue3);
 }
 
-// InfoLocationTest
-void
-AppFileInfoTest::InfoLocationTest()
-{
-	// tests:
-	// * void SetInfoLocation(info_location location);
-	// * bool IsUsingAttributes() const;
-	// * bool IsUsingResources() const;
 
-	// type
-	NextSubTest();
-	InfoLocationTester<TypeValue, TypeSetter, TypeGetter, TypeChecker>(
-		TypeValue(testType1), TypeValue(testType2), TypeValue(testType3));
+class AppFileInfoTest : public InfoTest {
+	CPPUNIT_TEST_SUITE(AppFileInfoTest);
 
-	// signature
-	NextSubTest();
-	InfoLocationTester<SignatureValue, SignatureSetter, SignatureGetter,
-					   SignatureChecker>(
-		SignatureValue(testAppSignature1), SignatureValue(testAppSignature2),
-		SignatureValue(testAppSignature3));
+	CPPUNIT_TEST(Default_Constructor_ReturnsNoInit);
+	CPPUNIT_TEST(NullFile_Constructor_ReturnsBadValue);
+	CPPUNIT_TEST(InvalidFile_Constructor_ReturnsBadValue);
+	CPPUNIT_TEST(ValidFile_Constructor_ReturnsOk);
 
-	// app flags
-	NextSubTest();
-	InfoLocationTester<AppFlagsValue, AppFlagsSetter, AppFlagsGetter,
-					   AppFlagsChecker>(
-		AppFlagsValue(B_SINGLE_LAUNCH | B_ARGV_ONLY),
-		AppFlagsValue(B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP),
-		AppFlagsValue(B_MULTIPLE_LAUNCH));
+	CPPUNIT_TEST(NullFile_SetTo_ReturnsBadValue);
+	CPPUNIT_TEST(InvalidFile_SetTo_ReturnsBadValue);
+	CPPUNIT_TEST(ValidFile_SetTo_ReturnsOk);
+	CPPUNIT_TEST(Reinitialize_SetTo_ReturnsExpected);
 
-	// supported types
-	NextSubTest();
-	// The file needs to have a signature and the signature must be known
-	// to the MIME database. Otherwise SetSupportedType() fails.
+	CPPUNIT_TEST(NullType_GetType_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_GetType_ReturnsNoInit);
+	CPPUNIT_TEST(NoType_GetType_ReturnsEntryNotFound);
+
+	CPPUNIT_TEST(NullType_SetType_UnsetsTypeReturnsOk);
+	CPPUNIT_TEST(Uninitialized_SetType_ReturnsNoInit);
+	CPPUNIT_TEST(Valid_SetType_ReturnsOk);
+	CPPUNIT_TEST(InvalidMime_SetType_ReturnsOk);
+	CPPUNIT_TEST(TooLongMime_SetType_ReturnsBadValue);
+
+	CPPUNIT_TEST(NullSignature_GetSignature_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_GetSignature_ReturnsNoInit);
+	CPPUNIT_TEST(NoSignature_GetSignature_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Valid_GetSignature_ReturnsOk);
+
+	CPPUNIT_TEST(NullSignature_SetSignature_UnsetsSignatureReturnsOk);
+	CPPUNIT_TEST(Uninitialized_SetSignature_ReturnsNoInit);
+	CPPUNIT_TEST(Valid_SetSignature_ReturnsOk);
+	CPPUNIT_TEST(InvalidMime_SetSignature_ReturnsOk);
+	CPPUNIT_TEST(TooLongMime_SetSignature_ReturnsBadValue);
+
+	CPPUNIT_TEST(NullFlags_GetAppFlags_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_GetAppFlags_ReturnsNoInit);
+	CPPUNIT_TEST(NoFlags_GetAppFlags_ReturnsEntryNotFound);
+
+	CPPUNIT_TEST(Uninitialized_SetAppFlags_ReturnsNoInit);
+	CPPUNIT_TEST(Valid_SetAppFlags_ReturnsOk);
+
+	CPPUNIT_TEST(NullMessage_GetSupportedTypes_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_GetSupportedTypes_ReturnsNoInit);
+	CPPUNIT_TEST(NoSupportedTypes_GetSupportedTypes_ReturnsEntryNotFound);
+	CPPUNIT_TEST(PartiallyFilledMessage_GetSupportedTypes_ClearsInvalidFieldsReturnsOk);
+
+	CPPUNIT_TEST(NullMessage_SetSupportedTypes_UnsetsTypesReturnsOk);
+	CPPUNIT_TEST(Uninitialized_SetSupportedTypes_ReturnsNoInit);
+	CPPUNIT_TEST(Valid_SetSupportedTypes_ReturnsOk);
+	CPPUNIT_TEST(SyncAll_SetSupportedTypes_ReturnsExpected);
+	CPPUNIT_TEST(NoSyncAll_SetSupportedTypes_ReturnsExpected);
+	CPPUNIT_TEST(InvalidMime_SetSupportedTypes_ReturnsBadValue);
+	CPPUNIT_TEST(SignatureNotInstalled_SetSupportedTypesSyncAll_ReturnsExpected);
+	CPPUNIT_TEST(SignatureNotInstalled_SetSupportedTypes_ReturnsExpected);
+	CPPUNIT_TEST(NoAppSignature_SetSupportedTypesSyncAll_ReturnsExpected);
+	CPPUNIT_TEST(NoAppSignature_SetSupportedTypes_ReturnsExpected);
+	CPPUNIT_TEST(RemoveFileCreateFile_SetSupportedTypes_ReturnsExpected);
+
+	CPPUNIT_TEST(Valid_IsSupportedType_ReturnsExpected);
+	CPPUNIT_TEST(NullType_IsSupportedType_ReturnsFalse);
+	CPPUNIT_TEST(OctetStreamSupported_IsSupportedTypeImageGif_ReturnsTrue);
+
+	CPPUNIT_TEST(Valid_Supports_ReturnsExpected);
+	CPPUNIT_TEST(NullType_Supports_ReturnsFalse);
+	CPPUNIT_TEST(OctetStreamSupported_SupportsImageGif_ReturnsFalse);
+
+	CPPUNIT_TEST(NullIcon_GetIcon_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_GetIcon_ReturnsNoInit);
+	CPPUNIT_TEST(WrongIconDimensions_GetIcon_ReturnsBadValue);
+	CPPUNIT_TEST(NoIcon_GetIcon_ReturnsEntryNotFound);
+	CPPUNIT_TEST(SetGetResetGet_SetIcon_ReturnsExpected);
+	CPPUNIT_TEST(BitmapColorSpaceNotCMAP8_GetIcon_ReturnsOk);
+
+	CPPUNIT_TEST(NullIcon_SetIcon_UnsetsIconReturnsOk);
+	CPPUNIT_TEST(Uninitialized_SetIcon_ReturnsNoInit);
+	CPPUNIT_TEST(WrongIconDimensions_SetIcon_ReturnsBadValue);
+	CPPUNIT_TEST(FileHasAppSignature_SetIcon_IconAlsoSetOnMimeType);
+
+	CPPUNIT_TEST(Uninitialized_GetVersionInfo_ReturnsNoInit);
+	CPPUNIT_TEST(NullInfo_GetVersionInfo_ReturnsBadValue);
+	CPPUNIT_TEST(NoVersionInfo_GetVersionInfo_ReturnsEntryNotFound);
+
+	CPPUNIT_TEST(Uninitialized_SetVersionInfo_ReturnsNoInit);
+	CPPUNIT_TEST(Valid_SetVersionInfo_ReturnsOk);
+	CPPUNIT_TEST(Null_SetVersionInfo_UnsetsBothKindsReturnsOk);
+	CPPUNIT_TEST(SetGetResetGetAppKind_SetVersionInfo_ReturnsExpected);
+	CPPUNIT_TEST(SetGetResetGetSystemKind_SetVersionInfo_ReturnsExpected);
+
+	CPPUNIT_TEST(Uninitialized_GetIconForType_ReturnsNoInit);
+	CPPUNIT_TEST(NullIcon_GetIconForType_ReturnsBadValue);
+	CPPUNIT_TEST(WrongIconDimensions_GetIconForType_ReturnsBadValue);
+	CPPUNIT_TEST(NoIcon_GetIconForType_ReturnsEntryNotFound);
+	CPPUNIT_TEST(BitmapColorSpaceNotCMAP8_GetIconForType_ReturnsOk);
+
+	CPPUNIT_TEST(Valid_SetIconForType_ReturnsOk);
+	CPPUNIT_TEST(Uninitialized_SetIconForType_ReturnsNoInit);
+	CPPUNIT_TEST(WrongIconDimensions_SetIconForType_ReturnsBadValue);
+	CPPUNIT_TEST(SetGetResetGet_SetIconForTypeMiniIcon_ReturnsExpected);
+	CPPUNIT_TEST(SetGetResetGet_SetIconForTypeLargeIcon_ReturnsExpected);
+	CPPUNIT_TEST(NullMiniIcon_SetIconForType_UnsetsIconReturnsOk);
+	CPPUNIT_TEST(NullLargeIcon_SetIconForType_UnsetsIconReturnsOk);
+	CPPUNIT_TEST(NullType_SetIconForType_SetsStandardIcon);
+	CPPUNIT_TEST(TwoTypesSetGet_SetIconForType_ReturnsExpected);
+	CPPUNIT_TEST(InvalidType_SetIconForType_ReturnsBadValue);
+	CPPUNIT_TEST(TooLongType_SetIconForType_ReturnsBadValue);
+	CPPUNIT_TEST(FileHasAppSignature_SetIconForType_IconAlsoSetOnMimeType);
+	CPPUNIT_TEST(SetGetResetGet_SetIconForType_ReturnsExpected);
+
+#if __GNUC__ > 2
+	CPPUNIT_TEST(ValidType_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidSignature_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidAppFlags_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidSupportedTypes_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidIcon_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidVersionInfo_SetInfoLocation_ReturnsExpected);
+	CPPUNIT_TEST(ValidIconForType_SetInfoLocation_ReturnsExpected);
+#endif
+
+	CPPUNIT_TEST_SUITE_END();
+
+	BMimeType		fMimeTestType[4];
+	version_info	fTestInfo[4];
+	BMessage		fTestTypes[2];
+
+	BApplication	*fApplication;
+	const bool		fHasInitialLocation;
+
+
+public:
+	AppFileInfoTest()
+	:
+	InfoTest("application/x-vnd.obos.app-file-info-test"),
+#ifndef TEST_R5
+	fHasInitialLocation(true)
+#else
+	fHasInitialLocation(false)
+#endif
 	{
-		BFile file(testFile1, B_READ_WRITE);
-		BAppFileInfo appFileInfo;
-		CHK(appFileInfo.SetTo(&file) == B_OK);
-		CHK(appFileInfo.SetSignature(testAppSignature1) == B_OK);
-		BMimeType type(testAppSignature1);
-		if (!type.IsInstalled())
-			CHK(type.Install() == B_OK);
+		for (int i = 0; i < 4; i++) {
+			fMimeTestType[i].SetTo(fMimeTypeString[i].c_str());
+			uint32 fill = static_cast<uint32>(i);
+			fTestInfo[i] = (version_info){ fill, fill, fill, fill, fill, "short1", "long1" };
+			fTestInfo[i].short_info[5] += i;
+			fTestInfo[i].long_info[4] += i;
+			fTestTypes[i / 2].AddString("types", fMimeTypeString[i].c_str());
+		}
 	}
-	const char *supportedTypes1[] = { testType1 };
-	const char *supportedTypes2[] = { testType2, testType3 };
-	const char *supportedTypes3[] = { testType3, testType2, testType1 };
-	InfoLocationTester<SupportedTypesValue, SupportedTypesSetter,
-					   SupportedTypesGetter, SupportedTypesChecker>(
-		SupportedTypesValue(supportedTypes1, 1),
-		SupportedTypesValue(supportedTypes2, 2),
-		SupportedTypesValue(supportedTypes3, 3));
 
-	// icon
-	NextSubTest();
-	InfoLocationTester<IconValue, IconSetter, IconGetter, IconChecker>(
-		IconValue(fIconM1, fIconL1),
-		IconValue(fIconM2, fIconL2),
-		IconValue(fIconM3, fIconL3));
+	~AppFileInfoTest() {
+	}
 
-	// version info
-	NextSubTest();
-	version_info versionInfo1 = { 1, 1, 1, 1, 1, "short1", "long1" };
-	version_info versionInfo2 = { 2, 2, 2, 2, 2, "short2", "long2" };
-	version_info versionInfo3 = { 3, 3, 3, 3, 3, "short3", "long3" };
-	InfoLocationTester<VersionInfoValue, VersionInfoSetter, VersionInfoGetter,
-					   VersionInfoChecker>(
-		VersionInfoValue(versionInfo1, versionInfo1),
-		VersionInfoValue(versionInfo2, versionInfo2),
-		VersionInfoValue(versionInfo3, versionInfo3));
+	void setUp()
+	{
+		// app has to be created here instead of constructor, to avoid
+		// creating two application objects
+		fApplication = new BApplication(kMimeTypeBase);
 
-	// icon for type
-	NextSubTest();
-	InfoLocationTester<IconForTypeValue, IconForTypeSetter, IconForTypeGetter,
-					   IconForTypeChecker>(
-		IconForTypeValue(fIconM1, fIconL1),
-		IconForTypeValue(fIconM2, fIconL2),
-		IconForTypeValue(fIconM3, fIconL3));
-}
+		InfoTest::setUp();
+	}
 
+	void tearDown()
+	{
+		InfoTest::tearDown();
+
+		delete fApplication;
+		fApplication = NULL;
+	}
+
+	void Default_Constructor_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == fHasInitialLocation);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == fHasInitialLocation);
+	}
+
+	void NullFile_Constructor_ReturnsBadValue()
+	{
+		BAppFileInfo appFileInfo(NULL);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == fHasInitialLocation);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == fHasInitialLocation);
+	}
+
+	void InvalidFile_Constructor_ReturnsBadValue()
+	{
+		BFile file;
+		BAppFileInfo appFileInfo(&file);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == fHasInitialLocation);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == fHasInitialLocation);
+	}
+
+	void ValidFile_Constructor_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo(&file);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
+	}
+
+	void NullFile_SetTo_ReturnsBadValue()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetTo(NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == fHasInitialLocation);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == fHasInitialLocation);
+	}
+
+	void InvalidFile_SetTo_ReturnsBadValue()
+	{
+		BFile file;
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == fHasInitialLocation);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == fHasInitialLocation);
+	}
+
+	void ValidFile_SetTo_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
+
+		off_t size;
+		CPPUNIT_ASSERT_EQUAL(B_OK, file.GetSize(&size));
+		CPPUNIT_ASSERT(size == 0);
+		CheckNoAttr(file, kTypeAttribute);
+		CheckNoAttr(file, kMiniIconAttribute);
+		CheckNoAttr(file, kLargeIconAttribute);
+	}
+
+	void Reinitialize_SetTo_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.InitCheck());
+		off_t size;
+
+		// reinit with NULL file
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetTo(NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
+		CPPUNIT_ASSERT_EQUAL(B_OK, file.GetSize(&size));
+		CPPUNIT_ASSERT(size == 0);
+		CheckNoAttr(file, kTypeAttribute);
+		CheckNoAttr(file, kMiniIconAttribute);
+		CheckNoAttr(file, kLargeIconAttribute);
+
+		// reinit with valid file
+		BFile file2(fTestFilePaths[1].c_str(), B_READ_WRITE);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file2));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.InitCheck());
+		CPPUNIT_ASSERT(appFileInfo.IsUsingAttributes() == true);
+		CPPUNIT_ASSERT(appFileInfo.IsUsingResources() == true);
+	}	// Type
+
+	void NullType_GetType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetType(NULL));
+	}
+
+	void Uninitialized_GetType_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetType(buffer));
+	}
+
+	void NoType_GetType_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetType(buffer));
+	}
+
+	void NullType_SetType_UnsetsTypeReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(fMimeTypeString[0].c_str()));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(NULL));
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetType(buffer));
+		CheckNoAttr(file, kTypeAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kTypeAttribute);
+	}
+
+	void Uninitialized_SetType_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetType(fMimeTypeString[0].c_str()));
+	}
+
+	void Valid_SetType_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(fMimeTypeString[0].c_str()));
+
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetType(buffer));
+		CPPUNIT_ASSERT(strcmp(fMimeTypeString[0].c_str(), buffer) == 0);
+		CheckTypeAttr(file, fMimeTypeString[0].c_str());
+		SyncResources(appFileInfo);
+		CheckTypeResource(file, fMimeTypeString[0].c_str());
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(fMimeTypeString[1].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetType(buffer));
+		CPPUNIT_ASSERT(strcmp(fMimeTypeString[1].c_str(), buffer) == 0);
+		CheckTypeAttr(file, fMimeTypeString[1].c_str());
+		SyncResources(appFileInfo);
+		CheckTypeResource(file, fMimeTypeString[1].c_str());
+	}
+
+	void InvalidMime_SetType_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(invalidTestType));
+
+		char type[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetType(type));
+		CPPUNIT_ASSERT(strcmp(invalidTestType, type) == 0);
+		CheckTypeAttr(file, invalidTestType);
+		SyncResources(appFileInfo);
+		CheckTypeResource(file, invalidTestType);
+	}
+
+	void TooLongMime_SetType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		// remove attr first
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetType(NULL));
+		// try to set the too long type
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetType(tooLongTestType));
+		CheckNoAttr(file, kTypeAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kTypeAttribute);
+	}
+
+	void NullSignature_GetSignature_ReturnsBadValue()
+	{
+
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetSignature(NULL));
+	}
+
+	void Uninitialized_GetSignature_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetSignature(buffer));
+	}
+
+	void NoSignature_GetSignature_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSignature(buffer));
+	}
+
+	void Valid_GetSignature_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSignature(buffer));
+		CPPUNIT_ASSERT(strcmp(fMimeTypeAppString[0].c_str(), buffer) == 0);
+	}
+
+	void NullSignature_SetSignature_UnsetsSignatureReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(NULL));
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSignature(buffer));
+		CheckNoAttr(file, kSignatureAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSignatureAttribute);
+	}
+
+	void Uninitialized_SetSignature_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+	}
+
+	void Valid_SetSignature_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeAppString[0].c_str()).IsInstalled() == false);
+
+		char buffer[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSignature(buffer));
+		CPPUNIT_ASSERT(strcmp(fMimeTypeAppString[0].c_str(), buffer) == 0);
+		CheckSignatureAttr(file, fMimeTypeAppString[0].c_str());
+		SyncResources(appFileInfo);
+		CheckSignatureResource(file, fMimeTypeAppString[0].c_str());
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[1].c_str()));
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeAppString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSignature(buffer));
+		CPPUNIT_ASSERT(strcmp(fMimeTypeAppString[1].c_str(), buffer) == 0);
+		CheckSignatureAttr(file, fMimeTypeAppString[1].c_str());
+		SyncResources(appFileInfo);
+		CheckSignatureResource(file, fMimeTypeAppString[1].c_str());
+	}
+
+	void InvalidMime_SetSignature_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(invalidTestType));
+		// get
+		char signature[B_MIME_TYPE_LENGTH];
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSignature(signature));
+		CPPUNIT_ASSERT(strcmp(invalidTestType, signature) == 0);
+		CheckSignatureAttr(file, invalidTestType);
+		SyncResources(appFileInfo);
+		CheckSignatureResource(file, invalidTestType);
+	}
+
+	void TooLongMime_SetSignature_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		// remove attr first
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(NULL));
+		// try to set the too long signature
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetSignature(tooLongTestType));
+		CheckNoAttr(file, kSignatureAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSignatureAttribute);
+	}
+
+	void NullFlags_GetAppFlags_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetAppFlags(NULL));
+	}
+
+	void Uninitialized_GetAppFlags_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		uint32 flags;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetAppFlags(&flags));
+	}
+
+	void NoFlags_GetAppFlags_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		uint32 flags;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetAppFlags(&flags));
+	}
+
+	void Uninitialized_SetAppFlags_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetAppFlags(B_SINGLE_LAUNCH));
+	}
+
+	void Valid_SetAppFlags_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		uint32 flags = B_SINGLE_LAUNCH | B_BACKGROUND_APP;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetAppFlags(flags));
+
+		uint32 getFlags;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetAppFlags(&getFlags));
+		CPPUNIT_ASSERT(flags == getFlags);
+		CheckAppFlagsAttr(file, flags);
+		SyncResources(appFileInfo);
+		CheckAppFlagsResource(file, flags);
+
+		flags = B_MULTIPLE_LAUNCH | B_ARGV_ONLY;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetAppFlags(flags));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetAppFlags(&getFlags));
+		CPPUNIT_ASSERT(flags == getFlags);
+		CheckAppFlagsAttr(file, flags);
+		SyncResources(appFileInfo);
+		CheckAppFlagsResource(file, flags);
+	}
+
+	void NullMessage_GetSupportedTypes_ReturnsBadValue()
+	{
+		// R5: crashes when passing NULL types
+#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetSupportedTypes(NULL));
+#endif
+	}
+
+	void Uninitialized_GetSupportedTypes_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		BMessage message;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetSupportedTypes(&message));
+	}
+
+	void NoSupportedTypes_GetSupportedTypes_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BMessage message;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&message));
+	}
+
+	void PartiallyFilledMessage_GetSupportedTypes_ClearsInvalidFieldsReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BMessage types2;
+		CPPUNIT_ASSERT_EQUAL(B_OK, types2.AddString("types", fMimeTypeString[0].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, types2.AddString("dummy", "Hello"));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types2));
+		CPPUNIT_ASSERT(SupportedTypesValue(types2) == SupportedTypesValue(fTestTypes[1]));
+		const char *dummy;
+		CPPUNIT_ASSERT(types2.FindString("dummy", &dummy) != B_OK);
+	}
+
+	void NullMessage_SetSupportedTypes_UnsetsTypesReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(NULL));
+		BMessage message;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&message));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[2].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[3].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[2]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[3]) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+
+#ifndef TEST_R5
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(NULL, true));
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[2].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[3].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[2]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[3]) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+#endif
+	}
+
+	void Uninitialized_SetSupportedTypes_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetSupportedTypes(&fTestTypes[0], true));
+	}
+
+	void Valid_SetSupportedTypes_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		BMessage message;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&message));
+		SupportedTypesValue value(message);
+		CPPUNIT_ASSERT(value == fTestTypes[0]);
+		CheckSupportedTypesAttr(file, &fTestTypes[0]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[0]);
+	}
+
+	void SyncAll_SetSupportedTypes_ReturnsExpected()
+	{
+		CPPUNIT_ASSERT_EQUAL(B_OK, BMimeType(fMimeTypeAppString[0].c_str()).Install());
+
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0], true));
+
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == true);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[1], true));
+
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == false);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == false);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[2].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[3].c_str(), fMimeTypeAppString[0].c_str()) == true);
+	}
+
+	void NoSyncAll_SetSupportedTypes_ReturnsExpected()
+	{
+		CPPUNIT_ASSERT_EQUAL(B_OK, BMimeType(fMimeTypeAppString[0].c_str()).Install());
+
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == true);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[1]));
+
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[2].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[3].c_str(), fMimeTypeAppString[0].c_str()) == true);
+	}
+
+	void InvalidMime_SetSupportedTypes_ReturnsBadValue()
+	{
+	// R5: doesn't fail
+#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		BMessage invalidTestTypes;
+		CPPUNIT_ASSERT_EQUAL(B_OK, invalidTestTypes.AddString("types", invalidTestType));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(NULL, true));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetSupportedTypes(&invalidTestTypes, false));
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(invalidTestType) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+#endif
+	}
+
+	void SignatureNotInstalled_SetSupportedTypesSyncAll_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0], true));
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == true);
+		CheckSupportedTypesAttr(file, &fTestTypes[0]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[0]);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[2].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[3].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[1], true));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[2].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[3].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[2]) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[3]) == true);
+		CheckSupportedTypesAttr(file, &fTestTypes[1]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[1]);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[2].c_str()).IsInstalled() == false);
+// R5: returns true. In fact the last SetSupportedTypes() installed testType4
+// in the database, but not testType3. Certainly a bug
+#ifndef TEST_R5
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[3].c_str()).IsInstalled() == false);
+#endif
+	}
+
+	void SignatureNotInstalled_SetSupportedTypes_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
+//     fail.
+#ifdef TEST_R5
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+#else
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+#endif
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == true);
+		CheckSupportedTypesAttr(file, &fTestTypes[0]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[0]);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[2].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[3].c_str()).IsInstalled() == false);
+// R5: SetSupportedTypes() returns B_ENTRY_NOT_FOUND, although it does not
+//     fail.
+#ifdef TEST_R5
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.SetSupportedTypes(&fTestTypes[1]));
+#else
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[1]));
+#endif
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[1]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[2].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[3].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[2]) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[3]) == true);
+		CheckSupportedTypesAttr(file, &fTestTypes[1]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[1]);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[2].c_str()).IsInstalled() == false);
+// R5: returns true. In fact the last SetSupportedTypes() installed testType4
+// in the database, but not testType3. Certainly a bug
+#ifndef TEST_R5
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[3].c_str()).IsInstalled() == false);
+#endif
+	}
+
+	void NoAppSignature_SetSupportedTypesSyncAll_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.SetSupportedTypes(&fTestTypes[0], true));
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+	}
+
+	void NoAppSignature_SetSupportedTypes_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[1].c_str()).IsInstalled() == false);
+	}
+
+	void RemoveFileCreateFile_SetSupportedTypes_ReturnsExpected()
+	{
+		CPPUNIT_ASSERT_EQUAL(B_OK, BMimeType(fMimeTypeAppString[0].c_str()).Install());
+
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE | B_CREATE_FILE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetSupportedTypes(&types));
+		CPPUNIT_ASSERT(SupportedTypesValue(types) == SupportedTypesValue(fTestTypes[0]));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == true);
+		CheckSupportedTypesAttr(file, &fTestTypes[0]);
+		SyncResources(appFileInfo);
+		CheckSupportedTypesResource(file, &fTestTypes[0]);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == true);
+
+		appFileInfo.SetTo(NULL);
+		file.Unset();
+		CPPUNIT_ASSERT_EQUAL(B_OK, BEntry(fTestFilePaths[0].c_str()).Remove());
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, file.SetTo(fTestFilePaths[0].c_str(), B_READ_WRITE | B_CREATE_FILE));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+
+		BMessage types2;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetSupportedTypes(&types2));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[0]) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&fMimeTestType[1]) == false);
+		CheckNoAttr(file, kSupportedTypesAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kSupportedTypesAttribute);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[0].c_str(), fMimeTypeAppString[0].c_str()) == true);
+		CPPUNIT_ASSERT(IsSupportingApp(fMimeTypeString[1].c_str(), fMimeTypeAppString[0].c_str()) == true);
+	}
+
+	void Valid_IsSupportedType_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[0].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[1].c_str()) == true);
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(fMimeTypeString[2].c_str()) == false);
+	}
+
+	void NullType_IsSupportedType_ReturnsFalse()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(NULL) == false);
+	}
+
+	void OctetStreamSupported_IsSupportedTypeImageGif_ReturnsTrue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BMimeType gifType("image/gif");
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(gifType.Type()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&gifType) == false);
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_OK, types.AddString("types", "application/octet-stream"));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&types));
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(gifType.Type()) == true);
+	}
+
+	void Valid_Supports_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&fTestTypes[0]));
+
+		BMimeType type1(fMimeTypeString[0].c_str());
+		BMimeType type2(fMimeTypeString[1].c_str());
+		BMimeType type3(fMimeTypeString[2].c_str());
+		CPPUNIT_ASSERT(appFileInfo.Supports(&type1) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&type2) == true);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&type3) == false);
+
+#ifndef TEST_R5
+		CPPUNIT_ASSERT(appFileInfo.Supports(NULL) == false);
+#endif
+	}
+
+	void NullType_Supports_ReturnsFalse()
+	{
+#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT(appFileInfo.Supports(NULL) == false);
+#endif
+	}
+
+	void OctetStreamSupported_SupportsImageGif_ReturnsFalse()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BMimeType gifType("image/gif");
+		CPPUNIT_ASSERT(appFileInfo.IsSupportedType(gifType.Type()) == false);
+		CPPUNIT_ASSERT(appFileInfo.Supports(&gifType) == false);
+		BMessage types;
+		CPPUNIT_ASSERT_EQUAL(B_OK, types.AddString("types", "application/octet-stream"));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSupportedTypes(&types));
+		CPPUNIT_ASSERT(appFileInfo.Supports(&gifType) == false);
+	}
+
+	void NullIcon_GetIcon_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIcon(NULL, B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIcon(NULL, B_LARGE_ICON));
+	}
+
+	void Uninitialized_GetIcon_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetIcon(&icon2, B_LARGE_ICON));
+	}
+
+	void WrongIconDimensions_GetIcon_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIcon(&icon2, B_LARGE_ICON));
+	}
+
+	void NoIcon_GetIcon_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+	}
+
+	void SetGetResetGet_SetIcon_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconM[0], B_MINI_ICON));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconAttr(file, fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconM[1], B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon2, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon2));
+		CheckIconAttr(file, fIconM[1]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[1]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconL[0], B_LARGE_ICON));
+
+		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon3, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon3));
+		CheckIconAttr(file, fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconL[1], B_LARGE_ICON));
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon4));
+		CheckIconAttr(file, fIconL[1]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[1]);
+	}
+
+	// * bitmap color_space != B_CMAP8 => B_OK
+	void BitmapColorSpaceNotCMAP8_GetIcon_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 16x16.
+		icon2.SetBits(fIconM[1]->Bits(), fIconM[1]->BitsLength(), 0, B_CMAP8);
+		CPPUNIT_ASSERT(IconEqual(&icon, &icon2));
+
+// R5: Crashes for some weird reason in GetIcon().
+#ifndef TEST_R5
+		BBitmap icon3(BRect(0, 0, 31, 31), B_RGB32);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon3, B_LARGE_ICON));
+		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 32x32.
+		icon4.SetBits(fIconL[1]->Bits(), fIconL[1]->BitsLength(), 0, B_CMAP8);
+		CPPUNIT_ASSERT(IconEqual(&icon3, &icon4));
+#endif
+	}
+
+	// status_t SetIcon(const BBitmap *icon, icon_size k)
+	void NullIcon_SetIcon_UnsetsIconReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(NULL, B_MINI_ICON));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		CheckNoAttr(file, kMiniIconAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kMiniIconAttribute);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(NULL, B_LARGE_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIcon(&icon2, B_LARGE_ICON));
+		CheckNoAttr(file, kLargeIconAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kLargeIconAttribute);
+	}
+
+	void Uninitialized_SetIcon_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetIcon(&icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetIcon(&icon2, B_LARGE_ICON));
+	}
+
+	void WrongIconDimensions_SetIcon_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIcon(&icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIcon(&icon2, B_LARGE_ICON));
+	}
+
+	void FileHasAppSignature_SetIcon_IconAlsoSetOnMimeType()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		// uninstalled signature
+		BMimeType mimeType(fMimeTypeAppString[0].c_str());
+		CPPUNIT_ASSERT(mimeType.IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconL[0], B_LARGE_ICON));
+		CPPUNIT_ASSERT(mimeType.IsInstalled() == true);
+
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, mimeType.GetIcon(&icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, mimeType.GetIcon(&icon2, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon2));
+		// installed signature
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconM[1], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIcon(fIconL[1], B_LARGE_ICON));
+
+		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, mimeType.GetIcon(&icon3, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon3));
+
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, mimeType.GetIcon(&icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon4));
+	}
+
+	void Uninitialized_GetVersionInfo_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		version_info info;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		version_info info2;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetVersionInfo(&info2, B_SYSTEM_VERSION_KIND));
+	}
+
+	void NullInfo_GetVersionInfo_ReturnsBadValue()
+	{
+	#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT(equals(appFileInfo.GetVersionInfo(NULL, B_APP_VERSION_KIND),
+					   B_BAD_ADDRESS, B_BAD_VALUE));
+		CPPUNIT_ASSERT(equals(appFileInfo.GetVersionInfo(NULL, B_SYSTEM_VERSION_KIND),
+					   B_BAD_ADDRESS, B_BAD_VALUE));
+	#endif
+	}
+
+	void NoVersionInfo_GetVersionInfo_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		version_info info;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		version_info info2;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info2, B_SYSTEM_VERSION_KIND));
+	}
+
+	void Uninitialized_SetVersionInfo_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetVersionInfo(&fTestInfo[0], B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetVersionInfo(&fTestInfo[0], B_SYSTEM_VERSION_KIND));
+	}
+
+	void Valid_SetVersionInfo_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		version_info info;
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[0], B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[1], B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[0]);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[1]);
+
+		version_info infos[] = { fTestInfo[0], fTestInfo[1] };
+		CheckVersionInfoAttr(file, infos);
+		SyncResources(appFileInfo);
+		CheckVersionInfoResource(file, infos);
+	}
+
+	void Null_SetVersionInfo_UnsetsBothKindsReturnsOk()
+	{
+// R5: Crashes when passing a NULL icon.
+#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[0], B_APP_VERSION_KIND));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(NULL, B_APP_VERSION_KIND));
+		version_info info;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		CheckNoAttr(file, kVersionInfoAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kVersionInfoAttribute);
+	
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[0], B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[0], B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(NULL, B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		CheckNoAttr(file, kVersionInfoAttribute);
+		SyncResources(appFileInfo);
+		CheckNoResource(file, kVersionInfoAttribute);
+#endif
+	}
+
+	void SetGetResetGetAppKind_SetVersionInfo_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[0], B_APP_VERSION_KIND));
+
+		version_info info;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[0]);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		version_info infos[] = { fTestInfo[0], fTestInfo[0] };
+		CheckVersionInfoAttr(file, infos);
+		SyncResources(appFileInfo);
+		CheckVersionInfoResource(file, infos);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[2], B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[2]);
+		version_info infos2[] = { fTestInfo[2], fTestInfo[0] };
+		CheckVersionInfoAttr(file, infos2);
+		SyncResources(appFileInfo);
+		CheckVersionInfoResource(file, infos2);
+	}
+
+	void SetGetResetGetSystemKind_SetVersionInfo_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[1], B_SYSTEM_VERSION_KIND));
+
+		version_info info;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[1]);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND));
+		version_info infos[] = { fTestInfo[1], fTestInfo[1] };
+		CheckVersionInfoAttr(file, infos);
+		SyncResources(appFileInfo);
+		CheckVersionInfoResource(file, infos);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetVersionInfo(&fTestInfo[3], B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetVersionInfo(&info, B_SYSTEM_VERSION_KIND));
+		CPPUNIT_ASSERT(info == fTestInfo[3]);
+		version_info infos2[] = { fTestInfo[1], fTestInfo[3] };
+		CheckVersionInfoAttr(file, infos2);
+		SyncResources(appFileInfo);
+		CheckVersionInfoResource(file, infos2);
+	}
+
+	void Uninitialized_GetIconForType_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+	}
+
+	void NullIcon_GetIconForType_ReturnsBadValue()
+	{
+// R5: Crashes when passing a NULL icon.
+#ifndef TEST_R5
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), NULL, B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), NULL, B_LARGE_ICON));
+#endif
+	}
+
+	void WrongIconDimensions_GetIconForType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+	}
+
+	void NoIcon_GetIconForType_ReturnsEntryNotFound()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+	}
+
+	// * bitmap color_space != B_CMAP8 => B_OK
+	void BitmapColorSpaceNotCMAP8_GetIconForType_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		BBitmap icon(BRect(0, 0, 15, 15), B_RGB32);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 16x16.
+		icon2.SetBits(fIconM[1]->Bits(), fIconM[1]->BitsLength(), 0, B_CMAP8);
+		CPPUNIT_ASSERT(IconEqual(&icon, &icon2));
+
+// R5: Crashes for some weird reason in GetIconForType().
+#ifndef TEST_R5
+		BBitmap icon3(BRect(0, 0, 31, 31), B_RGB32);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon3, B_LARGE_ICON));
+		BBitmap icon4(BRect(0, 0, 31, 31), B_RGB32);
+		// SetBits() can be used, since there's no row padding for 32x32.
+		icon4.SetBits(fIconL[1]->Bits(), fIconL[1]->BitsLength(), 0, B_CMAP8);
+		CPPUNIT_ASSERT(IconEqual(&icon3, &icon4));
+#endif
+	}
+
+	void Valid_SetIconForType_ReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconM[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconL[0]);
+	}
+
+	void Uninitialized_SetIconForType_ReturnsNoInit()
+	{
+		BAppFileInfo appFileInfo;
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+	}
+
+	void WrongIconDimensions_SetIconForType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+	}
+
+	void SetGetResetGet_SetIconForTypeMiniIcon_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo(&file);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconM[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[1], B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon2));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconM[1]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconM[1]);
+	}
+
+	void SetGetResetGet_SetIconForTypeLargeIcon_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconL[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[1], B_LARGE_ICON));
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon2));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconL[1]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconL[1]);
+	}
+
+	void NullMiniIcon_SetIconForType_UnsetsIconReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), NULL, B_MINI_ICON));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CheckNoIconForTypeAttr(file, fMimeTypeString[0].c_str(), B_MINI_ICON);
+		SyncResources(appFileInfo);
+		CheckNoIconForTypeResource(file, fMimeTypeString[0].c_str(), B_MINI_ICON);
+	}
+
+	void NullLargeIcon_SetIconForType_UnsetsIconReturnsOk()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), NULL, B_LARGE_ICON));
+		BBitmap icon(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_LARGE_ICON));
+		CheckNoIconForTypeAttr(file, fMimeTypeString[0].c_str(), B_LARGE_ICON);
+		SyncResources(appFileInfo);
+		CheckNoIconForTypeResource(file, fMimeTypeString[0].c_str(), B_LARGE_ICON);
+	}
+
+	void NullType_SetIconForType_SetsStandardIcon()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(NULL, fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(NULL, fIconL[0], B_LARGE_ICON));
+		// get mini icon via GetIcon()
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconAttr(file, fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[0]);
+		// get large via GetIcon()
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIcon(&icon2, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon2));
+		CheckIconAttr(file, fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[0]);
+		// get mini icon via GetIconForType()
+		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(NULL, &icon3, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon3));
+		CheckIconAttr(file, fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[0]);
+		// get large via GetIconForType()
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(NULL, &icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon4));
+		CheckIconAttr(file, fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[0]);
+	}
+
+	void TwoTypesSetGet_SetIconForType_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		// set icons for both types
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[1].c_str(), fIconM[1], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[1].c_str(), fIconL[1], B_LARGE_ICON));
+		// check first type
+		// get mini
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconM[0]);
+		// get large
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon2));
+		CheckIconForTypeAttr(file, fMimeTypeString[0].c_str(), fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[0].c_str(), fIconL[0]);
+		// check second type
+		// get mini
+		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[1].c_str(), &icon3, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon3));
+		CheckIconForTypeAttr(file, fMimeTypeString[1].c_str(), fIconM[1]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[1].c_str(), fIconM[1],
+								 kMiniIconForTypeResourceID + 1);
+		// get large
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[1].c_str(), &icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon4));
+		CheckIconForTypeAttr(file, fMimeTypeString[1].c_str(), fIconL[1]);
+		SyncResources(appFileInfo);
+		CheckIconForTypeResource(file, fMimeTypeString[1].c_str(), fIconL[1],
+								 kLargeIconForTypeResourceID + 1);
+		// unset both icons
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), NULL, B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), NULL, B_LARGE_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[1].c_str(), NULL, B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[1].c_str(), NULL, B_LARGE_ICON));
+	}
+
+	void InvalidType_SetIconForType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(invalidTestType, fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(invalidTestType, fIconL[0], B_LARGE_ICON));
+		// get mini
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(invalidTestType, &icon, B_MINI_ICON));
+		CheckNoIconForTypeAttr(file, invalidTestType, B_LARGE_ICON);
+		CheckNoIconForTypeResource(file, invalidTestType, B_LARGE_ICON);
+		// get large
+		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.GetIconForType(invalidTestType, &icon3, B_LARGE_ICON));
+		CheckNoIconForTypeAttr(file, invalidTestType, B_MINI_ICON);
+		CheckNoIconForTypeResource(file, invalidTestType, B_MINI_ICON);
+	}
+
+	void TooLongType_SetIconForType_ReturnsBadValue()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(tooLongTestType, fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, appFileInfo.SetIconForType(tooLongTestType, fIconL[0], B_LARGE_ICON));
+	}
+
+	void FileHasAppSignature_SetIconForType_IconAlsoSetOnMimeType()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+		// uninstalled signature
+		BMimeType mimeType(fMimeTypeAppString[0].c_str());
+		CPPUNIT_ASSERT(mimeType.IsInstalled() == false);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetSignature(fMimeTypeAppString[0].c_str()));
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+		CPPUNIT_ASSERT(mimeType.IsInstalled() == true);
+		CPPUNIT_ASSERT(BMimeType(fMimeTypeString[0].c_str()).IsInstalled() == false);
+		// get mini
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			mimeType.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		// get large
+		BBitmap icon2(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			mimeType.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon2));
+		// installed signature
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[1], B_MINI_ICON));
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[1], B_LARGE_ICON));
+		// get mini
+		BBitmap icon3(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			mimeType.GetIconForType(fMimeTypeString[0].c_str(), &icon3, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon3));
+		// get large
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK,
+			mimeType.GetIconForType(fMimeTypeString[0].c_str(), &icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon4));
+	}
+
+	void SetGetResetGet_SetIconForType_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		BAppFileInfo appFileInfo;
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetTo(&file));
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[0], B_MINI_ICON));
+		BBitmap icon(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[0], &icon));
+		CheckIconAttr(file, fIconM[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconM[1], B_MINI_ICON));
+		BBitmap icon2(BRect(0, 0, 15, 15), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon2, B_MINI_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconM[1], &icon2));
+		CheckIconAttr(file, fIconM[1]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconM[1]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[0], B_LARGE_ICON));
+
+		BBitmap icon3(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon3, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[0], &icon3));
+		CheckIconAttr(file, fIconL[0]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[0]);
+
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.SetIconForType(fMimeTypeString[0].c_str(), fIconL[1], B_LARGE_ICON));
+		BBitmap icon4(BRect(0, 0, 31, 31), B_CMAP8);
+		CPPUNIT_ASSERT_EQUAL(B_OK, appFileInfo.GetIconForType(fMimeTypeString[0].c_str(), &icon4, B_LARGE_ICON));
+		CPPUNIT_ASSERT(IconEqual(fIconL[1], &icon4));
+		CheckIconAttr(file, fIconL[1]);
+		SyncResources(appFileInfo);
+		CheckIconResource(file, fIconL[1]);
+	}
+
+#if __GNUC__ > 2 // FIXME: after refactoring GCC2 fails with internal compiler error
+	void ValidType_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		TypeValue v1(fMimeTypeString[0].c_str());
+		TypeValue v2(fMimeTypeString[1].c_str());
+		TypeValue v3(fMimeTypeString[2].c_str());
+		InfoLocationTester<TypeValue, TypeSetter, TypeGetter, TypeChecker>(
+			file, v1, v2, v3);
+	}
+
+	void ValidSignature_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		SignatureValue v1(fMimeTypeAppString[0].c_str());
+		SignatureValue v2(fMimeTypeAppString[1].c_str());
+		SignatureValue v3(fMimeTypeAppString[2].c_str());
+		InfoLocationTester<SignatureValue, SignatureSetter, SignatureGetter,
+						   SignatureChecker>(file, v1, v2, v3);
+	}
+
+	void ValidAppFlags_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		AppFlagsValue v1(B_SINGLE_LAUNCH);
+		AppFlagsValue v2(B_MULTIPLE_LAUNCH);
+		AppFlagsValue v3(B_BACKGROUND_APP);
+		InfoLocationTester<AppFlagsValue, AppFlagsSetter, AppFlagsGetter,
+						   AppFlagsChecker>(file, v1, v2, v3);
+	}
+
+	void ValidSupportedTypes_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		{
+			BMimeType type(fMimeTypeAppString[0].c_str());
+			if (!type.IsInstalled())
+				CPPUNIT_ASSERT_EQUAL(B_OK, type.Install());
+		}
+		const char *supportedTypes1[] = { fMimeTypeString[0].c_str() };
+		const char *supportedTypes2[] = { fMimeTypeString[1].c_str(), fMimeTypeString[2].c_str() };
+		const char *supportedTypes3[] = { fMimeTypeString[2].c_str(), fMimeTypeString[1].c_str(), fMimeTypeString[0].c_str() };
+		SupportedTypesValue v1(supportedTypes1, 1);
+		SupportedTypesValue v2(supportedTypes2, 2);
+		SupportedTypesValue v3(supportedTypes3, 3);
+		InfoLocationTester<SupportedTypesValue, SupportedTypesSetter,
+						   SupportedTypesGetter, SupportedTypesChecker>(
+			file, v1, v2, v3);
+	}
+
+	void ValidIcon_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		IconValue v1(fIconM[0], fIconL[0]);
+		IconValue v2(fIconM[1], fIconL[1]);
+		IconValue v3(fIconM[2], fIconL[2]);
+		InfoLocationTester<IconValue, IconSetter, IconGetter, IconChecker>(
+			file, v1, v2, v3);
+	}
+
+	void ValidVersionInfo_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		VersionInfoValue v1(fTestInfo[0], fTestInfo[0]);
+		VersionInfoValue v2(fTestInfo[1], fTestInfo[1]);
+		VersionInfoValue v3(fTestInfo[2], fTestInfo[2]);
+		InfoLocationTester<VersionInfoValue, VersionInfoSetter, VersionInfoGetter,
+						   VersionInfoChecker>(file, v1, v2, v3);
+	}
+
+	void ValidIconForType_SetInfoLocation_ReturnsExpected()
+	{
+		BFile file(fTestFilePaths[0].c_str(), B_READ_WRITE);
+		IconForTypeValue v1(fIconM[0], fIconL[0]);
+		IconForTypeValue v2(fIconM[1], fIconL[1]);
+		IconForTypeValue v3(fIconM[2], fIconL[2]);
+		InfoLocationTester<IconForTypeValue, IconForTypeSetter, IconForTypeGetter,
+						   IconForTypeChecker>(file, v1, v2, v3);
+	}
+#endif
+};
+
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(AppFileInfoTest, getTestSuiteName());

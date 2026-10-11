@@ -1,46 +1,47 @@
-// DataIOTest.cpp
+/*
+ * Copyright 2023-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <string.h>
 #include <BufferedDataIO.h>
 
-#include <TestShell.h>
+#include <StorageDefs.h>
+#include <SupportDefs.h>
 
-#include "DataIOTest.h"
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
-
-CppUnit::Test*
-DataIOTest::Suite() {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
-	typedef CppUnit::TestCaller<DataIOTest> TC;
-
-	suite->addTest(new TC("BResourceString::BufferedDataIO Test",
-		&DataIOTest::BufferedDataIOTest));
-
-	return suite;
-}
+#include "BasicTest.h"
 
 
-void
-DataIOTest::BufferedDataIOTest()
-{
-	// very basic test
-	NextSubTest();
-	{
+
+class DataIOTest : public BasicTest {
+	CPPUNIT_TEST_SUITE(DataIOTest);
+	CPPUNIT_TEST(BufferedDataIOTest);
+	CPPUNIT_TEST_SUITE_END();
+
+public:
+	void BufferedDataIOTest() {
 		BMallocIO mallocIO;
-		CPPUNIT_ASSERT(mallocIO.SetSize(1024) == B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, mallocIO.SetSize(1024));
 
 		BBufferedDataIO bufferedDataIO(mallocIO, 8, false);
-		CPPUNIT_ASSERT(bufferedDataIO.InitCheck() == B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, bufferedDataIO.InitCheck());
 
 		CPPUNIT_ASSERT(bufferedDataIO.Write("test ", 5) == 5);
 		CPPUNIT_ASSERT(bufferedDataIO.Write("test ", 5) == 5);
 		CPPUNIT_ASSERT(bufferedDataIO.Write("test ", 5) == 5);
 
-		CPPUNIT_ASSERT(bufferedDataIO.Flush() == B_OK);
+		CPPUNIT_ASSERT_EQUAL(B_OK, bufferedDataIO.Flush());
 
 		CPPUNIT_ASSERT(bufferedDataIO.Write("longer-test", 12) == 12);
 
 //		CPPUNIT_ASSERT(mallocIO.Position() == 27);
 //		CPPUNIT_ASSERT(memcmp(mallocIO.Buffer(), "test test test longer-test", 27) == 0);
 	}
-}
+};
+
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(DataIOTest, getTestSuiteName());

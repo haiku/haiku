@@ -1,4 +1,8 @@
-// FindDirectoryTest.cpp
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <errno.h>
 #include <stdio.h>
@@ -6,122 +10,47 @@
 #include <unistd.h>
 
 #include <string>
-using std::string;
 
-#include "FindDirectoryTest.h"
-
-#include <FindDirectory.h>
-#include <fs_info.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 #include <Path.h>
+#include <StorageDefs.h>
+#include <SupportDefs.h>
 #include <Volume.h>
+#include <fs_info.h>
+ 
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
+#include "BasicTest.h"
 
 
-
-const directory_which directories[] = {
-	B_DESKTOP_DIRECTORY,
-	B_TRASH_DIRECTORY,
+const directory_which directories[] = {B_DESKTOP_DIRECTORY, B_TRASH_DIRECTORY,
 	// BeOS directories.  These are mostly accessed read-only.
-	B_BEOS_DIRECTORY,
-	B_BEOS_SYSTEM_DIRECTORY,
-	B_BEOS_ADDONS_DIRECTORY,
-	B_BEOS_BOOT_DIRECTORY,
-	B_BEOS_FONTS_DIRECTORY,
-	B_BEOS_LIB_DIRECTORY,
- 	B_BEOS_SERVERS_DIRECTORY,
-	B_BEOS_APPS_DIRECTORY,
-	B_BEOS_BIN_DIRECTORY,
-	B_BEOS_ETC_DIRECTORY,
-	B_BEOS_DOCUMENTATION_DIRECTORY,
-	B_BEOS_PREFERENCES_DIRECTORY,
-	B_BEOS_TRANSLATORS_DIRECTORY,
-	B_BEOS_MEDIA_NODES_DIRECTORY,
-	B_BEOS_SOUNDS_DIRECTORY,
-	B_SYSTEM_ETC_DIRECTORY,
-	B_SYSTEM_SETTINGS_DIRECTORY,
-	B_SYSTEM_LOG_DIRECTORY,
-	B_SYSTEM_SPOOL_DIRECTORY,
-	B_SYSTEM_TEMP_DIRECTORY,
-	B_SYSTEM_VAR_DIRECTORY,
-	B_SYSTEM_DESKBAR_DIRECTORY,
+	B_BEOS_DIRECTORY, B_BEOS_SYSTEM_DIRECTORY, B_BEOS_ADDONS_DIRECTORY, B_BEOS_BOOT_DIRECTORY,
+	B_BEOS_FONTS_DIRECTORY, B_BEOS_LIB_DIRECTORY, B_BEOS_SERVERS_DIRECTORY, B_BEOS_APPS_DIRECTORY,
+	B_BEOS_BIN_DIRECTORY, B_BEOS_ETC_DIRECTORY, B_BEOS_DOCUMENTATION_DIRECTORY,
+	B_BEOS_PREFERENCES_DIRECTORY, B_BEOS_TRANSLATORS_DIRECTORY, B_BEOS_MEDIA_NODES_DIRECTORY,
+	B_BEOS_SOUNDS_DIRECTORY, B_SYSTEM_ETC_DIRECTORY, B_SYSTEM_SETTINGS_DIRECTORY,
+	B_SYSTEM_LOG_DIRECTORY, B_SYSTEM_SPOOL_DIRECTORY, B_SYSTEM_TEMP_DIRECTORY,
+	B_SYSTEM_VAR_DIRECTORY, B_SYSTEM_DESKBAR_DIRECTORY,
 	// User directories.  These are interpreted in the context
 	// of the user making the find_directory call.
-	B_USER_DIRECTORY,
-	B_USER_CONFIG_DIRECTORY,
-	B_USER_ADDONS_DIRECTORY,
-	B_USER_BOOT_DIRECTORY,
-	B_USER_FONTS_DIRECTORY,
-	B_USER_LIB_DIRECTORY,
-	B_USER_SETTINGS_DIRECTORY,
-	B_USER_DESKBAR_DIRECTORY,
-	B_USER_PRINTERS_DIRECTORY,
-	B_USER_TRANSLATORS_DIRECTORY,
-	B_USER_MEDIA_NODES_DIRECTORY,
-	B_USER_SOUNDS_DIRECTORY,
+	B_USER_DIRECTORY, B_USER_CONFIG_DIRECTORY, B_USER_ADDONS_DIRECTORY, B_USER_BOOT_DIRECTORY,
+	B_USER_FONTS_DIRECTORY, B_USER_LIB_DIRECTORY, B_USER_SETTINGS_DIRECTORY,
+	B_USER_DESKBAR_DIRECTORY, B_USER_PRINTERS_DIRECTORY, B_USER_TRANSLATORS_DIRECTORY,
+	B_USER_MEDIA_NODES_DIRECTORY, B_USER_SOUNDS_DIRECTORY,
 	// Global directories.
-	B_APPS_DIRECTORY,
-	B_PREFERENCES_DIRECTORY,
-	B_UTILITIES_DIRECTORY
-};
+	B_APPS_DIRECTORY, B_PREFERENCES_DIRECTORY, B_UTILITIES_DIRECTORY};
 
 const int32 directoryCount = sizeof(directories) / sizeof(directory_which);
 
-const char *testFile		= "/tmp/testFile";
-const char *testMountPoint	= "/non-existing-mount-point";
+const char* testFile = "/tmp/testFile";
+const char* testMountPoint = "/non-existing-mount-point";
 
-
-// Suite
-CppUnit::Test*
-FindDirectoryTest::Suite() {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
-	typedef CppUnit::TestCaller<FindDirectoryTest> TC;
-		
-	suite->addTest( new TC("find_directory() Test",
-						   &FindDirectoryTest::Test) );
-		
-	return suite;
-}		
-
-// setUp
-void
-FindDirectoryTest::setUp()
-{
-	BasicTest::setUp();
-	createVolume(testFile, testMountPoint, 1);
-}
-	
-// tearDown
-void
-FindDirectoryTest::tearDown()
-{
-	deleteVolume(testFile, testMountPoint);
-	BasicTest::tearDown();
-}
-
-// print_directories
-/*static
-void
-print_directories(dev_t device)
-{
-	printf("device id: %ld\n", device);
-	BVolume volume;
-	status_t error = volume.SetTo(device);
-	if (error != B_OK)
-		printf("Failed to init volume\n");
-	for (int32 i = 0; error == B_OK && i < directoryCount; i++) {
-		BPath path;
-		error = find_directory(directories[i], &path, false, &volume);
-		if (error == B_OK)
-			printf("%4d: `%s'\n", directories[i], path.Path());
-		else
-			printf("Failed to find directory: %s\n", strerror(error));
-	}
-}*/
-
-// test_find_directory
-static
-status_t
-test_find_directory(directory_which dir, BPath &path, dev_t device)
+static status_t
+test_find_directory(directory_which dir, BPath& path, dev_t device)
 {
 	status_t error = B_BAD_VALUE;
 	switch (dir) {
@@ -138,10 +67,12 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 					error = homePath.InitCheck();
 					if (error == B_OK)
 						path.SetTo(homePath.Path(), "Desktop");
-				} else
+				} else {
 					error = B_ENTRY_NOT_FOUND;
-			} else
+				}
+			} else {
 				error = errno;
+			}
 			break;
 		}
 		case B_TRASH_DIRECTORY:
@@ -162,10 +93,12 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 					error = recycledPath.InitCheck();
 					if (error == B_OK)
 						path.SetTo(recycledPath.Path(), "_BEOS_");
-				} else
+				} else {
 					error = B_ENTRY_NOT_FOUND;
-			} else
+				}
+			} else {
 				error = errno;
+			}
 			break;
 		}
 		// BeOS directories.  These are mostly accessed read-only.
@@ -187,7 +120,7 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 		case B_BEOS_LIB_DIRECTORY:
 			error = path.SetTo("/boot/beos/system/lib");
 			break;
- 		case B_BEOS_SERVERS_DIRECTORY:
+		case B_BEOS_SERVERS_DIRECTORY:
 			error = path.SetTo("/boot/beos/system/servers");
 			break;
 		case B_BEOS_APPS_DIRECTORY:
@@ -296,105 +229,137 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 	return error;
 }
 
-// TestDirectories
-static
-void
-TestDirectories(dev_t device)
-{
-	BVolume volume;
-	if (device >= 0)
-		CPPUNIT_ASSERT( volume.SetTo(device) == B_OK );
-	for (int32 i = 0; i < directoryCount; i++) {
-		BPath path;
-		BPath path2;
-		char path3[B_PATH_NAME_LENGTH + 1];
-		status_t result = test_find_directory(directories[i], path, device);
-		status_t result2 = find_directory(directories[i], &path2, false,
-										  &volume);
-		status_t result3 = find_directory(directories[i], device, false,
-										  path3, B_PATH_NAME_LENGTH + 1);
-		CPPUNIT_ASSERT( result == result2 && result == result3 );
-		if (result == B_OK)
-			CPPUNIT_ASSERT( path == path2 && path == path3 );
-	}
-}
 
-// Test
-void
-FindDirectoryTest::Test()
-{
-	// /boot
-	NextSubTest();
-	dev_t device = dev_for_path("/boot");
-	CPPUNIT_ASSERT( device > 0 );
-	TestDirectories(device);
-	// /dev
-	NextSubTest();
-	device = dev_for_path("/dev");
-	CPPUNIT_ASSERT( device > 0 );
-	TestDirectories(device);
-	// /
-	NextSubTest();
-	device = dev_for_path("/");
-	CPPUNIT_ASSERT( device > 0 );
-	TestDirectories(device);
-	// test image
-	NextSubTest();
-	device = dev_for_path(testMountPoint);
-	CPPUNIT_ASSERT( device > 0 );
-	TestDirectories(device);
-	// invalid device ID
-	NextSubTest();
-	TestDirectories(-1);
-	// NULL BVolume
-	NextSubTest();
-	for (int32 i = 0; i < directoryCount; i++) {
-		BPath path;
-		BPath path2;
-		status_t result = test_find_directory(directories[i], path, -1);
-		status_t result2 = find_directory(directories[i], &path2, false, NULL);
-		CPPUNIT_ASSERT( result == result2 );
-		if (result == B_OK)
-			CPPUNIT_ASSERT( path == path2 );
+class FindDirectoryTest : public BasicTest {
+	CPPUNIT_TEST_SUITE(FindDirectoryTest);
+	CPPUNIT_TEST(Boot_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(Dev_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(Root_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(MountPoint_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(InvalidDevice_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(NullVolume_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(NoSuchVolume_FindDirectory_ReturnsOk);
+	CPPUNIT_TEST(BadArgs_FindDirectory_ReturnsError);
+	CPPUNIT_TEST(SmallBuffer_FindDirectory_ReturnsError);
+	CPPUNIT_TEST_SUITE_END();
+
+	void _TestDirectories(dev_t device)
+	{
+		BVolume volume;
+		if (device >= 0)
+			CPPUNIT_ASSERT_EQUAL(B_OK, volume.SetTo(device));
+		for (int32 i = 0; i < directoryCount; i++) {
+			BPath path;
+			BPath path2;
+			char path3[B_PATH_NAME_LENGTH + 1];
+			status_t result = test_find_directory(directories[i], path, device);
+			status_t result2 = find_directory(directories[i], &path2, false, &volume);
+			status_t result3
+				= find_directory(directories[i], device, false, path3, B_PATH_NAME_LENGTH + 1);
+			CPPUNIT_ASSERT(result == result2 && result == result3);
+			if (result == B_OK)
+				CPPUNIT_ASSERT(path == path2 && path == path3);
+		}
 	}
-	// no such volume
-	NextSubTest();
-	device = 213;
-	fs_info info;
-	while (fs_stat_dev(device, &info) == 0)
-		device++;
-	for (int32 i = 0; i < directoryCount; i++) {
-		BPath path;
-		char path3[B_PATH_NAME_LENGTH + 1];
-		status_t result = test_find_directory(directories[i], path, device);
-		status_t result3 = find_directory(directories[i], device, false,
-										  path3, B_PATH_NAME_LENGTH + 1);
-		// Our test_find_directory() returns rather strange errors instead
-		// of B_ENTRY_NOT_FOUND.
-		CPPUNIT_ASSERT( result == B_OK && result3 == B_OK
-						|| result != B_OK && result3 != B_OK );
-		if (result == B_OK)
-			CPPUNIT_ASSERT( path == path3 );
+
+	std::string fImageFile;
+
+public:
+	void setUp()
+	{
+		BasicTest::setUp();
+		fImageFile = CreateVolume(testMountPoint, 1);
 	}
-	// bad args
-	// R5: crashes
-	NextSubTest();
-	device = dev_for_path("/boot");
-	CPPUNIT_ASSERT( device > 0 );
+
+	void tearDown()
+	{
+		DeleteVolume(fImageFile, testMountPoint);
+		BasicTest::tearDown();
+	}
+
+	void Boot_FindDirectory_ReturnsOk()
+	{
+		dev_t device = dev_for_path("/boot");
+		CPPUNIT_ASSERT(device > 0);
+		_TestDirectories(device);
+	}
+
+	void Dev_FindDirectory_ReturnsOk()
+	{
+		dev_t device = dev_for_path("/dev");
+		CPPUNIT_ASSERT(device > 0);
+		_TestDirectories(device);
+	}
+
+	void Root_FindDirectory_ReturnsOk()
+	{
+		dev_t device = dev_for_path("/");
+		CPPUNIT_ASSERT(device > 0);
+		_TestDirectories(device);
+	}
+
+	void MountPoint_FindDirectory_ReturnsOk()
+	{
+		dev_t device = dev_for_path(testMountPoint);
+		CPPUNIT_ASSERT(device > 0);
+		_TestDirectories(device);
+	}
+
+	void InvalidDevice_FindDirectory_ReturnsOk() { _TestDirectories(-1); }
+
+	void NullVolume_FindDirectory_ReturnsOk()
+	{
+		for (int32 i = 0; i < directoryCount; i++) {
+			BPath path;
+			BPath path2;
+			status_t result = test_find_directory(directories[i], path, -1);
+			status_t result2 = find_directory(directories[i], &path2, false, NULL);
+			CPPUNIT_ASSERT(result == result2);
+			if (result == B_OK)
+				CPPUNIT_ASSERT(path == path2);
+		}
+	}
+
+	void NoSuchVolume_FindDirectory_ReturnsOk()
+	{
+		dev_t device = 213;
+		fs_info info;
+		while (fs_stat_dev(device, &info) == 0)
+			device++;
+		for (int32 i = 0; i < directoryCount; i++) {
+			BPath path;
+			char path3[B_PATH_NAME_LENGTH + 1];
+			status_t result = test_find_directory(directories[i], path, device);
+			status_t result3
+				= find_directory(directories[i], device, false, path3, B_PATH_NAME_LENGTH + 1);
+			// Our test_find_directory() returns rather strange errors instead
+			// of B_ENTRY_NOT_FOUND.
+			CPPUNIT_ASSERT(
+				(result == B_OK && result3 == B_OK) || (result != B_OK && result3 != B_OK));
+			if (result == B_OK)
+				CPPUNIT_ASSERT(path == path3);
+		}
+	}
+
+	void BadArgs_FindDirectory_ReturnsError()
+	{
+		dev_t device = dev_for_path("/boot");
+		CPPUNIT_ASSERT(device > 0);
 #if !TEST_R5
-	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, NULL, false, NULL)
-					== B_BAD_VALUE );
-	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, device, false, NULL, 50)
-					== B_BAD_VALUE );
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, find_directory(B_BEOS_DIRECTORY, NULL, false, NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, find_directory(B_BEOS_DIRECTORY, device, false, NULL, 50));
 #endif
-	// small buffer
-	NextSubTest();
-	char path3[7];
-	CPPUNIT_ASSERT( find_directory(B_BEOS_DIRECTORY, device, false, path3, 7)
-					== E2BIG );
-}
+	}
+
+	void SmallBuffer_FindDirectory_ReturnsError()
+	{
+		dev_t device = dev_for_path("/boot");
+		CPPUNIT_ASSERT(device > 0);
+		char path3[7];
+		CPPUNIT_ASSERT(find_directory(B_BEOS_DIRECTORY, device, false, path3, 7) == E2BIG);
+	}
+};
 
 
-
-
-
+// FIXME
+// CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(FindDirectoryTest, getTestSuiteName());

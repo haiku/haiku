@@ -45,7 +45,6 @@ print_usage(bool error)
 		programName, programName);
 }
 
-// print_usage_and_exit
 static
 void
 print_usage_and_exit(bool error)
@@ -54,7 +53,6 @@ print_usage_and_exit(bool error)
 	exit(error ? 1 : 0);
 }
 
-// next_arg
 static
 const char*
 next_arg(int argc, const char* const* argv, int& argi, bool dontFail = false)
@@ -68,7 +66,6 @@ next_arg(int argc, const char* const* argv, int& argi, bool dontFail = false)
 	return argv[++argi];
 }
 
-// clipboard_clear
 static
 void
 clipboard_clear(BClipboard &clipboard)
@@ -82,7 +79,6 @@ clipboard_clear(BClipboard &clipboard)
 	}
 }
 
-// clipboard_dump
 static
 void
 clipboard_dump(BClipboard &clipboard)
@@ -96,7 +92,6 @@ clipboard_dump(BClipboard &clipboard)
 		clipboard.Data()->PrintToStream();
 }
 
-// clipboard_set
 static
 void
 clipboard_set(BClipboard &clipboard, const char *value)

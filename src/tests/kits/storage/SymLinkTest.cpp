@@ -1,917 +1,1121 @@
-// SymLinkTest.cpp
+/*
+ * Copyright 2002-2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
 
 #include <stdio.h>
 #include <string.h>
 
 #include <string>
-using std::string;
 
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
 #include <SymLink.h>
 
-#include "SymLinkTest.h"
+#include <TestSuiteAddon.h>
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
 
-// Suite
-SymLinkTest::Test*
-SymLinkTest::Suite()
-{
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
-	typedef CppUnit::TestCaller<SymLinkTest> TC;
-	
-	NodeTest::AddBaseClassTests<SymLinkTest>("BSymLink::", suite);
+#include "NodeTest.h"
 
-	suite->addTest( new TC("BSymLink::Init Test 1", &SymLinkTest::InitTest1) );
-	suite->addTest( new TC("BSymLink::Init Test 2", &SymLinkTest::InitTest2) );
-	suite->addTest( new TC("BSymLink::ReadLink Test",
-						   &SymLinkTest::ReadLinkTest) );
-	suite->addTest( new TC("BSymLink::MakeLinkedPath Test",
-						   &SymLinkTest::MakeLinkedPathTest) );
-	suite->addTest( new TC("BSymLink::IsAbsolute Test",
-						   &SymLinkTest::IsAbsoluteTest) );
-	suite->addTest( new TC("BSymLink::Assignment Test",
-						   &SymLinkTest::AssignmentTest) );
-	
-	return suite;
-}		
 
-// CreateRONodes
-void
-SymLinkTest::CreateRONodes(TestNodes& testEntries)
-{
-	testEntries.clear();
-	const char *filename;
-	filename = "/tmp";
-	testEntries.add(new BSymLink(filename), filename);
-	filename = dirLinkname;
-	testEntries.add(new BSymLink(filename), filename);
-	filename = fileLinkname;
-	testEntries.add(new BSymLink(filename), filename);
-	filename = badLinkname;
-	testEntries.add(new BSymLink(filename), filename);
-	filename = cyclicLinkname1;
-	testEntries.add(new BSymLink(filename), filename);
-}
+class SymLinkTest : public NodeTest {
+	CPPUNIT_TEST_SUB_SUITE(SymLinkTest, NodeTest);
+	CPPUNIT_TEST(Uninitialized_Constructor_ReturnsNoInit);
+	CPPUNIT_TEST(FileLink_PathConstructor_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_PathConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_PathConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(Empty_PathConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(ExistingFile_PathConstructor_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_PathConstructor_ReturnsOk);
+	CPPUNIT_TEST(TooLong_PathConstructor_ReturnsNameTooLong);
 
-// CreateRWNodes
-void
-SymLinkTest::CreateRWNodes(TestNodes& testEntries)
-{
-	testEntries.clear();
-	const char *filename;
-	filename = dirLinkname;
-	testEntries.add(new BSymLink(filename), filename);
-	filename = fileLinkname;
-	testEntries.add(new BSymLink(filename), filename);
-}
+	CPPUNIT_TEST(DirectoryLink_EntryConstructor_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_EntryConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_EntryConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_EntryConstructor_ReturnsError);
+	CPPUNIT_TEST(ExistingFile_EntryConstructor_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_EntryConstructor_ReturnsOk);
+	CPPUNIT_TEST(TooLong_EntryConstructor_ReturnsError);
 
-// CreateUninitializedNodes
-void
-SymLinkTest::CreateUninitializedNodes(TestNodes& testEntries)
-{
-	testEntries.clear();
-	testEntries.add(new BSymLink, "");
-}
+	CPPUNIT_TEST(DirectoryLink_EntryRefConstructor_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_EntryRefConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_EntryRefConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(ExistingFile_EntryRefConstructor_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_EntryRefConstructor_ReturnsOk);
 
-// setUp
-void SymLinkTest::setUp()
-{
-	NodeTest::setUp();
-}
+	CPPUNIT_TEST(RelativePath_DirAndPathConstructor_ReturnsOk);
+	CPPUNIT_TEST(InvalidPath_DirAndPathConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(NonExisting_DirAndPathConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(NullArgs_DirAndPathConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(NullDir_DirAndPathConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(NullPath_DirAndPathConstructor_ReturnsBadValue);
+	CPPUNIT_TEST(EmptyPath_DirAndPathConstructor_ReturnsEntryNotFound);
+	CPPUNIT_TEST(ExistingFile_DirAndPathConstructor_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_DirAndPathConstructor_ReturnsOk);
+	CPPUNIT_TEST(TooLong_DirAndPathConstructor_ReturnsNameTooLong);
+	CPPUNIT_TEST(FileSuperDir_DirAndPathConstructor_ReturnsEntryNotFound);
 
-// tearDown
-void SymLinkTest::tearDown()
-{
-	NodeTest::tearDown();
-}
+	CPPUNIT_TEST(FileLink_SetToPath_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_SetToPath_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_SetToPath_ReturnsBadValue);
+	CPPUNIT_TEST(Empty_SetToPath_ReturnsEntryNotFound);
+	CPPUNIT_TEST(ExistingFile_SetToPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_SetToPath_ReturnsOk);
+	CPPUNIT_TEST(TooLong_SetToPath_ReturnsNameTooLong);
 
-// InitTest1
-void
-SymLinkTest::InitTest1()
-{
-	const char *dirLink = dirLinkname;
-	const char *dirSuperLink = dirSuperLinkname;
-	const char *dirRelLink = dirRelLinkname;
-	const char *fileLink = fileLinkname;
-	const char *existingDir = existingDirname;
-	const char *existingSuperDir = existingSuperDirname;
-	const char *existingRelDir = existingRelDirname;
-	const char *existingFile = existingFilename;
-	const char *existingSuperFile = existingSuperFilename;
-	const char *existingRelFile = existingRelFilename;
-	const char *nonExisting = nonExistingDirname;
-	const char *nonExistingSuper = nonExistingSuperDirname;
-	const char *nonExistingRel = nonExistingRelDirname;
-	// 1. default constructor
-	NextSubTest();
+	CPPUNIT_TEST(DirectoryLink_SetToEntry_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_SetToEntry_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_SetToEntry_ReturnsBadValue);
+	CPPUNIT_TEST(Uninitialized_SetToEntry_ReturnsError);
+	CPPUNIT_TEST(ExistingFile_SetToEntry_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_SetToEntry_ReturnsOk);
+	CPPUNIT_TEST(TooLong_SetToEntry_ReturnsError);
+
+	CPPUNIT_TEST(DirectoryLink_SetToEntryRef_ReturnsOk);
+	CPPUNIT_TEST(NonExisting_SetToEntryRef_ReturnsEntryNotFound);
+	CPPUNIT_TEST(Null_SetToEntryRef_ReturnsBadValue);
+	CPPUNIT_TEST(ExistingFile_SetToEntryRef_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_SetToEntryRef_ReturnsOk);
+
+	CPPUNIT_TEST(RelativePath_SetToDirAndPath_ReturnsOk);
+	CPPUNIT_TEST(InvalidPath_SetToDirAndPath_ReturnsBadValue);
+	CPPUNIT_TEST(NonExisting_SetToDirAndPath_ReturnsEntryNotFound);
+	CPPUNIT_TEST(NullArgs_SetToDirAndPath_ReturnsBadValue);
+	CPPUNIT_TEST(NullDir_SetToDirAndPath_ReturnsBadValue);
+	CPPUNIT_TEST(NullPath_SetToDirAndPath_ReturnsBadValue);
+	CPPUNIT_TEST(EmptyPath_SetToDirAndPath_ReturnsEntryNotFound);
+	CPPUNIT_TEST(ExistingFile_SetToDirAndPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingDir_SetToDirAndPath_ReturnsOk);
+	CPPUNIT_TEST(TooLong_SetToDirAndPath_ReturnsNameTooLong);
+	CPPUNIT_TEST(FileSuperDir_SetToDirAndPath_ReturnsEntryNotFound);
+
+	CPPUNIT_TEST(Uninitialized_ReadLink_ReturnsError);
+	CPPUNIT_TEST(ExistingDirLink_ReadLink_ReturnsOk);
+	CPPUNIT_TEST(ExistingFileLink_ReadLink_ReturnsOk);
+	CPPUNIT_TEST(ExistingCyclicLink_ReadLink_ReturnsOk);
+	CPPUNIT_TEST(ExistingLinkToNonExisting_ReadLink_ReturnsOk);
+	CPPUNIT_TEST(NonExistingLink_ReadLink_ReturnsError);
+	CPPUNIT_TEST(Dir_ReadLink_ReturnsError);
+	CPPUNIT_TEST(File_ReadLink_ReturnsError);
+	CPPUNIT_TEST(SmallBuffer_ReadLink_ReturnsLength);
+	CPPUNIT_TEST(ExtraByteInLength_ReadLink_ResultIsNULLTerminated);
+	CPPUNIT_TEST(BadArgs_ReadLink_ReturnsError);
+
+	CPPUNIT_TEST(Uninitialized_MakeLinkedPathDirPath_ReturnsError);
+	CPPUNIT_TEST(ExistingAbsDirLink_MakeLinkedPathDirPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingAbsFileLink_MakeLinkedPathDirPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingAbsCyclicLink_MakeLinkedPathDirPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingRelDirLink_MakeLinkedPathDirPath_ReturnsOk);
+	CPPUNIT_TEST(ExistingRelFileLink_MakeLinkedPathDirPath_ReturnsOk);
+	CPPUNIT_TEST(NullPath_MakeLinkedPathDirPath_ReturnsBadValue);
+	CPPUNIT_TEST(NullDirPath_MakeLinkedPathDirPath_ReturnsBadValue);
+	CPPUNIT_TEST(NullDirAndPath_MakeLinkedPathDirPath_ReturnsBadValue);
+
+	CPPUNIT_TEST(Uninitialized_MakeLinkedPathDirPtr_ReturnsError);
+	CPPUNIT_TEST(ExistingAbsDirLink_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(ExistingAbsFileLink_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(ExistingAbsCyclicLink_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(ExistingRelDirLink_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(ExistingRelFileLink_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(AbsLinkUninitializedDir_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(AbsLinkBadDir_MakeLinkedPathDirPtr_ReturnsOk);
+	CPPUNIT_TEST(RelLinkUninitializedDir_MakeLinkedPathDirPtr_ReturnsError);
+	CPPUNIT_TEST(RelLinkBadDir_MakeLinkedPathDirPtr_ReturnsError);
+	CPPUNIT_TEST(NullPath_MakeLinkedPathDirPtr_ReturnsBadValue);
+	CPPUNIT_TEST(NullDir_MakeLinkedPathDirPtr_ReturnsBadValue);
+	CPPUNIT_TEST(NullDirAndPath_MakeLinkedPathDirPtr_ReturnsBadValue);
+
+	CPPUNIT_TEST(Uninitialized_IsAbsolute_ReturnsFalse);
+	CPPUNIT_TEST(ExistingAbsDirLink_IsAbsolute_ReturnsTrue);
+	CPPUNIT_TEST(ExistingRelFileLink_IsAbsolute_ReturnsFalse);
+	CPPUNIT_TEST(NonExistingLink_IsAbsolute_ReturnsFalse);
+	CPPUNIT_TEST(Dir_IsAbsolute_ReturnsFalse);
+	CPPUNIT_TEST(File_IsAbsolute_ReturnsFalse);
+
+	CPPUNIT_TEST(Uninitialized_CopyConstructor_ReturnsError);
+	CPPUNIT_TEST(ExistingDirLink_CopyConstructor_ReturnsOk);
+	CPPUNIT_TEST(ExistingFileLink_CopyConstructor_ReturnsOk);
+	CPPUNIT_TEST(Uninitialized1_Assignment_ReturnsError);
+	CPPUNIT_TEST(Uninitialized2_Assignment_ReturnsError);
+	CPPUNIT_TEST(ExistingDirLink_Assignment_ReturnsOk);
+	CPPUNIT_TEST(ExistingFileLink_Assignment_ReturnsOk);
+	CPPUNIT_TEST_SUITE_END();
+
+protected:
+	void CreateUninitializedNodes(TestNodes& testEntries)
+	{
+		testEntries.clear();
+		testEntries.add(new BSymLink, "");
+	}
+
+	void CreateRWNodes(TestNodes& testEntries)
+	{
+		testEntries.clear();
+		const char* filename;
+		filename = dirLinkname;
+		testEntries.add(new BSymLink(filename), filename);
+		filename = fileLinkname;
+		testEntries.add(new BSymLink(filename), filename);
+	}
+
+	void CreateRONodes(TestNodes& testEntries)
+	{
+		testEntries.clear();
+		const char* filename;
+		filename = "/tmp";
+		testEntries.add(new BSymLink(filename), filename);
+		filename = dirLinkname;
+		testEntries.add(new BSymLink(filename), filename);
+		filename = fileLinkname;
+		testEntries.add(new BSymLink(filename), filename);
+		filename = badLinkname;
+		testEntries.add(new BSymLink(filename), filename);
+		filename = cyclicLinkname1;
+		testEntries.add(new BSymLink(filename), filename);
+	}
+
+public:
+	void setUp() { NodeTest::setUp(); }
+	void tearDown() { NodeTest::tearDown(); }
+
+	void Uninitialized_Constructor_ReturnsNoInit()
 	{
 		BSymLink link;
-		CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, link.InitCheck());
 	}
 
-	// 2. BSymLink(const char*)
-	NextSubTest();
+	void FileLink_PathConstructor_ReturnsOk()
 	{
-		BSymLink link(fileLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		BSymLink link(fileLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void NonExisting_PathConstructor_ReturnsEntryNotFound()
 	{
-		BSymLink link(nonExisting);
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
+		BSymLink link(nonExistingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
-	NextSubTest();
+
+	void Null_PathConstructor_ReturnsBadValue()
 	{
-		BSymLink link((const char *)NULL);
-		CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
+		BSymLink link((const char*)NULL);
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_VALUE, B_NO_INIT));
 	}
-	NextSubTest();
+
+	void Empty_PathConstructor_ReturnsEntryNotFound()
 	{
 		BSymLink link("");
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	}
-	NextSubTest();
-	{
-		BSymLink link(existingFile);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	}
-	NextSubTest();
-	{
-		BSymLink link(existingDir);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	}
-	NextSubTest();
-	{
-		BSymLink link(tooLongEntryname);
-		CPPUNIT_ASSERT( link.InitCheck() == B_NAME_TOO_LONG );
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
 
-	// 3. BSymLink(const BEntry*)
-	NextSubTest();
+	void ExistingFile_PathConstructor_ReturnsOk()
 	{
-		BEntry entry(dirLink);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
+		BSymLink link(existingFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void ExistingDir_PathConstructor_ReturnsOk()
+	{
+		BSymLink link(existingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void TooLong_PathConstructor_ReturnsNameTooLong()
+	{
+		BSymLink link(tooLongEntryname);
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.InitCheck());
+	}
+
+	void DirectoryLink_EntryConstructor_ReturnsOk()
+	{
+		BEntry entry(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
 		BSymLink link(&entry);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void NonExisting_EntryConstructor_ReturnsEntryNotFound()
 	{
-		BEntry entry(nonExisting);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
+		BEntry entry(nonExistingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
 		BSymLink link(&entry);
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
-	NextSubTest();
+
+	void Null_EntryConstructor_ReturnsBadValue()
 	{
-		BSymLink link((BEntry *)NULL);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
+		BSymLink link((BEntry*)NULL);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
 	}
-	NextSubTest();
+
+	void Uninitialized_EntryConstructor_ReturnsError()
 	{
 		BEntry entry;
 		BSymLink link(&entry);
-		CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE));
 	}
-	NextSubTest();
-	{
-		BEntry entry(existingFile);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
-		BSymLink link(&entry);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
 
-	}
-	NextSubTest();
+	void ExistingFile_EntryConstructor_ReturnsOk()
 	{
-		BEntry entry(existingDir);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
+		BEntry entry(existingFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
 		BSymLink link(&entry);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void ExistingDir_EntryConstructor_ReturnsOk()
+	{
+		BEntry entry(existingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		BSymLink link(&entry);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void TooLong_EntryConstructor_ReturnsError()
 	{
 		BEntry entry(tooLongEntryname);
-		// R5 returns E2BIG instead of B_NAME_TOO_LONG
-		CPPUNIT_ASSERT( equals(entry.InitCheck(), E2BIG, B_NAME_TOO_LONG) );
+		CPPUNIT_ASSERT(equals(entry.InitCheck(), E2BIG, B_NAME_TOO_LONG));
 		BSymLink link(&entry);
-		CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE));
 	}
 
-	// 4. BSymLink(const entry_ref*)
-	NextSubTest();
+	void DirectoryLink_EntryRefConstructor_ReturnsOk()
 	{
-		BEntry entry(dirLink);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
+		BEntry entry(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
 		entry_ref ref;
-		CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
 		BSymLink link(&ref);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	}
-	NextSubTest();
-	{
-		BEntry entry(nonExisting);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
-		entry_ref ref;
-		CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-		BSymLink link(&ref);
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	}
-	NextSubTest();
-	{
-		BSymLink link((entry_ref *)NULL);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	}
-	NextSubTest();
-	{
-		BEntry entry(existingFile);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
-		entry_ref ref;
-		CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-		BSymLink link(&ref);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	}
-	NextSubTest();
-	{
-		BEntry entry(existingDir);
-		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
-		entry_ref ref;
-		CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-		BSymLink link(&ref);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
 
-	// 5. BSymLink(const BDirectory*, const char*)
-	NextSubTest();
+	void NonExisting_EntryRefConstructor_ReturnsEntryNotFound()
 	{
-		BDirectory pathDir(dirSuperLink);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, dirRelLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		BEntry entry(nonExistingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		BSymLink link(&ref);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
-	NextSubTest();
+
+	void Null_EntryRefConstructor_ReturnsBadValue()
 	{
-		BDirectory pathDir(dirSuperLink);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, dirLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
+		BSymLink link((entry_ref*)NULL);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
 	}
-	NextSubTest();
+
+	void ExistingFile_EntryRefConstructor_ReturnsOk()
 	{
-		BDirectory pathDir(nonExistingSuper);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, nonExistingRel);
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
+		BEntry entry(existingFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		BSymLink link(&ref);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void ExistingDir_EntryRefConstructor_ReturnsOk()
 	{
-		BSymLink link((BDirectory *)NULL, (const char *)NULL);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
+		BEntry entry(existingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		BSymLink link(&ref);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void RelativePath_DirAndPathConstructor_ReturnsOk()
 	{
-		BSymLink link((BDirectory *)NULL, dirLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, dirRelLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void InvalidPath_DirAndPathConstructor_ReturnsBadValue()
 	{
-		BDirectory pathDir(dirSuperLink);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, (const char *)NULL);
-		CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
 	}
-	NextSubTest();
+
+	void NonExisting_DirAndPathConstructor_ReturnsEntryNotFound()
 	{
-		BDirectory pathDir(dirSuperLink);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
+		BDirectory pathDir(nonExistingSuperDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, nonExistingRelDirname);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void NullArgs_DirAndPathConstructor_ReturnsBadValue()
+	{
+		BSymLink link((BDirectory*)NULL, (const char*)NULL);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void NullDir_DirAndPathConstructor_ReturnsBadValue()
+	{
+		BSymLink link((BDirectory*)NULL, dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void NullPath_DirAndPathConstructor_ReturnsBadValue()
+	{
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, (const char*)NULL);
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void EmptyPath_DirAndPathConstructor_ReturnsEntryNotFound()
+	{
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
 		BSymLink link(&pathDir, "");
-		CPPUNIT_ASSERT(link.InitCheck() == B_ENTRY_NOT_FOUND);
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
-	NextSubTest();
+
+	void ExistingFile_DirAndPathConstructor_ReturnsOk()
 	{
-		BDirectory pathDir(existingSuperFile);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, existingRelFile);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		BDirectory pathDir(existingSuperFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, existingRelFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void ExistingDir_DirAndPathConstructor_ReturnsOk()
 	{
-		BDirectory pathDir(existingSuperDir);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-		BSymLink link(&pathDir, existingRelDir);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
+		BDirectory pathDir(existingSuperDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		BSymLink link(&pathDir, existingRelDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
-	NextSubTest();
+
+	void TooLong_DirAndPathConstructor_ReturnsNameTooLong()
 	{
 		BDirectory pathDir(tooLongSuperEntryname);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
 		BSymLink link(&pathDir, tooLongRelEntryname);
-		CPPUNIT_ASSERT( link.InitCheck() == B_NAME_TOO_LONG );
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.InitCheck());
 	}
-	NextSubTest();
+
+	void FileSuperDir_DirAndPathConstructor_ReturnsEntryNotFound()
 	{
 		BDirectory pathDir(fileSuperDirname);
-		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
 		BSymLink link(&pathDir, fileRelDirname);
-		CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
 	}
-}
 
-// InitTest2
-void
-SymLinkTest::InitTest2()
-{
-	const char *dirLink = dirLinkname;
-	const char *dirSuperLink = dirSuperLinkname;
-	const char *dirRelLink = dirRelLinkname;
-	const char *fileLink = fileLinkname;
-	const char *existingDir = existingDirname;
-	const char *existingSuperDir = existingSuperDirname;
-	const char *existingRelDir = existingRelDirname;
-	const char *existingFile = existingFilename;
-	const char *existingSuperFile = existingSuperFilename;
-	const char *existingRelFile = existingRelFilename;
-	const char *nonExisting = nonExistingDirname;
-	const char *nonExistingSuper = nonExistingSuperDirname;
-	const char *nonExistingRel = nonExistingRelDirname;
-	BSymLink link;
-	// 2. BSymLink(const char*)
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(nonExisting) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( equals(link.SetTo((const char *)NULL), B_BAD_VALUE,
-						   B_NO_INIT) );
-	CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo("") == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(tooLongEntryname) == B_NAME_TOO_LONG );
-	CPPUNIT_ASSERT( link.InitCheck() == B_NAME_TOO_LONG );
-
-	// 3. BSymLink(const BEntry*)
-	NextSubTest();
-	BEntry entry(dirLink);
-	CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&entry) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(nonExisting) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&entry) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo((BEntry *)NULL) == B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	entry.Unset();
-	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
-	CPPUNIT_ASSERT( equals(link.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE) );
-	CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&entry) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&entry) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	// R5 returns E2BIG instead of B_NAME_TOO_LONG
-	CPPUNIT_ASSERT( equals(entry.SetTo(tooLongEntryname), E2BIG,
-						   B_NAME_TOO_LONG) );
-	CPPUNIT_ASSERT( equals(link.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE) );
-	CPPUNIT_ASSERT( equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
-
-	// 4. BSymLink(const entry_ref*)
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(dirLink) == B_OK );
-	entry_ref ref;
-	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(nonExisting) == B_OK );
-	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&ref) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo((entry_ref *)NULL) == B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&ref) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-
-	// 5. BSymLink(const BDirectory*, const char*)
-	NextSubTest();
-	BDirectory pathDir(dirSuperLink);
-	CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, dirRelLink) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, dirLink) == B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(nonExistingSuper) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, nonExistingRel) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo((BDirectory *)NULL, (const char *)NULL)
-					== B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo((BDirectory *)NULL, dirLink) == B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, (const char *)NULL) == B_BAD_VALUE );
-	CPPUNIT_ASSERT( link.InitCheck() == B_BAD_VALUE );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
-	CPPUNIT_ASSERT(link.SetTo(&pathDir, "") == B_ENTRY_NOT_FOUND);
-	CPPUNIT_ASSERT(link.InitCheck() == B_ENTRY_NOT_FOUND);
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperFile) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, existingRelFile) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperDir) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, existingRelDir) == B_OK );
-	CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(tooLongSuperEntryname) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, tooLongRelEntryname)
-					== B_NAME_TOO_LONG );
-	CPPUNIT_ASSERT( link.InitCheck() == B_NAME_TOO_LONG );
-	//
-	NextSubTest();
-	CPPUNIT_ASSERT( pathDir.SetTo(fileSuperDirname) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(&pathDir, fileRelDirname) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
-}
-
-// ReadLinkTest
-void
-SymLinkTest::ReadLinkTest()
-{
-	const char *dirLink = dirLinkname;
-	const char *fileLink = fileLinkname;
-	const char *badLink = badLinkname;
-	const char *cyclicLink1 = cyclicLinkname1;
-	const char *cyclicLink2 = cyclicLinkname2;
-	const char *existingDir = existingDirname;
-	const char *existingFile = existingFilename;
-	const char *nonExisting = nonExistingDirname;
-	BSymLink link;
-	char buffer[B_PATH_NAME_LENGTH + 1];
-	// uninitialized
-	// R5: returns B_BAD_ADDRESS instead of (as doc'ed) B_FILE_ERROR
-	NextSubTest();
-	CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
-	CPPUNIT_ASSERT( equals(link.ReadLink(buffer, sizeof(buffer)),
-						   B_BAD_ADDRESS, B_FILE_ERROR) );
-	// existing dir link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer))
-					== (ssize_t)strlen(existingDir) );
-	CPPUNIT_ASSERT( strcmp(buffer, existingDir) == 0 );
-	// existing file link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer))
-					== (ssize_t)strlen(existingFile) );
-	CPPUNIT_ASSERT( strcmp(buffer, existingFile) == 0 );
-	// existing cyclic link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(cyclicLink1) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer))
-					== (ssize_t)strlen(cyclicLink2) );
-	CPPUNIT_ASSERT( strcmp(buffer, cyclicLink2) == 0 );
-	// existing link to non-existing entry
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(badLink) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer))
-					== (ssize_t)strlen(nonExisting) );
-	CPPUNIT_ASSERT( strcmp(buffer, nonExisting) == 0 );
-	// non-existing link
-	// R5: returns B_BAD_ADDRESS instead of (as doc'ed) B_FILE_ERROR
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(nonExisting) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( equals(link.ReadLink(buffer, sizeof(buffer)),
-						   B_BAD_ADDRESS, B_FILE_ERROR) );
-	// dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer)) == B_BAD_VALUE );
-	// file
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer)) == B_BAD_VALUE );
-	// small buffer
-	// R5: returns the size of the contents, not the number of bytes copied
-	// Haiku: ... so do we
-	NextSubTest();
-	char smallBuffer[2];
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	ssize_t linkLength = link.ReadLink(smallBuffer, sizeof(smallBuffer));
-	CPPUNIT_ASSERT(linkLength == static_cast<ssize_t>(strlen(existingDir)));
-	CPPUNIT_ASSERT_EQUAL('/', smallBuffer[0]);
-	CPPUNIT_ASSERT_EQUAL('\0', smallBuffer[1]);
-
-	// Invoke with one extra byte of length to ensure that the result is NULL
-	// terminated.
-	NextSubTest();
-	buffer[17] = 'x';
-	CPPUNIT_ASSERT(link.ReadLink(buffer, 18));
-	CPPUNIT_ASSERT_EQUAL('\0', buffer[17]);
-	CPPUNIT_ASSERT_EQUAL(strcmp(buffer, "/tmp/existing-dir"), 0);
-
-	// bad args
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
-	CPPUNIT_ASSERT( equals(link.ReadLink(NULL, sizeof(buffer)), B_BAD_ADDRESS,
-						   B_BAD_VALUE) );
-}
-
-// MakeLinkedPathTest
-void
-SymLinkTest::MakeLinkedPathTest()
-{
-	const char *dirLink = dirLinkname;
-	const char *fileLink = fileLinkname;
-	const char *relDirLink = relDirLinkname;
-	const char *relFileLink = relFileLinkname;
-	const char *cyclicLink1 = cyclicLinkname1;
-	const char *cyclicLink2 = cyclicLinkname2;
-	const char *existingDir = existingDirname;
-	const char *existingSuperDir = existingSuperDirname;
-	const char *existingFile = existingFilename;
-	const char *existingSuperFile = existingSuperFilename;
-	const char *nonExisting = nonExistingDirname;
-	BSymLink link;
-	BPath path;
-	// 1. MakeLinkedPath(const char*, BPath*)
-	// uninitialized
-	NextSubTest();
-	CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
-	CPPUNIT_ASSERT( equals(link.MakeLinkedPath("/boot", &path), B_BAD_ADDRESS,
-						   B_FILE_ERROR) );
-	link.Unset();
-	path.Unset();
-	// existing absolute dir link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( link.MakeLinkedPath("/boot", &path)
-					== (ssize_t)strlen(existingDir) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingDir) == path.Path() );
-	link.Unset();
-	path.Unset();
-	// existing absolute file link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
-	CPPUNIT_ASSERT( link.MakeLinkedPath("/boot", &path)
-					== (ssize_t)strlen(existingFile) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingFile) == path.Path() );
-	link.Unset();
-	path.Unset();
-	// existing absolute cyclic link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(cyclicLink1) == B_OK );
-	CPPUNIT_ASSERT( link.MakeLinkedPath("/boot", &path)
-					== (ssize_t)strlen(cyclicLink2) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(cyclicLink2) == path.Path() );
-	link.Unset();
-	path.Unset();
-	// existing relative dir link
-	NextSubTest();
-	BEntry entry;
-	BPath entryPath;
-	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( entry.GetPath(&entryPath) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(relDirLink) == B_OK );
-	CPPUNIT_ASSERT( link.MakeLinkedPath(existingSuperDir, &path)
-					== (ssize_t)strlen(entryPath.Path()) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( entryPath == path );
-	link.Unset();
-	path.Unset();
-	entry.Unset();
-	entryPath.Unset();
-	// existing relative file link
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( entry.GetPath(&entryPath) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(relFileLink) == B_OK );
-	CPPUNIT_ASSERT( link.MakeLinkedPath(existingSuperFile, &path)
-					== (ssize_t)strlen(entryPath.Path()) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( entryPath == path );
-	link.Unset();
-	path.Unset();
-	entry.Unset();
-	entryPath.Unset();
-	// bad args
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-// R5: crashs, when passing a NULL path
-#if !TEST_R5
-	CPPUNIT_ASSERT( link.MakeLinkedPath("/boot", NULL) == B_BAD_VALUE );
-#endif
-	CPPUNIT_ASSERT( link.MakeLinkedPath((const char*)NULL, &path)
-					== B_BAD_VALUE );
-// R5: crashs, when passing a NULL path
-#if !TEST_R5
-	CPPUNIT_ASSERT( link.MakeLinkedPath((const char*)NULL, NULL)
-					== B_BAD_VALUE );
-#endif
-	link.Unset();
-	path.Unset();
-
-	// 2. MakeLinkedPath(const BDirectory*, BPath*)
-	// uninitialized
-	NextSubTest();
-	link.Unset();
-	CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
-	BDirectory dir;
-	CPPUNIT_ASSERT( dir.SetTo("/boot") == B_OK);
-	CPPUNIT_ASSERT( equals(link.MakeLinkedPath(&dir, &path), B_BAD_ADDRESS,
-						   B_FILE_ERROR) );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// existing absolute dir link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo("/boot") == B_OK);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(existingDir) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingDir) == path.Path() );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// existing absolute file link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo("/boot") == B_OK);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(existingFile) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingFile) == path.Path() );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// existing absolute cyclic link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(cyclicLink1) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo("/boot") == B_OK);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(cyclicLink2) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(cyclicLink2) == path.Path() );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// existing relative dir link
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( entry.GetPath(&entryPath) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(relDirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo(existingSuperDir) == B_OK);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(entryPath.Path()) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( entryPath == path );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	entry.Unset();
-	entryPath.Unset();
-	// existing relative file link
-	NextSubTest();
-	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( entry.GetPath(&entryPath) == B_OK );
-	CPPUNIT_ASSERT( link.SetTo(relFileLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo(existingSuperFile) == B_OK);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(entryPath.Path()) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( entryPath == path );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	entry.Unset();
-	entryPath.Unset();
-	// absolute link, uninitialized dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.InitCheck() == B_NO_INIT);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(existingDir) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingDir) == path.Path() );
-	// absolute link, badly initialized dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo(nonExisting) == B_ENTRY_NOT_FOUND);
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, &path)
-					== (ssize_t)strlen(existingDir) );
-	CPPUNIT_ASSERT( path.InitCheck() == B_OK );
-	CPPUNIT_ASSERT( string(existingDir) == path.Path() );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// relative link, uninitialized dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(relDirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.InitCheck() == B_NO_INIT);
-	CPPUNIT_ASSERT( equals(link.MakeLinkedPath(&dir, &path), B_NO_INIT,
-						   B_BAD_VALUE) );
-	link.Unset();
-	// relative link, badly initialized dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(relDirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo(nonExisting) == B_ENTRY_NOT_FOUND);
-	CPPUNIT_ASSERT( equals(link.MakeLinkedPath(&dir, &path), B_NO_INIT,
-						   B_BAD_VALUE) );
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-	// bad args
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( dir.SetTo("/boot") == B_OK);
-// R5: crashs, when passing a NULL path
-#if !TEST_R5
-	CPPUNIT_ASSERT( link.MakeLinkedPath(&dir, NULL) == B_BAD_VALUE );
-#endif
-
-	CPPUNIT_ASSERT( link.MakeLinkedPath((const BDirectory*)NULL, &path)
-					== B_BAD_VALUE );
-// R5: crashs, when passing a NULL path
-#if !TEST_R5
-	CPPUNIT_ASSERT( link.MakeLinkedPath((const BDirectory*)NULL, NULL)
-					== B_BAD_VALUE );
-#endif
-	link.Unset();
-	path.Unset();
-	dir.Unset();
-}
-
-// IsAbsoluteTest
-void
-SymLinkTest::IsAbsoluteTest()
-{
-	const char *dirLink = dirLinkname;
-	const char *relFileLink = relFileLinkname;
-	const char *existingDir = existingDirname;
-	const char *existingFile = existingFilename;
-	const char *nonExisting = nonExistingDirname;
-	BSymLink link;
-	// uninitialized
-	NextSubTest();
-	CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
-	CPPUNIT_ASSERT( link.IsAbsolute() == false );
-	link.Unset();
-	// existing absolute dir link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );
-	CPPUNIT_ASSERT( link.IsAbsolute() == true );
-	link.Unset();
-	// existing relative file link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(relFileLink) == B_OK );
-	CPPUNIT_ASSERT( link.IsAbsolute() == false );
-	link.Unset();
-	// non-existing link
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(nonExisting) == B_ENTRY_NOT_FOUND );
-	CPPUNIT_ASSERT( link.IsAbsolute() == false );
-	link.Unset();
-	// dir
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingDir) == B_OK );
-	CPPUNIT_ASSERT( link.IsAbsolute() == false );
-	link.Unset();
-	// file
-	NextSubTest();
-	CPPUNIT_ASSERT( link.SetTo(existingFile) == B_OK );
-	CPPUNIT_ASSERT( link.IsAbsolute() == false );
-	link.Unset();
-}
-
-// AssignmentTest
-void
-SymLinkTest::AssignmentTest()
-{
-	const char *dirLink = dirLinkname;
-	const char *fileLink = fileLinkname;
-	// 1. copy constructor
-	// uninitialized
-	NextSubTest();
+	void FileLink_SetToPath_ReturnsOk()
 	{
 		BSymLink link;
-		CPPUNIT_ASSERT( link.InitCheck() == B_NO_INIT );
-		BSymLink link2(link);
-		// R5 returns B_BAD_VALUE instead of B_NO_INIT
-		CPPUNIT_ASSERT( equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
-	}
-	// existing dir link
-	NextSubTest();
-	{
-		BSymLink link(dirLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-		BSymLink link2(link);
-		CPPUNIT_ASSERT( link2.InitCheck() == B_OK );
-	}
-	// existing file link
-	NextSubTest();
-	{
-		BSymLink link(fileLink);
-		CPPUNIT_ASSERT( link.InitCheck() == B_OK );
-		BSymLink link2(link);
-		CPPUNIT_ASSERT( link2.InitCheck() == B_OK );
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(fileLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
 	}
 
-	// 2. assignment operator
-	// uninitialized
-	NextSubTest();
+	void NonExisting_SetToPath_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(nonExistingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void Null_SetToPath_ReturnsBadValue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT(equals(link.SetTo((const char*)NULL), B_BAD_VALUE, B_NO_INIT));
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_VALUE, B_NO_INIT));
+	}
+
+	void Empty_SetToPath_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(""));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void ExistingFile_SetToPath_ReturnsOk()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void ExistingDir_SetToPath_ReturnsOk()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void TooLong_SetToPath_ReturnsNameTooLong()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.SetTo(tooLongEntryname));
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.InitCheck());
+	}
+
+	void DirectoryLink_SetToEntry_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&entry));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void NonExisting_SetToEntry_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		BEntry entry(nonExistingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(&entry));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void Null_SetToEntry_ReturnsBadValue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo((BEntry*)NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void Uninitialized_SetToEntry_ReturnsError()
+	{
+		BSymLink link;
+		BEntry entry;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, entry.InitCheck());
+		CPPUNIT_ASSERT(equals(link.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE));
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE));
+	}
+
+	void ExistingFile_SetToEntry_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(existingFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&entry));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void ExistingDir_SetToEntry_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(existingDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&entry));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void TooLong_SetToEntry_ReturnsError()
+	{
+		BSymLink link;
+		BEntry entry;
+		CPPUNIT_ASSERT(equals(entry.SetTo(tooLongEntryname), E2BIG, B_NAME_TOO_LONG));
+		CPPUNIT_ASSERT(equals(link.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE));
+		CPPUNIT_ASSERT(equals(link.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE));
+	}
+
+	void DirectoryLink_SetToEntryRef_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(dirLinkname);
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void NonExisting_SetToEntryRef_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		BEntry entry(nonExistingDirname);
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void Null_SetToEntryRef_ReturnsBadValue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo((entry_ref*)NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void ExistingFile_SetToEntryRef_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(existingFilename);
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void ExistingDir_SetToEntryRef_ReturnsOk()
+	{
+		BSymLink link;
+		BEntry entry(existingDirname);
+		entry_ref ref;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetRef(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&ref));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void RelativePath_SetToDirAndPath_ReturnsOk()
+	{
+		BSymLink link;
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&pathDir, dirRelLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void InvalidPath_SetToDirAndPath_ReturnsBadValue()
+	{
+		BSymLink link;
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo(&pathDir, dirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void NonExisting_SetToDirAndPath_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		BDirectory pathDir(nonExistingSuperDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(&pathDir, nonExistingRelDirname));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void NullArgs_SetToDirAndPath_ReturnsBadValue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo((BDirectory*)NULL, (const char*)NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void NullDir_SetToDirAndPath_ReturnsBadValue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo((BDirectory*)NULL, dirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void NullPath_SetToDirAndPath_ReturnsBadValue()
+	{
+		BSymLink link;
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.SetTo(&pathDir, (const char*)NULL));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.InitCheck());
+	}
+
+	void EmptyPath_SetToDirAndPath_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		BDirectory pathDir(dirSuperLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(&pathDir, ""));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void ExistingFile_SetToDirAndPath_ReturnsOk()
+	{
+		BSymLink link;
+		BDirectory pathDir(existingSuperFilename);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&pathDir, existingRelFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void ExistingDir_SetToDirAndPath_ReturnsOk()
+	{
+		BSymLink link;
+		BDirectory pathDir(existingSuperDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(&pathDir, existingRelDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+	}
+
+	void TooLong_SetToDirAndPath_ReturnsNameTooLong()
+	{
+		BSymLink link;
+		BDirectory pathDir(tooLongSuperEntryname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.SetTo(&pathDir, tooLongRelEntryname));
+		CPPUNIT_ASSERT_EQUAL(B_NAME_TOO_LONG, link.InitCheck());
+	}
+
+	void FileSuperDir_SetToDirAndPath_ReturnsEntryNotFound()
+	{
+		BSymLink link;
+		BDirectory pathDir(fileSuperDirname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, pathDir.InitCheck());
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(&pathDir, fileRelDirname));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.InitCheck());
+	}
+
+	void Uninitialized_ReadLink_ReturnsError()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, link.InitCheck());
+		// R5: returns B_BAD_ADDRESS instead of (as doc'ed) B_FILE_ERROR
+		CPPUNIT_ASSERT(equals(link.ReadLink(buffer, sizeof(buffer)), B_BAD_ADDRESS, B_FILE_ERROR));
+	}
+
+	void ExistingDirLink_ReadLink_ReturnsOk()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT(link.ReadLink(buffer, sizeof(buffer)) == (ssize_t)strlen(existingDirname));
+		CPPUNIT_ASSERT(strcmp(buffer, existingDirname) == 0);
+	}
+
+	void ExistingFileLink_ReadLink_ReturnsOk()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(fileLinkname));
+		CPPUNIT_ASSERT(link.ReadLink(buffer, sizeof(buffer)) == (ssize_t)strlen(existingFilename));
+		CPPUNIT_ASSERT(strcmp(buffer, existingFilename) == 0);
+	}
+
+	void ExistingCyclicLink_ReadLink_ReturnsOk()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(cyclicLinkname1));
+		CPPUNIT_ASSERT(link.ReadLink(buffer, sizeof(buffer)) == (ssize_t)strlen(cyclicLinkname2));
+		CPPUNIT_ASSERT(strcmp(buffer, cyclicLinkname2) == 0);
+	}
+
+	void ExistingLinkToNonExisting_ReadLink_ReturnsOk()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(badLinkname));
+		CPPUNIT_ASSERT(link.ReadLink(buffer, sizeof(buffer)) == (ssize_t)strlen(nonExistingFilename));
+		CPPUNIT_ASSERT(strcmp(buffer, nonExistingFilename) == 0);
+	}
+
+	void NonExistingLink_ReadLink_ReturnsError()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(nonExistingFilename));
+		// R5: returns B_BAD_ADDRESS instead of (as doc'ed) B_FILE_ERROR
+		CPPUNIT_ASSERT(equals(link.ReadLink(buffer, sizeof(buffer)), B_BAD_ADDRESS, B_FILE_ERROR));
+	}
+
+	void Dir_ReadLink_ReturnsError()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.ReadLink(buffer, sizeof(buffer)));
+	}
+
+	void File_ReadLink_ReturnsError()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.ReadLink(buffer, sizeof(buffer)));
+	}
+
+	void SmallBuffer_ReadLink_ReturnsLength()
+	{
+		BSymLink link;
+		// R5: returns the size of the contents, not the number of bytes copied
+		// Haiku: ... so do we
+		char smallBuffer[2];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		ssize_t linkLength = link.ReadLink(smallBuffer, sizeof(smallBuffer));
+		CPPUNIT_ASSERT(linkLength == static_cast<ssize_t>(strlen(existingDirname)));
+		CPPUNIT_ASSERT_EQUAL('/', smallBuffer[0]);
+		CPPUNIT_ASSERT_EQUAL('\0', smallBuffer[1]);
+	}
+
+	void ExtraByteInLength_ReadLink_ResultIsNULLTerminated()
+	{
+		BSymLink link;
+		// Invoke with one extra byte of length to ensure that the result is NULL
+		// terminated.
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		buffer[17] = 'x';
+		CPPUNIT_ASSERT(link.ReadLink(buffer, 18));
+		CPPUNIT_ASSERT_EQUAL('\0', buffer[17]);
+		CPPUNIT_ASSERT_EQUAL(strcmp(buffer, "/tmp/existing-dir"), 0);
+	}
+
+	void BadArgs_ReadLink_ReturnsError()
+	{
+		BSymLink link;
+		char buffer[B_PATH_NAME_LENGTH + 1];
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(fileLinkname));
+		CPPUNIT_ASSERT(equals(link.ReadLink(NULL, sizeof(buffer)), B_BAD_ADDRESS, B_BAD_VALUE));
+	}
+
+	void Uninitialized_MakeLinkedPathDirPath_ReturnsError()
+	{
+		BSymLink link;
+		BPath path;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, link.InitCheck());
+		CPPUNIT_ASSERT(equals(link.MakeLinkedPath("/boot", &path), B_BAD_ADDRESS, B_FILE_ERROR));
+	}
+
+	void ExistingAbsDirLink_MakeLinkedPathDirPath_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath("/boot", &path) == (ssize_t)strlen(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingDirname) == path.Path());
+	}
+
+	void ExistingAbsFileLink_MakeLinkedPathDirPath_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(fileLinkname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath("/boot", &path) == (ssize_t)strlen(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingFilename) == path.Path());
+	}
+
+	void ExistingAbsCyclicLink_MakeLinkedPathDirPath_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(cyclicLinkname1));
+		CPPUNIT_ASSERT(link.MakeLinkedPath("/boot", &path) == (ssize_t)strlen(cyclicLinkname2));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(cyclicLinkname2) == path.Path());
+	}
+
+	void ExistingRelDirLink_MakeLinkedPathDirPath_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BEntry entry;
+		BPath entryPath;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.SetTo(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetPath(&entryPath));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relDirLinkname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(existingSuperDirname, &path)
+					   == (ssize_t)strlen(entryPath.Path()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(entryPath == path);
+	}
+
+	void ExistingRelFileLink_MakeLinkedPathDirPath_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BEntry entry;
+		BPath entryPath;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.SetTo(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetPath(&entryPath));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relFileLinkname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(existingSuperFilename, &path)
+					   == (ssize_t)strlen(entryPath.Path()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(entryPath == path);
+	}
+
+	void NullPath_MakeLinkedPathDirPath_ReturnsBadValue()
+	{
+#if !TEST_R5
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		// R5: crashs, when passing a NULL path
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.MakeLinkedPath("/boot", NULL));
+#endif
+	}
+
+	void NullDirPath_MakeLinkedPathDirPath_ReturnsBadValue()
+	{
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		BPath path;
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.MakeLinkedPath((const char*)NULL, &path));
+	}
+
+	void NullDirAndPath_MakeLinkedPathDirPath_ReturnsBadValue()
+	{
+#if !TEST_R5
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		// R5: crashs, when passing a NULL path
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.MakeLinkedPath((const char*)NULL, NULL));
+#endif
+	}
+
+	void Uninitialized_MakeLinkedPathDirPtr_ReturnsError()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo("/boot"));
+		CPPUNIT_ASSERT(equals(link.MakeLinkedPath(&dir, &path), B_BAD_ADDRESS, B_FILE_ERROR));
+	}
+
+	void ExistingAbsDirLink_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo("/boot"));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingDirname) == path.Path());
+	}
+
+	void ExistingAbsFileLink_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(fileLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo("/boot"));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingFilename) == path.Path());
+	}
+
+	void ExistingAbsCyclicLink_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(cyclicLinkname1));
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo("/boot"));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(cyclicLinkname2));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(cyclicLinkname2) == path.Path());
+	}
+
+	void ExistingRelDirLink_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		BEntry entry;
+		BPath entryPath;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.SetTo(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetPath(&entryPath));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relDirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo(existingSuperDirname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(entryPath.Path()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(entryPath == path);
+	}
+
+	void ExistingRelFileLink_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		BEntry entry;
+		BPath entryPath;
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.SetTo(existingFilename));
+		CPPUNIT_ASSERT_EQUAL(B_OK, entry.GetPath(&entryPath));
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relFileLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo(existingSuperFilename));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(entryPath.Path()));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(entryPath == path);
+	}
+
+	void AbsLinkUninitializedDir_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingDirname) == path.Path());
+	}
+
+	void AbsLinkBadDir_MakeLinkedPathDirPtr_ReturnsOk()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, dir.SetTo(nonExistingDirname));
+		CPPUNIT_ASSERT(link.MakeLinkedPath(&dir, &path) == (ssize_t)strlen(existingDirname));
+		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
+		CPPUNIT_ASSERT(std::string(existingDirname) == path.Path());
+	}
+
+	void RelLinkUninitializedDir_MakeLinkedPathDirPtr_ReturnsError()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relDirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());
+		CPPUNIT_ASSERT(equals(link.MakeLinkedPath(&dir, &path), B_NO_INIT, B_BAD_VALUE));
+	}
+
+	void RelLinkBadDir_MakeLinkedPathDirPtr_ReturnsError()
+	{
+		BSymLink link;
+		BPath path;
+		BDirectory dir;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relDirLinkname));
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, dir.SetTo(nonExistingDirname));
+		CPPUNIT_ASSERT(equals(link.MakeLinkedPath(&dir, &path), B_NO_INIT, B_BAD_VALUE));
+	}
+
+	void NullPath_MakeLinkedPathDirPtr_ReturnsBadValue()
+	{
+#if !TEST_R5
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		BDirectory dir("/boot");
+		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
+		// R5: crashs, when passing a NULL path
+		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, link.MakeLinkedPath(&dir, NULL));
+#endif
+	}
+
+	void NullDir_MakeLinkedPathDirPtr_ReturnsBadValue()
+	{
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		BPath path;
+		CPPUNIT_ASSERT(link.MakeLinkedPath((const BDirectory*)NULL, &path) == B_BAD_VALUE);
+	}
+
+	void NullDirAndPath_MakeLinkedPathDirPtr_ReturnsBadValue()
+	{
+#if !TEST_R5
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		// R5: crashs, when passing a NULL path
+		CPPUNIT_ASSERT(link.MakeLinkedPath((const BDirectory*)NULL, NULL) == B_BAD_VALUE);
+#endif
+	}
+
+	void Uninitialized_IsAbsolute_ReturnsFalse()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, link.InitCheck());
+		CPPUNIT_ASSERT(link.IsAbsolute() == false);
+	}
+
+	void ExistingAbsDirLink_IsAbsolute_ReturnsTrue()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(dirLinkname));
+		CPPUNIT_ASSERT(link.IsAbsolute() == true);
+	}
+
+	void ExistingRelFileLink_IsAbsolute_ReturnsFalse()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(relFileLinkname));
+		CPPUNIT_ASSERT(link.IsAbsolute() == false);
+	}
+
+	void NonExistingLink_IsAbsolute_ReturnsFalse()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, link.SetTo(nonExistingDirname));
+		CPPUNIT_ASSERT(link.IsAbsolute() == false);
+	}
+
+	void Dir_IsAbsolute_ReturnsFalse()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingDirname));
+		CPPUNIT_ASSERT(link.IsAbsolute() == false);
+	}
+
+	void File_IsAbsolute_ReturnsFalse()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.SetTo(existingFilename));
+		CPPUNIT_ASSERT(link.IsAbsolute() == false);
+	}
+
+	void Uninitialized_CopyConstructor_ReturnsError()
+	{
+		BSymLink link;
+		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, link.InitCheck());
+		BSymLink link2(link);
+		// R5 returns B_BAD_VALUE instead of B_NO_INIT
+		CPPUNIT_ASSERT(equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT));
+	}
+
+	void ExistingDirLink_CopyConstructor_ReturnsOk()
+	{
+		BSymLink link(dirLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		BSymLink link2(link);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link2.InitCheck());
+	}
+
+	void ExistingFileLink_CopyConstructor_ReturnsOk()
+	{
+		BSymLink link(fileLinkname);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link.InitCheck());
+		BSymLink link2(link);
+		CPPUNIT_ASSERT_EQUAL(B_OK, link2.InitCheck());
+	}
+
+	void Uninitialized1_Assignment_ReturnsError()
 	{
 		BSymLink link;
 		BSymLink link2;
 		link2 = link;
 		// R5 returns B_BAD_VALUE instead of B_NO_INIT
-		CPPUNIT_ASSERT( equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
+		CPPUNIT_ASSERT(equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT));
 	}
-	NextSubTest();
+
+	void Uninitialized2_Assignment_ReturnsError()
 	{
 		BSymLink link;
-		BSymLink link2(dirLink);
+		BSymLink link2(dirLinkname);
 		link2 = link;
 		// R5 returns B_BAD_VALUE instead of B_NO_INIT
-		CPPUNIT_ASSERT( equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
+		CPPUNIT_ASSERT(equals(link2.InitCheck(), B_BAD_VALUE, B_NO_INIT));
 	}
-	// existing dir link
-	NextSubTest();
-	{
-		BSymLink link(dirLink);
-		BSymLink link2;
-		link2 = link;
-		CPPUNIT_ASSERT( link2.InitCheck() == B_OK );
-	}
-	// existing file link
-	NextSubTest();
-	{
-		BSymLink link(fileLink);
-		BSymLink link2;
-		link2 = link;
-		CPPUNIT_ASSERT( link2.InitCheck() == B_OK );
-	}
-}
 
+	void ExistingDirLink_Assignment_ReturnsOk()
+	{
+		BSymLink link(dirLinkname);
+		BSymLink link2;
+		link2 = link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link2.InitCheck());
+	}
+
+	void ExistingFileLink_Assignment_ReturnsOk()
+	{
+		BSymLink link(fileLinkname);
+		BSymLink link2;
+		link2 = link;
+		CPPUNIT_ASSERT_EQUAL(B_OK, link2.InitCheck());
+	}
+};
+
+
+CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(SymLinkTest, getTestSuiteName());
