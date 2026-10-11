@@ -7,7 +7,6 @@ UnitTestLib libnetapitest.so :
 
 	NetworkAddressTest.cpp
 	NetworkInterfaceTest.cpp
-	NetworkUrlTest.cpp
 
 	: be bnetapi network [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

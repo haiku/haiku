@@ -43,6 +43,8 @@ UnitTestLib libsupporttest.so
 
 		StringListTest.cpp
 
+		UrlTest.cpp
+
 	: be [ TargetLibstdc++ ] libsupporttest_RemoteTestObject.so
 ;
 
