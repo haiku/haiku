@@ -56,6 +56,7 @@ of their respective holders. All rights reserved.
 #include <E-mail.h>
 #include <File.h>
 #include <IconUtils.h>
+#include <Keymap.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Node.h>
@@ -69,6 +70,7 @@ of their respective holders. All rights reserved.
 #include <StringList.h>
 #include <StringView.h>
 #include <TextView.h>
+#include <UnicodeChar.h>
 #include <UTF8.h>
 #include <VolumeRoster.h>
 
@@ -383,6 +385,22 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		B_TRANSLATE("Accounts" B_UTF8_ELLIPSIS),
 		new BMessage(M_ACCOUNTS)));
 	item->SetTarget(be_app);
+
+	if (!fIncoming) {
+		// Add semantic increase quote shortcut, bug #7428
+		BKeymap keymap;
+		keymap.SetToCurrent();
+		BStringList unmodified(3);
+		if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, unmodified) == B_OK) {
+			int32 count = unmodified.CountStrings();
+			for (int32 i = 0; i < count; i++) {
+				uint32 key = BUnicodeChar::FromUTF8(unmodified.StringAt(i));
+				if (!HasShortcut(key, 0))
+					AddShortcut(key, B_COMMAND_KEY, new BMessage(M_ADD_QUOTE_LEVEL));
+			}
+		}
+		unmodified.MakeEmpty();
+	}
 
 	// View Menu
 
