@@ -1,51 +1,25 @@
-void _Qp_fgt();
-void _Qp_flt();
-void _Qp_fne();
-void _Qp_fgt();
-void _Qp_flt();
-void _Qp_fgt();
-void _Qp_flt();
-void _Qp_fle();
-void _Qp_fgt();
-void _Qp_fle();
-void _Qp_fle();
-void _Qp_fle();
-void _Qp_fle();
-void _Qp_mul();
-void _Qp_fne();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_fge();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_fge();
-void _Qp_mul();
-void _Qp_fle();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_mul();
-void _Qp_fgt();
-void _Qp_fle();
-void _Qp_fgt();
-void _Qp_fle();
-void _Qp_mul();
-void _Qp_mul();
-void _Qp_mul();
-void _Qp_qtod();
-void _Qp_dtoq();
-void _Qp_sub();
-void _Qp_fge();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_fgt();
-void _Qp_fge();
-void _Qp_mul();
-void _Qp_mul();
-void _Qp_mul();
-void _Qp_mul();
-void _Qp_qtod();
-
+void _Qp_add() {}
+void _Qp_cmp() {}
+void _Qp_cmpe() {}
+void _Qp_div() {}
+void _Qp_dtoq() {}
+void _Qp_feq() {}
+void _Qp_fge() {}
+void _Qp_fgt() {}
+void _Qp_fle() {}
+void _Qp_flt() {}
+void _Qp_fne() {}
+void _Qp_itoq() {}
+void _Qp_mul() {}
+void _Qp_qtod() {}
+void _Qp_qtoi() {}
+void _Qp_qtos() {}
+void _Qp_qtoui() {}
+void _Qp_qtoux() {}
+void _Qp_qtox() {}
+void _Qp_sqrt() {}
+void _Qp_stoq() {}
+void _Qp_sub() {}
+void _Qp_uitoq() {}
+void _Qp_uxtoq() {}
+void _Qp_xtoq() {}

@@ -266,12 +266,6 @@ getnetanswer(res_state res, querybuf *answer, int anslen, int net_i)
 			break;
 		}
 		net_entry.n_aliases++;
-#if (defined(__sparc__) && defined(_LP64)) ||		\
-    defined(__alpha__) ||				\
-    (defined(__i386__) && defined(_LP64)) ||		\
-    (defined(__sh__) && defined(_LP64))
-		net_entry.__n_pad0 = 0;
-#endif
 		return &net_entry;
 	}
 	h_errno = TRY_AGAIN;
@@ -626,12 +620,6 @@ _ypnetent(char *line)
 	if (p != NULL)
 		*p++ = '\0';
 	net_entry.n_net = inet_network(cp);
-#if (defined(__sparc__) && defined(_LP64)) ||		\
-    defined(__alpha__) ||				\
-    (defined(__i386__) && defined(_LP64)) ||		\
-    (defined(__sh__) && defined(_LP64))
-	net_entry.__n_pad0 = 0;
-#endif
 	net_entry.n_addrtype = AF_INET;
 	q = net_entry.n_aliases = net_aliases;
 	if (p != NULL)  {

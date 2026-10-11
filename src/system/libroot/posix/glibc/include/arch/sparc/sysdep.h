@@ -18,7 +18,6 @@
 #include_next <sysdep.h>
 
 #define _SYSDEPS_SYSDEP_H 1
-#include <bits/hwcap.h>
 
 #ifdef	__ASSEMBLER__
 

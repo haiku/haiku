@@ -19,6 +19,8 @@
 /* generic stuff */
 #if B_PAGE_SIZE == 4096
 #define _MAX_PAGE_SHIFT 12
+#elif B_PAGE_SIZE == 8192
+#define _MAX_PAGE_SHIFT 13
 #endif
 
 extern char* __progname;
