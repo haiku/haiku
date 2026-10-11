@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Note that this file included code earlier from `Model.cpp` and
@@ -10,6 +10,8 @@
 
 
 #include "PackageFilter.h"
+
+#include <set>
 
 #include "Logger.h"
 #include "PackageFilterSpecification.h"
@@ -72,19 +74,22 @@ public:
 class StateFilter : public PackageFilter
 {
 public:
-	StateFilter(PackageState state)
-		:
-		fState(state)
+	StateFilter()
 	{
+	}
+
+	void Add(PackageState state)
+	{
+		fStates.insert(state);
 	}
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		return PackageUtils::State(package) == fState;
+		return fStates.find(PackageUtils::State(package)) != fStates.end();
 	}
 
 private:
-	PackageState	fState;
+	std::set<PackageState> fStates;
 };
 
 
@@ -310,13 +315,6 @@ PackageFilterFactory::CreateDepotFilter(const BString& depotName)
 
 
 /*static*/ PackageFilterRef
-PackageFilterFactory::CreateStateFilter(PackageState state)
-{
-	return PackageFilterRef(new StateFilter(state), true);
-}
-
-
-/*static*/ PackageFilterRef
 PackageFilterFactory::CreateDesktopFilter()
 {
 	return PackageFilterRef(new DesktopFilter(), true);
@@ -352,6 +350,13 @@ PackageFilterFactory::CreateFalseFilter()
 
 
 /*static*/ PackageFilterRef
+PackageFilterFactory::Not(PackageFilterRef filter)
+{
+	return PackageFilterRef(new NotFilter(filter), true);
+}
+
+
+/*static*/ PackageFilterRef
 PackageFilterFactory::CreateFilter(const PackageFilterSpecificationRef specification)
 {
 	if (!specification.IsSet())
@@ -374,14 +379,25 @@ PackageFilterFactory::CreateFilter(const PackageFilterSpecificationRef specifica
 	if (specification->ShowOnlyNativeDesktopPackages())
 		andFilter->AddFilter(CreateNativeDesktopFilter());
 
-	if (!specification->ShowInstalledPackages())
-		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateStateFilter(ACTIVATED)), true));
+	if (!specification->ShowInstalledPackages()) {
+		StateFilter* stateFilter = new StateFilter();
+		stateFilter->Add(ACTIVATED);
+		stateFilter->Add(INSTALLED);
+		andFilter->AddFilter(Not(PackageFilterRef(stateFilter, true)));
+	}
+
+	if (!specification->ShowAvailablePackages()) {
+		StateFilter* stateFilter = new StateFilter();
+		stateFilter->Add(NONE);
+		stateFilter->Add(UNINSTALLED);
+		andFilter->AddFilter(Not(PackageFilterRef(stateFilter, true)));
+	}
 
 	if (!specification->ShowSourcePackages())
-		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateSourceFilter()), true));
+		andFilter->AddFilter(Not(CreateSourceFilter()));
 
 	if (!specification->ShowDevelopPackages())
-		andFilter->AddFilter(PackageFilterRef(new NotFilter(CreateDevelopmentFilter()), true));
+		andFilter->AddFilter(Not(CreateDevelopmentFilter()));
 
 	return PackageFilterRef(andFilter, true);
 }

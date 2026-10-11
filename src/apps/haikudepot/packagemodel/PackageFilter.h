@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2025, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2026, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Note that this file included code earlier from `Model.cpp` and
@@ -63,13 +63,13 @@ public:
 	static	PackageFilterRef	CreateCategoryFilter(const BString& category);
 	static	PackageFilterRef	CreateSearchTermsFilter(const BString& searchTerms);
 	static	PackageFilterRef	CreateDepotFilter(const BString& depotName);
-	static	PackageFilterRef	CreateStateFilter(PackageState state);
 	static	PackageFilterRef	CreateDesktopFilter();
 	static	PackageFilterRef	CreateNativeDesktopFilter();
 	static	PackageFilterRef	CreateSourceFilter();
 	static	PackageFilterRef	CreateDevelopmentFilter();
 	static	PackageFilterRef	CreateFalseFilter();
 	static	PackageFilterRef	CreateFilter(const PackageFilterSpecificationRef specification);
+	static	PackageFilterRef	Not(PackageFilterRef filter);
 };
 
 
