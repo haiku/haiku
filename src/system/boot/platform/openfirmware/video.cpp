@@ -125,16 +125,15 @@ platform_init_video(void)
 		return B_NO_INIT;
 	edid1_raw edidRaw;
 	if (of_getprop(screen, "EDID", &edidRaw, sizeof(edidRaw)) != OF_FAILED) {
-		edid1_info info;
-		edid_decode(&info, &edidRaw);
+		edid1_info* info = (edid1_info*)kernel_args_malloc(sizeof(edid1_info));
+		gKernelArgs.edid_info = info;
+		if (info == NULL)
+			return B_OK;
+		edid_decode(info, &edidRaw);
 #ifdef TRACE_VIDEO
-		edid_dump(&info);
+		edid_dump(info);
 #endif
-		gKernelArgs.edid_info = kernel_args_malloc(sizeof(edid1_info));
-		if (gKernelArgs.edid_info != NULL)
-			memcpy(gKernelArgs.edid_info, &info, sizeof(edid1_info));
 	}
 
 	return B_OK;
 }
-

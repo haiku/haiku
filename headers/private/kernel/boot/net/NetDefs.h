@@ -41,11 +41,6 @@ struct mac_addr_t {
 		memcpy(this->address, address, ETH_ALEN);
 	}
 
-	mac_addr_t(const mac_addr_t& other)
-	{
-		memcpy(address, other.address, sizeof(address));
-	}
-
 	uint64 ToUInt64() const
 	{
 		return ((uint64)address[0] << 40)
@@ -59,12 +54,6 @@ struct mac_addr_t {
 	uint8 operator[](int index)
 	{
 		return address[index];
-	}
-
-	mac_addr_t& operator=(const mac_addr_t& other)
-	{
-		memcpy(address, other.address, sizeof(address));
-		return *this;
 	}
 
 	bool operator==(const mac_addr_t& other) const

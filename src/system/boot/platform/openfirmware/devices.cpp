@@ -217,7 +217,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 		devicesList->Add(device);
 	}
-	printf("\t(loop ended with %ld)\n", status);
+	printf("\t(loop ended with %d)\n", status);
 
 	return B_OK;
 }
