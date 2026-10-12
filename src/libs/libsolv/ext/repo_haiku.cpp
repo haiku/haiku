@@ -126,7 +126,16 @@ static Id add_package_info_to_repo(Repo *repo, Repodata *repoData,
   if (packageInfo.Architecture() == B_PACKAGE_ARCHITECTURE_ANY)
     solvable->arch = ARCH_ANY;
   else if (packageInfo.Architecture() == B_PACKAGE_ARCHITECTURE_SOURCE)
-    solvable->arch = ARCH_SRC;
+    solvable->arch = ARCH_ANY;
+		// The mapping from the Haiku package source architecture here to the
+		// libsolv any architecture is because Haiku and libsolv have different
+		// ideas about how source packages should work. In libsolv, the source
+		// package does not "provide" anything and so is searched by name, but
+		// this can't work with PackageKit because the packages' names are
+		// prefixed with `pkg:` and so will never be matched; instead by mapping
+		// to "any" architecture on the libsolv side, the source package is seen
+		// as an object that can "provide" something and so can be found for
+		// the purpose of installation.
   else
     solvable->arch = pool_str2id(pool,
       BPackageInfo::kArchitectureNames[packageInfo.Architecture()], 1);
