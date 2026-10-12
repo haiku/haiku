@@ -250,11 +250,10 @@ ExpanderWindow::ValidateDest()
 void
 ExpanderWindow::UpdateControls()
 {
-	bool enable = fSourceValid && fDestValid;
-	fShowContents->SetEnabled(enable);
-	fExpandButton->SetEnabled(enable);
-	fExpandItem->SetEnabled(enable);
-	fShowItem->SetEnabled(enable);
+	fShowContents->SetEnabled(fSourceValid);
+	fExpandButton->SetEnabled(fSourceValid && fDestValid);
+	fExpandItem->SetEnabled(fSourceValid && fDestValid);
+	fShowItem->SetEnabled(fSourceValid);
 }
 
 
@@ -607,17 +606,15 @@ ExpanderWindow::RefsReceived(BMessage* message)
 			}
 
 			BEntry dEntry(&fDestRef, true);
-			if (dEntry.Exists()) {
-				fExpandButton->SetEnabled(true);
-				fExpandItem->SetEnabled(true);
-			}
+			if (dEntry.Exists())
+				fDestValid = true;
+
+			fSourceValid = true;
+			UpdateControls();
 
 			if (fShowContents->Value() == B_CONTROL_ON) {
 				StopListing();
 				StartListing();
-			} else {
-				fShowContents->SetEnabled(true);
-				fShowItem->SetEnabled(true);
 			}
 
 			bool fromApp;
