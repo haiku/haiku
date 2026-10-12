@@ -643,43 +643,63 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 	void* buf,	size_t* num_bytes)
 {
 	assert(cookie != NULL);
-	status_t err = B_ERROR;
+	status_t status = B_ERROR;
 	usbmidi_port_info* port = cookie->port;
 	usbmidi_device_info* midiDevice = cookie->device;
+
+	*num_bytes = 0;
 
 	if (midiDevice == NULL || !midiDevice->active)
 		return B_ERROR;	/* already unplugged */
 
 	DPRINTF_DEBUG((MY_ID "usb_midi_read: (%" B_PRIuSIZE " byte buffer at %"
 		B_PRIdOFF " cookie %p)\n", *num_bytes, position, cookie));
+
 	while (midiDevice && midiDevice->active) {
 		ZDPRINTF_DEBUG((MY_ID "waiting on acquire_sem_etc\n"));
-		err = acquire_sem_etc(cookie->sem_cb, 1,
-			 B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 1000000);
-		if (err == B_TIMED_OUT) {
+
+		status = acquire_sem_etc(cookie->sem_cb, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 1000000);
+
+		if (status == B_TIMED_OUT) {
 			ZDPRINTF_DEBUG((MY_ID "acquire_sem_etc timed out\n"));
 			continue;	/* see if we're still active */
 		}
-		if (err == B_INTERRUPTED) {
+		if (status == B_INTERRUPTED) {
 			// reader got interrupted while device idle
-			*num_bytes = 0;
-			return err;
+			return status;
 		}
-		if (err != B_OK) {
-			*num_bytes = 0;
+		if (status != B_OK) {
 			DPRINTF_DEBUG((MY_ID "acquire_sem_etc aborted\n"));
 			break;
 		}
-		DPRINTF_DEBUG((MY_ID "reading from ringbuffer\n"));
+
+		// how more byte(s) can we actually read?
+		int32 bytesCount = 0;
+		if (get_sem_count(cookie->sem_cb, &bytesCount) == B_BAD_SEM_ID)
+			break;
+
+		bytesCount = MIN(bytesCount + 1, (int32)*num_bytes);
+		if (bytesCount > 1 // the first byte was "acquired" already
+			&& acquire_sem_etc(cookie->sem_cb, bytesCount - 1, B_RELATIVE_TIMEOUT, 0) != B_OK) {
+			// midi_server is the only reader, get_sem_count() reported at least bytesCount more
+			// are available / were release_sem()'d in usb_midi_read_callback().
+			// At this stage, failure can only be due to B_BAD_SEM_ID: device was removed between
+			// the initial acquire_sem() and this one.
+			// Can't be B_INTERRUPTED (no B_CAN_INTERRUPT flag), nor B_TIMED_OUT
+			// So, let's giving up.
+			break;
+		}
+
 		acquire_sem(midiDevice->sem_lock);
-			/* a global semaphore -- OK, I think */
-		ring_buffer_user_read(port->rbuf, (uint8*)buf, 1);
+		ring_buffer_user_read(port->rbuf, (uint8*)buf, bytesCount);
 		release_sem(midiDevice->sem_lock);
-		*num_bytes = 1;
-		DPRINTF_DEBUG((MY_ID "read byte %x -- cookie %p)\n",
-			*(uint8*)buf, cookie));
+
+		*num_bytes = bytesCount;
+
+		DPRINTF_DEBUG((MY_ID "%p: read %u byte(s)\n", cookie, bytesCount));
 		return B_OK;
 	}
+
 	DPRINTF_INFO((MY_ID "usb_midi_read: loop terminated"
 		" -- Device no longer active\n"));
 	return B_CANCELED;
