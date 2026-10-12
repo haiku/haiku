@@ -11,7 +11,7 @@
 #include <Messenger.h>
 #include <Roster.h>
 
-#include <stdio.h>
+#include <syslog.h>
 
 
 ACMonitor::ACMonitor()
@@ -36,6 +36,5 @@ ACMonitor::HandleEvent(int fd)
 	if (read(fd, &status, 1) != 1)
 		return;
 
-	if (status == 1)
-		printf("ac status 1\n");
+	syslog(LOG_INFO, "AC adapter %s", status == 1 ? "online" : "offline");
 }
