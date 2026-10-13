@@ -424,6 +424,7 @@ void	ieee80211_load_module(const char *);
 /*
  * Crypto modules implement cipher support.
  */
+#define	IEEE80211_CRYPTO_MODULE_ADD(name)
 #define IEEE80211_CRYPTO_MODULE(name, version) \
 	_IEEE80211_POLICY_MODULE(crypto, name, version, \
 		ieee80211_crypto_register(&name), \
