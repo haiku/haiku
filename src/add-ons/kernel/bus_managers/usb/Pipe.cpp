@@ -12,6 +12,8 @@
 
 Pipe::Pipe(Object *parent)
 	:	Object(parent),
+		fMaxBurst(0),
+		fBytesPerInterval(0),
 		fDataToggle(false),
 		fControllerCookie(NULL)
 {
@@ -42,16 +44,18 @@ Pipe::InitCommon(int8 deviceAddress, uint8 endpointAddress, usb_speed speed,
 	fHubAddress = hubAddress;
 	fHubPort = hubPort;
 
-	fBytesPerInterval = 0;
-
 	if (speed == USB_SPEED_HIGHSPEED
 			&& (Type() & (USB_OBJECT_INTERRUPT_PIPE | USB_OBJECT_ISO_PIPE)) != 0) {
 		// max_packet_size contains two values (USB 2.0 § 9.6.6 Table 9-13 p271.)
 		fMaxPacketSize = (maxPacketSize & 0x7ff);
 		fMaxBurst = (maxPacketSize >> 11) & 0x3;
+		fBytesPerInterval = 0;
 	} else {
 		fMaxPacketSize = maxPacketSize;
-		fMaxBurst = 0;
+		if (speed < USB_SPEED_SUPERSPEED) {
+			fMaxBurst = 0;
+			fBytesPerInterval = 0;
+		}
 	}
 
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_CREATED);

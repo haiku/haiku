@@ -640,14 +640,14 @@ Device::InitEndpoints(int32 interfaceIndex)
 				continue;
 			}
 
-			pipe->InitCommon(fDeviceAddress,
-				endpoint->descr->endpoint_address & 0x0f,
-				fSpeed, direction, endpoint->descr->max_packet_size,
-				endpoint->descr->interval, fHubAddress, fHubPort);
 			if (comp_descr != NULL) {
 				pipe->InitSuperSpeed(comp_descr->max_burst,
 					comp_descr->bytes_per_interval);
 			}
+			pipe->InitCommon(fDeviceAddress,
+				endpoint->descr->endpoint_address & 0x0f,
+				fSpeed, direction, endpoint->descr->max_packet_size,
+				endpoint->descr->interval, fHubAddress, fHubPort);
 			endpoint->handle = pipe->USBID();
 		}
 	}
