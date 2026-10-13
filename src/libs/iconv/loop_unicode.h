@@ -319,7 +319,7 @@ static size_t unicode_loop_convert (iconv_t icd,
           locals.l_outbuf = outptr;
           locals.l_outbytesleft = outleft;
           locals.l_errno = 0;
-          cd->fallbacks.mb_to_uc_fallback(inptr, incount,
+          cd->fallbacks.mb_to_uc_fallback((const char*)inptr, incount,
                                           mb_to_uc_write_replacement,
                                           &locals,
                                           cd->fallbacks.data);
