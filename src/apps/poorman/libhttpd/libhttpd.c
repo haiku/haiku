@@ -51,7 +51,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-//#include <syslog.h>
+#include <syslog.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <pthread.h>
