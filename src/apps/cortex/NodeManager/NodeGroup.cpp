@@ -274,7 +274,7 @@ status_t NodeGroup::removeNode(
 
 	// remove it
 	ASSERT(m_nodes.size());
-	remove(
+	(void)remove(
 		m_nodes.begin(),
 		m_nodes.end(),
 		node);
