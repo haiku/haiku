@@ -50,7 +50,7 @@ SDPClient::Start()
 	socklen_t errorLength = sizeof(sockError);
 	status = getsockopt(fClientSocket, SOL_SOCKET, SO_ERROR, &sockError, &errorLength);
 	if (status < 0)
-		TRACE_BT("SDP: Error occured\n");
+		TRACE_BT("SDP: Error occurred\n");
 	else if (sockError == 0)
 		TRACE_BT("SDP: Socket connected.\n");
 	else
@@ -97,9 +97,9 @@ SDPClient::RequestServiceRecords()
 	rawReqDataIO.WriteExactly(&maxAttrByteCount, 2);
 
 	// getting all attributes start_id = 0x0000, end_id = 0xFFFF
-	uint32 arrtRange = 0x0000FFFF;
+	uint32 attrRange = 0x0000FFFF;
 	rawReq.AddDataSeq(5);
-	rawReq.AddUInt32(arrtRange);
+	rawReq.AddUInt32(attrRange);
 
 	char contStateData[17];
 	uint8 contStateNumBytes = 0;
@@ -129,7 +129,7 @@ SDPClient::RequestServiceRecords()
 
 		BMallocIO reply;
 		if (_IssueRequest(request.Buffer(), request.BufferLength(), &reply) != B_OK) {
-			TRACE_BT("SDP: Issueing Request failed\n");
+			TRACE_BT("SDP: Issuing Request failed\n");
 			return B_ERROR;
 		}
 
@@ -206,7 +206,8 @@ void
 SDPClient::_ParseAttrLists(BMallocIO* attrListsDataIO)
 {
 	attrListsDataIO->Seek(0, SEEK_SET);
-	TRACE_BT("SDP: Parsing the AttrLists... Num Bytes=%ld\n", attrListsDataIO->BufferLength());
+	TRACE_BT("SDP: Parsing the AttrLists... Num Bytes=%" B_PRIdSSIZE "\n",
+		attrListsDataIO->BufferLength());
 
 	SDPDataIO attrLists(attrListsDataIO);
 	attrLists.ReadSeq();
@@ -255,7 +256,7 @@ SDPClient::_IssueRequest(const void* request, int32 size, BMallocIO* reply)
 	if (numBytes < 0)
 		return B_ERROR;
 
-	TRACE_BT("SDP: Recieved the response: num bytes=%ld\n", numBytes);
+	TRACE_BT("SDP: Received the response: num bytes=%" B_PRIdSSIZE "\n", numBytes);
 
 	reply->SetSize(0);
 	reply->Write(buffer, numBytes);
