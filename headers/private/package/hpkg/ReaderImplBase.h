@@ -247,6 +247,7 @@ public:
 			void*				operator new(size_t size, AttributeHandlerContext* context);
 			void				operator delete(void* pointer);
 
+								AttributeHandler();
 	virtual						~AttributeHandler();
 
 			void				SetLevel(int level);

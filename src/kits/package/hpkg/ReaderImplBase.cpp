@@ -88,6 +88,13 @@ ReaderImplBase::AttributeHandlerContext::ErrorOccurred()
 // #pragma mark - AttributeHandler
 
 
+ReaderImplBase::AttributeHandler::AttributeHandler()
+	:
+	fDeleting(false)
+{
+}
+
+
 ReaderImplBase::AttributeHandler::~AttributeHandler()
 {
 }
@@ -123,10 +130,7 @@ ReaderImplBase::AttributeHandler::NotifyDone(
 void*
 ReaderImplBase::AttributeHandler::operator new(size_t size, AttributeHandlerContext* context)
 {
-	AttributeHandler* handler = (AttributeHandler*)context->handlersAllocator.Allocate(size);
-	if (handler != NULL)
-		handler->fDeleting = false;
-	return handler;
+	return context->handlersAllocator.Allocate(size);
 }
 
 
