@@ -350,7 +350,8 @@ rule KernelArchitectureSetup architecture
 		;
 
 	# C/C++ flags
-	local ccBaseFlags = -ffreestanding -finline -fno-semantic-interposition ;
+	local ccBaseFlags = -ffreestanding -finline -fno-semantic-interposition
+		-Wno-error=unused-local-typedefs ;
 
 	# Since GCC 13, autovectorization generates code which causes problems
 	# in various virtual machines (bare metal is apparently unaffected.)
