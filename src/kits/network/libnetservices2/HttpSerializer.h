@@ -10,6 +10,8 @@
 #include <functional>
 #include <optional>
 
+#include <sys/types.h>
+
 class BDataIO;
 
 namespace BPrivate {
