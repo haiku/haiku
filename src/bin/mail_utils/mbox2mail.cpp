@@ -99,8 +99,8 @@ static void DisplayErrorMessage (
 
   if (ErrorNumber != 0)
   {
-    sprintf (ErrorBuffer, "%s, error code $%X/%d (%s) has occured.",
-      MessageString, ErrorNumber, ErrorNumber, strerror (ErrorNumber));
+    sprintf(ErrorBuffer, "%s, error code $%X/%d (%s) has occurred.", MessageString, ErrorNumber,
+        ErrorNumber, strerror(ErrorNumber));
     MessageString = ErrorBuffer;
   }
 
@@ -312,8 +312,7 @@ bool IsStartOfUsenetArticle (char *LineString)
 
   if (memcmp ("of ", StringPntr, 3) != 0)
   {
-    printf ("False alarm, article line \"of\" misssing in \"%s\".\n",
-      LineString);
+    printf("False alarm, article line \"of\" missing in \"%s\".\n", LineString);
     return false;
   }
   StringPntr += 2;

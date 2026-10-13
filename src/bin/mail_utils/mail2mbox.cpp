@@ -55,8 +55,8 @@ DisplayErrorMessage(const char* messageString = NULL, status_t errorNumber = 0,
 	}
 
 	if (errorNumber != 0) {
-		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%" B_PRIx32 ")"
-			"has occured.", messageString, strerror(errorNumber), errorNumber);
+		snprintf(errorBuffer, sizeof(errorBuffer), "%s: %s (%" B_PRIx32 ") has occurred.",
+			messageString, strerror(errorNumber), errorNumber);
 		messageString = errorBuffer;
 	}
 
@@ -354,7 +354,7 @@ main(int argc, char** argv)
 	closedir(dir);
 
 	if (status != B_OK) {
-		DisplayErrorMessage("Stopping early because an error occured", status);
+		DisplayErrorMessage("Stopping early because an error occurred", status);
 		return status;
 	}
 
