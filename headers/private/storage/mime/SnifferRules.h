@@ -8,7 +8,14 @@
 
 #include <SupportDefs.h>
 
+#if __GNUC__ >= 15
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 #include <list>
+#if __GNUC__ >= 15
+#pragma GCC diagnostic pop
+#endif
 #include <string>
 
 class BFile;
