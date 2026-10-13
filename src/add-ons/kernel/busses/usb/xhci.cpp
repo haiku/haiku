@@ -2269,14 +2269,7 @@ XHCI::ConfigureEndpoint(xhci_endpoint* ep, uint8 slot, uint8 number, uint8 type,
 	if ((type & USB_OBJECT_ISO_PIPE) == 0)
 		dwendpoint1 |= ENDPOINT_1_CERR(3);
 
-	// Assign maximum burst size. For USB3 devices this is passed in; for
-	// all other devices we compute it. (XHCI 1.2 § 4.8.2 p161.)
-	if (speed == USB_SPEED_HIGHSPEED && (type & (USB_OBJECT_INTERRUPT_PIPE
-			| USB_OBJECT_ISO_PIPE)) != 0) {
-		maxBurst = (maxPacketSize & 0x1800) >> 11;
-	} else if (speed < USB_SPEED_SUPERSPEED) {
-		maxBurst = 0;
-	}
+	// Assign maximum burst size. (XHCI 1.2 § 4.8.2 p161.)
 	dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
 
 	// Assign maximum packet size, set the ring address, and set the

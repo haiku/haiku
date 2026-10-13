@@ -1281,8 +1281,7 @@ EHCI::SubmitIsochronous(Transfer *transfer)
 			| EHCI_ITD_ADDRESS(pipe->DeviceAddress());
 		itd->buffer_phy[1] |= EHCI_ITD_MAXPACKETSIZE(pipe->MaxPacketSize())
 				| EHCI_ITD_DIR(directionIn);
-		itd->buffer_phy[2]
-			|= EHCI_ITD_MUL((pipe->MaxPacketSize() >> EHCI_ITD_MAXPACKETSIZE_LENGTH) + 1);
+		itd->buffer_phy[2] |= EHCI_ITD_MUL(pipe->MaxBurst() + 1);
 
 		TRACE("isochronous filled itd buffer_phy[0,1,2] 0x%" B_PRIx32 ", 0x%"
 			B_PRIx32 " 0x%" B_PRIx32 "\n",
