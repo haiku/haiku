@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons print drivers gutenprint ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
+SubDirC++Flags -Wno-sign-compare ;
 
 AddResources Gutenprint : Gutenprint.rdef ;
 UsePublicHeaders kernel ;
