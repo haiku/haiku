@@ -21,7 +21,8 @@
 #include <String.h>
 
 MidiPortConsumer::MidiPortConsumer(int fd, const char* name)
-	: BMidiLocalConsumer(name),
+	:
+	BMidiLocalConsumer(name),
 	fFileDescriptor(fd)
 {
 }
@@ -43,13 +44,14 @@ MidiPortConsumer::Data(uchar* data, size_t length,
 
 
 MidiPortProducer::MidiPortProducer(int fd, const char *name)
-	: BMidiLocalProducer(name),
-	fFileDescriptor(fd), fKeepRunning(true)
-	
+	:
+	BMidiLocalProducer(name),
+	fFileDescriptor(fd),
+	fKeepRunning(true)
 {
 	BString tmp = name;
-	tmp << " reader";
-	
+	tmp << " producer";
+
 	fReaderThread = spawn_thread(
 		_ReaderThread, tmp.String(), B_URGENT_PRIORITY, this);
 

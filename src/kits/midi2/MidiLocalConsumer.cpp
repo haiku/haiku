@@ -34,11 +34,16 @@ BMidiLocalConsumer::BMidiLocalConsumer(const char* name)
 	fTimeoutData = NULL;
 
 	fPort = create_port(1, "MidiEventPort");
-	fThread = spawn_thread(
-		_midi_event_thread, "MidiEventThread", B_REAL_TIME_PRIORITY, this);
-	resume_thread(fThread);
 
 	BMidiRoster::MidiRoster()->CreateLocal(this);
+
+	BString tmp(name);
+	if (tmp.IsEmpty())
+		tmp << "Midi ID " << ID();
+	tmp << " consumer";
+
+	fThread = spawn_thread(_midi_event_thread, tmp.String(), B_REAL_TIME_PRIORITY, this);
+	resume_thread(fThread);
 }
 
 

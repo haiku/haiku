@@ -40,7 +40,7 @@ MidiEventMeter::MidiEventMeter(int32 producerID)
 		BMidiProducer* producer = roster->FindProducer(producerID);
 		if (producer != NULL) {
 			BString name;
-			name << producer->Name() << " Event Meter";
+			name << "Midi ID " << producer->ID() << " Meter";
 			fCounter = new CountEventConsumer(name.String());
 			producer->Connect(fCounter);
 			producer->Release();
