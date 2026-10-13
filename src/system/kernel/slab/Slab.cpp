@@ -361,7 +361,7 @@ dump_object_info(int argc, char* argv[])
 		slab* slab = cache->ObjectSlab(object);
 		const char* slabType = cache->empty.Contains(slab) ? "empty"
 			: cache->partial.Contains(slab) ? "partial"
-			: cache->full.Contains(slab) ? "full" : NULL;
+			: cache->full.Contains(slab) ? "full" : "NULL";
 
 		kprintf("\tobject is in %s slab: %p\n", slabType, slab);
 
