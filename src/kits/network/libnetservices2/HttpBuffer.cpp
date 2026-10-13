@@ -116,8 +116,10 @@ HttpBuffer::WriteTo(HttpTransferFunction func, std::optional<size_t> maxSize)
 std::optional<BString>
 HttpBuffer::GetNextLine()
 {
+
 	auto offset = fBuffer.cbegin() + fCurrentOffset;
-	auto result = std::search(offset, fBuffer.cend(), kNewLine.cbegin(), kNewLine.cend());
+	auto result = std::search(offset, fBuffer.cend(), kNewLine.cbegin(), kNewLine.cend(),
+		[](std::byte i, std::byte j) { return i == j;});
 	if (result == fBuffer.cend())
 		return std::nullopt;
 
