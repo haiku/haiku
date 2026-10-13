@@ -47,8 +47,12 @@
 
 #	define HUGE_VALF        __builtin_huge_valf()
 #	define HUGE_VALL		__builtin_huge_vall()
-#	define NAN              __builtin_nanf("")
-#	define INFINITY			__builtin_inff()
+#	ifndef NAN
+#		define NAN              __builtin_nanf("")
+#	endif
+#	ifndef INFINITY
+#		define INFINITY			__builtin_inff()
+#	endif
 #else
 	/* gcc2 definitions */
 #	define	__HUGE_VAL_v	0x7ff0000000000000LL
