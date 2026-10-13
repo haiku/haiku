@@ -112,11 +112,11 @@ main(int argc, char** argv)
 		if (update_time(settings, &errorString, &errorCode) == B_OK) {
 			printf("Synchronization successful\n");
 		} else if (errorCode != 0) {
-			printf("The following error occured "
+			printf("The following error occurred "
 					"while synchronizing:\n%s: %s\n",
 				errorString, strerror(errorCode));
 		} else {
-			printf("The following error occured while synchronizing:\n%s\n",
+			printf("The following error occurred while synchronizing:\n%s\n",
 				errorString);
 		}
 	} else {
