@@ -97,12 +97,12 @@ private:
 	typedef VectorIterator<Value>	Iterator;
 
 public:
-	inline VectorIterator<Value>()
+	inline VectorIterator()
 		: fElement(NULL)
 	{
 	}
 
-	inline VectorIterator<Value>(const Iterator &other)
+	inline VectorIterator(const Iterator &other)
 		: fElement(other.fElement)
 	{
 	}
@@ -169,7 +169,7 @@ public:
 
 // private
 public:
-	inline VectorIterator<Value>(Value *element)
+	inline VectorIterator(Value *element)
 		: fElement(element)
 	{
 	}
