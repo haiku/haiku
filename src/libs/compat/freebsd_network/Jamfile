@@ -6,7 +6,7 @@ UsePrivateHeaders net ;
 UsePrivateKernelHeaders ;
 UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 ] -Wno-error=incompatible-pointer-types ;
 SubDirC++Flags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :

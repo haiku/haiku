@@ -1,12 +1,17 @@
 SubDir HAIKU_TOP src system libroot posix glibc regex ;
 
 SubDirHdrs $(HAIKU_TOP) headers ;
-SubDirCcFlags -D_REGEX_RE_COMP -D_DEFAULT_SOURCE ;
+
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
+		local ccFlags = -D_REGEX_RE_COMP -D_DEFAULT_SOURCE ;
+		if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
+			ccFlags += -Wno-error=incompatible-pointer-types ;
+		}
+		SubDirCcFlags $(ccFlags) ;
 
 		MergeObject <$(architecture)>posix_gnu_regex.o :
 			regex.c

@@ -11,7 +11,7 @@ UsePrivateKernelHeaders ;
 CCFLAGS on [ FGristFiles ieee80211_scan_sw.o ] = -O0 ;
 
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
-	-Wno-format -Wno-unused -Wno-uninitialized ;
+	-Wno-format -Wno-unused -Wno-uninitialized -Wno-incompatible-pointer-types ;
 SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;

@@ -5,7 +5,7 @@ UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) libntfs ] ;
 SubDirHdrs [ FDirName $(SUBDIR) utils ] ;
 
-SubDirCcFlags -DHAVE_CONFIG_H=1 ;
+SubDirCcFlags -DHAVE_CONFIG_H=1 -Wno-error=incompatible-pointer-types ;
 SubDirC++Flags -DHAVE_CONFIG_H=1 ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) utils ] ;

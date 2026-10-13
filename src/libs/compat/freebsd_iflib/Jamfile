@@ -5,7 +5,7 @@ UseHeaders [ FDirName $(SUBDIR) .. freebsd_network compat ] : true ;
 UsePrivateHeaders net ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ALTQ ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ALTQ ] -Wno-error=incompatible-pointer-types ;
 
 KernelStaticLibrary freebsd_iflib.a :
 	device_if.c

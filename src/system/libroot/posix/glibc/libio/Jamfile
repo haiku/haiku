@@ -4,8 +4,6 @@ SubDir HAIKU_TOP src system libroot posix glibc libio ;
 # obprintf() is also disabled, because we don't have
 # obstack functionality
 
-SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -21,6 +19,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
+		local ccFlags = -D_GNU_SOURCE -DUSE_IN_LIBIO ;
+		if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
+			ccFlags += -Wno-error=incompatible-pointer-types ;
+		}
+		SubDirCcFlags $(ccFlags) ;
+
 
 		UsePrivateHeaders libroot ;
 

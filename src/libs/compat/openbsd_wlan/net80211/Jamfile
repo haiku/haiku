@@ -8,7 +8,7 @@ UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
 SubDirCcFlags [ FDefines _KERNEL=1 ]
-	-Wno-format -Wno-unused -Wno-uninitialized -Wno-pointer-sign -Wno-sign-compare ;
+	-Wno-format -Wno-unused -Wno-uninitialized -Wno-pointer-sign -Wno-sign-compare -Wno-incompatible-pointer-types ;
 SubDirC++Flags [ FDefines _KERNEL=1 ] -fpermissive ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) .. ] ;

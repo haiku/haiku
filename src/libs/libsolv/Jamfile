@@ -9,13 +9,17 @@ DEFINES =
 	HAVE_FOPENCOOKIE
 	;
 
-SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) solv ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) ext ] ;
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+		local ccFlags = -Wno-sign-compare -Wno-missing-prototypes ;
+		if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
+			ccFlags += -Wno-error=incompatible-pointer-types ;
+		}
+		SubDirCcFlags $(ccFlags) ;
 
 		UseBuildFeatureHeaders zlib ;
 		Includes [ FGristFiles solv_xfopen.c ]
