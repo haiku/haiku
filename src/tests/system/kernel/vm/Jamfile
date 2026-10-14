@@ -10,6 +10,7 @@ SimpleTest mmap_resize_test : mmap_resize_test.cpp ;
 SimpleTest mmap_cut_tests : mmap_cut_tests.cpp ;
 SimpleTest mmap_invalid_tests : mmap_invalid_tests.cpp ;
 SimpleTest mmap_fixed_test : mmap_fixed_test.cpp ;
+SimpleTest mmap_read_self_test : mmap_read_self_test.cpp ;
 
 SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 SimpleTest resize_area_tests : resize_area_tests.cpp ;
