@@ -992,17 +992,18 @@ static status_t
 cache_io(void* ref, void* cookie, off_t offset, addr_t buffer,
 	size_t* _size, bool doWrite)
 {
-	size_t originalSize = *_size;
+	const size_t originalSize = *_size;
 
 	thread_get_current_thread()->page_fault_waits_allowed--;
 	status_t status = do_cache_io(ref, cookie, offset, buffer, _size, doWrite);
 	thread_get_current_thread()->page_fault_waits_allowed++;
 
-	if (status == B_BUSY) {
-		// This likely means that fault handler would've needed to wait for a page,
-		// but we can't allow that here because it could be one of our pages that
-		// it would've waited on, which would cause a deadlock.
-		// Call memset so that all pages are faulted in, and retry.
+	if (status == B_BUSY || status == B_BAD_ADDRESS) {
+		// This likely (B_BUSY) means, or could (B_BAD_ADDRESS) mean, that the
+		// fault handler would've needed to wait for a page, but we can't allow
+		// that here because it could be one of our pages that it would've
+		// waited on, which would cause a deadlock. So, we temporarily lock
+		// the memory before retrying.
 		off_t retryOffset = offset;
 		addr_t retryBuffer = buffer;
 		size_t retrySize = originalSize;
@@ -1010,19 +1011,29 @@ cache_io(void* ref, void* cookie, off_t offset, addr_t buffer,
 			retryOffset += *_size;
 			retryBuffer += *_size;
 			retrySize -= *_size;
-		}
-		if (IS_USER_ADDRESS(buffer)) {
-			status = user_memset((void*)retryBuffer, 0, retrySize);
 		} else {
-			memset((void*)retryBuffer, 0, retrySize);
-			status = B_OK;
+			*_size = 0;
 		}
+
+		const uint32 lockFlags = doWrite ? 0 : B_READ_DEVICE;
+		const size_t lockSize = retrySize;
+		status = lock_memory((void*)retryBuffer, lockSize, lockFlags);
+
 		if (status == B_OK) {
 			thread_get_current_thread()->page_fault_waits_allowed--;
 			status = do_cache_io(ref, cookie, retryOffset, retryBuffer, &retrySize, doWrite);
-			*_size += retrySize;
 			thread_get_current_thread()->page_fault_waits_allowed++;
+
+			unlock_memory((void*)retryBuffer, lockSize, lockFlags);
 		}
+
+		if (status != B_OK) {
+			if (*_size != 0)
+				return B_OK;
+			return status;
+		}
+
+		*_size += retrySize;
 	}
 
 	return status;
