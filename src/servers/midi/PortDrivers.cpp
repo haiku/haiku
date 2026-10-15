@@ -62,13 +62,13 @@ MidiPortProducer::MidiPortProducer(int fd, const char *name)
 MidiPortProducer::~MidiPortProducer()
 {
 	fKeepRunning = false;
-	
+
 	status_t dummy;
 	wait_for_thread(fReaderThread, &dummy);
 }
 
 
-int32 
+int32
 MidiPortProducer::_ReaderThread(void* data)
 {
 	return ((MidiPortProducer*) data)->GetData();
@@ -78,8 +78,12 @@ MidiPortProducer::_ReaderThread(void* data)
 int32
 MidiPortProducer::GetData()
 {
-	uint8 msgBuf[3];
+	uint8 bytes[256];
+	ssize_t bytesCount = 0;
+	uint8* nextByte = NULL;
+	bigtime_t timestamp = 0;
 
+	uint8 msgBuf[3];
 	uint8* msgPtr = NULL;
 	size_t msgSize = 0;
 	size_t needed = 0;
@@ -90,18 +94,23 @@ MidiPortProducer::GetData()
 	size_t sysexBufferSize = B_PAGE_SIZE;
 	size_t sysexSize = 0;
 
-	uint8 next = 0;
-
 	while (fKeepRunning) {
-		if (read(fFileDescriptor, &next, 1) != 1) {
-			if (errno == B_CANCELED)
-				fKeepRunning = false;
-			else
-				perror("Error reading data from driver");
-			break;
+		if (bytesCount == 0) {
+			bytesCount = read(fFileDescriptor, bytes, sizeof(bytes));
+			if (bytesCount < 0) {
+				if (errno == B_CANCELED)
+					fKeepRunning = false;
+				else
+					perror("Error reading data from driver");
+				break;
+			}
+
+			timestamp = system_time();
+			nextByte = bytes;
 		}
 
-		bigtime_t timestamp = system_time();
+		uint8 next = *nextByte++;
+		bytesCount--;
 
 		if (haveSysEx) {
 			// System Exclusive mode
@@ -165,13 +174,13 @@ MidiPortProducer::GetData()
 					needed = 1;
 					msgSize = 2;
 					break;
-			
-				case B_SYS_EX_END:	
+
+				case B_SYS_EX_END:
 					// Unpaired with B_SYS_EX_START, but pass it anyway...
 				case B_TUNE_REQUEST:
 					SpraySystemCommon(next, 0, 0, timestamp);
 					break;
-			}			
+			}
 		} else if ((next & 0x80) == 0x80) {
 			// Voice message
 			runningStatus = next;
@@ -199,45 +208,37 @@ MidiPortProducer::GetData()
 			if (--needed == 0) {
 				switch (msgBuf[0] & 0xF0) {
 					case B_NOTE_OFF:
-						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
-							timestamp);
+						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
 						break;
 
 					case B_NOTE_ON:
-						SprayNoteOn(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
-							timestamp);
+						SprayNoteOn(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
 						break;
 
 					case B_KEY_PRESSURE:
-						SprayKeyPressure(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
-							timestamp);
+						SprayKeyPressure(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
 						break;
 
 					case B_CONTROL_CHANGE:
-						SprayControlChange(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
-							timestamp);
+						SprayControlChange(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
 						break;
 
 					case B_PROGRAM_CHANGE:
-						SprayProgramChange(msgBuf[0] & 0x0F, msgBuf[1],
-							timestamp);
+						SprayProgramChange(msgBuf[0] & 0x0F, msgBuf[1], timestamp);
 						break;
 
 					case B_CHANNEL_PRESSURE:
-						SprayChannelPressure(msgBuf[0] & 0x0F, msgBuf[1],
-							timestamp);
+						SprayChannelPressure(msgBuf[0] & 0x0F, msgBuf[1], timestamp);
 						break;
 
 					case B_PITCH_BEND:
-						SprayPitchBend(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2],
-							timestamp);
+						SprayPitchBend(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
 						break;
 				}
 
 				switch (msgBuf[0]) {
 					case B_SONG_POSITION:
-						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2],
-							timestamp);
+						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2], timestamp);
 						break;
 
 					case B_MIDI_TIME_CODE:
@@ -254,6 +255,7 @@ MidiPortProducer::GetData()
 			msgPtr = msgBuf + 2;
 			needed = msgSize - 2;
 		}
+
 	}	// while fKeepRunning
 
 	free(sysexBuffer);
