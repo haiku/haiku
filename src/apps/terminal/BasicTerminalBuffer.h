@@ -105,7 +105,6 @@ public:
 									bool findNonWords, TermPos& start,
 									TermPos& end) const;
 			int32				LineLength(int32 index) const;
-			void				GetLineColor(int32 index, Attributes& attr) const;
 
 			bool				PreviousLinePos(TermPos& pos) const;
 			bool				NextLinePos(TermPos& pos, bool normalize) const;
@@ -133,6 +132,7 @@ public:
 
 			// insert chars/lines
 			void				InsertChar(UTF8Char c);
+			void				ReplaceChar(UTF8Char c);
 			void				FillScreen(UTF8Char c, Attributes &attr);
 
 			void				InsertCR();
@@ -183,6 +183,10 @@ public:
 			bool				IsOriginMode();
 			void				SaveOriginMode();
 			void				RestoreOriginMode();
+			void				SetAutoWrapMode(bool enabled);
+			bool				IsAutoWrapMode();
+			void				SetScreenReverseVideoMode(bool enabled);
+			bool				IsScreenReverseVideoMode();
 
 			// tab stops
 			void				SetTabStop(int32 x);
@@ -256,6 +260,8 @@ protected:
 			bool				fAlternateScreenActive;
 			bool				fOriginMode;
 			bool				fSavedOriginMode;
+			bool				fAutoWrapMode;
+			bool				fScreenReverseVideoMode;
 			bool*				fTabStops;
 
 			int					fEncoding;

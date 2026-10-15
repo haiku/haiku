@@ -67,7 +67,7 @@ TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 		return B_NO_MEMORY;
 
 	for (int32 i = 0; i < height; i++)
-		fAlternateScreen[i]->Clear();
+		fAlternateScreen[i]->Clear(width);
 
 	fColorsPalette = new(std::nothrow) rgb_color[kTermColorCount];
 	if (fColorsPalette == NULL)

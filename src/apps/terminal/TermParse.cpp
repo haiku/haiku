@@ -654,6 +654,7 @@ TermParse::EscParse()
 						param[nparam++] = '!';
 					break;
 
+				case CASE_CSI_DOL: // ESC [N p
 				case CASE_DEC_DOL: // ESC [? N p
 					// part of change cursor style DECRQM
 					if (nparam < NPARAM)
@@ -784,15 +785,27 @@ TermParse::EscParse()
 
 				case CASE_SET:
 					/* SET */
-					if (param[0] == 4)
-						fBuffer->SetInsertMode(MODE_INSERT);
+					switch (param[0]) {
+						case 4:
+							fBuffer->SetInsertMode(MODE_INSERT);
+							break;
+						case 20:
+							fBuffer->SetMode(MODE_LINEFEED_NEWLINE);
+							break;
+					}
 					parsestate = groundtable;
 					break;
 
 				case CASE_RST:
 					/* RST */
-					if (param[0] == 4)
-						fBuffer->SetInsertMode(MODE_OVER);
+					switch (param[0]) {
+						case 4:
+							fBuffer->SetInsertMode(MODE_OVER);
+							break;
+						case 20:
+							fBuffer->ResetMode(MODE_LINEFEED_NEWLINE);
+							break;
+					}
 					parsestate = groundtable;
 					break;
 
@@ -1193,6 +1206,7 @@ TermParse::EscParse()
 					// Additional things reset that are not changed by soft terminal reset.
 					fBuffer->Clear(true);
 					fBuffer->SetDefaultTabStops(TAB_WIDTH);
+					parsestate = groundtable;
 					break;
 
 				case CASE_LS2:
@@ -1323,6 +1337,10 @@ TermParse::EscParse()
 					if (nparam == 2 && param[1] == '!') {
 						// DECSTR - soft terminal reset
 						_DecSoftTerminalReset();
+					}
+					if (nparam == 2 && param[1] == '$') {
+						// DECRQM - request ANSI mode
+						_AnsiModeRequest(param[0]);
 					}
 					parsestate = groundtable;
 					break;
@@ -1552,14 +1570,16 @@ TermParse::_DecPrivateModeSet(int value)
 			fBuffer->SetScrollRegion(0, fBuffer->Height() - 1);
 			break;
 		case 5:
-			// Reverse Video (inverses colors for the complete screen
-			// -- when followed by normal video, that's shortly flashes the
-			// screen).
-			// Not supported yet.
+			// Set Screen Reverse Video Mode.
+			fBuffer->SetScreenReverseVideoMode(true);
 			break;
 		case 6:
 			// Set Origin Mode.
 			fBuffer->SetOriginMode(true);
+			break;
+		case 7:
+			// Set Auto Wrap Mode.
+			fBuffer->SetAutoWrapMode(true);
 			break;
 		case 9:
 			// Set Mouse X and Y on button press.
@@ -1641,12 +1661,16 @@ TermParse::_DecPrivateModeReset(int value)
 			// Not supported yet.
 			break;
 		case 5:
-			// Normal Video (Leaves Reverse Video, cf. there).
-			// Not supported yet.
+			// Reset Screen Reverse Video Mode.
+			fBuffer->SetScreenReverseVideoMode(false);
 			break;
 		case 6:
 			// Reset Origin Mode.
 			fBuffer->SetOriginMode(false);
+			break;
+		case 7:
+			// Reset Auto Wrap Mode.
+			fBuffer->SetAutoWrapMode(false);
 			break;
 		case 9:
 			// Disable Mouse X and Y on button press.
@@ -1726,9 +1750,17 @@ TermParse::_DecPrivateModeRequest(int value)
 			// switching to 132 column mode.
 			reply.SetTo("\033[?3;4$y");
 			break;
+		case 5:
+			// Request Screen Reverse Video mode
+			reply.SetToFormat("\033[?5;%u$y", fBuffer->IsScreenReverseVideoMode() ? 1 : 2);
+			break;
 		case 6:
 			// Request Origin mode
 			reply.SetToFormat("\033[?6;%u$y", fBuffer->IsOriginMode() ? 1 : 2);
+			break;
+		case 7:
+			// Request Auto Wrap mode
+			reply.SetToFormat("\033[?7;%u$y", fBuffer->IsAutoWrapMode() ? 1 : 2);
 			break;
 		case 12:
 			// Request cursor blinking mode
@@ -1743,6 +1775,19 @@ TermParse::_DecPrivateModeRequest(int value)
 			reply.SetToFormat("\033[?1006;%u$y",
 				fBuffer->IsMode(MODE_EXTENDED_MOUSE_COORDINATES) ? 1 : 2);
 			break;
+		case 1034:
+			// Request interpret meta key
+			reply.SetToFormat("\033[?1034;%u$y", fBuffer->IsMode(MODE_INTERPRET_META_KEY) ? 1 : 2);
+			break;
+		case 1036:
+			// Request meta sends escape
+			reply.SetToFormat("\033[?1036;%u$y",
+				fBuffer->IsMode(MODE_META_KEY_SENDS_ESCAPE) ? 1 : 2);
+			break;
+		case 1049:
+			// Request alt screen buffer
+			reply.SetToFormat("\033[?1049;%u$y", fBuffer->IsAlternateScreenActive() ? 1 : 2);
+			break;
 		case 2004:
 			// Request bracketed paste mode
 			reply.SetToFormat("\033[?2004;%u$y", fBuffer->IsMode(MODE_BRACKETED_PASTE) ? 1 : 2);
@@ -1750,6 +1795,30 @@ TermParse::_DecPrivateModeRequest(int value)
 		default:
 			// Unsupported option
 			reply.SetToFormat("\033[?%u;0$y", value);
+			break;
+	}
+	_WriteReply(reply);
+}
+
+
+void
+TermParse::_AnsiModeRequest(int value)
+{
+	BString reply;
+	switch (value) {
+		case 4:
+			reply.SetToFormat("\033[4;%u$y", fBuffer->IsMode(MODE_INSERT) ? 1 : 2);
+			break;
+		case 12:
+			// Reply with permanently set: we do not support half-duplex / local echo.
+			reply.SetTo("\033[12;3$y");
+			break;
+		case 20:
+			reply.SetToFormat("\033[20;%u$y", fBuffer->IsMode(MODE_LINEFEED_NEWLINE) ? 1 : 2);
+			break;
+		default:
+			// Unsupported option, report as permanently reset (like xterm)
+			reply.SetToFormat("\033[%u;4$y", value);
 			break;
 	}
 	_WriteReply(reply);

@@ -228,12 +228,12 @@ struct TerminalCell {
 struct TerminalLine {
 	uint16			length;
 	bool			softBreak;	// soft line break
-	Attributes		attributes;
 	TerminalCell	cells[1];
 
 	inline void Clear()
 	{
 		Clear(Attributes());
+		length = 0;
 	}
 
 	inline void Clear(size_t count)
@@ -243,11 +243,12 @@ struct TerminalLine {
 
 	inline void Clear(Attributes attr, size_t count = 0)
 	{
-		length = 0;
-		attributes = attr;
+		length = count;
 		softBreak = false;
-		for (size_t i = 0; i < count; i++)
+		for (size_t i = 0; i < count; i++) {
 			cells[i].attributes = attr;
+			cells[i].character = kNonCharacter;
+		}
 	}
 };
 

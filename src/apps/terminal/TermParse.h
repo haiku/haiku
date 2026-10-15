@@ -74,6 +74,7 @@ private:
 	void _DecPrivateModeReset(int value);
 	void _DecPrivateModeRequest(int value);
 	void _DecSoftTerminalReset();
+	void _AnsiModeRequest(int value);
 	int* _GuessGroundTable(int encoding);
 	void _ProcessOperatingSystemControls(uchar* params);
 	void _WriteReply(BString &reply);

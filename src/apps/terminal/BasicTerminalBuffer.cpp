@@ -119,6 +119,8 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 	fAlternateScreenActive(false),
 	fOriginMode(false),
 	fSavedOriginMode(false),
+	fAutoWrapMode(true),
+	fScreenReverseVideoMode(false),
 	fTabStops(NULL),
 	fEncoding(M_UTF8),
 	fCaptureFile(-1),
@@ -178,7 +180,7 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 		return error;
 
 	for (int32 i = 0; i < fHeight; i++)
-		fScreen[i]->Clear();
+		fScreen[i]->Clear(fWidth);
 
 	fDirtyInfo.Reset();
 
@@ -265,7 +267,6 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 		if (sourceLine != NULL) {
 			if (sourceLine != destLine) {
 				destLine->length = sourceLine->length;
-				destLine->attributes = sourceLine->attributes;
 				destLine->softBreak = sourceLine->softBreak;
 				if (destLine->length > 0) {
 					memcpy(destLine->cells, sourceLine->cells,
@@ -307,7 +308,7 @@ BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 		return IN_STRING;
 
 	TerminalCell& cell = line->cells[column];
-	character = cell.character;
+	character = (cell.character == kNonCharacter ? kSpaceChar : cell.character);
 	attributes = cell.attributes;
 	return A_CHAR;
 }
@@ -354,6 +355,11 @@ BasicTerminalBuffer::GetString(int32 row, int32 firstColumn, int32 lastColumn,
 		TerminalCell& cell = line->cells[column];
 		if (cell.attributes != attributes)
 			break;
+
+		if (cell.character == kNonCharacter) {
+			*buffer++ = ' ';
+			continue;
+		}
 
 		int32 bytes = cell.character.ByteCount();
 		for (int32 i = 0; i < bytes; i++)
@@ -503,18 +509,6 @@ BasicTerminalBuffer::LineLength(int32 index) const
 }
 
 
-void
-BasicTerminalBuffer::GetLineColor(int32 index, Attributes& attr) const
-{
-	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
-	TerminalLine* line = _HistoryLineAt(index, lineBuffer);
-	if (line != NULL)
-		attr = line->attributes;
-	else
-		attr.Reset();
-}
-
-
 bool
 BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 	bool forward, bool caseSensitive, bool matchWord, TermPos& _matchStart,
@@ -625,12 +619,48 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 
 
 void
+BasicTerminalBuffer::ReplaceChar(UTF8Char c)
+{
+	int32 width = c.IsFullWidth() ? FULL_WIDTH : HALF_WIDTH;
+
+	TerminalLine* line = _LineAt(fCursor.y);
+
+	if (width == FULL_WIDTH && fCursor.x == fWidth - 1) {
+		// There is not enough room to display two columns of a full-width character. Drop the
+		// character entirely, displaying a space instead. This matches xterm's behavior.
+		line->cells[fCursor.x].character = kSpaceChar;
+		line->cells[fCursor.x].attributes = fAttributes;
+	} else {
+		line->cells[fCursor.x].character = c;
+		line->cells[fCursor.x].attributes = fAttributes;
+		line->cells[fCursor.x].attributes.state |= (width == FULL_WIDTH ? A_WIDTH : 0);
+		if (width == FULL_WIDTH) {
+			line->cells[fCursor.x + 1].character = kSpaceChar;
+			line->cells[fCursor.x + 1].attributes = fAttributes;
+		}
+	}
+
+	_Invalidate(fCursor.y, fCursor.y);
+
+	if (line->length < fCursor.x + width)
+		line->length = fCursor.x + width;
+
+	fSoftWrappedCursor = false;
+}
+
+
+void
 BasicTerminalBuffer::InsertChar(UTF8Char c)
 {
 //debug_printf("BasicTerminalBuffer::InsertChar('%.*s' (%d), %#lx)\n",
 //(int)c.ByteCount(), c.bytes, c.bytes[0], attributes);
 	fLast = c;
 	int32 width = c.IsFullWidth() ? FULL_WIDTH : HALF_WIDTH;
+
+	if (!fAutoWrapMode && (fCursor.x + width) >= fWidth) {
+		ReplaceChar(c);
+		return;
+	}
 
 	if (fSoftWrappedCursor || (fCursor.x + width) > fWidth)
 		_SoftBreakLine();
@@ -646,19 +676,23 @@ BasicTerminalBuffer::InsertChar(UTF8Char c)
 	line->cells[fCursor.x].character = c;
 	line->cells[fCursor.x].attributes = fAttributes;
 	line->cells[fCursor.x].attributes.state |= (width == FULL_WIDTH ? A_WIDTH : 0);
+	if (width == FULL_WIDTH) {
+		line->cells[fCursor.x + 1].character = kSpaceChar;
+		line->cells[fCursor.x + 1].attributes = fAttributes;
+	}
 
 	if (line->length < fCursor.x + width)
 		line->length = fCursor.x + width;
 
 	_Invalidate(fCursor.y, fCursor.y);
 
-	fCursor.x += width;
-
-// TODO: Deal correctly with full-width chars! We must take care not to
-// overwrite half of a full-width char. This holds also for other methods.
-
-	if (fCursor.x == fWidth) {
-		fCursor.x -= width;
+	// If there are width columns between the cursor and screen width, advance the cursor. If not,
+	// set the soft-wrapped flag. Note that the cursor should be on the right-half cell of a
+	// full-width character that spans the rightmost two columns.
+	if (fCursor.x + width < fWidth) {
+		fCursor.x += width;
+	} else {
+		fCursor.x = fWidth - 1;
 		fSoftWrappedCursor = true;
 	}
 }
@@ -693,7 +727,6 @@ BasicTerminalBuffer::InsertCR()
 {
 	TerminalLine* line = _LineAt(fCursor.y);
 
-	line->attributes = fAttributes;
 	line->softBreak = false;
 	fSoftWrappedCursor = false;
 	fCursor.x = 0;
@@ -818,9 +851,8 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i < fCursor.x + num; i++) {
 			line->cells[i].character = kSpaceChar;
-			line->cells[i].attributes = line->cells[fCursor.x - 1].attributes;
+			line->cells[i].attributes = fAttributes;
 		}
-		line->attributes = fAttributes;
 
 		_Invalidate(fCursor.y, fCursor.y);
 	}
@@ -835,8 +867,6 @@ BasicTerminalBuffer::EraseCharsFrom(int32 first, int32 numChars)
 	int32 end = min_c(first + numChars, fWidth);
 	for (int32 i = first; i < end; i++)
 		line->cells[i].attributes = fAttributes;
-
-	line->attributes = fAttributes;
 
 	fSoftWrappedCursor = false;
 
@@ -872,7 +902,7 @@ BasicTerminalBuffer::EraseAbove()
 			to++;
 		for (int32 i = 0; i <= to; i++) {
 			line->cells[i].attributes = fAttributes;
-			line->cells[i].character = kSpaceChar;
+			line->cells[i].character = kNonCharacter;
 		}
 	} else
 		line->Clear(fAttributes, fWidth);
@@ -923,25 +953,17 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 	fSoftWrappedCursor = false;
 
 	TerminalLine* line = _LineAt(fCursor.y);
-	if (fCursor.x < line->length) {
-		if (fCursor.x + numChars < line->length) {
-			int32 left = line->length - fCursor.x - numChars;
-			memmove(line->cells + fCursor.x, line->cells + fCursor.x + numChars,
-				left * sizeof(TerminalCell));
-			line->length = fCursor.x + left;
-			// process BCE on freed tail cells
-			for (int i = 0; i < numChars; i++)
-				line->cells[fCursor.x + left + i].attributes = fAttributes;
-		} else {
-			// process BCE on freed tail cells
-			for (int i = 0; i < line->length - fCursor.x; i++)
-				line->cells[fCursor.x + i].attributes = fAttributes;
-			// remove all remaining chars
-			line->length = fCursor.x;
-		}
-
-		_Invalidate(fCursor.y, fCursor.y);
+	if (fCursor.x + numChars < fWidth) {
+		int32 left = fWidth - fCursor.x - numChars;
+		memmove(line->cells + fCursor.x, line->cells + fCursor.x + numChars,
+			left * sizeof(TerminalCell));
 	}
+	for (int i = fWidth - 1; i >= fWidth - numChars; i--) {
+		line->cells[i].character = kNonCharacter;
+		line->cells[i].attributes = fAttributes;
+	}
+
+	_Invalidate(fCursor.y, fCursor.y);
 }
 
 
@@ -952,13 +974,11 @@ BasicTerminalBuffer::DeleteColumnsFrom(int32 first)
 
 	TerminalLine* line = _LineAt(fCursor.y);
 
-	for (int32 i = first; i < fWidth; i++)
+	for (int32 i = first; i < fWidth; i++) {
 		line->cells[i].attributes = fAttributes;
-
-	if (first <= line->length) {
-		line->length = first;
-		line->attributes = fAttributes;
+		line->cells[i].character = kNonCharacter;
 	}
+
 	_Invalidate(fCursor.y, fCursor.y);
 }
 
@@ -1056,6 +1076,35 @@ void
 BasicTerminalBuffer::RestoreOriginMode()
 {
 	fOriginMode = fSavedOriginMode;
+}
+
+
+void
+BasicTerminalBuffer::SetAutoWrapMode(bool enabled)
+{
+	fAutoWrapMode = enabled;
+}
+
+
+bool
+BasicTerminalBuffer::IsAutoWrapMode()
+{
+	return fAutoWrapMode;
+}
+
+
+void
+BasicTerminalBuffer::SetScreenReverseVideoMode(bool enabled)
+{
+	fScreenReverseVideoMode = enabled;
+	_InvalidateAll();
+}
+
+
+bool
+BasicTerminalBuffer::IsScreenReverseVideoMode()
+{
+	return fScreenReverseVideoMode;
 }
 
 
@@ -1164,22 +1213,11 @@ BasicTerminalBuffer::_FreeLines(TerminalLine** lines, int32 count)
 void
 BasicTerminalBuffer::_ClearLines(int32 first, int32 last)
 {
-	int32 firstCleared = -1;
-	int32 lastCleared = -1;
-
 	for (int32 i = first; i <= last; i++) {
 		TerminalLine* line = _LineAt(i);
-		if (line->length > 0) {
-			if (firstCleared == -1)
-				firstCleared = i;
-			lastCleared = i;
-		}
-
 		line->Clear(fAttributes, fWidth);
 	}
-
-	if (firstCleared >= 0)
-		_Invalidate(firstCleared, lastCleared);
+	_Invalidate(first, last);
 }
 
 
@@ -1370,8 +1408,17 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 			if (history != NULL && destTotalLines >= height)
 				history->AddLine(screen[destIndex]);
 			destLine->Clear(fAttributes, width);
+			destLine->length = 0;
 			newDestLine = false;
 		}
+
+		// Remove all non-character padding that isn't the second half of a full-width character.
+		int32 sourceLength = min_c(sourceLine->length, fWidth);
+		while (sourceLength > 0 && sourceLine->cells[sourceLength - 1].character == kNonCharacter
+			&& !(sourceLength > 1 && sourceLine->cells[sourceLength - 2].attributes.IsWidth())) {
+			sourceLength--;
+		}
+		sourceLine->length = sourceLength;
 
 		int32 sourceLeft = sourceLine->length - sourceX;
 		int32 destLeft = width - destLine->length;
@@ -1419,8 +1466,6 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 			destLine->length += toCopy;
 		}
 
-		destLine->attributes = sourceLine->attributes;
-
 		bool nextDestLine = false;
 		if (toCopy == sourceLeft) {
 			if (!sourceLine->softBreak)
@@ -1436,6 +1481,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 		}
 
 		if (nextDestLine) {
+			destLine->length = width;
 			destIndex = (destIndex + 1) % height;
 			destTotalLines++;
 			newDestLine = true;
@@ -1708,6 +1754,9 @@ BasicTerminalBuffer::_GetPartialLineString(BString& string, int32 row,
 	if (endColumn > line->length)
 		endColumn = line->length;
 
+	while (endColumn > 0 && line->cells[endColumn - 1].character == kNonCharacter)
+		endColumn--;
+
 	for (int32 x = startColumn; x < endColumn; x++) {
 		const TerminalCell& cell = line->cells[x];
 		string.Append(cell.character.bytes, cell.character.ByteCount());
@@ -1855,8 +1904,7 @@ BasicTerminalBuffer::MakeLinesSnapshots(time_t timeStamp, const char* fileName)
 				continue;
 			}
 
-			fprintf(fileOut, "%02" B_PRId16 ":%02" B_PRId16 ":%08" B_PRIx32 ":\n",
-					i, line->length, line->attributes.state);
+			fprintf(fileOut, "%02" B_PRId16 ":%02" B_PRId16 ":\n", i, line->length);
 			for (int j = 0; j < line->length; j++)
 				if (line->cells[j].character.bytes[0] != 0)
 					fwrite(line->cells[j].character.bytes, 1,

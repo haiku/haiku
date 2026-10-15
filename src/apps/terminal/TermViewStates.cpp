@@ -322,7 +322,7 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 	switch (*bytes) {
 		case B_RETURN:
 			if (rawChar == B_RETURN)
-				toWrite = "\r";
+				toWrite = fView->TextBuffer()->IsMode(MODE_LINEFEED_NEWLINE) ? "\r\n" : "\r";
 			break;
 
 		case B_DELETE:

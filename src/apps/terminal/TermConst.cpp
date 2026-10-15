@@ -5,6 +5,7 @@
 
 
 #include "TermConst.h"
+#include "UTF8Char.h"
 
 #include <Catalog.h>
 
@@ -45,3 +46,5 @@ const char* const kToolTipCommonTitlePlaceholders = B_TRANSLATE(
 const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
 const char* const kDefaultAdditionalWordCharacters = ":@-./_~";
 const char* const kURLAdditionalWordCharacters = ":/-._~[]?#@!$%&'()*+,;=";
+
+const UTF8Char kNonCharacter = UTF8Char("\xff\xff", 2);
