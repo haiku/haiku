@@ -17,7 +17,7 @@
 #include <arch/x86/smp_priv.h>
 #include <arch/x86/timer.h>
 
-#include <x86intrin.h>
+#include <x86gprintrin.h>
 
 
 //#define TRACE_TIMER

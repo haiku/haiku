@@ -12,7 +12,7 @@
 #include <arch/debug.h>
 #include <arch/x86/timer.h>
 
-#include <x86intrin.h>
+#include <x86gprintrin.h>
 #include <stdio.h>
 #include <stdlib.h>
 
