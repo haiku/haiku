@@ -847,7 +847,7 @@ int nvme_qpair_construct(struct nvme_ctrlr *ctrlr, struct nvme_qpair *qpair,
 	volatile uint32_t *doorbell_base;
 	struct nvme_tracker *tr;
 	uint64_t offset;
-	unsigned long phys_addr = 0;
+	phys_addr_t phys_addr = 0;
 	uint16_t i;
 	int ret;
 
@@ -888,7 +888,7 @@ int nvme_qpair_construct(struct nvme_ctrlr *ctrlr, struct nvme_qpair *qpair,
 		qpair->cmd =
 			nvme_mem_alloc_node(sizeof(struct nvme_cmd) * entries,
 				    PAGE_SIZE, NVME_NODE_ID_ANY,
-				    (unsigned long *) &qpair->cmd_bus_addr);
+				    &qpair->cmd_bus_addr);
 		if (!qpair->cmd) {
 			nvme_err("Allocate qpair commands failed\n");
 			goto fail;
@@ -902,7 +902,7 @@ int nvme_qpair_construct(struct nvme_ctrlr *ctrlr, struct nvme_qpair *qpair,
 
 	qpair->cpl = nvme_mem_alloc_node(sizeof(struct nvme_cpl) * entries,
 				 PAGE_SIZE, NVME_NODE_ID_ANY,
-				 (unsigned long *) &qpair->cpl_bus_addr);
+				 &qpair->cpl_bus_addr);
 	if (!qpair->cpl) {
 		nvme_err("Allocate qpair completions failed\n");
 		goto fail;
