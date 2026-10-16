@@ -21,6 +21,7 @@ struct bpf_if;
 #define bpfattach(ifnet, dlt, hdrlen) do { } while (0);
 #define bpfattach2(ifnet, dlt, hdrlen, bpf_if) do { } while (0)
 #define bpfdetach(ifnet) do { } while (0);
+#define bpf_mtap_if(bpf_if, mbuf) do { } while (0)
 
 
 static inline int
