@@ -647,8 +647,6 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 	usbmidi_port_info* port = cookie->port;
 	usbmidi_device_info* midiDevice = cookie->device;
 
-	*num_bytes = 0;
-
 	if (midiDevice == NULL || !midiDevice->active)
 		return B_ERROR;	/* already unplugged */
 
@@ -666,6 +664,7 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 		}
 		if (status == B_INTERRUPTED) {
 			// reader got interrupted while device idle
+			*num_bytes = 0;
 			return status;
 		}
 		if (status != B_OK) {
@@ -702,6 +701,7 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 
 	DPRINTF_INFO((MY_ID "usb_midi_read: loop terminated"
 		" -- Device no longer active\n"));
+	*num_bytes = 0;
 	return B_CANCELED;
 }
 
