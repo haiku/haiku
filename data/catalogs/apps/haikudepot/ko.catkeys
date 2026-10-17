@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-HaikuDepot	1084407986
+1	korean	x-vnd.Haiku-HaikuDepot	2762597797
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		사용자 약관 다운로드 문제
 Available packages	MainWindow		사용 가능한 패키지
 It was not possible to create the new user.	UserLoginWindow		새 사용자를 생성할 수 없습니다.
@@ -114,7 +114,6 @@ User Created	UserLoginWindow		사용자 생성됨
 Check for updates…	MainWindow		업데이트 확인…
 Uninstalled	PackageListView		제거됨
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		사용자 약관에 동의합니다
-Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" 설치 중
 OK	App		확인
 Develop packages	MainWindow		패키지 개발
 Starting the package daemon failed:\n\n%Error%	App		데몬을 시작할 수 없습니다:\n\n%Error%

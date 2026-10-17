@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	697720495
+1	friulian	x-vnd.Haiku-HaikuDepot	2375910306
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 User ratings loading…	PackageInfoView		Cjariament valutazions dai utents…
 Available packages	MainWindow		Pachets disponibii
@@ -127,7 +127,6 @@ User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
 Uninstalled	PackageListView		Disinstalât
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		O aceti lis cundizions di utilizazion
-Installing \"%PackageName%\"	InstallPackageProcess		Instalazion di \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Disinstale %PackageTitle%
 OK	App		Va ben
 Develop packages	MainWindow		Pachets di svilup

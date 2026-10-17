@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2478499492
+1	english	x-vnd.Haiku-HaikuDepot	4156689303
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用條件下載問題
 Available packages	MainWindow		可用軟體套件
 It was not possible to create the new user.	UserLoginWindow		無法創建新使用者。
@@ -117,7 +117,6 @@ User Created	UserLoginWindow		用戶已創建
 Check for updates…	MainWindow		檢查更新…
 Uninstalled	PackageListView		已解除安裝
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用條件
-Installing \"%PackageName%\"	InstallPackageProcess		正在安裝 \"%PackageName%\"
 OK	App		確認
 Develop packages	MainWindow		開發套件
 Starting the package daemon failed:\n\n%Error%	App		啟動包守護程式失敗：\n\n%Error%

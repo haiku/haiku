@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-About	2654448748
+1	polish	x-vnd.Haiku-About	297025571
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
@@ -52,7 +52,6 @@ GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z Projektu GNU wydane na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, bash\nCopyright © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		Zespołu HaikuPorts\n
-Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, udostępnione na licencji BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Wszelkie prawa zastrzeżone.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, i in.
 Current maintainers:\n	AboutView		Obecni współpracownicy:\n

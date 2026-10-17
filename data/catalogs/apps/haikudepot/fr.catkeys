@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	195173269
+1	french	x-vnd.Haiku-HaikuDepot	1873363080
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d’utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
@@ -112,7 +112,6 @@ User Created	UserLoginWindow		Utilisateur créé
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstalled	PackageListView		Désinstallé
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		J’accepte les conditions d’utilisation
-Installing \"%PackageName%\"	InstallPackageProcess		Installation de « %PackageName% »
 OK	App		OK
 Develop packages	MainWindow		Paquets de développement
 Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de paquets a échoué :\n\n%Error%

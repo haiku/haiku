@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskUsage	2951688400
+1	japanese	x-vnd.Haiku-DiskUsage	464111389
 Path	Info Window		パス
 Open with	Pie View		アプリケーションで開く
 file unavailable	Pie View		ファイルは利用できません
@@ -8,6 +8,7 @@ Scanning %refName%	Scanner		%refName%をスキャン中
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# ファイル} other{# ファイル}}
 Size	Info Window		サイズ
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d 個のファイル
+%volume_name% volume scanner	Scanner		%volume_name% volume scanner
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Scan	Status View		スキャン
 Abort	Status View		中断

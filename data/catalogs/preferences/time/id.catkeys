@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Time	3691539601
+1	indonesian	x-vnd.Haiku-Time	1111403326
 OK	Time		OKE
 Message receiving failed	Time		Penerimaan pesan gagal
 Australia	Time		Australia
@@ -16,7 +16,6 @@ Asia	Time		Asia
 Try all servers	Time		Coba semua server
 Time	Time		Jam
 Current time:	Time		Waktu saat ini:
-The following error occured while synchronizing:\n%s: %s	Time		Kesalahan berikut terjadi saat menyinkronkan:\n%s: %s
 Europe	Time		Eropa
 Show day of week	Time		Tampilkan nama hari dalam sepekan
 Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)

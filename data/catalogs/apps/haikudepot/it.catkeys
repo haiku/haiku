@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	412185348
+1	italian	x-vnd.Haiku-HaikuDepot	2090375159
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
@@ -122,7 +122,6 @@ User Created	UserLoginWindow		Utente Creato
 Check for updates…	MainWindow		Controllo aggiornamenti…
 Uninstalled	PackageListView		Disinstallato
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Accetto le condizioni di utilizzo
-Installing \"%PackageName%\"	InstallPackageProcess		Installazione di \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Disinstalla %PackageTitle%
 OK	App		OK
 Develop packages	MainWindow		Sviluppo

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	1084407986
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2762597797
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema con la descarga de las condiciones de uso
 Available packages	MainWindow		Paquetes disponibles
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
@@ -114,7 +114,6 @@ User Created	UserLoginWindow		Usuario creado
 Check for updates…	MainWindow		Buscar actualizaciones…
 Uninstalled	PackageListView		Desinstalado
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Acepto las condiciones de uso
-Installing \"%PackageName%\"	InstallPackageProcess		Instalando \"%PackageName%\"
 OK	App		Aceptar
 Develop packages	MainWindow		Paquetes para desarrollo
 Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%

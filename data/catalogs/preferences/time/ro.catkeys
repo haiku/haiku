@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Time	3691539601
+1	romanian	x-vnd.Haiku-Time	1111403326
 OK	Time		OK
 Message receiving failed	Time		Primirea mesajului a eșuat
 Australia	Time		Australia
@@ -16,7 +16,6 @@ Asia	Time		Asia
 Try all servers	Time		Încearcă toate serverele
 Time	Time		Oră
 Current time:	Time		Oră curentă:
-The following error occured while synchronizing:\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Afișează ziua săptămânii
 Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)

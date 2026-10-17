@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3697363706
+1	finnish	x-vnd.Haiku-HaikuDepot	1080586221
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -116,7 +116,6 @@ User Created	UserLoginWindow		Käyttäjän luoma
 Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstalled	PackageListView		Poistetut asennukset
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Hyväksyn käyttöehdot
-Installing \"%PackageName%\"	InstallPackageProcess		Asennetaan \"%PackageName%\"
 OK	App		Valmis
 Develop packages	MainWindow		Kehityspaketit
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%

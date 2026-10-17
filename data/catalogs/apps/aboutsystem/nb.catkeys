@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	506608794
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	2444152913
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter forbeholdt.
 \n\nSpecial thanks to:\n	AboutView		\n\nEn spesiell takk til:\n
@@ -53,7 +53,6 @@ GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Opphavsrett © 1996-2002, 2006 David Turner, Robert Wilhelm og Werner Lemberg.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Inneholder programvare fra "The GNU Project", utgitt under GPL, og LGPL lisensene:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nOpphavsrett © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		HaikuPorts-teamet\n
-Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Inneholder programvare fra "The FreeBSD Project", utgitt under BSD lisensen:\nftpd, ping, telnet, telnetd, traceroute\nOpphavsrett © 1994-2008 The FreeBSD Project. Alle rettigheter forbeholdt.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Opphavsrett © 2002-2003 Steve Lhomme. Alle rettigheter forbeholdt.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Opphavsrett © 2000-2019 Fabrice Bellard, m. fl.
 Current maintainers:\n	AboutView		Nåværende vedlikeholdere:\n

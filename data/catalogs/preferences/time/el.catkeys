@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Time	3691539601
+1	greek, modern (1453-)	x-vnd.Haiku-Time	1111403326
 OK	Time		Εντάξει
 Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
 Australia	Time		Αυστραλία
@@ -16,7 +16,6 @@ Asia	Time		Ασία
 Try all servers	Time		Δοκιμή όλων των εξυπηρετητών
 Time	Time		Ώρα
 Current time:	Time		Τρέχουσα ώρα:
-The following error occured while synchronizing:\n%s: %s	Time		Προέκυψε το ακόλουθο σφάλμα κατά τον συγχρονισμό:\n%s: %s
 Europe	Time		Ευρώπη
 Show day of week	Time		Εμφάνιση μέρας της εβδομάδας
 Local time (Windows compatible)	Time		Τοπική ώρα (συμβατή με τα Windows)

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	967787019
+1	hungarian	x-vnd.Haiku-HaikuDepot	2645976830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -132,7 +132,6 @@ User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstalled	PackageListView		Eltávolítva
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Egyetértek a felhasználási feltételekkel
-Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" telepítése
 Uninstall %PackageTitle%	PackageAction		%PackageTitle% eltávolítása
 OK	App		Rendben
 Develop packages	MainWindow		Fejlesztői csomagok
@@ -201,9 +200,9 @@ Login issue	MainWindow		Belépési hiba
 Your rating:	RatePackageWindow		Saját értékelés:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		A %Nickname% felhasználó sikeresen létrejött a HaikuDepot kiszolgáló rendszerében. Felhasználói adataid a webes felületen kezelheted. Most ezen új felhasználóként vagy bejelentkezve.
 Repositories	MainWindow		Tárolók
+Uninstall failure	UninstallPackageAction		Eltávolítási hiba
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		A csomagadatok frissítése közben felmerült egy probléma, amely az adatok elavulását vagy hiányát okozhatják az alkalmazásban. A problémával kapcsolatos további információkat az alkalmazásnaplókban tekintheted meg.\nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot szakaszában találhatók.
 This rating is visible to other users	RatePackageWindow		Ez az értékelés más felhasználók számára is látható
-Uninstall failure	UninstallPackageAction		Eltávolítási hiba
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Hiba történt a használati feltételek letöltése során. Nézd meg a naplót a részletekért, és próbáld újra. \nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot részében találhatók.
 Stop network use	ServerHelper		A hálózat használatának leállítása
 View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási feltételek…

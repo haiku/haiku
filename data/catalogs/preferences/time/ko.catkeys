@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Time	3691539601
+1	korean	x-vnd.Haiku-Time	1111403326
 OK	Time		확인
 Message receiving failed	Time		메세지 수신 실패
 Australia	Time		오스트레일리아
@@ -16,7 +16,6 @@ Asia	Time		아시아
 Try all servers	Time		모든 서버 시도
 Time	Time		시간
 Current time:	Time		현재 시간:
-The following error occured while synchronizing:\n%s: %s	Time		동기화 중 오류가 발생했습니다:\n%s: %s
 Europe	Time		유럽
 Show day of week	Time		요일 표시하기
 Local time (Windows compatible)	Time		지역 시간 (윈도우즈 호환)

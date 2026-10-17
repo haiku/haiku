@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	697720495
+1	czech	x-vnd.Haiku-HaikuDepot	2375910306
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití
 User ratings loading…	PackageInfoView		Načítání hodnocení uživatelů…
 Available packages	MainWindow		Dostupné balíčky
@@ -127,7 +127,6 @@ User Created	UserLoginWindow		Vytvořen uživatel
 Check for updates…	MainWindow		Zkontrolovat aktualizace…
 Uninstalled	PackageListView		Odinstalován
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Souhlasím s těmito podmínkami použití
-Installing \"%PackageName%\"	InstallPackageProcess		Instaluji \"%PackageName%\"
 Uninstall %PackageTitle%	PackageAction		Odinstalovat %PackageTitle%
 OK	App		OK
 Develop packages	MainWindow		Vývojové balíčky

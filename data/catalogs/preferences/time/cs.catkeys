@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Time	3691539601
+1	czech	x-vnd.Haiku-Time	1111403326
 OK	Time		OK
 Message receiving failed	Time		Přijetí zprávy selhalo
 Australia	Time		Austrálie
@@ -16,7 +16,6 @@ Asia	Time		Asie
 Try all servers	Time		Zkusit všechny servery
 Time	Time		Čas
 Current time:	Time		Aktuální čas:
-The following error occured while synchronizing:\n%s: %s	Time		Při synchronizaci došlo k následující chybě:\n%s: %s
 Europe	Time		Evropa
 Show day of week	Time		Zobrazit den v týdnu
 Local time (Windows compatible)	Time		Místní čas (kompatibilní s Windows)

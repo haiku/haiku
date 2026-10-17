@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	506608794
+1	greek, modern (1453-)	x-vnd.Haiku-About	2444152913
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
 \n\nSpecial thanks to:\n	AboutView		\n\nΙδιαίτερες ευχαριστίες στους:\n
@@ -53,7 +53,6 @@ GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Πνευματική ιδιοκτησία © 1996-2002, 2006 David Turner, Robert Wilhelm και Werner Lemberg.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Εμπεριέχει λογισμικό από το GNU Project, το οποίο έχει δημοσιευτεί με τις άδειες χρήσεις GPL και GPL:\nΒιβλιοθήκη GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nΠνευματική ιδιοκτησία © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
-Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Εμπεριέχει λογισμικό από το FreeBSD Project, το οποίο έχει δημοσιευτεί με την άδεια χρήσης BSD:\nftpd, ping, telnet, telnetd, traceroute\nΠνευματική ιδιοκτησία © 1994-2008 The FreeBSD Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2002-2003 Steve Lhomme. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Πνευματική ιδιοκτησία © 2000-2019 Fabrice Bellard, κλπ.
 Current maintainers:\n	AboutView		Εν ενεργεία συντηρητές:\n

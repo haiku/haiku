@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3691539601
+1	hungarian	x-vnd.Haiku-Time	1111403326
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
 Australia	Time		Ausztrália
@@ -16,7 +16,6 @@ Asia	Time		Ázsia
 Try all servers	Time		Összes kiszolgáló kipróbálása
 Time	Time		Idő
 Current time:	Time		Jelenlegi idő:
-The following error occured while synchronizing:\n%s: %s	Time		Hiba történt szinkronizálás közben:\n%s: %s
 Europe	Time		Európa
 Show day of week	Time		A hét napjának megjelenítése
 Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Time	3691539601
+1	english	x-vnd.Haiku-Time	1111403326
 OK	Time		確認
 Message receiving failed	Time		訊息接收失敗
 Australia	Time		澳洲
@@ -16,7 +16,6 @@ Asia	Time		亞洲
 Try all servers	Time		嘗試所有伺服器
 Time	Time		時間
 Current time:	Time		目前時間：
-The following error occured while synchronizing:\n%s: %s	Time		同步時發生以下錯誤:\n%s: %s
 Europe	Time		歐洲
 Show day of week	Time		顯示星期幾
 Local time (Windows compatible)	Time		當地時間（Windows 相容）

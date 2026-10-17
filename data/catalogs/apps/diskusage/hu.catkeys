@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskUsage	2951688400
+1	hungarian	x-vnd.Haiku-DiskUsage	464111389
 Path	Info Window		Útvonal
 Open with	Pie View		Megnyitás ezzel
 file unavailable	Pie View		fájl nem elérhető
@@ -8,6 +8,7 @@ Scanning %refName%	Scanner		%refName% elemzése
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fájl} other{# fájl}}
 Size	Info Window		Méret
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d fájl
+%volume_name% volume scanner	Scanner		%volume_name% lemez vizsgáló
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Scan	Status View		Elemzés
 Abort	Status View		Megszakítás

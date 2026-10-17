@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Time	3691539601
+1	finnish	x-vnd.Haiku-Time	1111403326
 OK	Time		Valmis
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
 Australia	Time		Australia
@@ -16,7 +16,6 @@ Asia	Time		Aasia
 Try all servers	Time		Yritä kaikkia palvelimia
 Time	Time		Aika
 Current time:	Time		Nykyinen aika:
-The following error occured while synchronizing:\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:\n%s: %s
 Europe	Time		Eurooppa
 Show day of week	Time		Näytä viikonpäivä
 Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)

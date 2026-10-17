@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3005404511
+1	russian	x-vnd.Haiku-HaikuDepot	388627026
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблемы при загрузке Условий использования
 User ratings loading…	PackageInfoView		Загружаются оценки пользователей…
 Available packages	MainWindow		Доступные пакеты
@@ -129,7 +129,6 @@ User Created	UserLoginWindow		Пользователь создан
 Check for updates…	MainWindow		Проверить обновления…
 Uninstalled	PackageListView		Деинсталлированные
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Я принимаю Условия использования
-Installing \"%PackageName%\"	InstallPackageProcess		Устанавливается \«%PackageName%\»
 Uninstall %PackageTitle%	PackageAction		Деинсталляция %PackageTitle%
 OK	App		OK
 Develop packages	MainWindow		Пакеты для разработчиков

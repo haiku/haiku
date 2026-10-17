@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Time	3691539601
+1	turkish	x-vnd.Haiku-Time	1111403326
 OK	Time		Tamam
 Message receiving failed	Time		İleti alımı başarısız
 Australia	Time		Avustralya
@@ -16,7 +16,6 @@ Asia	Time		Asya
 Try all servers	Time		Tüm sunucuları dene
 Time	Time		Tarih ve Zaman
 Current time:	Time		Geçerli zaman:
-The following error occured while synchronizing:\n%s: %s	Time		Eşzamanlama sırasında aşağıdaki hatalar oluştu:\n%s: %s
 Europe	Time		Avrupa
 Show day of week	Time		Haftanın gününü göster
 Local time (Windows compatible)	Time		Yerel zaman (Windows uyumlu)

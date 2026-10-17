@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Time	3691539601
+1	swedish	x-vnd.Haiku-Time	1111403326
 OK	Time		OK
 Message receiving failed	Time		Kunde inte ta emot meddelandet
 Australia	Time		Australien
@@ -16,7 +16,6 @@ Asia	Time		Asien
 Try all servers	Time		Prova alla servrarna
 Time	Time		Tid
 Current time:	Time		Aktuell tid:
-The following error occured while synchronizing:\n%s: %s	Time		Följande fel inträffade vid synkronisering:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Visa veckodag
 Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)

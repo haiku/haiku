@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Time	2069485065
+1	thai	x-vnd.Haiku-Time	3784316086
 OK	Time		ตกลง
 Message receiving failed	Time		การรับข้อความล้มเหลว
 Australia	Time		ออสเตรเลีย
@@ -15,7 +15,6 @@ Asia	Time		เอเชีย
 Try all servers	Time		ลองเวิฟเวอร์อื่น
 Time	Time		เวลา
 Current time:	Time		เวลาปัจจุบัน:
-The following error occured while synchronizing:\n%s: %s	Time		ข้อผิดพลาดต่อไปนี้เกิดขึ้นขณะซิงโครไนซ์:\n%s: %s
 Europe	Time		ยุโรป
 Show day of week	Time		แสดงวันในสัปดาห์
 Local time (Windows compatible)	Time		เวลาท้องถิ่น (รองรับ Windows)

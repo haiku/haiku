@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	4208417580
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1591640095
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні умов використання
 User ratings loading…	PackageInfoView		Завантажуються оцінки користувачів…
 Available packages	MainWindow		Доступні пакети
@@ -130,7 +130,6 @@ User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на оновлення…
 Uninstalled	PackageListView		Деінстальовані
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		З Умовами користування погоджуюсь
-Installing \"%PackageName%\"	InstallPackageProcess		Інсталюється \«%PackageName%\»
 Uninstall %PackageTitle%	PackageAction		Деінсталяція %PackageTitle%
 OK	App		ОК
 Develop packages	MainWindow		Пакети розробника
@@ -199,9 +198,9 @@ Login issue	MainWindow		Проблема входу в систему
 Your rating:	RatePackageWindow		Ваша оцінка:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Користувач %Nickname% був успішно створений в системі HaikuDepotServer. Ви можете адмініструвати дані цього користувача за допомогою вебінтерфейсу. Зараз Ви увійшли в систему під його ім'ям, як новий користувач.
 Repositories	MainWindow		Репозитарії
+Uninstall failure	UninstallPackageAction		Збій деінсталяції
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакету виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах програми.\nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot посібника користувача Haiku.
 This rating is visible to other users	RatePackageWindow		Оцінку видно і іншим користувачам
-Uninstall failure	UninstallPackageAction		Збій деінсталяції
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		При завантаженні умов користування виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі HaikuDepot посібника користувача Haiku.
 Stop network use	ServerHelper		Припинити використання мережі
 View agreed usage conditions…	MainWindow		Погоджені умови користування…

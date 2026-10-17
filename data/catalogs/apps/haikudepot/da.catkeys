@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-HaikuDepot	36869945
+1	danish	x-vnd.Haiku-HaikuDepot	1715059756
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med at indhente brugsvilkår
 Available packages	MainWindow		Tilgængelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke muligt at oprette den nye bruger.
@@ -112,7 +112,6 @@ User Created	UserLoginWindow		Bruger oprettet
 Check for updates…	MainWindow		Søg efter opdateringer…
 Uninstalled	PackageListView		Afinstalleret
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Jeg godkender brugsvilkårene
-Installing \"%PackageName%\"	InstallPackageProcess		Installerer \"%PackageName%\"
 OK	App		O.k.
 Develop packages	MainWindow		Udviklingspakker
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%

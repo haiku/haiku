@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Time	2069485065
+1	esperanto	x-vnd.Haiku-Time	3784316086
 OK	Time		Bone
 Message receiving failed	Time		Ricevo de mesaĝo malsukcesis
 Australia	Time		Aŭstralia
@@ -15,7 +15,6 @@ Asia	Time		Azia
 Try all servers	Time		Provi ĉiujn servilojn
 Time	Time		Tempo
 Current time:	Time		Nuna tempo:
-The following error occured while synchronizing:\n%s: %s	Time		Jena eraro okazis dum sinkronigo:\n%s: %s
 Europe	Time		Eŭropa
 Show day of week	Time		Tago de semajno
 Local time (Windows compatible)	Time		Loka tempo (kongrue al vindozo)

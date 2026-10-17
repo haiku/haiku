@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	967787019
+1	german	x-vnd.Haiku-HaikuDepot	2645976830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -132,7 +132,6 @@ User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen …
 Uninstalled	PackageListView		Deinstalliert
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Ich stimme den Nutzungsbedingungen zu
-Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" wird installiert
 Uninstall %PackageTitle%	PackageAction		%PackageTitle% deinstallieren
 OK	App		OK
 Develop packages	MainWindow		Entwicklungs-Pakete
@@ -201,9 +200,9 @@ Login issue	MainWindow		Anmeldungsproblem
 Your rating:	RatePackageWindow		Eigene Bewertung:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Der Nutzer %Nickname% wurde erfolgreich im HaikuDepotServer System angelegt. Nutzerdaten können im Webinterface verwaltet werden. Der neu angelegte Nutzer ist jetzt angemeldet.
 Repositories	MainWindow		Paketquellen
+Uninstall failure	UninstallPackageAction		Deinstallation fehlgeschlagen
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Bei der Aktualisierung von Paketdaten trat ein Problem auf. Dadurch könnten die angezeigten Daten der Anwendung veraltet sein oder fehlen. Weitere Details zu diesem Problem können dem Anwendungs-Log entnommen werden.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
 This rating is visible to other users	RatePackageWindow		Diese Bewertung is für andere Nutzer sichtbar
-Uninstall failure	UninstallPackageAction		Deinstallation fehlgeschlagen
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Beim Herunterladen der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte Log prüfen und nochmal probieren.\nWie diese Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
 Stop network use	ServerHelper		Netzwerknutzung stoppen
 View agreed usage conditions…	MainWindow		Zugestimmte Nutzungsbedingungen lesen …

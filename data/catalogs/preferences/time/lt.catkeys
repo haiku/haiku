@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Time	3691539601
+1	lithuanian	x-vnd.Haiku-Time	1111403326
 OK	Time		Gerai
 Message receiving failed	Time		Nepavyko gauti pranešimo
 Australia	Time		Australija
@@ -16,7 +16,6 @@ Asia	Time		Azija
 Try all servers	Time		Bandyti visus serverius
 Time	Time		Laikas
 Current time:	Time		Dabartinis laikas:
-The following error occured while synchronizing:\n%s: %s	Time		Klaida sinchronizuojant laiką:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Rodyti savaitės dieną
 Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)

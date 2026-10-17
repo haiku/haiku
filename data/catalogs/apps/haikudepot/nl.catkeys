@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1875391948
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3553581759
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Gebruiksvoorwaarden downloadprobleem
 Available packages	MainWindow		Beschikbare pakketten
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
@@ -111,7 +111,6 @@ User Created	UserLoginWindow		Gebruiker Aangemaakt
 Check for updates…	MainWindow		Controleer op updates…
 Uninstalled	PackageListView		Verwijderd
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		I aanvaard de gebruikersvoorwaarden
-Installing \"%PackageName%\"	InstallPackageProcess		Installeer \"%PackageName%\"
 OK	App		OK
 Develop packages	MainWindow		Ontwikkelaarspakketten
 Starting the package daemon failed:\n\n%Error%	App		Starten van de pakket-daemon mislukt:\n\n%Error%

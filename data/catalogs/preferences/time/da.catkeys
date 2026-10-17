@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Time	3691539601
+1	danish	x-vnd.Haiku-Time	1111403326
 OK	Time		O.k.
 Message receiving failed	Time		Modtagelse af meddelelse mislykkedes
 Australia	Time		Australien
@@ -16,7 +16,6 @@ Asia	Time		Asien
 Try all servers	Time		Prøv alle servere
 Time	Time		Tid
 Current time:	Time		Nuværende tid:
-The following error occured while synchronizing:\n%s: %s	Time		Følgende fejl opstod ved synkronisering:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Vis ugedag
 Local time (Windows compatible)	Time		Lokal tid (Windows-kompatibel)

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Time	3691539601
+1	russian	x-vnd.Haiku-Time	1111403326
 OK	Time		ОК
 Message receiving failed	Time		Не удалось получить данные
 Australia	Time		Австралия
@@ -16,7 +16,6 @@ Asia	Time		Азия
 Try all servers	Time		Пробовать все сервера
 Time	Time		Время
 Current time:	Time		Текущее время:
-The following error occured while synchronizing:\n%s: %s	Time		При синхронизации произошла следующая ошибка:\n%s: %s
 Europe	Time		Европа
 Show day of week	Time		Показывать день недели
 Local time (Windows compatible)	Time		Местное время (совместимо с Windows)

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	1554006247
+1	english	x-vnd.Haiku-HaikuDepot	3232196058
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 User ratings loading…	PackageInfoView		正在加载用户评分…
 Available packages	MainWindow		可用软件包
@@ -122,7 +122,6 @@ User Created	UserLoginWindow		用户已创建
 Check for updates…	MainWindow		检查更新…
 Uninstalled	PackageListView		已卸载
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用条款
-Installing \"%PackageName%\"	InstallPackageProcess		安装 \"%PackageName%\"
 OK	App		确定
 Develop packages	MainWindow		开发软件包
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%

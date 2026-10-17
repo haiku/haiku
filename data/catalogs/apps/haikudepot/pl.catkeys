@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	558160956
+1	polish	x-vnd.Haiku-HaikuDepot	2236350767
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem z pobieraniem warunków korzystania
 Available packages	MainWindow		Dostępne pakiety
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
@@ -113,7 +113,6 @@ User Created	UserLoginWindow		Użytkownik utworzony
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
 Uninstalled	PackageListView		Niezainstalowany
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Zgadzam się na warunki korzystania
-Installing \"%PackageName%\"	InstallPackageProcess		Instalowanie „%PackageName%”
 OK	App		OK
 Develop packages	MainWindow		Pakiety deweloperskie
 Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietów nie powiodło się:\n\n%Error%

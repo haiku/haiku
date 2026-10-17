@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Time	3691539601
+1	french	x-vnd.Haiku-Time	1111403326
 OK	Time		OK
 Message receiving failed	Time		La réception du message a échoué
 Australia	Time		Australie
@@ -16,7 +16,6 @@ Asia	Time		Asie
 Try all servers	Time		Essayer tous les serveurs
 Time	Time		Heure
 Current time:	Time		Heure actuelle :
-The following error occured while synchronizing:\n%s: %s	Time		L’erreur suivante s’est produite lors de la synchronisation :\n%s : %s
 Europe	Time		Europe
 Show day of week	Time		Afficher le jour de la semaine
 Local time (Windows compatible)	Time		Heure locale (compatible Windows)

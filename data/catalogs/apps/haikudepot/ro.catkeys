@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3697363706
+1	romanian	x-vnd.Haiku-HaikuDepot	1080586221
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -116,7 +116,6 @@ User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
 Uninstalled	PackageListView		Dezinstalat
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Sunt de acord cu condițiile de utilizare
-Installing \"%PackageName%\"	InstallPackageProcess		Se instalează \„%PackageName%\”
 OK	App		OK
 Develop packages	MainWindow		Pachete de dezvoltare
 Starting the package daemon failed:\n\n%Error%	App		Pornirea serviciului de pachete a eșuat:\n\n%Error%
