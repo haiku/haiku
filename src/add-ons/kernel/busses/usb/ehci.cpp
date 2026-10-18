@@ -701,9 +701,8 @@ EHCI::EHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stac
 
 		sitdPhysicalBase += sizeof(sitd_entry);
 		itdPhysicalBase += sizeof(itd_entry);
-		if ((sitdPhysicalBase & 0x10) != 0 || (itdPhysicalBase & 0x10) != 0)
-			panic("physical base for entry %" B_PRId32 " not aligned on 32\n",
-				i);
+		if ((sitdPhysicalBase % 32) != 0 || (itdPhysicalBase % 32) != 0)
+			panic("physical base for entry %" B_PRId32 " not aligned on 32\n", i);
 	}
 
 	// build flat interrupt tree
