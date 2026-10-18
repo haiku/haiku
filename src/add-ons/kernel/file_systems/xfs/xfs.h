@@ -65,6 +65,7 @@ public:
 			bool 				IsValidFeatureMask() const;
 			bool				IsVersion5() const;
 			bool				XfsHasIncompatFeature() const;
+			bool				IsBigtimeEnabled() const;
 			bool				UuidEquals(const uuid_t& u1);
 			const char*			Name() const;
 			uint32				BlockSize() const;
