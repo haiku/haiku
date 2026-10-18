@@ -3780,7 +3780,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 			// check key before doing expensive dynamic_cast
 			BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
 			if (textView != NULL) {
-				textView->KeyDown(bytes, modifiers);
+				textView->KeyDown(bytes, 1);
 				return true;
 			}
 		}
