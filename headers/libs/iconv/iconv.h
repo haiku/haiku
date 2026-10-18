@@ -21,6 +21,7 @@
 #ifndef _LIBICONV_H
 #define _LIBICONV_H
 
+#define HAVE_WCHAR_T 1
 #define _LIBICONV_VERSION 0x010B    /* version number: (major<<8) + minor */
 extern int _libiconv_version; 		/* Likewise */
 
