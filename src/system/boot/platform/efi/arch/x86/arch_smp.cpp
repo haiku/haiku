@@ -171,6 +171,16 @@ acpi_do_smp_config(void)
 	acpi_apic *end = (acpi_apic *)((uint8 *)madt + madt->header.length);
 	while (apic < end) {
 		switch (apic->type) {
+			case ACPI_MADT_IO_APIC:
+			{
+				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
+				TRACE("smp: found io APIC with id %" B_PRIu32 " and address 0x%" B_PRIx32 "\n",
+					ioApic->io_apic_id, ioApic->io_apic_address);
+				if (gKernelArgs.arch_args.ioapic_phys == 0)
+					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+				break;
+			}
+
 			case ACPI_MADT_LOCAL_APIC:
 			{
 				if (gKernelArgs.num_cpus == SMP_MAX_CPUS) {
@@ -187,6 +197,21 @@ acpi_do_smp_config(void)
 					break;
 				}
 
+				if (sX2APIC) {
+					// We may already have found a local x2APIC with this ID.
+					bool found = false;
+					for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
+						if (gKernelArgs.arch_args.cpu_apic_id[i] == localApic->apic_id) {
+							found = true;
+							break;
+						}
+					}
+					if (found) {
+						TRACE("smp: found local APIC, but ignoring in favor of x2APIC\n");
+						break;
+					}
+				}
+
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
 					= localApic->apic_id;
 				// TODO: how to find out? putting 0x10 in to indicate a local apic
@@ -196,14 +221,43 @@ acpi_do_smp_config(void)
 				break;
 			}
 
-			case ACPI_MADT_IO_APIC: {
-				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
-				TRACE("smp: found io APIC with id %" B_PRIu32 " and address 0x%" B_PRIx32 "\n",
-					ioApic->io_apic_id, ioApic->io_apic_address);
-				if (gKernelArgs.arch_args.ioapic_phys == 0)
-					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+			case ACPI_MADT_PROCESSOR_LOCAL_X2_APIC:
+			{
+				if (!sX2APIC) {
+					TRACE("smp: found local x2APIC, but x2APIC is disabled\n");
+					break;
+				}
+
+				acpi_local_x2_apic *x2Apic = (acpi_local_x2_apic *)apic;
+				TRACE("smp: found local x2APIC with id %u\n",
+					x2Apic->x2apic_id);
+				if ((x2Apic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
+					TRACE("smp: local x2APIC is disabled and will not be used\n");
+					break;
+				}
+
+				// We may already have found a local APIC with this ID.
+				bool found = false;
+				for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
+					if (gKernelArgs.arch_args.cpu_apic_id[i] == x2Apic->x2apic_id) {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					TRACE("smp: found local x2APIC, but this APIC was already found\n");
+					break;
+				}
+
+				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
+					= x2Apic->x2apic_id;
+				// TODO: how to find out? putting 0x10 in to indicate a local apic
+				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus]
+					= 0x10;
+				gKernelArgs.num_cpus++;
 				break;
 			}
+
 			default:
 				break;
 		}
