@@ -403,25 +403,22 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 }
 
 
-static status_t
-arp_send_announcement(arp_protocol* protocol, in_addr_t inetAddress)
+static net_buffer*
+arp_prepare_request(net_device* device, in_addr_t protocolSender, in_addr_t protocolTarget)
 {
-	TRACE(("%s(): address " FMT_IPv4 " == " FMT_MAC "\n", __FUNCTION__,
-		PRINTF_IPv4(ntohl(inetAddress)), PRINTF_MAC(LLADDR(&protocol->hardware_address))));
-
-	net_device* device = protocol->interface->device;
+	TRACE(("%s(): sender " FMT_IPv4 " == " FMT_MAC "\n", __FUNCTION__,
+		PRINTF_IPv4(ntohl(protocolSender)), PRINTF_MAC(LLADDR(&protocol->hardware_address))));
 
 	// prepare ARP request
 
 	net_buffer* buffer = gBufferModule->create(256);
 	if (buffer == NULL)
-		return B_NO_MEMORY;
+		return NULL;
 
 	NetBufferPrepend<arp_header> bufferHeader(buffer);
-	status_t status = bufferHeader.Status();
-	if (status < B_OK) {
+	if (bufferHeader.Status() != B_OK) {
 		gBufferModule->free(buffer);
-		return status;
+		return NULL;
 	}
 
 	// prepare ARP header
@@ -432,12 +429,12 @@ arp_send_announcement(arp_protocol* protocol, in_addr_t inetAddress)
 	header.protocol_type = htons(ETHER_TYPE_IP);
 	header.hardware_length = ETHER_ADDRESS_LENGTH;
 	header.protocol_length = sizeof(in_addr_t);
-	header.opcode = htons(ARP_OPCODE_REQUEST); // Gratuitous ARP Announcement
+	header.opcode = htons(ARP_OPCODE_REQUEST);
 
 	memcpy(header.hardware_sender, device->address.data, ETHER_ADDRESS_LENGTH);
 	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
-	header.protocol_sender = inetAddress;
-	header.protocol_target = inetAddress;
+	header.protocol_sender = protocolSender;
+	header.protocol_target = protocolTarget;
 
 	// prepare source and target addresses
 
@@ -451,15 +448,10 @@ arp_send_announcement(arp_protocol* protocol, in_addr_t inetAddress)
 	source.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(source.sdl_data, device->address.data, ETHER_ADDRESS_LENGTH);
 
-	gBufferModule->trim(buffer, sizeof(arp_header));
-
 	buffer->msg_flags = MSG_BCAST;
+		// this is a broadcast packet, we don't need to fill in the destination
 
-	status = protocol->next->module->send_data(protocol->next, buffer);
-	if (status < B_OK)
-		gBufferModule->free(buffer);
-
-	return status;
+	return buffer;
 }
 
 
@@ -495,8 +487,13 @@ arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 	memcpy(&protocol->hardware_address, &address, sizeof(sockaddr_dl));
 		// cache the address in our protocol
 
-	if (inetAddress != INADDR_ANY)
-		arp_send_announcement(protocol, inetAddress);
+	if (inetAddress != INADDR_ANY) {
+		// Gratuitous ARP Announcement
+		net_buffer* buffer = arp_prepare_request(protocol->interface->device,
+			inetAddress, inetAddress);
+		if (buffer != NULL)
+			protocol->next->module->send_data(protocol->next, buffer);
+	}
 
 	arp_entry* entry;
 	status_t status = arp_update_entry(inetAddress, &address,
@@ -816,51 +813,12 @@ arp_start_resolve(arp_protocol* protocol, in_addr_t address, arp_entry** _entry)
 		return B_NO_MEMORY;
 
 	// prepare ARP request
-
-	entry->request_buffer = gBufferModule->create(256);
+	entry->request_buffer = arp_prepare_request(protocol->interface->device,
+		protocol->local_address, address);
 	if (entry->request_buffer == NULL) {
 		entry->ScheduleRemoval();
 		return B_NO_MEMORY;
 	}
-
-	NetBufferPrepend<arp_header> bufferHeader(entry->request_buffer);
-	status_t status = bufferHeader.Status();
-	if (status < B_OK) {
-		entry->ScheduleRemoval();
-		return status;
-	}
-
-	// prepare ARP header
-
-	net_device *device = protocol->interface->device;
-	arp_header &header = bufferHeader.Data();
-
-	header.hardware_type = htons(ARP_HARDWARE_TYPE_ETHER);
-	header.protocol_type = htons(ETHER_TYPE_IP);
-	header.hardware_length = ETHER_ADDRESS_LENGTH;
-	header.protocol_length = sizeof(in_addr_t);
-	header.opcode = htons(ARP_OPCODE_REQUEST);
-
-	memcpy(header.hardware_sender, device->address.data, ETHER_ADDRESS_LENGTH);
-	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
-	header.protocol_sender = protocol->local_address;
-	header.protocol_target = address;
-
-	// prepare source and target addresses
-
-	struct sockaddr_dl &source = *(struct sockaddr_dl *)
-		entry->request_buffer->source;
-	source.sdl_len = sizeof(sockaddr_dl);
-	source.sdl_family = AF_LINK;
-	source.sdl_index = device->index;
-	source.sdl_type = IFT_ETHER;
-	source.sdl_e_type = htons(ETHER_TYPE_ARP);
-	source.sdl_nlen = source.sdl_slen = 0;
-	source.sdl_alen = ETHER_ADDRESS_LENGTH;
-	memcpy(source.sdl_data, device->address.data, ETHER_ADDRESS_LENGTH);
-
-	entry->request_buffer->msg_flags = MSG_BCAST;
-		// this is a broadcast packet, we don't need to fill in the destination
 
 	entry->protocol = protocol;
 	entry->timer_state = ARP_STATE_REQUEST;
