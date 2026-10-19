@@ -138,8 +138,11 @@ void
 ReaderImplBase::AttributeHandler::operator delete(void* pointer)
 {
 	AttributeHandler* handler = (AttributeHandler*)pointer;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 	if (!handler->fDeleting)
 		debugger("Package AttributeHandler: deleted without calling Delete()");
+#pragma GCC diagnostic pop
 
 	// Nothing else to do; memory is released by Delete().
 }
