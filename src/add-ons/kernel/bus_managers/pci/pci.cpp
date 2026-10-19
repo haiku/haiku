@@ -1839,36 +1839,65 @@ PCI::ReadConfig(PCIDev *device, uint16 offset, uint8 size)
 
 
 status_t
-PCI::WriteConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
+PCI::WriteConfig(uint8 domain, uint8 bus, uint8 _device, uint8 function,
 	uint16 offset, uint8 size, uint32 value)
 {
-	domain_data *info = _GetDomainData(domain);
-	if (info == NULL) {
-		KDEBUG_ONLY(panic("PCI: can't write config: domain %d does not exist!",
-			 domain));
-		return B_ERROR;
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL) {
+		KDEBUG_ONLY(panic("PCI: can't write config: can't find device!"));
+		return B_DEVICE_NOT_FOUND;
 	}
 
-	if (device > (info->max_bus_devices - 1)
-		|| function > 7
-		|| (size != 1 && size != 2 && size != 4)
-		|| (size == 2 && (offset & 3) == 3)
-		|| (size == 4 && (offset & 3) != 0)) {
-		dprintf("PCI: can't write config for domain %d, bus %u, device %u, function %u, offset %u, size %u\n",
-			 domain, bus, device, function, offset, size);
-		return B_ERROR;
-	}
-
-	return (*info->controller->write_pci_config)(info->controller_cookie, bus,
-		device, function, offset, size, value);
+	return WriteConfig(device, offset, size, value);
 }
 
 
 status_t
 PCI::WriteConfig(PCIDev *device, uint16 offset, uint8 size, uint32 value)
 {
-	return WriteConfig(device->domain, device->bus, device->device,
-		device->function, offset, size, value);
+	domain_data *info = _GetDomainData(device->domain);
+	ASSERT(info != NULL);
+
+	if ((size != 1 && size != 2 && size != 4)
+		|| (size == 2 && (offset & 3) == 3)
+		|| (size == 4 && (offset & 3) != 0)) {
+		dprintf("PCI: can't write config for %d %u:%u:%u (%u, %u)\n",
+			 device->domain, device->bus, device->device, device->function, offset, size);
+		return B_ERROR;
+	}
+
+	status_t status = (*info->controller->write_pci_config)(info->controller_cookie,
+		device->bus, device->device, device->function, offset, size, value);
+	if (status != B_OK)
+		return status;
+
+	if (offset == PCI_command && size == 2 && (value & PCI_command_master) != 0) {
+		// Make sure PCI_command_master is also enabled on all PCI-to-PCI bridges
+		// above this device. (Linux does the same when enabling PCI_command_master.)
+		for (PCIBus* bus = device->parent; bus != NULL && bus->parent != NULL;
+				bus = bus->parent->parent) {
+			PCIDev* parent = bus->parent;
+			if (parent->info.class_base != PCI_bridge
+				|| parent->info.class_sub != PCI_pci
+				|| (parent->info.header_type & PCI_header_type_mask)
+					!= PCI_header_type_PCI_to_PCI_bridge)
+				continue;
+
+			uint16 command = ReadConfig(parent, PCI_command, 2);
+			if ((command & PCI_command_master) != 0)
+				continue;
+
+			status_t status = (*info->controller->write_pci_config)(info->controller_cookie,
+				parent->bus, parent->device, parent->function,
+				PCI_command, 2, command | PCI_command_master);
+			if (status != B_OK)
+				return status;
+			dprintf("PCI: enabled bus-mastering for bridge %d %u:%u:%u",
+				parent->domain, parent->bus, parent->device, parent->function);
+		}
+	}
+
+	return status;
 }
 
 
@@ -2262,9 +2291,12 @@ PCI::EnableMSI(PCIDev *device)
 	if (info->configured_count == 0)
 		return B_NO_INIT;
 
+	// ensure bus-mastering has already been enabled
+	const uint16 command = ReadConfig(device, PCI_command, 2);
+	ASSERT((command & PCI_command_master) != 0);
+
 	// ensure the pinned interrupt is disabled
-	WriteConfig(device, PCI_command, 2,
-		ReadConfig(device, PCI_command, 2) | PCI_command_int_disable);
+	WriteConfig(device, PCI_command, 2, command | PCI_command_int_disable);
 
 	// enable msi generation
 	info->control_value |= PCI_msi_control_enable;
@@ -2428,9 +2460,12 @@ PCI::EnableMSIX(PCIDev *device)
 	if (info->configured_count == 0)
 		return B_NO_INIT;
 
+	// ensure bus-mastering has already been enabled
+	const uint16 command = ReadConfig(device, PCI_command, 2);
+	ASSERT((command & PCI_command_master) != 0);
+
 	// ensure the pinned interrupt is disabled
-	WriteConfig(device, PCI_command, 2,
-		ReadConfig(device, PCI_command, 2) | PCI_command_int_disable);
+	WriteConfig(device, PCI_command, 2, command | PCI_command_int_disable);
 
 	// enable msi-x generation
 	info->control_value |= PCI_msix_control_enable;
