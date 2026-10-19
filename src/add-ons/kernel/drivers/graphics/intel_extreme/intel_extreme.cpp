@@ -450,8 +450,9 @@ init_interrupt_handler(intel_info &info)
 		if (info.irq == 0xff)
 			info.irq = 0;
 	}
-	if (gPCI->get_msi_count(info.pci->bus,
-			info.pci->device, info.pci->function) >= 1) {
+	// MSI is known to work from Gen5
+	if (info.device_type.Generation() >= 5
+		&& gPCI->get_msi_count(info.pci->bus, info.pci->device, info.pci->function) >= 1) {
 		uint32 msiVector = 0;
 		if (gPCI->configure_msi(info.pci->bus, info.pci->device,
 				info.pci->function, 1, &msiVector) == B_OK
