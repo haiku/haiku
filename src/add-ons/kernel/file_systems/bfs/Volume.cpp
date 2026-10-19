@@ -51,6 +51,7 @@ disk_super_block::IsValid() const
 		|| (1UL << BlockShift()) != BlockSize()
 		|| AllocationGroups() < 1
 		|| AllocationGroupShift() < 1
+		|| AllocationGroupShift() > 16
 		|| BlocksPerAllocationGroup() < 1
 		|| NumBlocks() < 10
 		|| AllocationGroups() != divide_roundup(NumBlocks(),
