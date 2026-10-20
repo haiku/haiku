@@ -1440,6 +1440,7 @@ common_getrlimit(int resource, struct rlimit * rlp)
 			return B_OK;
 
 		case RLIMIT_CORE:
+			// Core files are controlled by debug_server, not applications.
 			rlp->rlim_cur = 0;
 			rlp->rlim_max = 0;
 			return B_OK;
@@ -1472,16 +1473,13 @@ common_getrlimit(int resource, struct rlimit * rlp)
 static status_t
 common_setrlimit(int resource, const struct rlimit * rlp)
 {
-	if (!rlp)
+	if (rlp == NULL)
 		return B_BAD_ADDRESS;
 
-	switch (resource) {
-		case RLIMIT_CORE:
-			// We don't support core file, so allow settings to 0/0 only.
-			if (rlp->rlim_cur != 0 || rlp->rlim_max != 0)
-				return EINVAL;
-			return B_OK;
+	if (rlp->rlim_cur > rlp->rlim_max)
+		return EINVAL;
 
+	switch (resource) {
 		case RLIMIT_NOFILE:
 		case RLIMIT_NOVMON:
 			return vfs_setrlimit(resource, rlp);
