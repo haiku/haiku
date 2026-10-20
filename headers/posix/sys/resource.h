@@ -21,7 +21,6 @@ struct rlimit {
 	rlim_t	rlim_max;		/* hard limit */
 };
 
-/* ToDo: the only supported mode is RLIMIT_NOFILE right now */
 #define RLIMIT_CORE		0	/* size of the core file */
 #define RLIMIT_CPU		1	/* CPU time per team */
 #define RLIMIT_DATA		2	/* data segment size */
@@ -34,7 +33,7 @@ struct rlimit {
 
 #define RLIM_NLIMITS	8	/* number of resource limits */
 
-#define RLIM_INFINITY	(0xffffffffUL)
+#define RLIM_INFINITY	__HAIKU_ADDR_MAX
 #define RLIM_SAVED_MAX	RLIM_INFINITY
 #define RLIM_SAVED_CUR	RLIM_INFINITY
 
