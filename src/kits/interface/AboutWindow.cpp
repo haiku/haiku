@@ -201,8 +201,8 @@ AboutView::AboutView(const char* appName, const char* signature)
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
 		.Add(fStripeView)
 		.AddGroup(B_VERTICAL)
-			.SetInsets(0, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.SetInsets(fStripeView->Icon() != NULL ? 0 : B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fNameView)
 				.Add(fVersionView)
