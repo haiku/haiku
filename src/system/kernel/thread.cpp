@@ -1445,6 +1445,7 @@ common_getrlimit(int resource, struct rlimit * rlp)
 			return B_OK;
 
 		case RLIMIT_DATA:
+		case RLIMIT_FSIZE:
 			rlp->rlim_cur = RLIM_INFINITY;
 			rlp->rlim_max = RLIM_INFINITY;
 			return B_OK;
