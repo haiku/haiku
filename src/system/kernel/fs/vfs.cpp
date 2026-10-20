@@ -5312,6 +5312,7 @@ vfs_setrlimit(int resource, const struct rlimit* rlp)
 		case RLIMIT_NOFILE:
 			/* TODO: check getuid() */
 			if (rlp->rlim_max != RLIM_SAVED_MAX
+				&& rlp->rlim_max != UINT32_MAX
 				&& rlp->rlim_max != MAX_FD_TABLE_SIZE)
 				return B_NOT_ALLOWED;
 
@@ -5321,6 +5322,7 @@ vfs_setrlimit(int resource, const struct rlimit* rlp)
 		case RLIMIT_NOVMON:
 			/* TODO: check getuid() */
 			if (rlp->rlim_max != RLIM_SAVED_MAX
+				&& rlp->rlim_max != UINT32_MAX
 				&& rlp->rlim_max != MAX_NODE_MONITORS)
 				return B_NOT_ALLOWED;
 
