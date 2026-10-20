@@ -82,6 +82,8 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 
 #ifdef __HAIKU__
 	ssize_t s, len;
+	char* lineBuffer = NULL;
+	size_t lineBufferSize = 0;
 #else
 	size_t s, len;
 #endif
@@ -110,11 +112,6 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 	 */
 	nl  = '\n';
 
-#ifdef __HAIKU__
-	char* lineBuffer = NULL;
-	size_t lineBufferSize = 0;
-#endif
-
 	while (cnt) {
 		cnt = 0;
 
@@ -122,6 +119,7 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 			(*lineno)++;
 
 #ifdef __HAIKU__
+		/* fgetln is not thread-safe, so use getline */
 		s = getline(&lineBuffer, &lineBufferSize, fp);
 		ptr = lineBuffer;
 		if (s < 0 || lineBuffer == NULL)
