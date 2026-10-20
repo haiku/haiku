@@ -80,7 +80,11 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 {
 	static const char dstr[3] = { '\\', '\\', '#' };
 
-	size_t	s, len;
+#ifdef __HAIKU__
+	ssize_t s, len;
+#else
+	size_t s, len;
+#endif
 	char   *buf;
 	char   *ptr, *cp;
 	int	cnt;
@@ -106,13 +110,24 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 	 */
 	nl  = '\n';
 
+#ifdef __HAIKU__
+	char* lineBuffer = NULL;
+	size_t lineBufferSize = 0;
+#endif
+
 	while (cnt) {
 		cnt = 0;
 
 		if (lineno)
 			(*lineno)++;
 
+#ifdef __HAIKU__
+		s = getline(&lineBuffer, &lineBufferSize, fp);
+		ptr = lineBuffer;
+		if (s < 0 || lineBuffer == NULL)
+#else
 		if ((ptr = fgetln(fp, &s)) == NULL)
+#endif
 			break;
 
 		if (s && com) {		/* Check and eliminate comments */
@@ -145,6 +160,9 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 
 		if ((cp = realloc(buf, len + s + 1)) == NULL) {
 			free(buf);
+#ifdef __HAIKU__
+			free(lineBuffer);
+#endif
 			return NULL;
 		}
 		buf = cp;
@@ -153,6 +171,10 @@ fparseln(FILE *fp, size_t *size, size_t *lineno, const char str[3], int flags)
 		len += s;
 		buf[len] = '\0';
 	}
+
+#ifdef __HAIKU__
+	free(lineBuffer);
+#endif
 
 	if ((flags & FPARSELN_UNESCALL) != 0 && esc && buf != NULL &&
 	    strchr(buf, esc) != NULL) {
