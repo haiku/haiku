@@ -706,9 +706,7 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 	fCore->OutputFormatChanged(io_format->u.raw_audio);
 
 	status = CreateBufferGroup(&group);
-	if (status != B_OK)
-		return status;
-	else {
+	if (status == B_OK) {
 		delete fBufferGroup;
 		fBufferGroup = group;
 		fCore->SetOutputBufferGroup(fBufferGroup);
@@ -774,8 +772,10 @@ AudioMixer::SetBufferGroup(const media_source &for_source,
 	fCore->Lock();
 	if (!newGroup) {
 		status_t status = CreateBufferGroup(&newGroup);
-		if (status != B_OK)
+		if (status != B_OK) {
+			fCore->Unlock();
 			return status;
+		}
 	}
 	fCore->SetOutputBufferGroup(newGroup);
 	delete fBufferGroup;
@@ -1021,8 +1021,10 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	// us from within its Connected() method.
 	if (fBufferGroup == NULL) {
 		BBufferGroup *group = NULL;
-		if (CreateBufferGroup(&group) != B_OK)
+		if (CreateBufferGroup(&group) != B_OK) {
+			fCore->Unlock();
 			return;
+		}
 		fBufferGroup = group;
 	}
 
