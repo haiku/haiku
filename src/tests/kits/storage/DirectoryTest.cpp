@@ -252,25 +252,28 @@ class DirectoryTest : public NodeTest {
 	{
 		// iteration over a directory containing files, dirs and symlinks
 		const char* iterDir = "/tmp/test-iter-dir";
-		create_directory(iterDir, S_IRWXU);
+		mkdir(iterDir, S_IRWXU);
 		std::string dirPathName(std::string (iterDir) + "/");
 		std::string entryName = "file1";
-		creat((dirPathName + entryName).c_str(), S_IRWXU);
+		int fd = creat((dirPathName + entryName).c_str(), S_IRWXU);
+		close(fd);
 		testSet.add(entryName);
 		entryName = "file2";
-		creat((dirPathName + entryName).c_str(), S_IRWXU);
+		fd = creat((dirPathName + entryName).c_str(), S_IRWXU);
+		close(fd);
 		testSet.add(entryName);
 		entryName = "file3";
-		creat((dirPathName + entryName).c_str(), S_IRWXU);
+		fd = creat((dirPathName + entryName).c_str(), S_IRWXU);
+		close(fd);
 		testSet.add(entryName);
 		entryName = "dir1";
-		create_directory((dirPathName + entryName).c_str(), S_IRWXU);
+		mkdir((dirPathName + entryName).c_str(), S_IRWXU);
 		testSet.add(entryName);
 		entryName = "dir2";
-		create_directory((dirPathName + entryName).c_str(), S_IRWXU);
+		mkdir((dirPathName + entryName).c_str(), S_IRWXU);
 		testSet.add(entryName);
 		entryName = "dir3";
-		create_directory((dirPathName + entryName).c_str(), S_IRWXU);
+		mkdir((dirPathName + entryName).c_str(), S_IRWXU);
 		testSet.add(entryName);
 		entryName = "link1";
 		symlink(existingFilename, (dirPathName + entryName).c_str());
@@ -281,6 +284,7 @@ class DirectoryTest : public NodeTest {
 		entryName = "link3";
 		symlink(existingFilename, (dirPathName + entryName).c_str());
 		testSet.add(entryName);
+		return iterDir;
 	}
 
 protected:
@@ -1529,8 +1533,10 @@ public:
 	{
 		mkdir(testDirname1, S_IRWXU);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 
 		BDirectory dir(testDirname1);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
@@ -1566,8 +1572,10 @@ public:
 		mkdir(testDirname1, S_IRWXU);
 		BDirectory dir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 		entry_ref ref;
 		TestSet testSet;
@@ -1603,8 +1611,10 @@ public:
 		mkdir(testDirname1, S_IRWXU);
 		BDirectory dir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 		TestSet testSet;
 		testSet.add("file1");
@@ -1629,8 +1639,10 @@ public:
 		mkdir(testDirname1, S_IRWXU);
 		BDirectory dir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 		BEntry entry;
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.GetNextEntry(&entry));
@@ -1644,8 +1656,10 @@ public:
 		mkdir(testDirname1, S_IRWXU);
 		BDirectory dir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 		CPPUNIT_ASSERT_EQUAL(2, dir.CountEntries());
 	}
@@ -1655,8 +1669,10 @@ public:
 		mkdir(testDirname1, S_IRWXU);
 		BDirectory dir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
-		creat((dirPathName + "file1").c_str(), S_IRWXU);
-		creat((dirPathName + "file2").c_str(), S_IRWXU);
+		int fd = creat((dirPathName + "file1").c_str(), S_IRWXU);
+		close(fd);
+		fd = creat((dirPathName + "file2").c_str(), S_IRWXU);
+		close(fd);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 
 		BEntry entry;
@@ -1889,7 +1905,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string (testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string (testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		BDirectory dir(testDirname1);
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.InitCheck());
 
@@ -1951,7 +1968,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file_abs").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file_abs").c_str(), S_IRWXU);
+		close(fd);
 		BDirectory dir;
 		CPPUNIT_ASSERT_EQUAL(B_OK, dir.SetTo(existingDirname));
 
@@ -1983,7 +2001,8 @@ public:
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
 		mkdir((std::string(testDirname1) + "/subdir1").c_str(), S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		symlink("dummy", (std::string(testDirname1) + "/link1").c_str());
 		BDirectory dir(testDirname1);
 		std::string entryName("subdir1");
@@ -1999,7 +2018,8 @@ public:
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
 		mkdir((std::string(testDirname1) + "/subdir1").c_str(), S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		symlink("dummy", (std::string(testDirname1) + "/link1").c_str());
 		BDirectory dir(testDirname1);
 		std::string entryName("file1");
@@ -2015,7 +2035,8 @@ public:
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
 		mkdir((std::string(testDirname1) + "/subdir1").c_str(), S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		symlink("dummy", (std::string(testDirname1) + "/link1").c_str());
 		BDirectory dir(testDirname1);
 		std::string entryName("file1");
@@ -2031,7 +2052,8 @@ public:
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
 		mkdir((std::string(testDirname1) + "/subdir1").c_str(), S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		symlink("dummy", (std::string(testDirname1) + "/link1").c_str());
 		BDirectory dir(testDirname1);
 		std::string entryName("link1");
@@ -2097,7 +2119,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
 		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());
@@ -2113,7 +2136,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
 		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());
@@ -2216,7 +2240,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		chdir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
@@ -2234,7 +2259,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		chdir(testDirname1);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
@@ -2377,7 +2403,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
 		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());
@@ -2392,7 +2419,8 @@ public:
 	{
 #ifndef TEST_R5
 		mkdir(testDirname1, S_IRWXU);
-		creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		int fd = creat((std::string(testDirname1) + "/file1").c_str(), S_IRWXU);
+		close(fd);
 		std::string dirPathName(std::string (testDirname1) + "/");
 		BDirectory dir;
 		CPPUNIT_ASSERT_EQUAL(B_NO_INIT, dir.InitCheck());

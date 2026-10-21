@@ -1088,6 +1088,7 @@ protected:
 public:
 	EntryTest()
 	{
+		SaveCWD();
 		// root dir for testing
 		testDir.initDir(badTestEntry, "testDir");
 		testDir.initPath((std::string ("/tmp/") + testDir.name).c_str());
@@ -1205,6 +1206,7 @@ public:
 		}
 		// create the tear down command line
 		tearDownCommandLine = std::string ("rm -rf ") + testDir.path;
+		RestoreCWD();
 	}
 
 	void setUp()
@@ -1610,7 +1612,6 @@ public:
 		chdir("/");
 		BEntry entry((const BDirectory*)NULL, "tmp");
 		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, entry.InitCheck());
-		RestoreCWD();
 #endif
 	}
 
@@ -2036,7 +2037,6 @@ public:
 		chdir("/");
 		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, entry.SetTo((const BDirectory*)NULL, "tmp"));
 		CPPUNIT_ASSERT_EQUAL(B_BAD_VALUE, entry.InitCheck());
-		RestoreCWD();
 #endif
 	}
 

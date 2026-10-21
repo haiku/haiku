@@ -25,6 +25,26 @@
 using namespace BPrivate::Storage::Sniffer;
 
 
+class TokenArrayDeleter
+{
+	Token** fArray;
+	size_t fCount;
+
+public:
+	TokenArrayDeleter(Token **array, size_t arraySize)
+		:
+		fArray(array),
+		fCount(arraySize / sizeof(Token*))
+	{}
+
+	~TokenArrayDeleter() {
+		for(size_t i = 0; i < fCount; i++) {
+			delete fArray[i];
+		}
+	}
+};
+
+
 class MimeSnifferTest : public CppUnit::TestFixture {
 	CPPUNIT_TEST_SUITE(MimeSnifferTest);
 #ifndef TEST_R5
@@ -83,7 +103,6 @@ class MimeSnifferTest : public CppUnit::TestFixture {
 				const Token* token = stream.Get();
 				CPPUNIT_ASSERT(token);
 				CPPUNIT_ASSERT(*token == *(tokens[j]));
-				delete tokens[j];
 			}
 			CPPUNIT_ASSERT(stream.IsEmpty());
 		} catch (Err* e) {
@@ -166,31 +185,40 @@ public:
 	void BasicTokens_Scanner_ReturnsExpected()
 	{
 		Token* t1[] = {_S("Hey"), _T(LeftBracket), _T(RightBracket), _T(Colon)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("'Hey'[]:", 4, t1);
 	}
 
 	void Numbers_Scanner_ReturnsExpected()
 	{
 		Token* t1[] = {_I(1)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("1", 1, t1);
 		Token* t2[] = {_F(1.0)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("1.0", 1, t2);
 		// priority format variants
 		Token* t3[] = {_F(1.2), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("1.2 ('ABCD')", 4, t3);
 		Token* t4[] = {_F(0.2), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d4(t4, sizeof(t4));
 		_ScannerTestHelper(".2 ('ABCD')", 4, t4);
 		Token* t5[] = {_F(0.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d5(t5, sizeof(t5));
 		_ScannerTestHelper("0. ('ABCD')", 4, t5);
 	}
 
 	void Parenthesized_Scanner_ReturnsExpected()
 	{
 		Token* t1[] = {_F(1.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("1.0 (\"ABCD\")", 4, t1);
 		Token* t2[] = {_F(1.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("1.0 ('ABCD')", 4, t2);
 		Token* t3[] = {_F(1.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("  1.0 ('ABCD')  ", 4, t3);
 	}
 
@@ -199,23 +227,27 @@ public:
 		Token* t1[] = {_F(0.8),		_T(LeftBracket),  _I(0),		 _T(Colon),
 					   _I(3),		_T(RightBracket), _T(LeftParen), _S("ABCDEFG"),
 					   _T(Divider), _S("abcdefghij"), _T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("0.8 [0:3] ('ABCDEFG' | 'abcdefghij')", 11, t1);
 
 		Token* t2[] = {_F(0.5),	   _T(LeftParen), _T(LeftBracket), _I(10), _T(RightBracket),
 					   _S("ABCD"), _T(Divider),	  _T(LeftBracket), _I(17), _T(RightBracket),
 					   _S("abcd"), _T(Divider),	  _T(LeftBracket), _I(13), _T(RightBracket),
 					   _S("EFGH"), _T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("0.5([10]'ABCD'|[17]'abcd'|[13]'EFGH')", 17, t2);
 
 		// whitespace handling
 		Token* t3[] = {_F(0.5),		 _T(LeftBracket), _I(0),		  _T(Colon),	_I(3),
 					   _T(RightBracket), _T(LeftParen),  _S("ABCD"), _T(Divider), _S("abcd"),
 					   _T(Divider),		 _S("EFGH"),	 _T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("0.5  \n   [0:3]  \t ('ABCD' \n | 'abcd' | 'EFGH')", 13, t3);
 
 		Token* t4[] = {_F(0.8),		_T(LeftBracket),  _I(0),		 _T(Colon),
 					   _I(3),		_T(RightBracket), _T(LeftParen), _S("ABCDEFG"),
 					   _T(Divider), _S("abcdefghij"), _T(RightParen)};
+		TokenArrayDeleter d4(t4, sizeof(t4));
 		_ScannerTestHelper("0.8 [  0  :  3  ] ('ABCDEFG' | 'abcdefghij')", 11, t4);
 
 		// alternate whitespace around divider-separated ranges
@@ -230,11 +262,13 @@ public:
 		Token* t6[] = {_F(0.8),		  _T(LeftBracket),	_I(-5),		   _T(Colon),
 					   _I(-3),		  _T(RightBracket), _T(LeftParen), _S("abc"),
 					   _T(Ampersand), _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d6(t6, sizeof(t6));
 		_ScannerTestHelper("0.8 [-5:-3] (\"abc\" & 'abc')", 11, t6);
 
 		Token* t7[] = {_F(0.8),		  _T(LeftBracket),	_I(5),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("abc"),
 					   _T(Ampersand), _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d7(t7, sizeof(t7));
 		_ScannerTestHelper("0.8 [5:3] (\"abc\" & 'abc')", 11, t7);
 	}
 
@@ -242,6 +276,7 @@ public:
 	{
 		Token* t1[] = {_F(1.0),		_T(LeftParen), _S("ABCD"), _T(RightParen),
 					   _T(Divider), _T(LeftParen), _S("EFGH"), _T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("1.0 ('ABCD') | ('EFGH')", 8, t1);
 	}
 
@@ -250,6 +285,7 @@ public:
 		Token* t1[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("ABCDEFG"),
 					   _T(Ampersand), _S("abcdefg"),	_T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("0.8 [0:3] ('ABCDEFG' & 'abcdefg')", 11, t1);
 	}
 
@@ -258,37 +294,44 @@ public:
 		Token* t1[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(4),		  _T(RightBracket), _T(LeftParen), _S("\077Mkj0x34"),
 					   _T(Ampersand), _S("abcdefgh"),	_T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("0.8 [0:4] (\\077Mkj0x34 & 'abcdefgh')", 11, t1);
 
 		Token* t2[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(4),		  _T(RightBracket), _T(LeftParen), _S("\077Mkj\x34"),
 					   _T(Ampersand), _S("abcdefgh"),	_T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("0.8 [0:4] (\\077Mkj\\x34 & 'abcdefgh')", 11, t2);
 
 		Token* t3[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\077034"),
 					   _T(Ampersand), _S("abcd"),		_T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("0.8 [0:3] (\\077034 & 'abcd')", 11, t3);
 
 		// octal escape variants
 		Token* t4[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\077\034"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d4(t4, sizeof(t4));
 		_ScannerTestHelper("0.8 [0:3] (\\077\\034 & 'ab')", 11, t4);
 
 		Token* t5[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\077\034"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d5(t5, sizeof(t5));
 		_ScannerTestHelper("0.8 [0:3] (\\77\\034 & 'ab')", 11, t5);
 
 		Token* t6[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\007"),
 					   _T(Ampersand), _S("a"),			_T(RightParen)};
+		TokenArrayDeleter d6(t6, sizeof(t6));
 		_ScannerTestHelper("0.8 [0:3] (\\7 & 'a')", 11, t6);
 
 		Token* t7[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\017"),
 					   _T(Ampersand), _S("a"),			_T(RightParen)};
+		TokenArrayDeleter d7(t7, sizeof(t7));
 		_ScannerTestHelper("0.8 [0:3] (\"\\17\" & 'a')", 11, t7);
 		_ScannerTestHelper("0.8 [0:3] ('\\17' & 'a')", 11, t7);
 
@@ -296,38 +339,45 @@ public:
 		Token* t8[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("g"),
 					   _T(Ampersand), _S("a"),			_T(RightParen)};
+		TokenArrayDeleter d8(t8, sizeof(t8));
 		_ScannerTestHelper("0.8 [0:3] (\\g & 'a')", 11, t8);
 
 		Token* t9[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("g"),
 					   _T(Ampersand), _S("\b"),			_T(RightParen)};
+		TokenArrayDeleter d9(t9, sizeof(t9));
 		_ScannerTestHelper("0.8 [0:3] (\\g&\\b)", 11, t9);
 
 		Token* t10[] = {_F(0.8),		   _T(LeftBracket), _I(0),		_T(Colon),
 						_I(3),			   _T(RightBracket), _T(LeftParen), _S("g&b"),
 						_T(Ampersand),	   _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d10(t10, sizeof(t10));
 		_ScannerTestHelper("0.8 [0:3] (\\g\\&b & 'abc')", 11, t10);
 
 		// string edge cases
 		Token* t11[] = {_F(0.8),		   _T(LeftBracket), _I(0),		_T(Colon),
 						_I(3),			   _T(RightBracket), _T(LeftParen), _S("ab\""),
 						_T(Ampersand),	   _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d11(t11, sizeof(t11));
 		_ScannerTestHelper("0.8 [0:3] ('ab\"' & 'abc')", 11, t11);
 		_ScannerTestHelper("0.8 [0:3] (\"ab\\\"\" & 'abc')", 11, t11);
 
 		Token* t12[] = {_F(0.8),		   _T(LeftBracket), _I(0),		_T(Colon),
 						_I(3),			   _T(RightBracket), _T(LeftParen), _S("abA"),
 						_T(Ampersand),	   _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d12(t12, sizeof(t12));
 		_ScannerTestHelper("0.8 [0:3] (\"ab\\A\" & 'abc')", 11, t12);
 
 		Token* t13[] = {_F(0.8),		   _T(LeftBracket), _I(0),		_T(Colon),
 						_I(3),			   _T(RightBracket), _T(LeftParen), _S("ab'"),
 						_T(Ampersand),	   _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d13(t13, sizeof(t13));
 		_ScannerTestHelper("0.8 [0:3] (\"ab'\" & 'abc')", 11, t13);
 
 		Token* t14[] = {_F(0.8),		   _T(LeftBracket), _I(0),		_T(Colon),
 						_I(3),			   _T(RightBracket), _T(LeftParen), _S("ab\\"),
 						_T(Ampersand),	   _S("abc"),		_T(RightParen)};
+		TokenArrayDeleter d14(t14, sizeof(t14));
 		_ScannerTestHelper("0.8 [0:3] (\"ab\\\\\" & 'abc')", 11, t14);
 	}
 
@@ -336,22 +386,26 @@ public:
 		Token* t1[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\x34\x57"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("0.8 [0:3] (0x3457 & 'ab')", 11, t1);
 
 		Token* t2[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\xA4\xb7"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("0.8 [0:3] (0xA4b7 & 'ab')", 11, t2);
 
 		// hex escape sequences
 		Token* t3[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\x34\x57"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("0.8 [0:3] (\\x34\\x57 & 'ab')", 11, t3);
 
 		Token* t4[] = {_F(0.8),		  _T(LeftBracket),	_I(0),		   _T(Colon),
 					   _I(3),		  _T(RightBracket), _T(LeftParen), _S("\xA4\xb7"),
 					   _T(Ampersand), _S("ab"),			_T(RightParen)};
+		TokenArrayDeleter d4(t4, sizeof(t4));
 		_ScannerTestHelper("0.8 [0:3] (\\xA4\\xb7 & 'ab')", 11, t4);
 		_ScannerTestHelper("0.8 [0:3] (\"\\xA4\\xb7\" & 'ab')", 11, t4);
 		_ScannerTestHelper("0.8 [0:3] (\'\\xA4\\xb7\' & 'ab')", 11, t4);
@@ -360,15 +414,20 @@ public:
 	void SignedNumbers_Scanner_ReturnsExpected()
 	{
 		Token* t1[] = {_I(-1), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("-1 ('ABCD')", 4, t1);
 		Token* t2[] = {_I(1), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("+1 ('ABCD')", 4, t2);
 		Token* t3[] = {_F(-1.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper("-1.0 ('ABCD')", 4, t3);
 		Token* t4[] = {_F(1.0), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d4(t4, sizeof(t4));
 		_ScannerTestHelper("+1.0 ('ABCD')", 4, t4);
 		// negative priority formats with exponents
 		Token* t5[] = {_F(-1e25), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d5(t5, sizeof(t5));
 		_ScannerTestHelper("-1E25 ('ABCD')", 4, t5);
 		_ScannerTestHelper("-1e25 ('ABCD')", 4, t5);
 		_ScannerTestHelper("-1E+25 ('ABCD')", 4, t5);
@@ -376,6 +435,7 @@ public:
 		_ScannerTestHelper("-1E-25 ('ABCD')", 4, t5);
 		_ScannerTestHelper("-1e-25 ('ABCD')", 4, t5);
 		Token* t6[] = {_F(-0.1e-25), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d6(t6, sizeof(t6));
 		_ScannerTestHelper("-.1E-25 ('ABCD')", 4, t6);
 		_ScannerTestHelper("-.1e-25 ('ABCD')", 4, t6);
 	}
@@ -383,6 +443,7 @@ public:
 	void ExtendedFloats_Scanner_ReturnsExpected()
 	{
 		Token* t1[] = {_F(1e25), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper("1E25 ('ABCD')", 4, t1);
 		_ScannerTestHelper("1e25 ('ABCD')", 4, t1);
 		_ScannerTestHelper("1E+25 ('ABCD')", 4, t1);
@@ -392,11 +453,13 @@ public:
 		_ScannerTestHelper("+1E+25 ('ABCD')", 4, t1);
 		_ScannerTestHelper("+1e+25 ('ABCD')", 4, t1);
 		Token* t2[] = {_F(1e-25), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d2(t2, sizeof(t2));
 		_ScannerTestHelper("1e-25 ('ABCD')", 4, t2);
 		_ScannerTestHelper("1E-25 ('ABCD')", 4, t2);
 		_ScannerTestHelper("+1E-25 ('ABCD')", 4, t2);
 		_ScannerTestHelper("+1e-25 ('ABCD')", 4, t2);
 		Token* t3[] = {_F(0.1e-25), _T(LeftParen), _S("ABCD"), _T(RightParen)};
+		TokenArrayDeleter d3(t3, sizeof(t3));
 		_ScannerTestHelper(".1E-25 ('ABCD')", 4, t3);
 		_ScannerTestHelper(".1e-25 ('ABCD')", 4, t3);
 	}
@@ -458,6 +521,7 @@ public:
 			_S("\xAB\xCD"),
 			_S("\xAB\xCD"),
 			_S("\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFE\xDC\xBA")};
+		TokenArrayDeleter d1(t1, sizeof(t1));
 		_ScannerTestHelper(
 			"0 -0 +0 1 -2 +3 0. -0. +0. 1. -2. +3. 0.0 -0.1 +0.2 1.0 -2.1 +3.2 "
 			"0.e0 0.e-1 0.e+2 1.e1 2.e-2 3.e+3 -1.e1 -2.e-2 -3.e+3 +1.e1 +2.e-2 +3.e+3 "

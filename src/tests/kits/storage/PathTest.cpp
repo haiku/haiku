@@ -590,7 +590,6 @@ public:
 		BPath path("boot", NULL, true);
 		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
 		CPPUNIT_ASSERT(std::string ("/boot") == path.Path());
-		RestoreCWD();
 	}
 
 	void RelativeNonExistingForceNormalized_Constructor_ReturnsNotFound()
@@ -599,7 +598,6 @@ public:
 		BPath path("doesn't/exist/but/who/cares", NULL, true);
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.InitCheck());
 		CPPUNIT_ASSERT(path.Path() == NULL);
-		RestoreCWD();
 	}
 
 	void NonExistingLeafForceNormalized_Constructor_ReturnsNotFound()
@@ -682,7 +680,6 @@ public:
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.SetTo("doesn't/exist/but/who/cares"));
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.InitCheck());
 		CPPUNIT_ASSERT(path.Path() == NULL);
-		RestoreCWD();
 	}
 
 	void RelativeNonExistingLeafNormalized_SetTo_ReturnsNotFound()
@@ -692,7 +689,6 @@ public:
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.SetTo("doesn't/exist", "but/who/cares", true));
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.InitCheck());
 		CPPUNIT_ASSERT(path.Path() == NULL);
-		RestoreCWD();
 	}
 
 	void SelfPath_SetTo_ReturnsSame()
@@ -775,7 +771,6 @@ public:
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.SetTo("doesn't/exist", "but/who/cares"));
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.InitCheck());
 		CPPUNIT_ASSERT(path.Path() == NULL);
-		RestoreCWD();
 	}
 
 	void RelativeAutoNormalizationLeaf_SetTo_ReturnsNormalized()
@@ -785,7 +780,6 @@ public:
 		CPPUNIT_ASSERT_EQUAL(B_OK, path.SetTo("home", "Desktop//"));
 		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
 		CPPUNIT_ASSERT(std::string ("/boot/home/Desktop") == path.Path());
-		RestoreCWD();
 	}
 
 	void ForceNormalized_SetTo_ReturnsOk()
@@ -815,7 +809,6 @@ public:
 		CPPUNIT_ASSERT_EQUAL(B_OK, path.SetTo("boot", NULL, true));
 		CPPUNIT_ASSERT_EQUAL(B_OK, path.InitCheck());
 		CPPUNIT_ASSERT(std::string ("/boot") == path.Path());
-		RestoreCWD();
 	}
 
 	void RelativeNonExistingForceNormalized_SetTo_ReturnsNotFound()
@@ -826,7 +819,6 @@ public:
 			path.SetTo("doesn't/exist/but/who/cares", NULL, true));
 		CPPUNIT_ASSERT_EQUAL(B_ENTRY_NOT_FOUND, path.InitCheck());
 		CPPUNIT_ASSERT(path.Path() == NULL);
-		RestoreCWD();
 	}
 
 	void NullArgs_SetTo_ReturnsBadValue()

@@ -773,7 +773,8 @@ public:
 
 	void WriteOnly_Size_ReturnsOk()
 	{
-		creat(testFilename1, S_IRWXU);
+		int fd = creat(testFilename1, S_IRWXU);
+		close(fd);
 		BFile file;
 		file.SetTo(testFilename1, B_WRITE_ONLY);
 		CPPUNIT_ASSERT_EQUAL(B_OK, file.InitCheck());
@@ -789,7 +790,8 @@ public:
 
 	void Enlarge_Size_ReturnsOk()
 	{
-		creat(testFilename1, S_IRWXU);
+		int fd = creat(testFilename1, S_IRWXU);
+		close(fd);
 		BFile file;
 		file.SetTo(testFilename1, B_READ_WRITE);
 		CPPUNIT_ASSERT_EQUAL(B_OK, file.InitCheck());
@@ -808,6 +810,7 @@ public:
 	{
 		int fd = creat(testFilename1, S_IRWXU);
 		write(fd, testFilename1, 4);
+		close(fd);
 		BFile file;
 		file.SetTo(testFilename1, B_WRITE_ONLY | B_ERASE_FILE);
 		CPPUNIT_ASSERT_EQUAL(B_OK, file.InitCheck());
@@ -825,6 +828,7 @@ public:
 	{
 		int fd = creat(testFilename1, S_IRWXU);
 		write(fd, testFilename1, 4);
+		close(fd);
 		BFile file;
 		file.SetTo(testFilename1, B_READ_WRITE);
 		CPPUNIT_ASSERT_EQUAL(B_OK, file.InitCheck());
