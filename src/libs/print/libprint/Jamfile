@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src libs print libprint ;
 
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ; 
+UsePrivateHeaders shared ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 StaticLibrary libprint.a :
 	AboutBox.cpp
@@ -27,8 +28,8 @@ StaticLibrary libprint.a :
 	PrintUtils.cpp
 	SpoolMetaData.cpp
 	StatusWindow.cpp
+	ToolBarIcons.cpp
 	Transport.cpp
 	UIDriver.cpp
 	ValidRect.cpp
 ;
-

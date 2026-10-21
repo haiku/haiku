@@ -24,9 +24,9 @@ Addon Gutenprint :
 	GPParameterVisitor.cpp
 	GPPrinterDriver.cpp
 	SelectPrinterDialog.cpp
-	: 
-	be 
+	:
+	be
 	[ BuildFeatureAttribute gutenprint : library ]
-	libprint.a 
+	libprint.a shared localestub
 	[ TargetLibstdc++ ]
 ;

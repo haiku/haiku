@@ -20,13 +20,23 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Region.h>
 #include <Screen.h>
-#include <String.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
+#include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <ToolBar.h>
+
+#include "ToolBarIcons.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "libprint_Preview"
 
 
 // #pragma mark - PreviewPage
@@ -275,6 +285,29 @@ PreviewView::Draw(BRect rect)
 
 
 void
+PreviewView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float deltaY;
+			if (message->FindFloat("be:wheel_delta_y", &deltaY) != B_OK)
+				return;
+
+			if (deltaY < 0 && CanZoomIn())
+				ZoomIn();
+			else if (deltaY > 0 && CanZoomOut())
+				ZoomOut();
+			break;
+		}
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 PreviewView::FrameResized(float width, float height)
 {
 	Invalidate();
@@ -466,6 +499,8 @@ PreviewView::ZoomIn()
 		fZoom++;
 		FixScrollbars();
 		Invalidate();
+
+		_Notify(MSG_PREVIEW_ZOOM_UPDATED);
 	}
 }
 
@@ -484,6 +519,8 @@ PreviewView::ZoomOut()
 		fZoom--;
 		FixScrollbars();
 		Invalidate();
+
+		_Notify(MSG_PREVIEW_ZOOM_UPDATED);
 	}
 }
 
@@ -548,6 +585,9 @@ PreviewView::NumberOfPages() const
 {
 	return fNumberOfPages;
 }
+
+
+// #pragma mark -
 
 
 BRect
@@ -775,115 +815,111 @@ int32 PreviewView::_GetPageNumber(int32 index) const
 }
 
 
+void
+PreviewView::_Notify(BMessage* message) const
+{
+	BMessenger target(Window());
+	target.SendMessage(message);
+}
+
+
+void
+PreviewView::_Notify(uint32 what) const
+{
+	BMessage message(what);
+	_Notify(&message);
+}
+
+
 // #pragma mark - PreviewWindow
 
 
 PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
-	: BlockingWindow(BRect(20, 24, 400, 600), "Preview", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS)
-	, fButtonBarHeight(0.0)
+	:
+	BlockingWindow(BRect(40, 40, 400, 600), B_TRANSLATE("Preview"), B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BRect bounds(Bounds());
-
-	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL,
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-					B_PLAIN_BORDER);
-	AddChild(panel);
-
-	bounds.OffsetBy(10.0, 10.0);
-
-	fFirst = new BButton(bounds, "first", "First page", new BMessage(MSG_FIRST_PAGE));
-	panel->AddChild(fFirst);
-	fFirst->ResizeToPreferred();
-
-	bounds.OffsetBy(fFirst->Bounds().Width() + 10.0, 0.0);
-	fPrev = new BButton(bounds, "previous", "Previous page", new BMessage(MSG_PREV_PAGE));
-	panel->AddChild(fPrev);
-	fPrev->ResizeToPreferred();
-
-	bounds.OffsetBy(fPrev->Bounds().Width() + 10.0, 0.0);
-	fNext = new BButton(bounds, "next", "Next page", new BMessage(MSG_NEXT_PAGE));
-	panel->AddChild(fNext);
-	fNext->ResizeToPreferred();
-
-	bounds.OffsetBy(fNext->Bounds().Width() + 10.0, 0.0);
-	fLast = new BButton(bounds, "last", "Last page", new BMessage(MSG_LAST_PAGE));
-	panel->AddChild(fLast);
-	fLast->ResizeToPreferred();
-
-	bounds = fLast->Frame();
-	bounds.OffsetBy(fLast->Bounds().Width() + 10.0, 0.0);
-	fPageNumber = new BTextControl(bounds, "numOfPage", "99", "",
-		new BMessage(MSG_FIND_PAGE));
-	panel->AddChild(fPageNumber);
-	fPageNumber->ResizeToPreferred();
-	fPageNumber->SetDivider(0.0);
-	fPageNumber->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
-	fPageNumber->MoveBy(0.0, bounds.Height() - fPageNumber->Bounds().Height());
-
-	uint32 num;
-	for (num = 0; num <= 255; num++)
-		fPageNumber->TextView()->DisallowChar(num);
-
-	for (num = 0; num <= 9; num++)
-		fPageNumber->TextView()->AllowChar('0' + num);
+	fPageNumber = new BTextControl("numOfPage", " ", "99999", new BMessage(MSG_FIND_PAGE));
 	fPageNumber->TextView()-> SetMaxBytes(5);
+	fPageNumber->SetExplicitSize(fPageNumber->MinSize());
+	fPageNumber->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
 
-	bounds.OffsetBy(fPageNumber->Bounds().Width() + 5.0, 0.0);
-	fPageText = new BStringView(bounds, "pageText", "");
-	panel->AddChild(fPageText);
-	fPageText->ResizeTo(fPageText->StringWidth("of 99999 pages"),
-		fFirst->Bounds().Height());
-
-	bounds.OffsetBy(fPageText->Bounds().Width() + 10.0, 0.0);
-	fZoomIn = new BButton(bounds, "zoomIn", "Zoom in", new BMessage(MSG_ZOOM_IN));
-	panel->AddChild(fZoomIn);
-	fZoomIn->ResizeToPreferred();
-
-	bounds.OffsetBy(fZoomIn->Bounds().Width() + 10.0, 0.0);
-	fZoomOut = new BButton(bounds, "ZoomOut", "Zoom out", new BMessage(MSG_ZOOM_OUT));
-	panel->AddChild(fZoomOut);
-	fZoomOut->ResizeToPreferred();
-
-	fButtonBarHeight = fZoomOut->Frame().bottom + 10.0;
-
-	bounds = Bounds();
-	bounds.top = fButtonBarHeight;
-
-	if (showOkAndCancelButtons) {
-		// adjust preview height
-		bounds.bottom -= fButtonBarHeight;
-		// update the total height of both bars
-		fButtonBarHeight *= 2;
-
-		// cancel printing if user closes the preview window
-		SetUserQuitResult(B_ERROR);
-
-		BButton *printJob = new BButton(BRect(), "printJob", "Print",
-			new BMessage(MSG_PRINT_JOB), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		panel->AddChild(printJob);
-		printJob->ResizeToPreferred();
-		printJob->MoveTo(bounds.right - (printJob->Bounds().Width() + 10.0),
-			bounds.bottom + 10.0);
-
-		BButton *cancelJob = new BButton(BRect(), "cancelJob", "Cancel",
-			new BMessage(MSG_CANCEL_JOB), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		panel->AddChild(cancelJob);
-		cancelJob->ResizeToPreferred();
-		cancelJob->MoveTo(printJob->Frame().left - (10.0 + cancelJob->Bounds().Width()),
-			bounds.bottom + 10.0);
-
-		printJob->MakeDefault(true);
+	for (uint32 c = 0; c <= 255; c++) {
+		if (c >= '0' && c <= '9')
+			fPageNumber->TextView()->AllowChar(c);
+		else
+			fPageNumber->TextView()->DisallowChar(c);
 	}
 
-	bounds.right -= B_V_SCROLL_BAR_WIDTH;
-	bounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	fPageText = new BStringView("pageText", B_TRANSLATE("of 99999 pages"));
+
+	fToolBar = new BToolBar();
+
+	init_tool_bar_icons();
+
+	fToolBar->AddAction(MSG_FIRST_PAGE, this, tool_bar_icon(kIconGoFirst),
+		B_TRANSLATE("Go to first page"));
+	fToolBar->AddAction(MSG_PREV_N_PAGE, this, tool_bar_icon(kIconGoFastBackward),
+		B_TRANSLATE("Go back 10 pages"));
+	fToolBar->AddAction(MSG_PREV_PAGE, this, tool_bar_icon(kIconGoPrevious),
+		B_TRANSLATE("Go to previous page"));
+	fToolBar->AddAction(MSG_NEXT_PAGE, this, tool_bar_icon(kIconGoNext),
+		B_TRANSLATE("Go to next page"));
+	fToolBar->AddAction(MSG_NEXT_N_PAGE, this, tool_bar_icon(kIconGoFastForward),
+		B_TRANSLATE("Go forward 10 pages"));
+	fToolBar->AddAction(MSG_LAST_PAGE, this, tool_bar_icon(kIconGoLast),
+		B_TRANSLATE("Go to last page"));
+
+	fToolBar->AddSeparator();
+
+	fToolBar->AddAction(MSG_ZOOM_IN, this, tool_bar_icon(kIconZoomIn), B_TRANSLATE("Zoom in"));
+	fToolBar->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut), B_TRANSLATE("Zoom out"));
+
+	fToolBar->AddSeparator();
+
+	fToolBar->AddView(fPageNumber);
+	fToolBar->AddView(fPageText);
+
+	fToolBar->AddGlue();
+
+	BRect bounds = Bounds();
+	bounds.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	bounds.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 	fPreview = new PreviewView(jobFile, bounds);
 	fPreviewScroller = new BScrollView("PreviewScroller", fPreview, B_FOLLOW_ALL,
 		B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
 	fPreviewScroller->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	panel->AddChild(fPreviewScroller);
+
+	BGroupView* buttons = new BGroupView(B_HORIZONTAL, B_USE_DEFAULT_SPACING);
+	buttons->Hide();
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(-1, 0, -2, -2)
+		.Add(fToolBar)
+		.Add(fPreviewScroller)
+		.Add(buttons);
+
+	if (showOkAndCancelButtons) {
+		// cancel printing if user closes the preview window
+		SetUserQuitResult(B_ERROR);
+
+		BButton* cancelButton
+			= new BButton("cancelJob", B_TRANSLATE("Cancel"), new BMessage(MSG_CANCEL_JOB));
+		BButton* printButton
+			= new BButton("printJob", B_TRANSLATE("Print"), new BMessage(MSG_PRINT_JOB));
+
+		printButton->MakeDefault(true);
+
+		buttons->Show();
+		buttons->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
+		BGroupLayoutBuilder(buttons)
+			.AddGlue()
+			.Add(cancelButton)
+			.Add(printButton);
+
+		SetLook(B_TITLED_WINDOW_LOOK);
+	}
 
 	if (fPreview->InitCheck() == B_OK) {
 		_ResizeToPage();
@@ -902,12 +938,20 @@ PreviewWindow::MessageReceived(BMessage* m)
 			fPreview->ShowFirstPage();
 			break;
 
-		case MSG_NEXT_PAGE:
-			fPreview->ShowNextPage();
+		case MSG_PREV_N_PAGE:
+			fPreview->ShowFindPage(fPreview->CurrentPage() - 10);
 			break;
 
 		case MSG_PREV_PAGE:
 			fPreview->ShowPrevPage();
+			break;
+
+		case MSG_NEXT_PAGE:
+			fPreview->ShowNextPage();
+			break;
+
+		case MSG_NEXT_N_PAGE:
+			fPreview->ShowFindPage(fPreview->CurrentPage() + 10);
 			break;
 
 		case MSG_LAST_PAGE:
@@ -936,6 +980,9 @@ PreviewWindow::MessageReceived(BMessage* m)
 
 		case MSG_PRINT_JOB:
 			Quit(B_OK);
+			break;
+
+		case MSG_PREVIEW_ZOOM_UPDATED:
 			break;
 
 		default:
@@ -969,9 +1016,11 @@ PreviewWindow::_ResizeToPage()
 	const float windowBorderWidth = 5;
 	const float windowBorderHeight = 5;
 
+	BSize toolBarSize = fToolBar->MinSize();
+
 	BRect rect(fPreview->ViewRect());
-	float width = rect.Width() + 1 + B_V_SCROLL_BAR_WIDTH;
-	float height = rect.Height() + 1 + fButtonBarHeight + B_H_SCROLL_BAR_HEIGHT;
+	float width = rect.Width() + 1 + be_control_look->GetScrollBarWidth(B_VERTICAL);
+	float height = rect.Height() + 1 + be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 	rect = screen.Frame();
 	// dimensions so that window does not reach outside of screen
@@ -979,33 +1028,34 @@ PreviewWindow::_ResizeToPage()
 	float maxHeight = rect.Height() + 1 - windowBorderHeight - Frame().top;
 
 	// width so that all buttons are visible
-	float minWidth = fZoomOut->Frame().right + 10;
+	float minWidth = toolBarSize.width;
 
 	if (width < minWidth) width = minWidth;
 	if (width > maxWidth) width = maxWidth;
 	if (height > maxHeight) height = maxHeight;
 
-	ResizeTo(width, height);
+	fPreviewScroller->SetExplicitMinSize(BSize(width, height));
 }
 
 
 void
 PreviewWindow::_UpdateControls()
 {
-	fFirst->SetEnabled(!fPreview->ShowsFirstPage());
-	fPrev->SetEnabled(!fPreview->ShowsFirstPage());
-	fNext->SetEnabled(!fPreview->ShowsLastPage());
-	fLast->SetEnabled(!fPreview->ShowsLastPage());
-	fZoomIn->SetEnabled(fPreview->CanZoomIn());
-	fZoomOut->SetEnabled(fPreview->CanZoomOut());
+	fToolBar->SetActionEnabled(MSG_FIRST_PAGE, !fPreview->ShowsFirstPage());
+	fToolBar->SetActionEnabled(MSG_PREV_N_PAGE, !fPreview->ShowsFirstPage());
+	fToolBar->SetActionEnabled(MSG_PREV_PAGE, !fPreview->ShowsFirstPage());
+	fToolBar->SetActionEnabled(MSG_NEXT_PAGE, !fPreview->ShowsLastPage());
+	fToolBar->SetActionEnabled(MSG_NEXT_N_PAGE, !fPreview->ShowsLastPage());
+	fToolBar->SetActionEnabled(MSG_LAST_PAGE, !fPreview->ShowsLastPage());
+
+	fToolBar->SetActionEnabled(MSG_ZOOM_IN, fPreview->CanZoomIn());
+	fToolBar->SetActionEnabled(MSG_ZOOM_OUT, fPreview->CanZoomOut());
 
 	BString text;
 	text << fPreview->CurrentPage();
 	fPageNumber->SetText(text.String());
 
-	text.SetTo("of ");
-	text << fPreview->NumberOfPages() << " Page";
-	if (fPreview->NumberOfPages() > 1)
-		text.Append("s");
+	text.SetTo(" / ");
+	text << fPreview->NumberOfPages();
 	fPageText->SetText(text.String());
 }

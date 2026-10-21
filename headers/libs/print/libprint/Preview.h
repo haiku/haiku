@@ -23,6 +23,10 @@ class BScrollView;
 class BStringView;
 class BTextControl;
 
+namespace BPrivate {
+	class BToolBar;
+}
+
 
 // #pragma mark - PreviewPage
 
@@ -49,6 +53,10 @@ private:
 
 // #pragma mark - PreviewView
 
+enum {
+	MSG_PREVIEW_ZOOM_UPDATED
+};
+
 
 class PreviewView : public BView {
 public:
@@ -58,6 +66,7 @@ public:
 	virtual void			Show();
 	virtual void			Hide();
 	virtual void			Draw(BRect r);
+	virtual void			MessageReceived(BMessage* message);
 	virtual void			FrameResized(float width, float height);
 	virtual void			MouseDown(BPoint point);
 	virtual void			MouseMoved(BPoint point, uint32 transit,
@@ -99,6 +108,8 @@ private:
 			void			_DrawMarginFrame(BRect rect);
 
 			int32			_GetPageNumber(int32 index) const;
+			void			_Notify(BMessage* message) const;
+			void			_Notify(uint32 what) const;
 
 private:
 			int32			fPage;
@@ -138,27 +149,23 @@ private:
 			void			_UpdateControls();
 
 private:
-			BButton*		fFirst;
-			BButton*		fNext;
-			BButton*		fPrev;
-			BButton*		fLast;
-			BButton*		fZoomIn;
-			BButton*		fZoomOut;
-			BTextControl*	fPageNumber;
-			BStringView*	fPageText;
-			PreviewView*	fPreview;
-			BScrollView*	fPreviewScroller;
-			float			fButtonBarHeight;
+	BPrivate::BToolBar*		fToolBar;
+	BTextControl*			fPageNumber;
+	BStringView*			fPageText;
+	PreviewView*			fPreview;
+	BScrollView*			fPreviewScroller;
 
-			enum {
-							MSG_FIRST_PAGE = 'pwfp',
-							MSG_NEXT_PAGE  = 'pwnp',
-							MSG_PREV_PAGE  = 'pwpp',
-							MSG_LAST_PAGE  = 'pwlp',
-							MSG_FIND_PAGE  = 'pwsp',
-							MSG_ZOOM_IN    = 'pwzi',
-							MSG_ZOOM_OUT   = 'pwzo',
-							MSG_PRINT_JOB  = 'pwpj',
-							MSG_CANCEL_JOB = 'pwcj',
-			};
+	enum {
+		MSG_FIRST_PAGE 	= 'pwfp',
+		MSG_PREV_N_PAGE = 'pwpn',
+		MSG_PREV_PAGE  	= 'pwpp',
+		MSG_NEXT_PAGE  	= 'pwnp',
+		MSG_NEXT_N_PAGE = 'pwnn',
+		MSG_LAST_PAGE  	= 'pwlp',
+		MSG_FIND_PAGE  	= 'pwsp',
+		MSG_ZOOM_IN    	= 'pwzi',
+		MSG_ZOOM_OUT   	= 'pwzo',
+		MSG_PRINT_JOB  	= 'pwpj',
+		MSG_CANCEL_JOB 	= 'pwcj',
+	};
 };

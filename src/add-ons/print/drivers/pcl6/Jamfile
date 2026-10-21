@@ -12,5 +12,5 @@ Addon PCL6\ Compatible :
 	PCL6Rasterizer.cpp
 	PCL6Writer.cpp
 	Rasterizer.cpp
-	: be libprint.a [ TargetLibstdc++ ]
+	: be libprint.a shared localestub [ TargetLibstdc++ ]
 ;
