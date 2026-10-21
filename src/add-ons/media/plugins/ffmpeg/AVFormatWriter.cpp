@@ -637,20 +637,20 @@ AVFormatWriter::_Seek(void* cookie, off_t offset, int whence)
 
 	AVFormatWriter* writer = reinterpret_cast<AVFormatWriter*>(cookie);
 
-	BMediaIO* mediaIO = dynamic_cast<BMediaIO*>(writer->fTarget);
-	if (mediaIO == NULL)
+	BPositionIO* positionIO = dynamic_cast<BPositionIO*>(writer->fTarget);
+	if (positionIO == NULL)
 		return -1;
 
 	// Support for special file size retrieval API without seeking anywhere:
 	if (whence == AVSEEK_SIZE) {
 		off_t size;
-		if (mediaIO->GetSize(&size) == B_OK)
+		if (positionIO->GetSize(&size) == B_OK)
 			return size;
 
 		return -1;
 	}
 
-	off_t position = mediaIO->Seek(offset, whence);
+	off_t position = positionIO->Seek(offset, whence);
 	TRACE_IO("  position: %lld\n", position);
 	if (position < 0)
 		return -1;
