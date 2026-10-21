@@ -665,6 +665,10 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		return B_NO_MEMORY;
 
 	AVPacket* pkt = av_packet_alloc();
+	if (pkt == NULL)
+		return B_NO_MEMORY;
+
+	status_t encodeStatus = B_OK;
 	while (frameCount > 0) {
 		int bpr = fInputFormat.u.raw_video.display.bytes_per_row;
 		size_t bufferSize = fInputFormat.u.raw_video.display.line_count * bpr;
@@ -674,14 +678,16 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		sws_scale(fSwsContext, &buf8, &bpr, 0,
 			fInputFormat.u.raw_video.display.line_count, fFrame->data,
 			fFrame->linesize);
-		
-		if (_EncodeVideoFrame(fFrame, pkt, info) == B_OK) {
-			// Skip to the next frame (but usually, there is only one to encode
-			// for video).
-			frameCount--;
-			fFramesWritten++;
-			buffer = (const void*)((const uint8*)buffer + bufferSize);
-		}
+
+		encodeStatus = _EncodeVideoFrame(fFrame, pkt, info);
+		if (encodeStatus != B_OK)
+			break;
+
+		// Skip to the next frame (but usually, there is only one to encode
+		// for video).
+		frameCount--;
+		fFramesWritten++;
+		buffer = (const void*)((const uint8*)buffer + bufferSize);
 	}
 
 	// TODO: we should pass a NULL AVFrame and enter "draining" mode, then flush buffers
@@ -692,7 +698,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	//_EncodeVideoFrame(NULL, pkt, info);
 	//avcodec_flush_buffers(fCodecContext);
 	av_packet_free(&pkt);
-	return B_OK;
+	return encodeStatus;
 }
 
 
@@ -710,6 +716,7 @@ AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_in
 	if (frame != NULL)
 		frame->pts++;
 	
+	status_t status = B_OK;
 	while (result == 0) {
 		result = avcodec_receive_packet(fCodecContext, pkt);
 		if (result == 0) {
@@ -733,18 +740,24 @@ AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_in
 				info->flags |= B_MEDIA_KEY_FRAME;
 	
 			// Write the chunk
-			result = WriteChunk(pkt->data, pkt->size, info);
-			if (result != B_OK) {
-				TRACE("  error writing chunk: %s\n", strerror(result));
+			status = WriteChunk(pkt->data, pkt->size, info);
+			if (status != B_OK) {
+				TRACE("  error writing chunk: %s\n", strerror(status));
 				break;
 			}
 		}	
 		av_packet_unref(pkt);
 	}
+
+	TRACE("   _EncodeVideoFrame(): returning...\n");
+
+	if (status != B_OK)
+		return status;
+
+	// decoder wants more input
 	if (result == AVERROR(EAGAIN))
 		return B_OK;
 
-	TRACE("   _EncodeVideoFrame(): returning...\n");
-	return result;
+	return B_ERROR;
 }
 
