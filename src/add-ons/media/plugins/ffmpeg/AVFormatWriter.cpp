@@ -395,14 +395,13 @@ AVFormatWriter::~AVFormatWriter()
 	TRACE("AVFormatWriter::~AVFormatWriter\n");
 
 	// Free the streams and close the AVCodecContexts
-	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
-		av_freep(&fFormatContext->streams[i]->codecpar);
-		av_freep(&fFormatContext->streams[i]);
+	if (fFormatContext != NULL)
+		avformat_free_context(fFormatContext);
+	if (fIOContext != NULL) {
+		// Frees the buffer pointer and sets it to NULL
+		av_freep(&fIOContext->buffer);
+		avio_context_free(&fIOContext);
 	}
-
-	avformat_free_context(fFormatContext);
-	av_free(fIOContext->buffer);
-	av_free(fIOContext);
 }
 
 
@@ -542,6 +541,9 @@ AVFormatWriter::AllocateCookie(void** _cookie, media_format* format,
 
 	StreamCookie* cookie = new(std::nothrow) StreamCookie(fFormatContext,
 		&fStreamLock);
+
+	if (cookie == NULL)
+		return B_NO_MEMORY;
 
 	status_t ret = cookie->Init(format, codecInfo);
 	if (ret != B_OK) {
