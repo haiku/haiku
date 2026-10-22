@@ -95,6 +95,8 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_CURSOR_STYLE,		PREF_BLOCK_CURSOR },
 	{ PREF_EMULATE_BOLD,		PREF_FALSE },
 
+	{ PREF_ALTERNATE_SCROLL,	PREF_FALSE },
+
 	{ NULL, NULL},
 };
 

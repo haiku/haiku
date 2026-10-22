@@ -35,6 +35,8 @@ TerminalBuffer::TerminalBuffer()
 	fListenerValid(false),
 	fMode(MODE_INTERPRET_META_KEY | MODE_META_KEY_SENDS_ESCAPE | MODE_CURSOR_BLINKING),
 	fCursorStyle(BLOCK_CURSOR),
+	fMouseMode(MOUSE_MODE_OFF),
+	fMouseProtocol(MOUSE_PROTOCOL_X10),
 	fNextOSCRef(1)
 {
 }
@@ -131,6 +133,20 @@ void
 TerminalBuffer::SetEncoding(int encoding)
 {
 	fEncoding = encoding;
+}
+
+
+void
+TerminalBuffer::SetMouseMode(MouseMode mouseMode)
+{
+	fMouseMode = mouseMode;
+}
+
+
+void
+TerminalBuffer::SetMouseProtocol(MouseProtocol mouseProtocol)
+{
+	fMouseProtocol = mouseProtocol;
 }
 
 

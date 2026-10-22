@@ -259,9 +259,9 @@ private:
 			void				_ScrollTo(float y, bool scrollGfx);
 			void				_ScrollToRange(TermPos start, TermPos end);
 
-			void				_SendMouseEvent(int32 button, int32 mode,
+			void				_SendMouseEvent(int32 button, int32 modifiers,
 									int32 x, int32 y, bool motion,
-									bool upEvent = false);
+									bool upEvent, int wheelButtons = 0);
 
 			void				_DrawInlineMethodString();
 			void				_HandleInputMethodChanged(BMessage* message);

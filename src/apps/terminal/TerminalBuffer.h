@@ -48,6 +48,12 @@ public:
 			inline const rgb_color*
 								Palette() const { return fColorsPalette; }
 
+			void				SetMouseMode(MouseMode mouseMode);
+			bool				IsMouseMode(MouseMode mouseMode) { return mouseMode == fMouseMode; };
+			void				SetMouseProtocol(MouseProtocol mouseProtocol);
+			bool				IsMouseProtocol(MouseProtocol mouseProtocol) {
+									return mouseProtocol == fMouseProtocol; };
+
 			void				NotifyQuit(int32 reason);
 
 	virtual	status_t			ResizeTo(int32 width, int32 height);
@@ -85,6 +91,8 @@ private:
 
 			uint32				fMode;
 			int					fCursorStyle;
+			int					fMouseMode;
+			int					fMouseProtocol;
 
 			typedef HashMap<HashKey32<int32>, HyperLink*> HyperLinkRefMap;
 			HyperLinkRefMap		fHyperLinkForRef;

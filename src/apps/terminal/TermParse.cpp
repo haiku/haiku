@@ -53,7 +53,7 @@ extern int gEscIgnoreTable[];		/* ESC ignore table */
 extern const char* gLineDrawCharacterSet[]; /* may be used for G0, G1, G2, G3 */
 
 #define DEFAULT -1
-#define NPARAM 10		// Max parameters
+#define NPARAM 16 // Max parameters is 16 as per DEC STD-070 page 2-7.
 
 
 //! Get char from pty reader buffer.
@@ -1583,7 +1583,7 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 9:
 			// Set Mouse X and Y on button press.
-			fBuffer->SetMode(MODE_REPORT_X10_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_X10);
 			break;
 		case 12:
 			// Start Blinking Cursor.
@@ -1599,20 +1599,28 @@ TermParse::_DecPrivateModeSet(int value)
 			break;
 		case 1000:
 			// Send Mouse X & Y on button press and release.
-			fBuffer->SetMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_NORMAL);
 			break;
 		case 1002:
 			// Send Mouse X and Y on button press and release, and on motion
 			// when the mouse enter a new cell
-			fBuffer->SetMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_BUTTON_EVENT);
 			break;
 		case 1003:
 			// Use All Motion Mouse Tracking
-			fBuffer->SetMode(MODE_REPORT_ANY_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_ANY_EVENT);
+			break;
+		case 1005:
+			// Enable extended mouse coordinates with UTF-8 scheme
+			fBuffer->SetMouseProtocol(MOUSE_PROTOCOL_UTF8);
 			break;
 		case 1006:
 			// Enable extended mouse coordinates with SGR scheme
-			fBuffer->SetMode(MODE_EXTENDED_MOUSE_COORDINATES);
+			fBuffer->SetMouseProtocol(MOUSE_PROTOCOL_SGR);
+			break;
+		case 1007:
+			// Enable alternate scroll
+			fBuffer->SetMode(MODE_ALTERNATE_SCROLL);
 			break;
 		case 1034:
 			// Interpret "meta" key, sets eighth bit.
@@ -1674,7 +1682,7 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 9:
 			// Disable Mouse X and Y on button press.
-			fBuffer->ResetMode(MODE_REPORT_X10_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_OFF);
 			break;
 		case 12:
 			// Stop Blinking Cursor.
@@ -1690,20 +1698,30 @@ TermParse::_DecPrivateModeReset(int value)
 			break;
 		case 1000:
 			// Don't send Mouse X & Y on button press and release.
-			fBuffer->ResetMode(MODE_REPORT_NORMAL_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_OFF);
 			break;
 		case 1002:
 			// Don't send Mouse X and Y on button press and release, and on motion
 			// when the mouse enter a new cell
-			fBuffer->ResetMode(MODE_REPORT_BUTTON_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_OFF);
 			break;
 		case 1003:
 			// Disable All Motion Mouse Tracking.
-			fBuffer->ResetMode(MODE_REPORT_ANY_MOUSE_EVENT);
+			fBuffer->SetMouseMode(MOUSE_MODE_OFF);
+			break;
+		case 1005:
+			// Disable extended mouse coordinates with UTF8 scheme
+			if (fBuffer->IsMouseProtocol(MOUSE_PROTOCOL_UTF8))
+				fBuffer->SetMouseProtocol(MOUSE_PROTOCOL_X10);
 			break;
 		case 1006:
 			// Disable extended mouse coordinates with SGR scheme
-			fBuffer->ResetMode(MODE_EXTENDED_MOUSE_COORDINATES);
+			if (fBuffer->IsMouseProtocol(MOUSE_PROTOCOL_SGR))
+				fBuffer->SetMouseProtocol(MOUSE_PROTOCOL_X10);
+			break;
+		case 1007:
+			// Disable alternate scroll
+			fBuffer->ResetMode(MODE_ALTERNATE_SCROLL);
 			break;
 		case 1034:
 			// Don't interpret "meta" key.
@@ -1762,6 +1780,10 @@ TermParse::_DecPrivateModeRequest(int value)
 			// Request Auto Wrap mode
 			reply.SetToFormat("\033[?7;%u$y", fBuffer->IsAutoWrapMode() ? 1 : 2);
 			break;
+		case 9:
+			// Request X10 mouse mode
+			reply.SetToFormat("\033[?9;%u$y", fBuffer->IsMouseMode(MOUSE_MODE_X10) ? 1 : 2);
+			break;
 		case 12:
 			// Request cursor blinking mode
 			reply.SetToFormat("\033[?12;%u$y", fBuffer->IsMode(MODE_CURSOR_BLINKING) ? 1 : 2);
@@ -1770,10 +1792,33 @@ TermParse::_DecPrivateModeRequest(int value)
 			// Request hidden cursor mode
 			reply.SetToFormat("\033[?25;%u$y", fBuffer->IsMode(MODE_CURSOR_HIDDEN) ? 1 : 2);
 			break;
+		case 1000:
+			// Request normal tracking mouse mode
+			reply.SetToFormat("\033[?1000;%u$y", fBuffer->IsMouseMode(MOUSE_MODE_NORMAL) ? 1 : 2);
+			break;
+		case 1002:
+			// Request button-event mouse mode
+			reply.SetToFormat("\033[?1002;%u$y",
+				fBuffer->IsMouseMode(MOUSE_MODE_BUTTON_EVENT) ? 1 : 2);
+			break;
+		case 1003:
+			// Request any-event mouse mode
+			reply.SetToFormat("\033[?1003;%u$y",
+				fBuffer->IsMouseMode(MOUSE_MODE_ANY_EVENT) ? 1 : 2);
+			break;
+		case 1005:
+			// Request extended mouse coordinates with UTF8 scheme
+			reply.SetToFormat("\033[?1005;%u$y",
+				fBuffer->IsMouseProtocol(MOUSE_PROTOCOL_UTF8) ? 1 : 2);
+			break;
 		case 1006:
 			// Request extended mouse coordinates with SGR scheme
 			reply.SetToFormat("\033[?1006;%u$y",
-				fBuffer->IsMode(MODE_EXTENDED_MOUSE_COORDINATES) ? 1 : 2);
+				fBuffer->IsMouseProtocol(MOUSE_PROTOCOL_SGR) ? 1 : 2);
+			break;
+		case 1007:
+			// Request alternate scroll mode
+			reply.SetToFormat("\033[?1007;%u$y", fBuffer->IsMode(MODE_ALTERNATE_SCROLL) ? 1 : 2);
 			break;
 		case 1034:
 			// Request interpret meta key
