@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010 Haiku Inc. All rights reserved.
+ * Copyright 2001-2026 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,17 +12,23 @@
 #include <stdio.h>
 
 #include <Alert.h>
-#include <Message.h>
+#include <Catalog.h>
 #include <Directory.h>
-#include <SupportKit.h>
-#include <String.h>
+#include <Message.h>
 #include <NetEndpoint.h>
+#include <String.h>
+#include <SupportKit.h>
 
 #include "SetupWindow.h"
 
 
-HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
-	: fHost(""),
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "HPJetDirectTransport"
+
+
+HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage* msg)
+	:
+	fHost(""),
 	fPort(9100),
 	fEndpoint(NULL),
 	fReady(B_ERROR)
@@ -54,7 +60,7 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 
 	fEndpoint = new(std::nothrow) BNetEndpoint(SOCK_STREAM);
 	if (fEndpoint == NULL || (fReady = fEndpoint->InitCheck()) != B_OK) {
-		BAlert *alert = new BAlert("", "Fail to create the NetEndpoint!", "OK");
+		BAlert* alert = new BAlert("", B_TRANSLATE("Fail to create the NetEndpoint!"), kOKLabel);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		delete fEndpoint;
@@ -67,8 +73,8 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 			fHost.String(), fPort);
 		fReady = B_OK;
 	} else {
-		BAlert *alert = new BAlert("",
-			"Can't connect to HP JetDirect printer port!", "OK");
+		BAlert* alert
+			= new BAlert("", B_TRANSLATE("Can't connect to HP JetDirect printer port!"), kOKLabel);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		fReady = B_ERROR;
