@@ -87,15 +87,18 @@ JobQueue::AddJob(BJob* job)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
+	JobPriorityQueue::iterator found = fQueuedJobs->find(job);
+	if (found != fQueuedJobs->end())
+		return B_NAME_IN_USE;
+
 	try {
-		if (!fQueuedJobs->insert(job).second)
-			return B_NAME_IN_USE;
+		BJob::Private(*job).SetTicketNumber(fNextTicketNumber++);
+		fQueuedJobs->insert(job);
 	} catch (const std::bad_alloc& e) {
 		return B_NO_MEMORY;
 	} catch (...) {
 		return B_ERROR;
 	}
-	BJob::Private(*job).SetTicketNumber(fNextTicketNumber++);
 	job->AddStateListener(this);
 	if (job->IsRunnable())
 		release_sem(fHaveRunnableJobSem);
@@ -123,6 +126,37 @@ JobQueue::RemoveJob(BJob* job)
 	}
 
 	return B_OK;
+}
+
+
+void
+JobQueue::RemoveDependency(BJob* dependantJob, BJob* job)
+{
+	BAutolock lock(&fLock);
+	if (!lock.IsLocked())
+		return;
+
+	JobPriorityQueue::iterator found = fQueuedJobs->find(dependantJob);
+	bool removed = false;
+	if (found != fQueuedJobs->end()) {
+		try {
+			fQueuedJobs->erase(dependantJob);
+			removed = true;
+		} catch (...) {
+		}
+	}
+
+	dependantJob->RemoveDependency(job);
+
+	if (removed) {
+		// Only insert a job if it was in our queue before
+		try {
+			fQueuedJobs->insert(dependantJob);
+			if (dependantJob->IsRunnable())
+				release_sem(fHaveRunnableJobSem);
+		} catch (...) {
+		}
+	}
 }
 
 

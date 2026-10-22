@@ -28,10 +28,10 @@ public:
 									// takes ownership
 			status_t			RemoveJob(BJob* job);
 									// gives up ownership
+			void				RemoveDependency(BJob* dependantJob, BJob* job);
 
 			BJob*				Pop();
-			status_t			Pop(bigtime_t timeout, bool returnWhenEmpty,
-									BJob** _job);
+			status_t			Pop(bigtime_t timeout, bool returnWhenEmpty, BJob** _job);
 									// caller owns job
 
 			size_t				CountJobs() const;

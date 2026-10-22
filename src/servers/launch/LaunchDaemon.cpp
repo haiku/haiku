@@ -1831,7 +1831,7 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 
 			// job conditions not present, launch
 			while (BJob* dependantJob = job->DependantJobAt(0))
-				dependantJob->RemoveDependency(job);
+				fJobQueue.RemoveDependency(dependantJob, job);
 		}
 	}
 
