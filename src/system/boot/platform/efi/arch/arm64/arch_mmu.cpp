@@ -211,6 +211,19 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 		return;
 	}
 
+	uint64 virt_offset = virt_addr % B_PAGE_SIZE;
+	uint64 phys_offset = phys_addr % B_PAGE_SIZE;
+
+	if (virt_offset != phys_offset) {
+		panic("map_range: page offset mismatch: virt=%#lx phys=%#lx size=%#lx",
+			(unsigned long)virt_addr, (unsigned long)phys_addr,
+			(unsigned long)size);
+	}
+
+	virt_addr -= virt_offset;
+	phys_addr -= phys_offset;
+	size = ROUNDUP(size + phys_offset, B_PAGE_SIZE);
+
 	uint64 address;
 	if (arch_mmu_is_kernel_address(virt_addr)) {
 		address = (uint64)sTTBR1;
@@ -218,7 +231,7 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 		address = (uint64)sTTBR0;
 	}
 
-	map_region(virt_addr, phys_addr, PAGE_ALIGN(size),
+	map_region(virt_addr, phys_addr, size,
 		0, flags, reinterpret_cast<uint64*>(address));
 
 	if (arch_mmu_is_kernel_address(virt_addr)) {
@@ -345,17 +358,21 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	if (gKernelArgs.arch_args.uart.kind[0] != 0) {
 		// Map uart because we want to use it during early boot.
 		uint64 regs_start = gKernelArgs.arch_args.uart.regs.start;
-		uint64 regs_size = ROUNDUP(gKernelArgs.arch_args.uart.regs.size, B_PAGE_SIZE);
-		uint64 base = get_next_virtual_address(regs_size);
+		uint64 regs_size = gKernelArgs.arch_args.uart.regs.size;
+
+		// The registers may not start on a page boundary,
+		// so keep that offset in the virtual address given to the kernel
+		uint64 regs_offset = regs_start % B_PAGE_SIZE;
+		uint64 base = get_next_virtual_address(ROUNDUP(regs_size + regs_offset, B_PAGE_SIZE));
 
 		map_range(regs_start, regs_start, regs_size,
 			ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute |
 			currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
-		map_range(base, regs_start, regs_size,
+		map_range(base + regs_offset, regs_start, regs_size,
 			ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute |
 			currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
 
-		gKernelArgs.arch_args.uart.regs.start = base;
+		gKernelArgs.arch_args.uart.regs.start = base + regs_offset;
 	}
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
