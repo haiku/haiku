@@ -2097,13 +2097,13 @@ get_dir_path_and_leaf(char* path, char* filename)
 		if (strlcpy(filename, path, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
 
-		strcpy(path, ".");
+		strcpy(path, "./");
 	} else {
 		last++;
 		if (last[0] == '\0') {
 			// special case: the path ends in one or more '/' - remove them
 			while (*--last == '/' && last != path);
-			last[1] = '\0';
+			last[2] = '\0';
 
 			// pathnames that end with one or more trailing slash characters
 			// must refer to directory paths
@@ -2116,7 +2116,8 @@ get_dir_path_and_leaf(char* path, char* filename)
 			return B_NAME_TOO_LONG;
 
 		last[0] = '.';
-		last[1] = '\0';
+		last[1] = '/';
+		last[2] = '\0';
 	}
 	return B_OK;
 }
