@@ -4,9 +4,12 @@ volumeName="qemu vvfat"
 
 /bin/mountvolume -alldos
 cp -r /system/add-ons/unittests /boot/home
-(cd /boot/home/unittests && UnitTester) > /"$volumeName"/test_result.txt 2>&1
+(cd /boot/home/unittests && UnitTester > /boot/home/test_result.txt 2>&1; echo $? > /boot/home/test_exit_code.txt) &
+tail -f /boot/home/test_result.txt > /dev/dprintf &
+wait %1
 
 sleep 5 # in case there is a crash and report has to be written
+cp /boot/home/test_result.txt /"$volumeName"/
 cp /boot/home/Desktop/*.report /"$volumeName"/
 
 sync
