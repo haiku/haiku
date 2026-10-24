@@ -185,7 +185,14 @@ arch_smp_boot_other_cpus(addr_t ttbr1, uint64 kernelEntry, addr_t virtKernelArgs
 			break;
 		case CpuEnableMethod::SpinTable:
 			*((uint64*)cpu->releaseAddr) = (uint64)arm64_secondary_startup;
-			asm("sev");
+			// The secondary CPUs have to read from RAM because their caches are disabled.
+			// Clean the cache line holding the release address before waking them.
+			asm volatile(
+				"dc cvac, %0\n"
+				"dsb sy\n"
+				"sev\n"
+				:: "r" (cpu->releaseAddr) : "memory"
+			);
 			break;
 		default:
 			// Unreachable, we set sCpuCount to 0 already
