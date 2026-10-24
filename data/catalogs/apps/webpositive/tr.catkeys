@@ -43,7 +43,7 @@ Proxy server port:	Settings Window		Vekil sunucu kapısı:
 Error opening downloads folder	Download Window		İndirilenler klasörü açılırken hata
 Show bookmark bar	WebPositive Window		Yer imi çubuğunu göster
 Find	WebPositive Window		Bul
-Standard font:	Settings Window		Standart yazıtipi:
+Standard font:	Settings Window		Standart font:
 Open download error	Download Window		İndirilen açılırken hata
 General	Settings Window		Genel
 New tabs:	Settings Window		Yeni sekmeler:
@@ -52,8 +52,8 @@ Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
 Darn!	WebPositive		Tüh!
 Decrease size	WebPositive Window		Küçült
-Default fixed font size:	Settings Window		Saptanmış eş aralıklı yazıtipi boyutu:
-Sans serif font:	Settings Window		Sans serif yazıtipi:
+Default fixed font size:	Settings Window		Saptanmış eş aralıklı font puntosu:
+Sans serif font:	Settings Window		Serifsiz font:
 Clear	WebPositive Window		Temizle
 The download could not be opened.	Download Window		İndirilen öge açılamadı.
 Cookies for %s	Cookie Manager		%s için çerezler
@@ -104,14 +104,14 @@ Rename bookmark	BookmarkBar		Yer imini yeniden adlandır
 Manage bookmarks	WebPositive Window		Yer imlerini yönet
 /s)	Download Window	...as in 'per second'	/sn)
 Restart	Download Window		Yeniden başlat
-Serif font:	Settings Window		Serif yazıtipi:
+Serif font:	Settings Window		Serifli font:
 Apply	Settings Window		Uygula
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Yer imleri klasörünü açmaya çalışırken bir hata oluştu.\n\nHata: %error
 Revert	Settings Window		Eski haline döndür
 Copy	WebPositive Window		Kopyala
 Your CPU is too old and does not support the SSE2 extensions, without which %appname% cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve %appname% uygulamasının çalışması için gerekli olan SSE2 genişletmelerini desteklemiyor. Bunun yerine NetSurf uygulamasını kurmanızı öneririz.
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Son satır # kez yinelendi.}other{Son satır # kez yinelendi.}}
-Default standard font size:	Settings Window		Saptanmış standart yazıtipi boyutu:
+Default standard font size:	Settings Window		Saptanmış standart font puntosu:
 Custom	Settings Window		Özel
 Bookmark this page	WebPositive Window		Bu sayfaya yer imi koy
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
@@ -125,7 +125,7 @@ Reset size	WebPositive Window		Boyutu sıfırla
 History	WebPositive Window		Geçmiş
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemeyi gerçekten istiyor musunuz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
-Fixed font:	Settings Window		Eş aralıklı yazıtipi
+Fixed font:	Settings Window		Eş aralıklı font
 Quit	WebPositive Window		Çık
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Arama dizgisinin önceki oluşumlarını bul
 Remember username and password for this site	Authentication Panel		Bu site için kullanıcı adı ve parolayı hatırla

@@ -5,7 +5,7 @@ Rotation: %d	ControlView		Dönüş: %d
 Shear: %d	ControlView		Kırp: %d
 Spacing: %d	ControlView		Boşluk: %d
 Cycle fonts	ControlView		Yazıtiplerini çevir
-Font:	ControlView		Yazıtipi:
+Font:	ControlView		Font:
 Drawing mode:	ControlView		Çizim kipi:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Denetimler

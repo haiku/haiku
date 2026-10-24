@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Time	1111403326
+1	turkish	x-vnd.Haiku-Time	365252571
 OK	Time		Tamam
 Message receiving failed	Time		İleti alımı başarısız
 Australia	Time		Avustralya
@@ -22,6 +22,7 @@ Local time (Windows compatible)	Time		Yerel zaman (Windows uyumlu)
 Hardware clock set to:	Time		Donanım saati şuna ayarlı:
 Arctic	Time		Kuzey Kutup Bölgesi
 Antarctica	Time		Antartika
+The following error occurred while synchronizing:\n%s: %s	Time		Eşzamanlama sırasında aşağıdaki hatalar oluştu:\n%s: %s
 GMT (UNIX compatible)	Time		GMT (UNIX uyumlu)
 Africa	Time		Afrika
 Stop	Time		Durdur

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	2786669505
+1	romanian	x-vnd.Haiku-CodyCam	384853512
 destination directory expected	CodyCam		dosar de destinație așteptat
 reply: '%s'\n	SftpClient		răspuns: „%s”\n
 PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (parolă reală trimisă)
@@ -50,6 +50,7 @@ server address expected	CodyCam		adresă de server așteptată
 Cannot start the video window	CodyCam		Nu se poate porni fereastra video
 reply: %d, %d\n	FtpClient		răspuns: %d, %d\n
 Cannot set the time source for the video window	CodyCam		Nu se poate stabili sursa de timp pentru fereastra video
+Cannot find a video source.\nYou need a webcam to use %appname%.	CodyCam		Nu se poate găsi o sursă video.\nAveți nevoie de o cameră web pentru a utiliza %appname%.
 Every 15 minutes	CodyCam		La fiecare 15 minute
 Every 24 hours	CodyCam		La fiecare 24 de ore
 Image Format Menu	CodyCam		Meniu format de imagine

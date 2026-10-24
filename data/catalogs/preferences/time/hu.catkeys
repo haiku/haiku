@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	1111403326
+1	hungarian	x-vnd.Haiku-Time	365252571
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
 Australia	Time		Ausztrália
@@ -22,6 +22,7 @@ Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
 Hardware clock set to:	Time		A hardveres óra beállítva erre:
 Arctic	Time		Arktisz
 Antarctica	Time		Antarktisz
+The following error occurred while synchronizing:\n%s: %s	Time		Az alábbi hiba történt szinkronizálás közben:\n%s: %s
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 Africa	Time		Afrika
 Stop	Time		Leállítás

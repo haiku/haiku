@@ -1,14 +1,16 @@
-1	romanian	x-vnd.Be-TSKB	3780974715
+1	romanian	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Ascundere automată
 Show all	WindowMenu		Afișează toate
 Edit in Tracker…	PreferencesWindow		Editare în Tracker…
 Menu	PreferencesWindow		Meniu
+Location	PreferencesWindow		Locație
 Tracker always first	PreferencesWindow		Tracker întotdeauna primul
 Hide clock	TimeView		Ascunde ceasul
 Large	PreferencesWindow		Mare
 <Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
 Recent documents	DeskbarMenu		Documente recente
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
+%appname% preferences	PreferencesWindow		Preferințe %appname%
 Always on top	PreferencesWindow		Întotdeauna deasupra
 Restart system	DeskbarMenu		Repornire sistem
 Recent documents:	PreferencesWindow		Documente recente:
@@ -28,12 +30,14 @@ Close all	WindowMenu		Închide toate
 About this system	DeskbarMenu		Despre acest sistem
 Quit application	WindowMenu		Ieșire din aplicație
 Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Aplicații
 Show application expander	PreferencesWindow		Arată extensorul de aplicație
 Suspend	DeskbarMenu		Suspendare
 Shutdown…	DeskbarMenu		Oprire…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
 Expand new applications	PreferencesWindow		Extinde aplicațiile noi
+%appname% preferences…	DeskbarMenu		Preferințe %appname%…
 Recent applications:	PreferencesWindow		Aplicații recente:
 Recent folders:	PreferencesWindow		Dosare recente:
 Recent folders	DeskbarMenu		Dosare recente

@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-Expander	1987011430
+1	ukrainian	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		Скасувати
 Destination	ExpanderWindow		Куди розпакувати
 Other	ExpanderPreferences		Інше
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
@@ -40,6 +41,7 @@ Expansion	ExpanderPreferences		Розпаковка
 Set destination…	ExpanderMenu		Куди розпакувати…
 Continue	ExpanderWindow		Продовжити
  is not supported	ExpanderWindow		 не підтримується
+OK	PasswordAlert		OK
 Cancel	ExpanderPreferences		Скасувати
 Use:	ExpanderPreferences		Використати іншу папку:
 Destination folder	ExpanderPreferences		Папка призначення

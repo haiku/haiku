@@ -87,7 +87,7 @@ Characters:	Statistics		Karakter:
 Error loading \"%filename%\":\n\tUnsupported format	LoadAlert		“%filename%” yüklenirken hata:\n\tDesteklenmeyen biçim
 Don't save	QuitAlert		Kaydetme
 Align	Menus		Hizalama
-Font	Menus		Yazıtipi
+Font	Menus		Font
 Select all	Menus		Tümünü seç
 Right	Menus		Sağ
 Error loading \"%filename%\":\n\t%error%	LoadAlert		“%filename%” yüklenirken hata:\n\t%error%

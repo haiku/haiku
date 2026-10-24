@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Time	1111403326
+1	catalan; valencian	x-vnd.Haiku-Time	365252571
 OK	Time		D'acord
 Message receiving failed	Time		Ha fallat rebre el missatge.
 Australia	Time		Austràlia
@@ -22,6 +22,7 @@ Local time (Windows compatible)	Time		Hora local (compatible amb el Windows)
 Hardware clock set to:	Time		El rellotge del maquinari s'ha establert a:
 Arctic	Time		Àrtic
 Antarctica	Time		Antàrtida
+The following error occurred while synchronizing:\n%s: %s	Time		Hi ha hagut l'error següent durant la sincronització:\n%s: %s
 GMT (UNIX compatible)	Time		GMT (compatible amb l'UNIX)
 Africa	Time		Àfrica
 Stop	Time		Interromp

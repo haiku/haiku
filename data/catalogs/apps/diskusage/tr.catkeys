@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DiskUsage	2951688400
+1	turkish	x-vnd.Haiku-DiskUsage	464111389
 Path	Info Window		Yol
 Open with	Pie View		Birlikte aç
 file unavailable	Pie View		dosya kullanılamıyor
@@ -8,6 +8,7 @@ Scanning %refName%	Scanner		%refName% taranıyor
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, other{# dosya}}
 Size	Info Window		Boyut
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d dosya
+%volume_name% volume scanner	Scanner		%volume_name% bölüm tarayıcısı
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Scan	Status View		Tara
 Abort	Status View		Durdur

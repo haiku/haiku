@@ -45,7 +45,7 @@ File: 	ProbeView		Dosya:
 Stop	ProbeView		Durdur
 Cancel	ProbeView		Vazgeç
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	“%s” açılamadı:\n%s
-Font size	ProbeView		Yazıtipi boyutu
+Font size	ProbeView		Font puntosu
 Type editor not supported	ProbeView		Tür düzenleyicisi desteklenmiyor
 Native: 0x%0*Lx	ProbeView		Yerel: 0x%0*Lx
 Copy	ProbeView		Kopyala

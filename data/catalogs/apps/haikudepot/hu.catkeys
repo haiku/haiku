@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2645976830
+1	hungarian	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 User ratings loading…	PackageInfoView		Felhasználói értékelések betöltése…
 Available packages	MainWindow		Elérhető csomagok
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Felhasználási felt�
 Size	PackageListView		Méret
 All categories	FilterView		Minden kategória
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		\"%MainPackageName%\" letöltése és telepítése
 ignore problem for now	PackageProblem		most hagyja figyelmen kívül
 n/a	PackageInfoView		nincs értékelve
 Error: %Errstr% (%Errno%)	PackageKitUtils		Hiba: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		Keresési feltétel:
 Quit	App		Kilépés
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		A becenév problémás karaktereket tartalmaz. A becenév csak számjegyeket és kisbetűs latin karaktereket tartalmazhat. A becenévnek négy és tizenhat karakter között kell lennie.
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		\"%MainPackageName%\" és %CountOtherPackages% egyéb letöltése és telepítése
 Captcha error	UserLoginWindow		Captcha hiba
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		A becenévnek egyedinek kell lennie, de a megadott név már foglalt. Válassz másik becenevet.
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Névtelen felha
 Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	az összes csomag kereséséhez.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		\"%MainPackageName%\" telepítésének előkészítése
 About	PackageInfoView		Névjegy
 Password requirements download problem	UserLoginWindow		A jelszókövetelményeket nem sikerült letölteni
 Password:	UserLoginWindow		Jelszó:

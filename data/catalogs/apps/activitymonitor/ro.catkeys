@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	2467534740
+1	romanian	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Echipe
+Temp	DataSource		Temp
 Block cache memory	DataSource		Memorie cache de bloc
 Media nodes	DataSource		Noduri media
 Network send	DataSource		Trimite în rețea
@@ -9,8 +10,10 @@ ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 Settings…	ActivityWindow		Configurări…
+Unknown thermal sensor	SystemInfoHandler		Senzor termal necunoscut
 Block cache	DataSource		Cache de bloc
 Memory	DataSource		Memorie
+No thermal sensor	SystemInfoHandler		Niciun senzor termal
 CPU speed	DataSource		Viteză CPU
 CPU usage	DataSource		Utilizare CPU
 Raw clipboard	DataSource		Clipboard brut
@@ -23,6 +26,7 @@ Page faults	DataSource		Defecțiuni de pagină
 Add graph	ActivityWindow		Adaugă un grafic
 Swap	DataSource		Swap
 %s faults/s	DataSource		%s defecțiuni/s
+Temperature	DataSource		Temperatură
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms

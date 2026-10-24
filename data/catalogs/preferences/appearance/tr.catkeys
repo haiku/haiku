@@ -9,7 +9,7 @@ Shadow	Colors tab		Gölge
 Document background	Colors tab		Belge arka planı
 List background	Colors tab		Liste arka planı
 No effect on running applications	DecorSettingsView		Çalışan uygulamalar üzerinde etkisiz
-Fixed font:	Font view		Eş aralıklı yazıtipi:
+Fixed font:	Font view		Eş aralıklı font:
 Appearance	System name		Görünüş
 Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
 Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
@@ -32,8 +32,8 @@ Look and feel	APRWindow		Görünüm ve his
 Selected menu item background	Colors tab		Seçili menü ögesi arka planı
 Link active	Colors tab		Etkin bağlantı
 Antialiasing	APRWindow		Kenar yumuşatma
-Menu font:	Font view		Menü yazıtipi:
-Bold font:	Font view		Kalın yazıtipi:
+Menu font:	Font view		Menü fontu:
+Bold font:	Font view		Kalın font:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nYazarlar:\n\t%decorAuthors\n\nURL: %decorURL\nLisans: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Dekorcu seç
 Failure	Colors tab		Başarısız
@@ -42,7 +42,7 @@ Double:	DecorSettingsView		Çift:
 Selected menu item text	Colors tab		Seçili menü ögesi metni
 Size:	Font Selection view		Boyut:
 Panel background	Colors tab		Panel arka planı
-Plain font:	Font view		Düz yazıtipi:
+Plain font:	Font view		Düz font:
 Automatically pick secondary colors	Colors tab		İkincil renkleri kendiliğinden seç
 Window tab text	Colors tab		Pencere sekmesi metni
 Navigation pulse	Colors tab		Navigasyon nabzı

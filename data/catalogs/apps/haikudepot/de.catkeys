@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2645976830
+1	german	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 User ratings loading…	PackageInfoView		Bewertungen werden geladen …
 Available packages	MainWindow		Verfügbare Pakete
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Nutzungsbedingungen z
 Size	PackageListView		Größe
 All categories	FilterView		Alle Kategorien
 Your rating was updated.	RatePackageWindow		Die Bewertung wurde aktualisiert.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		\"%MainPackageName%\" wird heruntergeladen und installiert
 ignore problem for now	PackageProblem		Problem erstmal ignorieren
 n/a	PackageInfoView		n.v.
 Error: %Errstr% (%Errno%)	PackageKitUtils		Fehler: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		Suchbegriffe:
 Quit	App		Beenden
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Der Benutzername ist ungültig. Er kann Buchstaben und Zahlen enthalten und muss zwischen 4 und 16 Zeichen lang sein.
 Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		\"%MainPackageName%\" + %CountOtherPackages% weitere werden heruntergeladen und installiert
 Captcha error	UserLoginWindow		Captcha-Fehler
 Manage repositories…	MainWindow		Paketquellen verwalten …
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Der Benutzername existiert bereits; bitte einen anderen probieren.
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonymisierte N
 Close	PackageManager		Schließen
 Changelog	PackageInfoView		Änderungsprotokoll
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	, um alle Pakete zu durchsuchen.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		Installation von \"%MainPackageName%\" wird vorbereitet
 About	PackageInfoView		Über
 Password requirements download problem	UserLoginWindow		Problem beim Herunterladen der Kennwortvorgaben
 Password:	UserLoginWindow		Kennwort:

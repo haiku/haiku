@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2645976830
+1	turkish	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 User ratings loading…	PackageInfoView		Kullanıcı derecelendirmeleri yükleniyor…
 Available packages	MainWindow		Kullanılabilir paketler
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Kullanım koşulları
 Size	PackageListView		Boyut
 All categories	FilterView		Tüm kategoriler
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		“%MainPackageName%” indiriliyor ve kuruluyor…
 ignore problem for now	PackageProblem		Sorunu şimdilik yok say
 n/a	PackageInfoView		yok
 Error: %Errstr% (%Errno%)	PackageKitUtils		Hata: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		Arama metni:
 Quit	App		Çık
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Takma ad hatalı. Takma adınız yalnızca rakamlardan ve İngilizce küçük harflerden oluşabilir. Takma ad uzunluğu dört ve on altı karakter arasında olabilir.
 Authentication failed	UserLoginWindow		Kimlik doğrulanamadı
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		“%MainPackageName%” ve %CountOtherPackages% diğeri indiriliyor ve kuruluyor…
 Captcha error	UserLoginWindow		CAPTCHA hatası
 Manage repositories…	MainWindow		Depoları yönet…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Takma adınız daha önce başkası tarafından alınmış. Başka bir takma ad seçin.
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Anonim veri kul
 Close	PackageManager		Kapat
 Changelog	PackageInfoView		Değişiklik günlüğü
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 buraya tıklayın.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		“%MainPackageName%” için kurulum hazırlanıyor…
 About	PackageInfoView		Hakkında
 Password requirements download problem	UserLoginWindow		Parola gereklilikleri indirme sorunu
 Password:	UserLoginWindow		Parola:

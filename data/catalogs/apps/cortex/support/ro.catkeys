@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.support	3450110595
+1	romanian	application/x-vnd.Cortex.support	2219614685
 Header has flags	MediaString		Antetul are fanioane
 32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
@@ -46,6 +46,7 @@ Right	MediaString		Dreapta
 System mixer	MediaString		Mixer de sistem
 Physical output	MediaString		Ieșire fizică
 Top-Back-center	MediaString		Sus-spate-centru
+(unknown video orientation)	MediaString		(orientare video necunoscută)
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		De sus în jos, de la stânga la dreapta
 (unknown run mode)	MediaString		(mod de rulare necunoscut)

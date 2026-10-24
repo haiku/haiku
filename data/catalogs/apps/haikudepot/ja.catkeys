@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2645976830
+1	japanese	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 User ratings loading…	PackageInfoView		ユーザー評価読み込み中…
 Available packages	MainWindow		使用可能なパッケージ
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		利用条件が同意
 Size	PackageListView		サイズ
 All categories	FilterView		すべての分類
 Your rating was updated.	RatePackageWindow		評価が更新されました。
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		 \"%MainPackageName%\"をダウンロードおよびインストール中
 ignore problem for now	PackageProblem		今は問題を無視する
 n/a	PackageInfoView		評価待ち
 Error: %Errstr% (%Errno%)	PackageKitUtils		エラー: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		検索:
 Quit	App		終了
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		ニックネームの形式が正しくありません。ニックネームは数字と英小文字しか含めません。また長さは 4 から 16 文字の間である必要があります。
 Authentication failed	UserLoginWindow		認証に失敗しました
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		\"%MainPackageName%\" + %CountOtherPackages% 個のパッケージをダウンロードおよびインストール中
 Captcha error	UserLoginWindow		キャプチャエラー
 Manage repositories…	MainWindow		リポジトリの管理...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ニックネームはユニークである必要がありますが、入力されたニックネームはすでに使用されています。別のニックネームを選んでください。
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		匿名の使用
 Close	PackageManager		閉じる
 Changelog	PackageInfoView		変更履歴
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	してすべてのパッケージを探す。
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		\"%MainPackageName%\"のインストールを準備
 About	PackageInfoView		パッケージについて
 Password requirements download problem	UserLoginWindow		パスワード要件ダウンロード不具合
 Password:	UserLoginWindow		パスワード:

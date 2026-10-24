@@ -104,7 +104,7 @@ The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\
 helpful message	Mail		yararlı ileti
 Label as…	Mail		Farklı etiketle…
  Read 	Mail		 Oku 
-Font:	Mail		Yazıtipi:
+Font:	Mail		Font:
 Accounts…	Mail		Hesaplar…
 Previous	Mail		Önceki
 Include file attributes in attachments	Mail		Eklerde dosya özniteliklerini içer

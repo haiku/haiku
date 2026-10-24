@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2645976830
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 User ratings loading…	PackageInfoView		Es carreguen les valoracions dels usuaris...
 Available packages	MainWindow		Paquets disponibles
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condicions d'ús acor
 Size	PackageListView		Mida
 All categories	FilterView		Totes les categories
 Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		Es baixa i s'instal·la \"%MainPackageName%\"
 ignore problem for now	PackageProblem		Ignora el problema per ara.
 n/a	PackageInfoView		n/d
 Error: %Errstr% (%Errno%)	PackageKitUtils		Error: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		Paraules que voleu cercar:
 Quit	App		Surt
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		El sobrenom està mal format. El sobrenom només pot contenir dígits i caràcters llatins en minúscules. Ha de tenir entre quatre i setze caràcters de longitud.
 Authentication failed	UserLoginWindow		L'autenticació ha fallat.
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		Es baixa i s'instal·la \"%MainPackageName%\" + %CountOtherPackages% més
 Captcha error	UserLoginWindow		Error de CAPTCHA
 Manage repositories…	MainWindow		Gestioneu els repositoris...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		El sobrenom ha de ser únic, però el sobrenom proporcionat ja està agafat. Trieu-ne un de diferent.
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dade
 Close	PackageManager		Tanca
 Changelog	PackageInfoView		Registre de canvis
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 per cercar tots els paquets.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		Es prepara la instal·lació per a \"%MainPackageName%\"
 About	PackageInfoView		Quant a
 Password requirements download problem	UserLoginWindow		Problema de baixada dels requisits de la contrasenya
 Password:	UserLoginWindow		Contrasenya:

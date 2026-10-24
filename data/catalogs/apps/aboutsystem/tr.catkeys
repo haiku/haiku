@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	2444152913
+1	turkish	x-vnd.Haiku-About	2310341941
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999–2007 Michael C. Ring. Tüm hakları saklıdır.
 \n\nSpecial thanks to:\n	AboutView		\n\nÖzel teşekkürlerimizle:\n
@@ -70,6 +70,7 @@ The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland Ünive
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Telif hakkı © 2012–2016 Google Yerelleştirme takımı.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Telif hakkı © 2001–%ld The Haiku project. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Telif hakkı © 1994–2008 Xiph.Org. Tüm hakları saklıdır.
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute, and various network drivers\nCopyright © 1994-2024 The FreeBSD Project. All rights reserved.	AboutView		FreeBSD projesinden BSD lisansı altında yayımlanan aşağıdaki yazılımları içerir:\nftpd, ping, telnet, telnetd, traceroute, ve çeşitli ağ sürücüleri\n© 1994–2024 FreeBSD Projesi. Tüm hakları saklıdır.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Telif hakkı © 1995–2004 Jean–loup Gailly ve Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Telif hakkı © 2001–2003 Expat geliştiricileri.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Telif hakkı © 2002–2006 Maxim Shemanarev (McSeem).

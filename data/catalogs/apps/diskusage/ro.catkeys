@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskUsage	2951688400
+1	romanian	x-vnd.Haiku-DiskUsage	464111389
 Path	Info Window		Cale
 Open with	Pie View		Deschide cu
 file unavailable	Pie View		fișier indisponibil
@@ -8,6 +8,7 @@ Scanning %refName%	Scanner		Se scanează %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
 Size	Info Window		Dimensiune
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d fișiere
+%volume_name% volume scanner	Scanner		Scaner volum %volume_name%
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Scan	Status View		Scanează
 Abort	Status View		Întrerupe

@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-Expander	1987011430
+1	russian	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		Отменить
 Destination	ExpanderWindow		Куда распаковать
 Other	ExpanderPreferences		Другое
 Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
@@ -40,6 +41,7 @@ Expansion	ExpanderPreferences		Извлечение
 Set destination…	ExpanderMenu		Куда распаковать…
 Continue	ExpanderWindow		Продолжить
  is not supported	ExpanderWindow		 не поддерживается
+OK	PasswordAlert		OK
 Cancel	ExpanderPreferences		Отменить
 Use:	ExpanderPreferences		Использовать другую папку:
 Destination folder	ExpanderPreferences		Путь для извлечения

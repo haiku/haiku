@@ -60,7 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		ÇJK birleşik ideograflar gen
 Ancient Greek musical notation	UnicodeBlocks		Antik Yunan müzik notasyonu
 Thai	UnicodeBlocks		Tayca
 Ethiopic supplement	UnicodeBlocks		Etiyopyaca ek
-Only show blocks contained in font	CharacterWindow		Yalnızca yazıtipinde içerilen blokları göster
+Only show blocks contained in font	CharacterWindow		Yalnızca fontta içerilen blokları göster
 Chess symbols	UnicodeBlocks		Satranç sembolleri
 Yijing hexagram symbols	UnicodeBlocks		Yijing altı köşeli semboller
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanlı Divan rakamları
@@ -272,7 +272,7 @@ Greek and Coptic	UnicodeBlocks		Yunan ve Eski Mısır
 Kangxi radicals	UnicodeBlocks		Kangxi kökleri
 Copy character	CharacterView		Karakteri kopyala
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
-Font	CharacterWindow		Yazıtipi
+Font	CharacterWindow		Font
 Ornamental dingbats	UnicodeBlocks		Süslü tipografik semboller
 Egyptian hieroglyph format controls	UnicodeBlocks		Mısır hiyeroglifleri biçim denetimleri
 Manichaean	UnicodeBlocks		Maniçyaca

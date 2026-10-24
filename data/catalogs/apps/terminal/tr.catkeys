@@ -51,7 +51,7 @@ Cannot execute \"%command\":\n\t%error	Terminal Shell		“%command” yürütül
 Terminal	System name		Uçbirim
 Custom	Terminal colors scheme		Özel
 Really close?	Terminal TermWindow		Gerçekten kapatılsın mı?
-Font size	Terminal TermWindow		Yazıtipi boyutu
+Font size	Terminal TermWindow		Font puntosu
 OK	Terminal TermApp		Tamam
 ANSI bright blue color	Terminal ThemeView		ANSI açık mavi
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tanımlanamayan seçenek “%s”\n
@@ -100,7 +100,7 @@ Use left Option as Meta key	Terminal AppearancePrefView		Sol Seçenek düğmesin
 Find	Terminal FindWindow		Bul
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Etkin sekme başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Save to file…	Terminal ThemeWindow		Dosyaya kaydet…
-Font:	Terminal AppearancePrefView		Yazıtipi:
+Font:	Terminal AppearancePrefView		Font:
 Paste	Terminal TermWindow		Yapıştır
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pencere başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 ANSI bright magenta color	Terminal ThemeView		ANSI açık mor
