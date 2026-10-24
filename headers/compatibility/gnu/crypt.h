@@ -28,7 +28,7 @@ struct crypt_data {
 char *crypt_rn(const char *key, const char *salt, struct crypt_data *data, size_t size);
 
 
-static inline char *
+static __inline char *
 crypt_r(const char *key, const char *salt, struct crypt_data *data)
 {
 	return crypt_rn(key, salt, data, sizeof(struct crypt_data));

@@ -42,7 +42,7 @@ typedef cpuset_t cpu_set_t;
 #include <string.h>
 
 
-static inline unsigned int
+static __inline unsigned int
 __cpu_count(cpuset_t *set)
 {
 	unsigned int count = 0;
