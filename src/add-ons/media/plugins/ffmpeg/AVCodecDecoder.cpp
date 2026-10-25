@@ -1153,7 +1153,9 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 	if (fDecodedDataBufferSize < 0)
 		fDecodedDataBufferSize = 0;
 
-	if (error == 0)
+	// Don't return an error for EAGAIN (just like we do above)
+	// The caller will loop and feed the next chunk
+	if (error == 0 || error == AVERROR(EAGAIN))
 		return B_OK;
 	else
 		return B_ERROR;
