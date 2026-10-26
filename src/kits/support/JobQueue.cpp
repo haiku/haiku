@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,10 +54,11 @@ class JobQueue::JobPriorityQueue
 // #pragma mark -
 
 
-JobQueue::JobQueue()
+JobQueue::JobQueue(bool ownsJobs)
 	:
 	fLock("job queue"),
-	fNextTicketNumber(1)
+	fNextTicketNumber(1),
+	fOwnsJobs(ownsJobs)
 {
 	fInitStatus = _Init();
 }
@@ -244,9 +245,11 @@ JobQueue::Close()
 
 		if (fQueuedJobs != NULL) {
 			// get rid of all jobs
-			for (JobPriorityQueue::iterator iter = fQueuedJobs->begin();
-				iter != fQueuedJobs->end(); ++iter) {
-				delete (*iter);
+			if (fOwnsJobs) {
+				for (JobPriorityQueue::iterator iter = fQueuedJobs->begin();
+						iter != fQueuedJobs->end(); ++iter) {
+					delete (*iter);
+				}
 			}
 			fQueuedJobs->clear();
 		}
@@ -316,8 +319,9 @@ JobQueue::_RemoveDependantJobsOf(BJob* job)
 
 		_RemoveDependantJobsOf(dependantJob);
 		dependantJob->RemoveDependency(job);
-		// TODO: we need some sort of ownership management
-		delete dependantJob;
+
+		if (fOwnsJobs)
+			delete dependantJob;
 	}
 }
 

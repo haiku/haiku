@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Haiku, Inc.
+ * Copyright 2011-2026, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SUPPORT_PRIVATE_JOB_QUEUE_H_
@@ -19,20 +19,20 @@ namespace BPrivate {
 
 class JobQueue : private BJobStateListener {
 public:
-								JobQueue();
+								JobQueue(bool ownsJobs = true);
 	virtual						~JobQueue();
 
 			status_t			InitCheck() const;
 
 			status_t			AddJob(BJob* job);
-									// takes ownership
+									// takes ownership (if the queue owns its jobs)
 			status_t			RemoveJob(BJob* job);
-									// gives up ownership
+									// gives up ownership (if the queue owns its jobs)
 			void				RemoveDependency(BJob* dependantJob, BJob* job);
 
 			BJob*				Pop();
 			status_t			Pop(bigtime_t timeout, bool returnWhenEmpty, BJob** _job);
-									// caller owns job
+									// caller owns job (if the queue owns its jobs)
 
 			size_t				CountJobs() const;
 
@@ -59,6 +59,7 @@ private:
 			sem_id				fHaveRunnableJobSem;
 
 			status_t			fInitStatus;
+			bool				fOwnsJobs;
 };
 
 
