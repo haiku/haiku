@@ -582,18 +582,19 @@ status_t
 AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	int64 frameCount, media_encode_info* info)
 {
-	status_t ret;
-
 	// Encode one audio chunk/frame.
 	AVPacket* packet = av_packet_alloc();
+	if (packet == NULL)
+		return B_NO_MEMORY;
+
 	// By leaving these NULL, we let the encoder allocate memory as it needs.
 	// This way we don't risk iving a too small buffer.
 	packet->data = NULL;
 	packet->size = 0;
 
 	int gotPacket = 0;
-
-	if (buffer) {
+	int result;
+	if (buffer != NULL) {
 		av_frame_unref(fFrame);
 		fFrame->nb_samples = frameCount;
 
@@ -611,25 +612,23 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 			/ fInputFormat.u.raw_audio.frame_rate);
 		fFramesWritten += fFrame->nb_samples;
 
-		ret = avcodec_send_frame(fCodecContext, fFrame);
+		result = avcodec_send_frame(fCodecContext, fFrame);
 		gotPacket = avcodec_receive_packet(fCodecContext, packet) == 0;
 	} else {
 		// If called with NULL, ask the encoder to flush any buffers it may
 		// have pending.
-		ret = avcodec_receive_packet(fCodecContext, packet);
-		gotPacket = (ret == 0);
+		result = avcodec_receive_packet(fCodecContext, packet);
+		gotPacket = (result == 0);
 	}
 
 	if (buffer && fFrame->extended_data != fFrame->data)
 		av_freep(&fFrame->extended_data);
 
-	if (ret != 0) {
-		TRACE("  avcodec_encode_audio() failed: %s\n", strerror(ret));
+	if (result != 0) {
+		TRACE("  avcodec_encode_audio() failed: %d\n", result);
 		av_packet_free(&packet);
 		return B_ERROR;
 	}
-
-	fFramesWritten += frameCount;
 
 	if (gotPacket) {
 		// Setup media_encode_info, most important is the time stamp.
@@ -641,11 +640,11 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 			info->flags = 0;
 
 		// We got a packet out of the encoder, write it to the output stream
-		ret = WriteChunk(packet->data, packet->size, info);
-		if (ret != B_OK) {
-			TRACE("  error writing chunk: %s\n", strerror(ret));
+		status_t status = WriteChunk(packet->data, packet->size, info);
+		if (status != B_OK) {
+			TRACE("  error writing chunk: %s\n", strerror(status));
 			av_packet_free(&packet);
-			return ret;
+			return status;
 		}
 	}
 
