@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2026, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -144,6 +144,10 @@ PartitionMapParser::_ParsePrimary(const partition_table* table,
 	// examine the table
 	for (int32 i = 0; i < 4; i++) {
 		const partition_descriptor* descriptor = &table->table[i];
+		// ignore entries with an invalid status byte
+		if (descriptor->active != 0 && descriptor->active != 0x80)
+			continue;
+
 		PrimaryPartition* partition = fMap->PrimaryPartitionAt(i);
 		partition->SetTo(descriptor, 0, fBlockSize);
 
