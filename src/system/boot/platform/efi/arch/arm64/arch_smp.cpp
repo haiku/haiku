@@ -38,7 +38,7 @@ extern "C" {
 
 extern "C" void arch_enter_kernel(struct kernel_args* kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop, uint32 cpu);
-void arm64_common_cpu_startup();
+void arm64_common_cpu_startup(uint32 cpu);
 
 static void arm64_psci_call_smc(uint64 func, uint64 arg0, uint64 arg1, uint64 arg2);
 static void arm64_psci_call_hvc(uint64 func, uint64 arg0, uint64 arg1, uint64 arg2);
@@ -159,7 +159,7 @@ arm64_secondary_startup()
 extern "C" void
 arm64_secondary_startup2(uint32 cpu)
 {
-	arm64_common_cpu_startup();
+	arm64_common_cpu_startup(cpu);
 
 	arch_enter_kernel(sKernelArgs, sKernelEntry,
 		gKernelArgs.cpu_kstack[cpu].start + gKernelArgs.cpu_kstack[cpu].size,

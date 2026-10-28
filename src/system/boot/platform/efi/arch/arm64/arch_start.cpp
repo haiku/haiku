@@ -37,6 +37,11 @@ extern phys_addr_t arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 
 void arm64_mmu_setup();
 
+// Primary CPU EL2 register values (TTBR0_EL2, MAIR_EL2, VBAR_EL2)
+static uint64 sTranslationBaseRegister;
+static uint64 sMemoryBaseRegister;
+static uint64 sVectorBaseRegister;
+
 
 void
 arch_convert_kernel_args(void)
@@ -46,7 +51,7 @@ arch_convert_kernel_args(void)
 
 
 void
-arm64_common_cpu_startup()
+arm64_common_cpu_startup(uint32 cpu)
 {
 	arch_cache_disable();
 
@@ -70,6 +75,18 @@ arm64_common_cpu_startup()
 		WRITE_SPECIALREG(CNTKCTL_EL1, 0b11);
 	} else {
 		arm64_mmu_setup();
+		// A secondary CPU released from a spin table starts with EL2 registers uninitialized
+		// so we need to copy them from the primary CPU before calling _arch_transition_EL2_EL1
+		if (cpu == 0) {
+			sTranslationBaseRegister = READ_SPECIALREG(TTBR0_EL2);
+			sMemoryBaseRegister = READ_SPECIALREG(MAIR_EL2);
+			sVectorBaseRegister = READ_SPECIALREG(VBAR_EL2);
+		} else {
+			WRITE_SPECIALREG(TTBR0_EL2, sTranslationBaseRegister);
+			WRITE_SPECIALREG(MAIR_EL2, sMemoryBaseRegister);
+			WRITE_SPECIALREG(VBAR_EL2, sVectorBaseRegister);
+			arm64_isb();
+		}
 		_arch_transition_EL2_EL1();
 	}
 
@@ -206,7 +223,7 @@ arch_start_kernel(addr_t kernelEntry)
 	serial_init();
 	serial_enable();
 
-	arm64_common_cpu_startup();
+	arm64_common_cpu_startup(0);
 
 	smp_boot_other_cpus(ttbr1, kernelEntry, (addr_t)&gKernelArgs);
 
