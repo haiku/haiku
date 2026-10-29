@@ -196,7 +196,7 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 			return B_NO_MEMORY;
 		vecsDeleter.SetTo(vecs);
 
-		status_t error = get_iovecs_from_user(message.msg_iov, message.msg_iovlen, vecs);
+		status_t error = get_iovecs_from_user(message.msg_iov, message.msg_iovlen, vecs, true);
 		if (error != B_OK)
 			return error;
 		message.msg_iov = vecs;
