@@ -213,7 +213,8 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 		if ((off_t)(pos + length) > (end - start) || length > fBodyEntry->ValueSize())
 			return ERANGE;
 	}
-	memcpy(buffer, start + (uint32)pos, length);
+	if (user_memcpy(buffer, start + (uint32)pos, length) != B_OK)
+		return B_BAD_ADDRESS;
 
 	*_length = length;
 	return B_OK;
