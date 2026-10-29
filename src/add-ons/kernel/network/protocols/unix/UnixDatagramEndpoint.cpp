@@ -26,7 +26,8 @@ UnixDatagramEndpoint::UnixDatagramEndpoint(net_socket* socket)
 	UnixEndpoint(socket),
 	fTargetEndpoint(NULL),
 	fReceiveFifo(NULL),
-	fShutdownWrite(false)
+	fShutdownWrite(false),
+	fShutdownRead(false)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixDatagramEndpoint::UnixDatagramEndpoint()\n",
 		find_thread(NULL), this);
