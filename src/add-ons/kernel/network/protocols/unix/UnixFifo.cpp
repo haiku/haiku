@@ -176,6 +176,13 @@ UnixBufferQueue::Read(UnixRequest& request)
 				"but only %lu bytes are readable\n", datagramEntry->size, readable);
 		else
 			readable = datagramEntry->size;
+	} else {
+		AncillaryDataEntry* entry = fAncillaryData.Head();
+		if (entry != NULL && readable > entry->offset) {
+			AncillaryDataEntry* next = fAncillaryData.GetNext(entry);
+			if (next != NULL)
+				readable = min_c(readable, next->offset + entry->offset);
+		}
 	}
 
 	while (readable > 0 && request.GetCurrentChunk(data, size)) {
@@ -260,6 +267,7 @@ UnixBufferQueue::Read(UnixRequest& request)
 		size_t offsetDelta = request.BytesTransferred();
 		while (entry != NULL && offsetDelta > entry->offset) {
 			request.CloneAncillaryData(entry->data);
+			offsetDelta -= entry->offset;
 			entry = fAncillaryData.GetNext(entry);
 		}
 		if (fType == UnixFifoType::Datagram && request.Address() != NULL)
