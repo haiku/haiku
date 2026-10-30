@@ -47,9 +47,6 @@ using BPrivate::HashString;
 
 const char *kDevicesRoot = "/dev/midi";
 
-const char* kInput = B_TRANSLATE("In");
-const char* kOutput = B_TRANSLATE("Out");
-
 
 class DeviceEndpoints {
 public:
@@ -354,16 +351,14 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 		BString endpointName;
 
 		if (!portName.IsEmpty()) {
-			endpointName.SetTo(B_TRANSLATE_COMMENT("%product_name% port %port_name% %in/out%",
+			endpointName.SetTo(B_TRANSLATE_COMMENT("%product_name% port %port_name%",
 				"Endpoint name (multi-ports device)"));
 		} else {
-			endpointName.SetTo(B_TRANSLATE_COMMENT("%product_name% %in/out%",
-				"Endpoint name (single port device)."));
+			endpointName.SetTo("%product_name%");
 		}
 
 		endpointName.ReplaceAll("%product_name%", productName);
 		endpointName.ReplaceAll("%port_name%", portName);
-		endpointName.ReplaceAll("%in/out%", endpoint->IsConsumer() ? kInput : kOutput);
 
 		endpoint->SetName(endpointName);
 	}
