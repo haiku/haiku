@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2645976830
+1	swedish	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 User ratings loading…	PackageInfoView		Användarbetyg laddas...
 Available packages	MainWindow		Tillgängliga paket
@@ -78,6 +78,7 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Användningsvillkor �
 Size	PackageListView		Storlek
 All categories	FilterView		Alla kategorier
 Your rating was updated.	RatePackageWindow		Ditt betyg ändrades.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		Laddar ner och installerar \”%MainPackageName%\”
 ignore problem for now	PackageProblem		ignorera problemet för tillfället
 n/a	PackageInfoView		oviktigt
 Error: %Errstr% (%Errno%)	PackageKitUtils		Fel: %Errstr% (%Errno%)
@@ -115,6 +116,7 @@ Search terms:	FilterView		Sökvillkor
 Quit	App		Avsluta
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Användarnamnet är felformat. Användarnamnet kan endast innehålla siffror och små bokstäver i små bokstäver. Användarnamnet måste vara mellan fyra och sexton tecken i längd.
 Authentication failed	UserLoginWindow		Autentisering misslyckades
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		Hämtar och installerar \”%MainPackageName%\” + %CountOtherPackages% ytterligare paket
 Captcha error	UserLoginWindow		Captcha-fel
 Manage repositories…	MainWindow		Hantera repositorier...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Användarnamnet måste vara unikt, men det medföljande användarnamnet har redan tagits. Välj ett annat användarnamnet .
@@ -174,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Dela anonym anv
 Close	PackageManager		Stäng
 Changelog	PackageInfoView		Ändringslogg
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	 för att söka i alla paket.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		Förbered installationen av \”%MainPackageName%\”
 About	PackageInfoView		Om
 Password requirements download problem	UserLoginWindow		Lösenordskrav nedladdningsproblem
 Password:	UserLoginWindow		Lösenord:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	2444152913
+1	swedish	x-vnd.Haiku-About	2310341941
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
 \n\nSpecial thanks to:\n	AboutView		\n\nSärskilt tack till:\n
@@ -70,6 +70,7 @@ The University of Auckland and Christof Lutteroth\n\n	AboutView		The University 
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Upphovsrätt © 2012-2016 Google Internationalisering team.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Haiku -projektet. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Upphovsrätt © 1994-2008 Xiph.Org. Med ensamrätt.
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute, and various network drivers\nCopyright © 1994-2024 The FreeBSD Project. All rights reserved.	AboutView		Innehåller programvara från FreeBSD-projektet, utgiven under BSD-licensen:\nftpd, ping, telnet, telnetd, traceroute samt diverse nätverks drivrutiner \nCopyright © 1994–2024 The FreeBSD Project. Med ensamrätt.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Upphovsrätt © 1995-2004 Jean-Ioup och Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Upphovsrätt © 2001-2003 Expat utvecklare.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Upphovsrätt © 2002-2006Maxim Shemanarev (McSeem).
