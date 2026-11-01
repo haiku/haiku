@@ -470,8 +470,8 @@ get_next_child_node(device_node* parent, const device_attr* attributes,
 	while (iterator.HasNext() && last != NULL) {
 		device_node* node = iterator.Next();
 
-		if (node != last)
-			continue;
+		if (node == last)
+			break;
 	}
 
 	// find the next one that fits
