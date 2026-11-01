@@ -27,50 +27,16 @@ local sourceDir ;
 for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
 }
-local genServerDumpExportRepositoryListenerTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepositorylistener ] ;
-local genServerDumpExportRepositoryModelTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepositorymodel ] ;
+local genServerRepositoryGenDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepository ] ;
 
-SEARCH_SOURCE += $(genServerDumpExportRepositoryListenerTargetDirectory) ;
-SEARCH_SOURCE += $(genServerDumpExportRepositoryModelTargetDirectory) ;
+SEARCH_SOURCE += $(genServerRepositoryGenDirectory) ;
 
 local genServerDumpExportRepositorySchema =
 	[ FDirName $(HAIKU_TOP) src apps haikudepot server schema dumpexportrepository.json ] ;
 
-local genServerRepositoryModelSourceFiles = 
-	DumpExportRepositoryModel.cpp
-;
-local genServerRepositoryParserSourceFiles =
-	DumpExportRepositoryJsonListener.cpp
-;
-
-local genDummyFile = "dummy.dat" ;
-
-local genServerDumpExportRepositoryListenerTargetFile =
-	[ FDirName $(genServerDumpExportRepositoryListenerTargetDirectory) $(genDummyFile) ] ;
-local genServerDumpExportRepositoryModelTargetFile =
-	[ FDirName $(genServerDumpExportRepositoryModelTargetDirectory) $(genDummyFile) ] ;
-
-JsonSchemaGenModel $(genServerDumpExportRepositoryModelTargetFile)
-	: $(genServerDumpExportRepositorySchema) ;
-
-JsonSchemaGenParser $(genServerDumpExportRepositoryListenerTargetFile)
-	: $(genServerDumpExportRepositorySchema) ;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerRepositoryParserSourceFiles) ]
-	[ FGristFiles $(genServerRepositoryParserSourceFiles:S=.h) ]
-	: $(genServerDumpExportRepositoryListenerTargetDirectory)
-	: $(genServerDumpExportRepositoryListenerTargetFile)
-;
-	
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerRepositoryModelSourceFiles) ]
-	[ FGristFiles $(genServerRepositoryModelSourceFiles:S=.h) ]
-	: $(genServerDumpExportRepositoryModelTargetDirectory)
-	: $(genServerDumpExportRepositoryModelTargetFile)
-;
+local genServerRepositoryGenFiles =
+	DumpExportRepositoryModel.cpp DumpExportRepositoryJsonListener.cpp ;
 
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
@@ -78,8 +44,7 @@ UnitTestLib haikudepottest.so :
 	DataIOUtils.cpp
 	DataIOUtilsTest.cpp
 
-	$(genServerRepositoryModelSourceFiles)
-	$(genServerRepositoryParserSourceFiles)
+	$(genServerRepositoryGenFiles)
 	DumpExportRepositoryJsonListenerTest.cpp
 	DumpExportRepositoryTest.cpp
 
@@ -156,4 +121,11 @@ Application TextDocumentTest :
 	UndoableEditListener.cpp
 
 	: be translation shared [ TargetLibsupc++ ]
+;
+
+JsonSchemaModelAndParser
+	$(genServerRepositoryGenDirectory)
+	: $(genServerRepositoryGenFiles)
+	: [ FGristFiles DumpExportRepositoryJsonListenerTest.cpp DumpExportRepositoryTest.cpp ]
+	: [ FDirName $(HAIKU_TOP) src apps haikudepot server schema dumpexportrepository.json ]
 ;

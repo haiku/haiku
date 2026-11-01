@@ -10,52 +10,14 @@ UsePrivateHeaders support locale ;
 
 HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
-# Generated sources JSON Schemas
+# Directories where generated sources will be written.
 
-local genServerDumpExportPkgSchema =
-	[ FDirName $(SUBDIR) server schema dumpexportpkg.json ] ;
-local genServerDumpExportRepositorySchema =
-	[ FDirName $(SUBDIR) server schema dumpexportrepository.json ] ;
-local genServerDumpExportReferenceSchema =
-	[ FDirName $(SUBDIR) server schema dumpexportreference.json ] ;
-
-# During the build process, some sources are generated into directories.  These
-# are the directories.
-
-local genServerDumpExportRepositoryBulkListenerTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepositorybulklistener ] ;
-local genServerDumpExportPkgBulkListenerTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportpkgbulklistener ] ;
-local genServerDumpExportReferenceListenerTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportreferencelistener ] ;
-
-local genServerDumpExportPkgModelTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportpkgmodel ] ;
-local genServerDumpExportRepositoryModelTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepositorymodel ] ;
-local genServerDumpExportReferenceModelTargetDirectory =
-	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportreferencemodel ] ;
-
-# During the build process, some sources are generated into a directory.  In
-# order to maintain a timestamp on that generation process, a dummy file is
-# used to signify the target of the generation.  The leafname of this dummy file
-# is defined here.
-
-local genDummyFile = "dummy.dat" ;
-
-local genServerDumpExportRepositoryBulkListenerTargetFile =
-	[ FDirName $(genServerDumpExportRepositoryBulkListenerTargetDirectory) $(genDummyFile) ] ;
-local genServerDumpExportPkgBulkListenerTargetFile =
-	[ FDirName $(genServerDumpExportPkgBulkListenerTargetDirectory) $(genDummyFile) ] ;
-local genServerDumpExportReferenceListenerTargetFile =
-	[ FDirName $(genServerDumpExportReferenceListenerTargetDirectory) $(genDummyFile) ] ;
-
-local genServerDumpExportPkgModelTargetFile =
-	[ FDirName $(genServerDumpExportPkgModelTargetDirectory) $(genDummyFile) ] ;
-local genServerDumpExportRepositoryModelTargetFile =
-	[ FDirName $(genServerDumpExportRepositoryModelTargetDirectory) $(genDummyFile) ] ;
-local genServerDumpExportReferenceModelTargetFile =
-	[ FDirName $(genServerDumpExportReferenceModelTargetDirectory) $(genDummyFile) ] ;
+local genServerRepositoryGenDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepository ] ;
+local genServerPkgGenDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportpkg ] ;
+local genServerReferenceGenDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportreference ] ;
 
 # source directories
 local sourceDirs =
@@ -80,13 +42,9 @@ for sourceDir in $(sourceDirs) {
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 
-SEARCH_SOURCE += $(genServerDumpExportRepositoryBulkListenerTargetDirectory) ;
-SEARCH_SOURCE += $(genServerDumpExportPkgBulkListenerTargetDirectory) ;
-SEARCH_SOURCE += $(genServerDumpExportReferenceListenerTargetDirectory) ;
-
-SEARCH_SOURCE += $(genServerDumpExportPkgModelTargetDirectory) ;
-SEARCH_SOURCE += $(genServerDumpExportRepositoryModelTargetDirectory) ;
-SEARCH_SOURCE += $(genServerDumpExportReferenceModelTargetDirectory) ;
+SEARCH_SOURCE += $(genServerRepositoryGenDirectory) ;
+SEARCH_SOURCE += $(genServerPkgGenDirectory) ;
+SEARCH_SOURCE += $(genServerReferenceGenDirectory) ;
 
 local textDocumentSources =
 	# edits_generic
@@ -247,30 +205,22 @@ local applicationSources =
 	ResultWindow.cpp
 ;
 
-local genServerPkgModelSourceFiles =
-	DumpExportPkgModel.cpp ;
-local genServerRepositoryModelSourceFiles =
-	DumpExportRepositoryModel.cpp ;
-local genServerReferenceModelSourceFiles =
-	DumpExportReferenceModel.cpp ;
+# Generated source files
 
-local genServerPkgParserSourceFiles =
-	DumpExportPkgJsonListener.cpp ;
-local genServerRepositoryParserSourceFiles =
-	DumpExportRepositoryJsonListener.cpp ;
-local genServerReferenceParserSourceFiles =
-	DumpExportReferenceJsonListener.cpp ;
+local genServerRepositoryGenFiles =
+	DumpExportRepositoryModel.cpp DumpExportRepositoryJsonListener.cpp ;
+local genServerPkgGenFiles =
+	DumpExportPkgModel.cpp DumpExportPkgJsonListener.cpp ;
+local genServerReferenceGenFiles =
+	DumpExportReferenceModel.cpp DumpExportReferenceJsonListener.cpp ;
 
 Application HaikuDepot
 	:
 	$(applicationSources)
 	$(textDocumentSources)
-	$(genServerPkgModelSourceFiles)
-	$(genServerRepositoryModelSourceFiles)
-	$(genServerReferenceModelSourceFiles)
-	$(genServerPkgParserSourceFiles)
-	$(genServerRepositoryParserSourceFiles)
-	$(genServerReferenceParserSourceFiles)
+	$(genServerPkgGenFiles)
+	$(genServerRepositoryGenFiles)
+	$(genServerReferenceGenFiles)
 	:
 	be package bnetapi translation libnetservices.a libcolumnlistview.a shared
 	[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
@@ -284,85 +234,28 @@ DoCatalogs HaikuDepot :
 	$(applicationSources)
 ;
 
-# The following use of rules configures the generation of .cpp and .h files from
-# JSON schemas that are defined in the HaikuDepotServer system.  See the
-# included Jam rules and actions for the definitions.
+# Configuration of the code generation of schemas. The `sourcesDependentOnGen` is excessive in that
+# it makes all of the Application's sources dependent on the generated sources which is not the
+# case, but to isolate specific sources and maintain that list is likely quite difficult over time.
 
-JsonSchemaGenModel $(genServerDumpExportPkgModelTargetFile)
-	: $(genServerDumpExportPkgSchema) ;
-JsonSchemaGenModel $(genServerDumpExportRepositoryModelTargetFile)
-	: $(genServerDumpExportRepositorySchema) ;
-JsonSchemaGenModel $(genServerDumpExportReferenceModelTargetFile)
-	: $(genServerDumpExportReferenceSchema) ;
+local sourcesDependentOnGen =
+	[ FGristFiles $(applicationSources) ] [ FGristFiles $(applicationSources:S=.h) ] ;
 
-JsonSchemaGenParser $(genServerDumpExportRepositoryBulkListenerTargetFile)
-	: $(genServerDumpExportRepositorySchema) ;
-JsonSchemaGenParser $(genServerDumpExportPkgBulkListenerTargetFile)
-	: $(genServerDumpExportPkgSchema) ;
-JsonSchemaGenParser $(genServerDumpExportReferenceListenerTargetFile)
-	: $(genServerDumpExportReferenceSchema) ;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerPkgParserSourceFiles) ]
-	[ FGristFiles $(genServerPkgParserSourceFiles:S=.h) ]
-	: $(genServerDumpExportPkgBulkListenerTargetDirectory)
-	: $(genServerDumpExportPkgBulkListenerTargetFile)
+JsonSchemaModelAndParser
+	$(genServerRepositoryGenDirectory)
+	: $(genServerRepositoryGenFiles)
+	: $(sourcesDependentOnGen)
+	: [ FDirName $(SUBDIR) server schema dumpexportrepository.json ]
 ;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerRepositoryParserSourceFiles) ]
-	[ FGristFiles $(genServerRepositoryParserSourceFiles:S=.h) ]
-	: $(genServerDumpExportRepositoryBulkListenerTargetDirectory)
-	: $(genServerDumpExportRepositoryBulkListenerTargetFile)
+JsonSchemaModelAndParser
+	$(genServerPkgGenDirectory)
+	: $(genServerPkgGenFiles)
+	: $(sourcesDependentOnGen)
+	: [ FDirName $(SUBDIR) server schema dumpexportpkg.json ]
 ;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerReferenceParserSourceFiles) ]
-	[ FGristFiles $(genServerReferenceParserSourceFiles:S=.h) ]
-	: $(genServerDumpExportReferenceListenerTargetDirectory)
-	: $(genServerDumpExportReferenceListenerTargetFile)
-;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerRepositoryModelSourceFiles) ]
-	[ FGristFiles $(genServerRepositoryModelSourceFiles:S=.h) ]
-	: $(genServerDumpExportRepositoryModelTargetDirectory)
-	: $(genServerDumpExportRepositoryModelTargetFile)
-;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerPkgModelSourceFiles) ]
-	[ FGristFiles $(genServerPkgModelSourceFiles:S=.h) ]
-	: $(genServerDumpExportPkgModelTargetDirectory)
-	: $(genServerDumpExportPkgModelTargetFile)
-;
-
-JsonSchemaGenAppSrcDependsOnGeneration
-	[ FGristFiles $(genServerReferenceModelSourceFiles) ]
-	[ FGristFiles $(genServerReferenceModelSourceFiles:S=.h) ]
-	: $(genServerDumpExportReferenceModelTargetDirectory)
-	: $(genServerDumpExportReferenceModelTargetFile)
-;
-
-# This will ensure that if any of the generated files' header files change, then
-# the application should be re-built.
-
-Includes [ FGristFiles $(applicationSources) ]
-	:
-	$(genServerDumpExportRepositoryBulkListenerTargetDirectory)
-	$(genServerDumpExportPkgBulkListenerTargetDirectory)
-	$(genServerDumpExportReferenceListenerTargetDirectory)
-	$(genServerDumpExportPkgModelTargetDirectory)
-	$(genServerDumpExportRepositoryModelTargetDirectory)
-	$(genServerDumpExportReferenceModelTargetDirectory)
-;
-
-Depends [ FGristFiles $(applicationSources:S=.o) ]
-	:
-	[ FGristFiles $(genServerPkgParserSourceFiles:S=.h) ]
-	[ FGristFiles $(genServerPkgModelSourceFiles:S=.h) ]
-	[ FGristFiles $(genServerRepositoryParserSourceFiles:S=.h) ]
-	[ FGristFiles $(genServerRepositoryModelSourceFiles:S=.h) ]
-	[ FGristFiles $(genServerReferenceParserSourceFiles:S=.h) ]
-	[ FGristFiles $(genServerReferenceModelSourceFiles:S=.h) ]
+JsonSchemaModelAndParser
+	$(genServerReferenceGenDirectory)
+	: $(genServerReferenceGenFiles)
+	: $(sourcesDependentOnGen)
+	: [ FDirName $(SUBDIR) server schema dumpexportreference.json ]
 ;

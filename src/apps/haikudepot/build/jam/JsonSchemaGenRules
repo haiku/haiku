@@ -123,3 +123,47 @@ actions JsonSchemaGenParser1
 	$(HOST_PYTHON) $(2[2]) --jsonschemafile $(2[1]) --outputdirectory $(2[3])
 	touch $(1)
 }
+
+# =====================================
+# pragma mark - Composition of other rules
+
+# This rule brings together the other rules in this file as a macro for applying
+# cohesively. This reduces the quantity of material in the main Jamfile.
+
+# 1 : generated sources dir
+# 2 : generated sources files
+# 3 : dependent sources
+# 4 : schema
+
+rule JsonSchemaModelAndParser
+{
+	local generatedDir = $(1[0]) ;
+	local generatedSourceFiles = $(2) ;
+	local dependentSources = $(3) ;
+	local schemaFile = $(4[0]) ;
+
+	# During the build process, some sources are generated into a directory.  In
+    # order to maintain a timestamp on that generation process, a dummy file is
+    # used to signify the target of the generation.  The leafname of this dummy file
+    # is defined here.
+
+	local dummyFile = [ FDirName $(generatedDir) "dummy.dat" ] ;
+
+	JsonSchemaGenModel $(dummyFile) : $(schemaFile) ;
+	JsonSchemaGenParser $(dummyFile) : $(schemaFile) ;
+
+    JsonSchemaGenAppSrcDependsOnGeneration
+    	[ FGristFiles $(generatedSourceFiles) ]
+    	[ FGristFiles $(generatedSourceFiles:S=.h) ]
+    	: $(generatedDir)
+    	: $(dummyFile)
+    ;
+
+	Includes [ FGristFiles $(dependentSources) ]
+		: $(generatedDir)
+	;
+	Depends [ FGristFiles $(dependentSources:S=.o) ]
+		: [ FGristFiles $(generatedSourceFiles:S=.h) ]
+	;
+
+}
