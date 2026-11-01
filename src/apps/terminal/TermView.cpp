@@ -1066,9 +1066,6 @@ void
 TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	char *buf, int32 width, Highlight* highlight, bool cursor, BView *inView)
 {
-	if (attr.IsHidden())
-		return;
-
 	if (highlight != NULL)
 		attr.state = highlight->Highlighter()->AdjustTextAttributes(attr.state);
 
@@ -1112,6 +1109,9 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	inView->SetHighColor(rgb_back);
 	inView->FillRect(BRect(x1, y1, x2 - 1, y2 - 1));
 	inView->SetLowColor(rgb_back);
+
+	if (attr.IsHidden())
+		return;
 
 	// underline attribute
 	if (attr.IsUnder()) {
@@ -1192,7 +1192,6 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	inView->MovePenTo(x1, y1 + fFontAscent);
 	inView->DrawString((char *)buf);
 	inView->SetDrawingMode(B_OP_COPY);
-
 }
 
 

@@ -821,7 +821,6 @@ TermParse::EscParse()
 								break;
 
 							case 1: /* Bold     */
-							case 5:
 								attributes |= BOLD;
 								break;
 
@@ -855,6 +854,9 @@ TermParse::EscParse()
 									attributes.SetUnder(SINGLE_UNDERLINE);
 								break;
 
+							case 5: /* Blink: not yet supported */
+								break;
+
 							case 7:	/* Inverse	*/
 								attributes |= INVERSE;
 								break;
@@ -875,6 +877,9 @@ TermParse::EscParse()
 								attributes.UnsetUnder();
 								break;
 
+							case 25: /* Not Blink: not yet supported */
+								break;
+
 							case 27:	/* Not Inverse	*/
 								attributes &= ~INVERSE;
 								break;
@@ -891,15 +896,6 @@ TermParse::EscParse()
 								attributes &= ~OVERLINE;
 								break;
 
-							case 90:
-							case 91:
-							case 92:
-							case 93:
-							case 94:
-							case 95:
-							case 96:
-							case 97:
-								param[row] -= 60;
 							case 30:
 							case 31:
 							case 32:
@@ -908,6 +904,7 @@ TermParse::EscParse()
 							case 35:
 							case 36:
 							case 37:
+								// Use the normal ANSI colors (indexed 0-7) for foreground.
 								attributes.SetIndexedForeground(param[row] - 30);
 								break;
 
@@ -930,15 +927,6 @@ TermParse::EscParse()
 								attributes.UnsetForeground();
 								break;
 
-							case 100:
-							case 101:
-							case 102:
-							case 103:
-							case 104:
-							case 105:
-							case 106:
-							case 107:
-								param[row] -= 60;
 							case 40:
 							case 41:
 							case 42:
@@ -947,6 +935,7 @@ TermParse::EscParse()
 							case 45:
 							case 46:
 							case 47:
+								// Use the normal ANSI colors (indexed 0-7) for background.
 								attributes.SetIndexedBackground(param[row] - 40);
 								break;
 
@@ -986,6 +975,30 @@ TermParse::EscParse()
 
 							case 59:
 								attributes.UnsetUnderline();
+								break;
+
+							case 90:
+							case 91:
+							case 92:
+							case 93:
+							case 94:
+							case 95:
+							case 96:
+							case 97:
+								// Use the bright ANSI colors (indexed 8-15) for foreground.
+								attributes.SetIndexedForeground(param[row] - 90 + 8);
+								break;
+
+							case 100:
+							case 101:
+							case 102:
+							case 103:
+							case 104:
+							case 105:
+							case 106:
+							case 107:
+								// Use the bright ANSI colors (indexed 8-15) for background.
+								attributes.SetIndexedBackground(param[row] - 100 + 8);
 								break;
 						}
 					}
