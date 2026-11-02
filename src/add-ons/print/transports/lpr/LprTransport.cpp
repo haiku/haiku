@@ -3,8 +3,8 @@
 
 #include <Alert.h>
 #include <DataIO.h>
-#include <Message.h>
 #include <Directory.h>
+#include <Message.h>
 
 #include <netdb.h>
 #include <pwd.h>
@@ -14,17 +14,17 @@
 #include <iomanip>
 #include <sstream>
 
-#include "LpsClient.h"
-#include "LprSetupDlg.h"
-#include "LprTransport.h"
-#include "LprDefs.h"
 #include "DbgMsg.h"
+#include "LprDefs.h"
+#include "LprTransport.h"
+#include "LpsClient.h"
+#include "SetupWindow.h"
 
 
 using namespace std;
 
 
-LprTransport::LprTransport(BMessage *msg)
+LprTransport::LprTransport(BMessage* msg)
 	:
 	BDataIO()
 {
@@ -35,7 +35,7 @@ LprTransport::LprTransport(BMessage *msg)
 	fJobId     = 0;
 	fError     = false;
 
-	struct passwd *pwd = getpwuid(geteuid());
+	struct passwd* pwd = getpwuid(geteuid());
 	if (pwd != NULL && pwd->pw_name != NULL && pwd->pw_name[0])
 		strcpy(fUser, pwd->pw_name);
 	else
@@ -43,27 +43,26 @@ LprTransport::LprTransport(BMessage *msg)
 
 	DUMP_BMESSAGE(msg);
 
-	const char *spool_path = msg->FindString(SPOOL_PATH);
+	const char* spool_path = msg->FindString(SPOOL_PATH);
 	if (spool_path && *spool_path) {
 		BDirectory dir(spool_path);
 		DUMP_BDIRECTORY(&dir);
 
 		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer, sizeof(fServer));
 		if (fServer[0] == '\0') {
-			LprSetupDlg *dlg = new LprSetupDlg(&dir);
-			if (dlg->Go() == B_ERROR) {
+			SetupWindow* setupWindow = new SetupWindow(&dir);
+			if (setupWindow->Go() == B_ERROR) {
 				fError = true;
 				return;
 			}
 		}
 
 		dir.ReadAttr(LPR_SERVER_NAME, B_STRING_TYPE, 0, fServer, sizeof(fServer));
-		dir.ReadAttr(LPR_QUEUE_NAME,  B_STRING_TYPE, 0, fQueue,  sizeof(fQueue));
-		dir.ReadAttr(LPR_JOB_ID,      B_INT32_TYPE,  0, &fJobId, sizeof(fJobId));
+		dir.ReadAttr(LPR_QUEUE_NAME, B_STRING_TYPE, 0, fQueue, sizeof(fQueue));
+		dir.ReadAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &fJobId, sizeof(fJobId));
 		fJobId++;
-		if (fJobId > 255) {
+		if (fJobId > 255)
 			fJobId = 1;
-		}
 		dir.WriteAttr(LPR_JOB_ID, B_INT32_TYPE, 0, &fJobId, sizeof(fJobId));
 
 		sprintf(fFile, "%s/%s@ipp.%" B_PRId32, spool_path, fUser, fJobId);
@@ -124,11 +123,9 @@ LprTransport::_SendFile()
 		lpr.receiveDataFile(dfsize, dfname.str().c_str());
 		lpr.transferData(fStream, dfsize);
 		lpr.endTransfer();
-	}
-
-	catch (LPSException &err) {
+	} catch (LPSException& err) {
 		DBGMSG(("error: %s\n", err.what()));
-		BAlert *alert = new BAlert("", err.what(), "OK");
+		BAlert* alert = new BAlert("", err.what(), "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
@@ -136,16 +133,16 @@ LprTransport::_SendFile()
 
 
 ssize_t
-LprTransport::Read(void *, size_t)
+LprTransport::Read(void*, size_t)
 {
 	return 0;
 }
 
 
 ssize_t
-LprTransport::Write(const void *buffer, size_t size)
+LprTransport::Write(const void* buffer, size_t size)
 {
-	if (!fStream.write((char *)buffer, size)) {
+	if (!fStream.write((char*)buffer, size)) {
 		fError = true;
 		return 0;
 	}

@@ -7,7 +7,7 @@ SubDirC++Flags -Wno-format-overflow ;
 
 Addon LPR :
 	Lpr.cpp
-	LprSetupDlg.cpp
+	SetupWindow.cpp
 	LprTransport.cpp
 	LpsClient.cpp
 
@@ -16,6 +16,7 @@ Addon LPR :
 	DbgMsg.o
 	:
 	be
+	localestub
 	libprint.a
 	$(TARGET_NETWORK_LIBS)
 	[ TargetLibstdc++ ]
