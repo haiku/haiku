@@ -50,11 +50,11 @@ public:
 			void				ResetWindowFrame();
 			void				ResetWindowFrame(BPoint where);
 
-			BToolTip*			Tip() const { return fToolTip; }
+			BReference<BToolTip> Tip() const { return fToolTip; }
 			bool				IsTipHidden() const { return fHidden; }
 
 private:
-			BToolTip*			fToolTip;
+			BReference<BToolTip> fToolTip;
 			BPoint				fWhere;
 			bool				fHidden;
 };
@@ -63,10 +63,9 @@ private:
 ToolTipView::ToolTipView(BToolTip* tip)
 	:
 	BView("tool tip", B_WILL_DRAW | B_FRAME_EVENTS),
-	fToolTip(tip),
+	fToolTip(tip, false),
 	fHidden(false)
 {
-	fToolTip->AcquireReference();
 	SetViewUIColor(B_TOOL_TIP_BACKGROUND_COLOR);
 	SetHighUIColor(B_TOOL_TIP_TEXT_COLOR);
 
@@ -80,7 +79,6 @@ ToolTipView::ToolTipView(BToolTip* tip)
 
 ToolTipView::~ToolTipView()
 {
-	fToolTip->ReleaseReference();
 }
 
 
@@ -338,14 +336,14 @@ ToolTipWindow::MessageReceived(BMessage* message)
 
 		case kMsgCurrentToolTip:
 		{
-			BToolTip* tip = view->Tip();
+			BReference<BToolTip> tip = view->Tip();
 
 			BMessage reply(B_REPLY);
-			reply.AddPointer("current", tip);
+			reply.AddPointer("current", tip.Get());
 			reply.AddPointer("owner", fOwner);
 
 			if (message->SendReply(&reply) == B_OK)
-				tip->AcquireReference();
+				tip.Detach();
 			break;
 		}
 
