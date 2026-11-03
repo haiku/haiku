@@ -1720,15 +1720,13 @@ devfs_read_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	if (!vecs.IsValid())
 		return B_NO_MEMORY;
 
-	size_t length = 0;
 	for (size_t i = 0; i < count; i++) {
 		vecs[i].base = (generic_addr_t)_vecs[i].iov_base;
 		vecs[i].length = _vecs[i].iov_len;
-		length += vecs[i].length;
 	}
 
 	IORequest request;
-	status_t status = request.Init(pos, vecs, count, length, false, 0);
+	status_t status = request.Init(pos, vecs, count, *_numBytes, false, 0);
 	if (status != B_OK)
 		return status;
 
@@ -1762,15 +1760,13 @@ devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	if (!vecs.IsValid())
 		return B_NO_MEMORY;
 
-	size_t length = 0;
 	for (size_t i = 0; i < count; i++) {
 		vecs[i].base = (generic_addr_t)_vecs[i].iov_base;
 		vecs[i].length = _vecs[i].iov_len;
-		length += vecs[i].length;
 	}
 
 	IORequest request;
-	status_t status = request.Init(pos, vecs, count, length, true, 0);
+	status_t status = request.Init(pos, vecs, count, *_numBytes, true, 0);
 	if (status != B_OK)
 		return status;
 
