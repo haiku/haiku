@@ -39,7 +39,8 @@ operator==(const display_mode &lhs, const display_mode &rhs)
 static bool
 is_mode_supported(display_mode* mode)
 {
-	return (mode != NULL) && (*mode == gInfo->shared_info->current_mode);
+	return (mode != NULL)
+		&& (*mode == gInfo->shared_info->display_info[gInfo->current_head].current_mode);
 }
 
 
@@ -47,9 +48,9 @@ is_mode_supported(display_mode* mode)
 	It's called from vesa_init_accelerant().
 */
 status_t
-create_mode_list(void)
+create_mode_list(int scanout)
 {
-	display_mode& currentMode = gInfo->shared_info->current_mode;
+	display_mode& currentMode = gInfo->shared_info->display_info[scanout].current_mode;
 
 	if (currentMode.timing.h_total == 0 || currentMode.timing.v_total == 0) {
 		compute_display_timing(currentMode.virtual_width, currentMode.virtual_height, 60, false,
@@ -58,27 +59,27 @@ create_mode_list(void)
 
 	const color_space colorspace[] = {(color_space)currentMode.space};
 
-	if (!gInfo->shared_info->has_edid) {
-		display_mode mode = gInfo->shared_info->current_mode;
+	if (!gInfo->shared_info->display_info[scanout].has_edid) {
+		display_mode mode = gInfo->shared_info->display_info[scanout].current_mode;
 
 		compute_display_timing(mode.virtual_width, mode.virtual_height, 60, false,
 			&mode.timing);
 		fill_display_mode(mode.virtual_width, mode.virtual_height, &mode);
 
-		gInfo->mode_list_area = create_display_modes("virtio_gpu modes",
-			NULL, &mode, 1, colorspace, 1, is_mode_supported, &gInfo->mode_list,
-			&gInfo->shared_info->mode_count);
+		gInfo->heads[scanout].mode_list_area = create_display_modes("virtio_gpu modes",
+			NULL, &mode, 1, colorspace, 1, is_mode_supported, &gInfo->heads[scanout].mode_list,
+			&gInfo->shared_info->display_info[scanout].mode_count);
 	} else {
 		edid1_info edidInfo;
-		edid_decode(&edidInfo, &gInfo->shared_info->edid_raw);
-		gInfo->mode_list_area = create_display_modes("virtio_gpu modes",
-			&edidInfo, NULL, 0, colorspace, 1, NULL, &gInfo->mode_list,
-			&gInfo->shared_info->mode_count);
+		edid_decode(&edidInfo, &gInfo->shared_info->display_info[scanout].edid_raw);
+		gInfo->heads[scanout].mode_list_area = create_display_modes("virtio_gpu modes",
+			&edidInfo, NULL, 0, colorspace, 1, NULL, &gInfo->heads[scanout].mode_list,
+			&gInfo->shared_info->display_info[scanout].mode_count);
 	}
-	if (gInfo->mode_list_area < 0)
-		return gInfo->mode_list_area;
+	if (gInfo->heads[scanout].mode_list_area < 0)
+		return gInfo->heads[scanout].mode_list_area;
 
-	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+	gInfo->shared_info->display_info[scanout].mode_list_area = gInfo->heads[scanout].mode_list_area;
 	return B_OK;
 }
 
@@ -90,8 +91,8 @@ uint32
 virtio_gpu_accelerant_mode_count(void)
 {
 	TRACE(("virtio_gpu_accelerant_mode_count() = %d\n",
-		gInfo->shared_info->mode_count));
-	return gInfo->shared_info->mode_count;
+		gInfo->shared_info->display_info[gInfo->current_head].mode_count));
+	return gInfo->shared_info->display_info[gInfo->current_head].mode_count;
 }
 
 
@@ -99,8 +100,8 @@ status_t
 virtio_gpu_get_mode_list(display_mode* modeList)
 {
 	TRACE(("virtio_gpu_get_mode_info()\n"));
-	memcpy(modeList, gInfo->mode_list,
-		gInfo->shared_info->mode_count * sizeof(display_mode));
+	memcpy(modeList, gInfo->heads[gInfo->current_head].mode_list,
+		gInfo->shared_info->display_info[gInfo->current_head].mode_count * sizeof(display_mode));
 	return B_OK;
 }
 
@@ -109,7 +110,7 @@ status_t
 virtio_gpu_get_preferred_mode(display_mode* _mode)
 {
 	TRACE(("virtio_gpu_get_preferred_mode()\n"));
-	*_mode = gInfo->shared_info->current_mode;
+	*_mode = gInfo->shared_info->display_info[gInfo->current_head].current_mode;
 
 	return B_OK;
 }
@@ -119,11 +120,16 @@ status_t
 virtio_gpu_set_display_mode(display_mode* _mode)
 {
 	TRACE(("virtio_gpu_set_display_mode()\n"));
-	if (_mode != NULL && *_mode == gInfo->shared_info->current_mode)
+	if (_mode != NULL
+		&& *_mode == gInfo->shared_info->display_info[gInfo->current_head].current_mode)
 		return B_OK;
 
+	virtio_gpu_set_display_mode_params params;
+	params.scanout = gInfo->current_head;
+	params.mode = *_mode;
+
 	return ioctl(gInfo->device, VIRTIO_GPU_SET_DISPLAY_MODE,
-		_mode, sizeof(display_mode));
+		&params, sizeof(params));
 }
 
 
@@ -131,7 +137,7 @@ status_t
 virtio_gpu_get_display_mode(display_mode* _currentMode)
 {
 	TRACE(("virtio_gpu_get_display_mode()\n"));
-	*_currentMode = gInfo->shared_info->current_mode;
+	*_currentMode = gInfo->shared_info->display_info[gInfo->current_head].current_mode;
 	return B_OK;
 }
 
@@ -141,12 +147,12 @@ virtio_gpu_get_edid_info(void* info, size_t size, uint32* _version)
 {
 	TRACE(("virtio_gpu_get_edid_info()\n"));
 
-	if (!gInfo->shared_info->has_edid)
+	if (!gInfo->shared_info->display_info[gInfo->current_head].has_edid)
 		return B_ERROR;
 	if (size < sizeof(struct edid1_info))
 		return B_BUFFER_OVERFLOW;
 
-	edid_decode((edid1_info*)info, &gInfo->shared_info->edid_raw);
+	edid_decode((edid1_info*)info, &gInfo->shared_info->display_info[gInfo->current_head].edid_raw);
 	*_version = EDID_VERSION_1;
 	edid_dump((edid1_info*)info);
 	return B_OK;
@@ -158,11 +164,11 @@ virtio_gpu_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("virtio_gpu_get_frame_buffer_config()\n"));
 
-	config->frame_buffer = gInfo->shared_info->frame_buffer;
+	config->frame_buffer = gInfo->shared_info->display_info[gInfo->current_head].frame_buffer;
 	TRACE(("virtio_gpu_get_frame_buffer_config() = %" B_PRIxADDR "\n",
 		config->frame_buffer));
-	//config->frame_buffer_dma = gInfo->shared_info->physical_frame_buffer;
-	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
+	//config->frame_buffer_dma = gInfo->shared_info->display_info[gInfo->current_head].physical_frame_buffer;
+	config->bytes_per_row = gInfo->shared_info->display_info[gInfo->current_head].bytes_per_row;
 	TRACE(("virtio_gpu_get_frame_buffer_config() %p\n", config->frame_buffer));
 	return B_OK;
 }
@@ -187,3 +193,25 @@ virtio_gpu_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _hig
 	return B_OK;
 }
 
+
+status_t
+virtio_gpu_set_current_scanout(int scanout)
+{
+	TRACE(("virtio_gpu_set_current_scanout(%" B_PRId32 ")\n", scanout));
+
+	gInfo->current_head = scanout;
+	return B_OK;
+}
+
+
+status_t
+virtio_gpu_get_display_count(uint32 *count) {
+	TRACE(("virtio_gpu_get_display_count()\n"));
+
+	int scanouts = 0;
+	for (int i = 0; i < MAX_SCANOUTS; i++) {
+		if(gInfo->enabled_heads & (1 << i)) scanouts++;
+	}
+	*count = scanouts;
+	return B_OK;
+}

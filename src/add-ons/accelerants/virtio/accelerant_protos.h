@@ -35,6 +35,9 @@ status_t virtio_gpu_get_frame_buffer_config(frame_buffer_config *config);
 status_t virtio_gpu_get_pixel_clock_limits(display_mode *dm, uint32 *low,
 	uint32 *high);
 
+status_t virtio_gpu_set_current_scanout(int scanout);
+status_t virtio_gpu_get_display_count(uint32* count);
+
 #ifdef __cplusplus
 }
 #endif

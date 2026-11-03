@@ -14,12 +14,26 @@
 
 #include <util/AutoLock.h>
 
+#include <debug.h>
+
 #include "viogpu.h"
 
 
 #define VIRTIO_GPU_DRIVER_MODULE_NAME "drivers/graphics/virtio_gpu/driver_v1"
 #define VIRTIO_GPU_DEVICE_MODULE_NAME "drivers/graphics/virtio_gpu/device_v1"
 #define VIRTIO_GPU_DEVICE_ID_GENERATOR	"virtio_gpu/device_id"
+
+
+typedef struct {
+	int						resourceId;
+	uint32					framebufferWidth;
+	uint32					framebufferHeight;
+	area_id					framebufferArea;
+	addr_t					framebuffer;
+	size_t					framebufferSize;
+	uint32					width;
+	uint32					height;
+} virtio_gpu_display_info;
 
 
 typedef struct {
@@ -39,14 +53,7 @@ typedef struct {
 
 	::virtio_queue			cursorQueue;
 
-	int						displayResourceId;
-	uint32					framebufferWidth;
-	uint32					framebufferHeight;
-	area_id					framebufferArea;
-	addr_t					framebuffer;
-	size_t					framebufferSize;
-	uint32					displayWidth;
-	uint32					displayHeight;
+	virtio_gpu_display_info*	displayInfo[VIRTIO_GPU_MAX_SCANOUTS];
 
 	thread_id				updateThread;
 	bool					updateThreadRunning;
@@ -171,15 +178,39 @@ virtio_gpu_get_display_info(virtio_gpu_driver_info* info)
 		return B_ERROR;
 	}
 
-	if (!displayInfo.pmodes[0].enabled) {
-		ERROR("pmodes[0] is not enabled\n");
-		return B_BAD_VALUE;
+	bool anyPmodeEnabled = false;
+
+	for(int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+		if (anyPmodeEnabled == false)
+			anyPmodeEnabled = displayInfo.pmodes[i].enabled;
+
+		if (!displayInfo.pmodes[i].enabled) {
+			if (info->displayInfo[i] != NULL) {
+				free(info->displayInfo[i]);
+				info->displayInfo[i] = NULL;
+			}
+			continue;
+		}
+
+		if (displayInfo.pmodes[i].enabled && info->displayInfo[i] == NULL) {
+			info->displayInfo[i] = (virtio_gpu_display_info*)malloc(sizeof(virtio_gpu_display_info));
+			if (info->displayInfo[i] == NULL) {
+				return B_NO_MEMORY;
+			}
+			TRACE("enabled and allocated");
+			info->displayInfo[i]->framebufferArea = -1;
+		}
+
+		info->displayInfo[i]->width = displayInfo.pmodes[i].r.width;
+		info->displayInfo[i]->height = displayInfo.pmodes[i].r.height;
+		TRACE("get_display_info width %" B_PRIu32 " height %" B_PRIu32 "\n",
+			info->displayInfo[i]->width, info->displayInfo[i]->height);
 	}
 
-	info->displayWidth = displayInfo.pmodes[0].r.width;
-	info->displayHeight = displayInfo.pmodes[0].r.height;
-	TRACE("virtio_gpu_get_display_info width %" B_PRIu32 " height %" B_PRIu32 "\n",
-		info->displayWidth, info->displayHeight);
+	if (!anyPmodeEnabled) {
+		ERROR("all pmodes are disabled\n");
+		return B_BAD_VALUE;
+	}
 
 	return B_OK;
 }
@@ -201,8 +232,8 @@ virtio_gpu_get_edids(virtio_gpu_driver_info* info, int scanout)
 		return B_ERROR;
 	}
 
-	info->sharedInfo->has_edid = true;
-	memcpy(&info->sharedInfo->edid_raw, response.edid, sizeof(edid1_raw));
+	info->sharedInfo->display_info[scanout].has_edid = true;
+	memcpy(&info->sharedInfo->display_info[scanout].edid_raw, response.edid, sizeof(edid1_raw));
 	TRACE("virtio_gpu_get_edids success\n");
 
 	return B_OK;
@@ -259,7 +290,7 @@ virtio_gpu_unref(virtio_gpu_driver_info* info, int resourceId)
 
 
 status_t
-virtio_gpu_attach_backing(virtio_gpu_driver_info* info, int resourceId)
+virtio_gpu_attach_backing(virtio_gpu_driver_info* info, int scanout, int resourceId)
 {
 	CALLED();
 	struct virtio_gpu_resource_attach_backing_entries {
@@ -269,7 +300,8 @@ virtio_gpu_attach_backing(virtio_gpu_driver_info* info, int resourceId)
 	struct virtio_gpu_ctrl_hdr response = {};
 
 	physical_entry entries[16] = {};
-	status_t status = get_memory_map((void*)info->framebuffer, info->framebufferSize, entries, 16);
+	status_t status = get_memory_map((void*)info->displayInfo[scanout]->framebuffer,
+		info->displayInfo[scanout]->framebufferSize, entries, 16);
 	if (status != B_OK) {
 		ERROR("virtio_gpu_attach_backing get_memory_map failed: %s\n", strerror(status));
 		return status;
@@ -399,9 +431,14 @@ virtio_update_thread(void *arg)
 	while (info->updateThreadRunning) {
 		bigtime_t start = system_time();
 		MutexLocker commandLocker(&info->commandLock);
-		virtio_gpu_transfer_to_host_2d(info, info->displayResourceId, info->displayWidth,
-			info->displayHeight);
-		virtio_gpu_flush_resource(info, info->displayResourceId, info->displayWidth, info->displayHeight);
+		for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+			if (info->displayInfo[i] == NULL)
+				continue;
+			virtio_gpu_transfer_to_host_2d(info, info->displayInfo[i]->resourceId,
+				info->displayInfo[i]->width, info->displayInfo[i]->height);
+			virtio_gpu_flush_resource(info, info->displayInfo[i]->resourceId,
+				info->displayInfo[i]->width, info->displayInfo[i]->height);
+		}
 		bigtime_t delay = system_time() - start;
 		if (delay < 20000)
 			snooze(20000 - delay);
@@ -411,11 +448,13 @@ virtio_update_thread(void *arg)
 
 
 status_t
-virtio_gpu_set_display_mode(virtio_gpu_driver_info* info, display_mode *mode)
+virtio_gpu_set_display_mode(virtio_gpu_driver_info* info, int scanout, display_mode *mode)
 {
 	CALLED();
 
-	int newResourceId = info->displayResourceId + 1;
+	ASSERT(info->displayInfo[scanout] != NULL);
+	virtio_gpu_display_info& displayInfo = *info->displayInfo[scanout];
+	int newResourceId = displayInfo.resourceId + VIRTIO_GPU_MAX_SCANOUTS;
 
 	// create framebuffer area
 	TRACE("virtio_gpu_set_display_mode %" B_PRIu16 " %" B_PRIu16 "\n", mode->virtual_width,
@@ -425,43 +464,46 @@ virtio_gpu_set_display_mode(virtio_gpu_driver_info* info, display_mode *mode)
 	if (status != B_OK)
 		return status;
 
-	status = virtio_gpu_attach_backing(info, newResourceId);
+	status = virtio_gpu_attach_backing(info, scanout, newResourceId);
 	if (status != B_OK)
 		return status;
 
-	status = virtio_gpu_unref(info, info->displayResourceId);
+	status = virtio_gpu_unref(info, displayInfo.resourceId);
 	if (status != B_OK)
 		return status;
 
-	info->displayResourceId = newResourceId;
-	info->displayWidth = mode->virtual_width;
-	info->displayHeight = mode->virtual_height;
+	displayInfo.resourceId = newResourceId;
+	displayInfo.width = mode->virtual_width;
+	displayInfo.height = mode->virtual_height;
 
-	status = virtio_gpu_set_scanout(info, 0, 0, 0, 0);
+	status = virtio_gpu_set_scanout(info, scanout, 0, 0, 0);
 	if (status != B_OK)
 		return status;
 
-	status = virtio_gpu_set_scanout(info, 0, info->displayResourceId, info->displayWidth, info->displayHeight);
+	status = virtio_gpu_set_scanout(info, scanout, displayInfo.resourceId,
+		displayInfo.width, displayInfo.height);
 	if (status != B_OK)
 		return status;
 
-	status = virtio_gpu_transfer_to_host_2d(info, info->displayResourceId, info->displayWidth, info->displayHeight);
+	status = virtio_gpu_transfer_to_host_2d(info, displayInfo.resourceId,
+		displayInfo.width, displayInfo.height);
 	if (status != B_OK)
 		return status;
 
-	status = virtio_gpu_flush_resource(info, info->displayResourceId, info->displayWidth, info->displayHeight);
+	status = virtio_gpu_flush_resource(info, displayInfo.resourceId,
+		displayInfo.width, displayInfo.height);
 	if (status != B_OK)
 		return status;
 
 	{
 		virtio_gpu_shared_info& sharedInfo = *info->sharedInfo;
-		sharedInfo.frame_buffer_area = info->framebufferArea;
-		sharedInfo.frame_buffer = (uint8*)info->framebuffer;
-		sharedInfo.bytes_per_row = info->displayWidth * 4;
-		sharedInfo.current_mode.virtual_width = info->displayWidth;
-		sharedInfo.current_mode.virtual_height = info->displayHeight;
-		sharedInfo.current_mode.space = B_RGB32;
-		sharedInfo.current_mode.timing = mode->timing;
+		sharedInfo.display_info[scanout].frame_buffer_area = displayInfo.framebufferArea;
+		sharedInfo.display_info[scanout].frame_buffer = (uint8*)displayInfo.framebuffer;
+		sharedInfo.display_info[scanout].bytes_per_row = displayInfo.width * 4;
+		sharedInfo.display_info[scanout].current_mode.virtual_width = displayInfo.width;
+		sharedInfo.display_info[scanout].current_mode.virtual_height = displayInfo.height;
+		sharedInfo.display_info[scanout].current_mode.space = B_RGB32;
+		sharedInfo.display_info[scanout].current_mode.timing = mode->timing;
 	}
 
 	return B_OK;
@@ -572,16 +614,16 @@ virtio_gpu_open(void* _info, const char* path, int openMode, void** _cookie)
 	if (handle == NULL)
 		return B_NO_MEMORY;
 
-	info->sharedArea = -1;
-	info->framebufferArea = -1;
-
 	info->commandDone = create_sem(1, "virtio_gpu_command");
 	if (info->commandDone < B_OK)
 		goto error;
 
-	info->sharedArea = create_area("virtio_gpu shared info",
-		(void**)&info->sharedInfo, B_ANY_KERNEL_ADDRESS,
-		ROUND_TO_PAGE_SIZE(sharedSize), B_FULL_LOCK,
+	for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++)
+		info->displayInfo[i] = NULL;
+
+	info->sharedArea = -1;
+	info->sharedArea = create_area("virtio_gpu shared info", (void**)&info->sharedInfo,
+		B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(sharedSize), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (info->sharedArea < 0)
 		goto error;
@@ -593,46 +635,54 @@ virtio_gpu_open(void* _info, const char* path, int openMode, void** _cookie)
 	if (status != B_OK)
 		goto error;
 
-	if ((info->features & VIRTIO_GPU_F_EDID) != 0)
-		virtio_gpu_get_edids(info, 0);
+	for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+		if (info->displayInfo[i] == NULL)
+			continue;
 
-	// so we can fit every mode
-	info->framebufferWidth = 3840;
-	info->framebufferHeight = 2160;
+		if ((info->features & VIRTIO_GPU_F_EDID) != 0)
+			virtio_gpu_get_edids(info, i);
 
-	// create framebuffer area
-	info->framebufferSize = 4 * info->framebufferWidth * info->framebufferHeight;
-	info->framebufferArea = create_area("virtio_gpu framebuffer", (void**)&info->framebuffer,
-		B_ANY_KERNEL_ADDRESS, info->framebufferSize,
-		B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-	if (info->framebufferArea < B_OK) {
-		status = info->framebufferArea;
-		goto error;
-	}
+		virtio_gpu_display_info& displayInfo = *info->displayInfo[i];
+		// so we can fit every mode
+		displayInfo.framebufferWidth = 3240;
+		displayInfo.framebufferHeight = 2160;
 
-	info->displayResourceId = 1;
-	status = virtio_gpu_create_2d(info, info->displayResourceId, info->displayWidth,
-		info->displayHeight);
-	if (status != B_OK)
-		goto error;
+		// create framebuffer area
+		displayInfo.framebufferSize =
+			4 * displayInfo.framebufferWidth * displayInfo.framebufferHeight;
+		displayInfo.framebufferArea = create_area("virtio_gpu framebuffer",
+			(void**)&displayInfo.framebuffer,
+			B_ANY_KERNEL_ADDRESS, displayInfo.framebufferSize,
+			B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		if (displayInfo.framebufferArea < B_OK) {
+			status = displayInfo.framebufferArea;
+			goto error;
+		}
 
-	status = virtio_gpu_attach_backing(info, info->displayResourceId);
-	if (status != B_OK)
-		goto error;
+		displayInfo.resourceId = 1 + i;
+		status = virtio_gpu_create_2d(info, displayInfo.resourceId,
+			displayInfo.width, displayInfo.height);
+		if (status != B_OK)
+			goto error;
 
-	status = virtio_gpu_set_scanout(info, 0, info->displayResourceId, info->displayWidth,
-		info->displayHeight);
-	if (status != B_OK)
-		goto error;
+		status = virtio_gpu_attach_backing(info, i, displayInfo.resourceId);
+		if (status != B_OK)
+			goto error;
 
-	{
-		virtio_gpu_shared_info& sharedInfo = *info->sharedInfo;
-		sharedInfo.frame_buffer_area = info->framebufferArea;
-		sharedInfo.frame_buffer = (uint8*)info->framebuffer;
-		sharedInfo.bytes_per_row = info->displayWidth * 4;
-		sharedInfo.current_mode.virtual_width = info->displayWidth;
-		sharedInfo.current_mode.virtual_height = info->displayHeight;
-		sharedInfo.current_mode.space = B_RGB32;
+		status = virtio_gpu_set_scanout(info, i, displayInfo.resourceId,
+			displayInfo.width, displayInfo.height);
+		if (status != B_OK)
+			goto error;
+
+		{
+			virtio_gpu_shared_info& sharedInfo = *info->sharedInfo;
+			sharedInfo.display_info[i].frame_buffer_area = displayInfo.framebufferArea;
+			sharedInfo.display_info[i].frame_buffer = (uint8*)displayInfo.framebuffer;
+			sharedInfo.display_info[i].bytes_per_row = displayInfo.width * 4;
+			sharedInfo.display_info[i].current_mode.virtual_width = displayInfo.width;
+			sharedInfo.display_info[i].current_mode.virtual_height = displayInfo.height;
+			sharedInfo.display_info[i].current_mode.space = B_RGB32;
+		}
 	}
 	info->updateThreadRunning = true;
 	info->updateThread = spawn_kernel_thread(virtio_update_thread, "virtio_gpu update",
@@ -647,8 +697,10 @@ virtio_gpu_open(void* _info, const char* path, int openMode, void** _cookie)
 	return B_OK;
 
 error:
-	delete_area(info->framebufferArea);
-	info->framebufferArea = -1;
+	for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+		delete_area(info->displayInfo[i]->framebufferArea);
+		info->displayInfo[i]->framebufferArea = -1;
+	}
 	delete_area(info->sharedArea);
 	info->sharedArea = -1;
 	delete_sem(info->commandDone);
@@ -684,8 +736,10 @@ virtio_gpu_free(void* cookie)
 	wait_for_thread(info->updateThread, &result);
 	info->updateThread = -1;
 	virtio_gpu_drain_queues(info);
-	delete_area(info->framebufferArea);
-	info->framebufferArea = -1;
+	for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+		delete_area(info->displayInfo[i]->framebufferArea);
+		info->displayInfo[i]->framebufferArea = -1;
+	}
 	delete_area(info->sharedArea);
 	info->sharedArea = -1;
 	free(handle);
@@ -727,7 +781,7 @@ virtio_gpu_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	virtio_gpu_handle* handle = (virtio_gpu_handle*)cookie;
 	virtio_gpu_driver_info* info = handle->info;
 
-	// TRACE("ioctl(op = %lx)\n", op);
+	TRACE("ioctl(op = %" B_PRId32 ")\n", op);
 
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
@@ -738,22 +792,35 @@ virtio_gpu_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 			return B_OK;
 
+		case VIRTIO_GPU_GET_ENABLED_SCANOUTS:
+		{
+			if (length != sizeof(uint32))
+				return B_BAD_VALUE;
+
+			uint32 enabled = 0;
+			for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++) {
+				if (info->displayInfo[i] != NULL)
+					enabled |= 1 << i;
+			}
+			return user_memcpy(buffer, &enabled, sizeof(enabled));
+		}
+
 		// needed to share data between kernel and accelerant
 		case VIRTIO_GPU_GET_PRIVATE_DATA:
 			return user_memcpy(buffer, &info->sharedArea, sizeof(area_id));
 
 		case VIRTIO_GPU_SET_DISPLAY_MODE:
 		{
-			if (length != sizeof(display_mode))
+			virtio_gpu_set_display_mode_params params;
+			if (length != sizeof(params))
 				return B_BAD_VALUE;
 
-			display_mode mode;
-			if (user_memcpy(&mode, buffer, sizeof(display_mode)) != B_OK)
+			if (user_memcpy(&params, buffer, sizeof(params)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			MutexLocker commandLocker(&info->commandLock);
 
-			return virtio_gpu_set_display_mode(info, &mode);
+			return virtio_gpu_set_display_mode(info, params.scanout, &params.mode);
 		}
 		default:
 			ERROR("ioctl: unknown message %" B_PRIx32 "\n", op);
@@ -820,7 +887,9 @@ virtio_gpu_init_driver(device_node* node, void** cookie)
 
 	memset(info, 0, sizeof(*info));
 
-	info->framebufferArea = -1;
+	for (int i = 0; i < VIRTIO_GPU_MAX_SCANOUTS; i++)
+		info->displayInfo[i] = NULL;
+
 	info->sharedArea = -1;
 
 	info->node = node;
@@ -851,8 +920,7 @@ virtio_gpu_register_child_devices(void* _cookie)
 		return id;
 
 	char name[64];
-	snprintf(name, sizeof(name), "graphics/virtio/%" B_PRId32,
-		id);
+	snprintf(name, sizeof(name), "graphics/virtio/%" B_PRId32, id);
 
 	status = sDeviceManager->publish_device(info->node, name,
 		VIRTIO_GPU_DEVICE_MODULE_NAME);

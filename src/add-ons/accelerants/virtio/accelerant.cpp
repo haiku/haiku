@@ -49,7 +49,6 @@ init_common(int device, bool isClone)
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
-	gInfo->current_mode = UINT16_MAX;
 
 	// get basic info from driver
 
@@ -63,6 +62,17 @@ init_common(int device, bool isClone)
 	status_t status = gInfo->shared_info_area = sharedDeleter.Get();
 	if (status < B_OK)
 		return status;
+
+	uint32 scanouts;
+	if (ioctl(device, VIRTIO_GPU_GET_ENABLED_SCANOUTS, &scanouts, sizeof(scanouts)) != 0)
+		return B_ERROR;
+
+	gInfo->enabled_heads = scanouts;
+	for (int i = 0; i < MAX_SCANOUTS; i++) {
+		gInfo->heads[i].current_mode = UINT16_MAX;
+		if (!(scanouts & (1 << i)))
+			continue;
+	}
 
 	infoDeleter.Detach();
 	sharedDeleter.Detach();
@@ -100,7 +110,11 @@ virtio_gpu_init_accelerant(int device)
 	if (status != B_OK)
 		return status;
 
-	status = create_mode_list();
+	for (int i = 0; i < MAX_SCANOUTS; i++) {
+		if (!(gInfo->enabled_heads & (1 << i)))
+			continue;
+		status = create_mode_list(i);
+	}
 	if (status != B_OK) {
 		uninit_common();
 		return status;
@@ -143,10 +157,12 @@ virtio_gpu_clone_accelerant(void *info)
 	if (status != B_OK)
 		goto err1;
 
-	// get read-only clone of supported display modes
-	status = gInfo->mode_list_area = clone_area(
-		"virtio_gpu cloned modes", (void **)&gInfo->mode_list,
-		B_ANY_ADDRESS, B_READ_AREA, gInfo->shared_info->mode_list_area);
+	for (int i = 0; i < MAX_SCANOUTS; i++) {
+		// get read-only clone of supported display modes
+		status = gInfo->heads[i].mode_list_area = clone_area(
+			"virtio_gpu cloned modes", (void **)&gInfo->heads[i].mode_list,
+			B_ANY_ADDRESS, B_READ_AREA, gInfo->shared_info->display_info[i].mode_list_area);
+	}
 	if (status < B_OK)
 		goto err2;
 
@@ -169,9 +185,11 @@ virtio_gpu_uninit_accelerant(void)
 {
 	TRACE(("virtio_gpu_uninit_accelerant()\n"));
 
-	// delete accelerant instance data
-	delete_area(gInfo->mode_list_area);
-	gInfo->mode_list = NULL;
+	for (int i = 0; i < MAX_SCANOUTS; i++) {
+		// delete accelerant instance data
+		delete_area(gInfo->heads[i].mode_list_area);
+		gInfo->heads[i].mode_list = NULL;
+	}
 
 	uninit_common();
 }
