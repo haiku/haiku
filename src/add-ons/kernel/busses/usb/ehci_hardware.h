@@ -272,9 +272,10 @@ typedef struct {
 #ifdef B_HAIKU_64_BIT
 	uint32		padding[6];
 #else
-	uint32		padding[2];
+	uint32		padding[10];
 #endif
 } interrupt_entry;
+STATIC_ASSERT(sizeof(interrupt_entry) == 128);
 
 typedef struct {
 	ehci_itd	itd;
@@ -284,6 +285,7 @@ typedef struct {
 	uint32		padding[5]; // align on 128
 #endif
 } itd_entry;
+STATIC_ASSERT(sizeof(itd_entry) == 128);
 
 typedef struct {
 	ehci_sitd	sitd;
@@ -294,6 +296,7 @@ typedef struct {
 	uint32 		padding[2]; // align on 64
 #endif
 } sitd_entry;
+STATIC_ASSERT((sizeof(sitd_entry) % 64) == 0);
 
 #define EHCI_INTERRUPT_ENTRIES_COUNT	(7 + 1)		// (log 128 / log 2) + 1
 #define EHCI_VFRAMELIST_ENTRIES_COUNT	128
