@@ -123,6 +123,14 @@ status_t wlan_close(void*);
 	device_hooks *find_device(const char *name)							\
 		{ return &gDeviceHooks; }
 
+// Generate glue code for a driver with multiple modules.
+//
+// This also provides stubs for the wlan support functions, which will do nothing but allow
+// non-wlan drivers to be linked with the compatibility layer. WLAN drivers should use
+// HAIKU_FBSD_WLAN_DRIVERS_GLUE instead.
+//
+// Drivers using this macro directly have to provide their own implementation of
+// __haiku_init_hardware.
 #define HAIKU_FBSD_DRIVERS_GLUE(publicname)								\
 	HAIKU_FBSD_DRIVERS_CORE_GLUE(publicname)							\
 	status_t init_wlan_stack(void)										\
@@ -138,6 +146,12 @@ status_t wlan_close(void*);
 	status_t wlan_close(void* cookie)									\
 		{ return B_OK; }
 
+// Generate glue code for a simple driver using a single module.
+//
+// This generates the same code as HAIKU_FBSD_DRIVERS_GLUE, and additionally generates a
+// __haiku_init_hardware implementation that will call the freebsd compatibility layer
+// initialization function. The supported bus names are pci, uhub (for USB) and simplebus
+// (for openfirmware, FDT, and similar busses).
 #define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\
 	extern driver_t* DRIVER_MODULE_NAME(name, busname);					\
 	void __haiku_init_hardware()										\
@@ -146,10 +160,12 @@ status_t wlan_close(void*);
 			DRIVER_MODULE_NAME(name, busname),							\
 			NULL														\
 		};																\
-		_fbsd_init_hardware_pci(drivers);								\
+		_fbsd_init_hardware_##busname(drivers);							\
 	}																	\
 	HAIKU_FBSD_DRIVERS_GLUE(publicname);
 
+// The WLAN version of the wrapper does not provide default empty implementations of the wlan
+// related functions. WLAN drivers should implement these functions to actually do something.
 #define HAIKU_FBSD_WLAN_DRIVERS_GLUE(publicname)						\
 	HAIKU_FBSD_DRIVERS_CORE_GLUE(publicname)
 
@@ -161,7 +177,7 @@ status_t wlan_close(void*);
 			DRIVER_MODULE_NAME(name, busname),							\
 			NULL														\
 		};																\
-		_fbsd_init_hardware_pci(drivers);								\
+		_fbsd_init_hardware_##busname(drivers);							\
 	}																	\
 	HAIKU_FBSD_WLAN_DRIVERS_GLUE(publicname);
 
