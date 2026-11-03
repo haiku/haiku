@@ -273,6 +273,7 @@ ifq_init(struct ifqueue *ifq, const char *name)
 void
 ifq_uninit(struct ifqueue *ifq)
 {
+	IF_DRAIN(ifq);
 	mtx_destroy(&ifq->ifq_mtx);
 }
 
