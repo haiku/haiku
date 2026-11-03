@@ -195,15 +195,15 @@ family::Release()
 	MutexLocker _(sChainLock);
 
 	ChainList::Iterator iterator = chains.GetIterator();
-	while (struct chain* chain = iterator.Next()) {
+	while (struct chain* chain = iterator.Next())
 		chain->Uninitialize();
-	}
 }
 
 
 /*static*/ struct family*
 family::Lookup(int type)
 {
+	ASSERT_LOCKED_MUTEX(&sChainLock);
 	return sFamilies->Lookup(type);
 }
 
@@ -211,6 +211,8 @@ family::Lookup(int type)
 /*static*/ struct family*
 family::Add(int type)
 {
+	ASSERT_LOCKED_MUTEX(&sChainLock);
+
 	struct family* family = new (std::nothrow) ::family(type);
 	if (family == NULL)
 		return NULL;
@@ -250,9 +252,8 @@ chain::chain(int _family, int _type, int _protocol)
 
 chain::~chain()
 {
-	for (int32 i = 0; i < MAX_CHAIN_MODULES; i++) {
+	for (int32 i = 0; i < MAX_CHAIN_MODULES; i++)
 		free((char*)modules[i]);
-	}
 
 	//parent->chains.Remove(this);
 }
@@ -330,6 +331,8 @@ chain::Uninitialize()
 /*static*/ struct chain*
 chain::Lookup(ChainTable* chains, int family, int type, int protocol)
 {
+	ASSERT_LOCKED_MUTEX(&sChainLock);
+
 	struct chain_key key = { family, type, protocol };
 	return chains->Lookup(key);
 }
@@ -339,6 +342,8 @@ chain::Lookup(ChainTable* chains, int family, int type, int protocol)
 chain::Add(ChainTable* chains, int family, int type, int protocol,
 	va_list modules)
 {
+	ASSERT_LOCKED_MUTEX(&sChainLock);
+
 	struct chain* chain = new (std::nothrow) ::chain(family, type, protocol);
 	if (chain == NULL)
 		return NULL;
@@ -393,6 +398,8 @@ chain::Add(ChainTable* chains, int family, int type, int protocol, ...)
 /*static*/ void
 chain::DeleteChains(ChainTable* chains)
 {
+	ASSERT_LOCKED_MUTEX(&sChainLock);
+
 	struct chain* current;
 	current = chains->Clear(true);
 	while (current) {
@@ -439,6 +446,7 @@ get_domain_protocols(net_socket* socket)
 
 	// create net_protocol objects for the protocols in the chain
 	if (chain == NULL || chain->Acquire() != B_OK) {
+		MutexLocker _(sChainLock);
 		if (::family::Lookup(socket->family) == NULL)
 			return EAFNOSUPPORT;
 		if (socket->type != 0 && socket->protocol == 0)
@@ -886,6 +894,8 @@ uninit_stack()
 	uninit_notifications();
 
 	// remove chains and families
+
+	mutex_lock(&sChainLock);
 
 	chain::DeleteChains(sProtocolChains);
 	chain::DeleteChains(sDatalinkProtocolChains);
