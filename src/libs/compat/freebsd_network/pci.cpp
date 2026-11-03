@@ -130,7 +130,7 @@ pci_get_domain(device_t dev)
 uint32_t
 pci_get_devid(device_t dev)
 {
-	return pci_get_device(dev) << 16 |
+	return ((uint32_t)pci_get_device(dev)) << 16 |
 		pci_get_vendor(dev);
 }
 
