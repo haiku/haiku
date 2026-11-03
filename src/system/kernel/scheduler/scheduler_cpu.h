@@ -401,7 +401,7 @@ CoreEntry::GetLoad() const
 	SCHEDULER_ENTER_FUNCTION();
 
 	ASSERT(fCPUCount > 0);
-	return std::min(fLoad / fCPUCount, kMaxLoad);
+	return fLoad / fCPUCount;
 }
 
 
