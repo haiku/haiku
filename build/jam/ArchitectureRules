@@ -59,10 +59,10 @@ rule ArchitectureSetup architecture
 	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 	HAIKU_LINK_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
 
+	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
 	HAIKU_CCFLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(ccBaseFlags) -nostdinc ;
 	HAIKU_LINKFLAGS_$(architecture) += $(ccBaseFlags) ;
-	HAIKU_ASFLAGS_$(architecture) += $(archFlags) -nostdinc ;
 
 	# strip is required
 	if ! $(HAIKU_STRIP_$(architecture)) {
@@ -137,12 +137,14 @@ rule ArchitectureSetup architecture
 	local debugFlags = -ggdb ;
 
 	# debug 0: suppress asserts
+	HAIKU_DEBUG_0_ASFLAGS_$(architecture) = [ FDefines NDEBUG=$(NDEBUG) ] ;
 	HAIKU_DEBUG_0_CCFLAGS_$(architecture) = [ FDefines NDEBUG=$(NDEBUG) ] ;
 	HAIKU_DEBUG_0_C++FLAGS_$(architecture) = [ FDefines NDEBUG=$(NDEBUG) ] ;
 
 	local level ;
 	for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 		local flags = $(debugFlags) [ FDefines DEBUG=$(level) ] ;
+		HAIKU_DEBUG_$(level)_ASFLAGS_$(architecture) = $(flags) ;
 		HAIKU_DEBUG_$(level)_CCFLAGS_$(architecture) = $(flags) ;
 		HAIKU_DEBUG_$(level)_C++FLAGS_$(architecture) = $(flags) ;
 	}
@@ -569,6 +571,8 @@ rule KernelArchitectureSetup architecture
 	local level ;
 	for level in $(HAIKU_DEBUG_LEVELS) {
 		local flags = $(HAIKU_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+		HAIKU_KERNEL_DEBUG_$(level)_ASFLAGS
+			= $(HAIKU_DEBUG_$(level)_ASFLAGS_$(architecture)) ;
 		HAIKU_KERNEL_DEBUG_$(level)_CCFLAGS
 			= $(HAIKU_DEBUG_$(level)_CCFLAGS_$(architecture)) ;
 		HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS

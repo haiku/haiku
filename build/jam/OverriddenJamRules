@@ -185,7 +185,7 @@ rule As
 		local systemIncludesOption ;
 
 		if $(PLATFORM) = host {
-			flags = $(HOST_ASFLAGS) $(ASFLAGS) ;
+			flags = $(HOST_ASFLAGS) $(HOST_DEBUG_$(DEBUG)_ASFLAGS) $(ASFLAGS) ;
 
 			CC on $(1) = $(HOST_CC) ;
 
@@ -193,7 +193,8 @@ rule As
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 		} else {
-			flags = $(TARGET_ASFLAGS_$(TARGET_PACKAGING_ARCH)) $(ASFLAGS) ;
+			flags = $(TARGET_ASFLAGS_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEBUG_$(DEBUG)_ASFLAGS_$(TARGET_PACKAGING_ARCH)) $(ASFLAGS) ;
 
 			CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
 
