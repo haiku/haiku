@@ -2922,18 +2922,17 @@ get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 	}
 
 	io_context* context = get_current_io_context(kernel);
+	WriteLocker contextLocker(context->lock);
 	fd = new_fd(context, descriptor);
 	if (fd < 0) {
+		contextLocker.Unlock();
 		descriptor->ops = NULL;
 		put_fd(descriptor);
 		return B_NO_MORE_FDS;
 	}
 
-	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (openMode & O_CLOEXEC) != 0);
 	fd_set_close_on_fork(context, fd, (openMode & O_CLOFORK) != 0);
-	rw_lock_write_unlock(&context->lock);
-
 	return fd;
 }
 
