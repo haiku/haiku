@@ -302,6 +302,9 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			ifr.ifr_data = (uint8_t*)&nwid;
 
 			if (op == SIOCS80211) {
+				if (ireq.i_len > IEEE80211_NWID_LEN)
+					return B_BAD_VALUE;
+
 				nwid.i_len = ireq.i_len;
 				if (user_memcpy(nwid.i_nwid, ireq.i_data, ireq.i_len) != B_OK)
 					return B_BAD_ADDRESS;
@@ -367,6 +370,8 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 		case IEEE80211_IOC_HAIKU_JOIN: {
 			if (op != SIOCS80211)
 				return B_BAD_VALUE;
+			if (ireq.i_len > sizeof(struct ieee80211_haiku_join_req))
+				return B_BAD_VALUE;
 
 			struct ieee80211_haiku_join_req* haiku_join =
 				(struct ieee80211_haiku_join_req*)calloc(1, ireq.i_len);
@@ -376,6 +381,8 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 			if (user_memcpy(haiku_join, ireq.i_data, ireq.i_len) != B_OK)
 				return B_BAD_ADDRESS;
+			if (haiku_join->i_nwid_len > IEEE80211_NWID_LEN)
+				return B_BAD_VALUE;
 
 			struct ifreq ifr;
 			struct ieee80211_nwid nwid;
@@ -415,6 +422,8 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 						wpaparams.i_akms |= IEEE80211_WPA_AKM_SHA256_PSK;
 
 					if (haiku_join->i_key_len != 0) {
+						if (haiku_join->i_key_len > sizeof(wpapsk.i_psk))
+							return B_BAD_VALUE;
 						wpapsk.i_enabled = 1;
 						memcpy(wpapsk.i_psk, haiku_join->i_key, haiku_join->i_key_len);
 						memset(&wpapsk.i_psk[haiku_join->i_key_len], 0,
