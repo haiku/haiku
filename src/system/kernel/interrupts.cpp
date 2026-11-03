@@ -274,6 +274,9 @@ io_interrupt_handler(int vector, interrupt_trigger_mode triggerMode)
 	ASSERT(sVectors[vector].type != INTERRUPT_TYPE_EXCEPTION
 		&& sVectors[vector].type != INTERRUPT_TYPE_SYSCALL);
 
+	cpu_ent* cpu = get_cpu_struct();
+
+	cpu->reschedule_disabled++;
 	if (!sVectors[vector].no_lock_vector)
 		acquire_spinlock(&sVectors[vector].vector_lock);
 
@@ -283,6 +286,7 @@ io_interrupt_handler(int vector, interrupt_trigger_mode triggerMode)
 		dprintf("unhandled io interrupt %d\n", vector);
 		if (!sVectors[vector].no_lock_vector)
 			release_spinlock(&sVectors[vector].vector_lock);
+		cpu->reschedule_disabled--;
 		return B_UNHANDLED_INTERRUPT;
 	}
 #endif
@@ -354,13 +358,13 @@ io_interrupt_handler(int vector, interrupt_trigger_mode triggerMode)
 
 	if (!sVectors[vector].no_lock_vector)
 		release_spinlock(&sVectors[vector].vector_lock);
+	cpu->reschedule_disabled--;
 
 	SpinLocker vectorLocker(sVectors[vector].load_lock);
 	bigtime_t deltaTime = system_time() - start;
 	sVectors[vector].last_measure_active += deltaTime;
 	vectorLocker.Unlock();
 
-	cpu_ent* cpu = get_cpu_struct();
 	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ
 		|| sVectors[vector].type == INTERRUPT_TYPE_ICI
 		|| sVectors[vector].type == INTERRUPT_TYPE_LOCAL_IRQ) {
