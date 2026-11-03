@@ -554,6 +554,7 @@ BMenuField::MouseUp(BPoint where)
 void
 BMenuField::DetachedFromWindow()
 {
+	Window()->RemoveCommonFilter(fMouseDownFilter);
 	BView::DetachedFromWindow();
 }
 
