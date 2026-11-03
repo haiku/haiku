@@ -551,11 +551,11 @@ rule KernelArchitectureSetup architecture
 					# TODO: coldfire (FireBee)
 				}
 			case riscv :
-				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic -fno-semantic-interposition ;
-				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic -fno-semantic-interposition ;
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -mcmodel=medany -fno-omit-frame-pointer -fno-plt -fno-pic ;
 			case openfirmware :
-				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -fno-semantic-interposition -Wno-error=main -Wstack-usage=1023 ;
-				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fno-pic -fno-semantic-interposition -Wno-error=main -Wstack-usage=1023 ;
+				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -Wno-error=main -Wstack-usage=1023 ;
+				HAIKU_BOOT_$(bootTarget:U)_C++FLAGS += -fno-pic -Wno-error=main -Wstack-usage=1023 ;
 			case * :
 				# all other bootloaders are non-PIC
 				HAIKU_BOOT_$(bootTarget:U)_CCFLAGS += -fno-pic -Wno-error=main ;
