@@ -199,10 +199,13 @@ void
 BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 {
 	int pipes[2];
-	if (pipe(&pipes[0]) != 0) {
+	if (pipe2(&pipes[0], O_CLOEXEC) != 0) {
 		// TODO: log error
 		return;
 	}
+
+	FileDescriptorCloser pipes0(pipes[0]);
+	FileDescriptorCloser pipes1(pipes[1]);
 
 	posix_spawn_file_actions_t fileActions;
 	int status = posix_spawn_file_actions_init(&fileActions);
@@ -238,7 +241,7 @@ BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 
 	// Retrieve environment from child
 
-	close(pipes[1]);
+	pipes1.Delete();
 
 	BString line;
 	char buffer[4096];
@@ -263,8 +266,6 @@ BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 			chunk = separator + 1;
 		}
 	}
-
-	close(pipes[0]);
 }
 
 
