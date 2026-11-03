@@ -84,35 +84,40 @@ pci_write_config(device_t dev, int offset, uint32_t value, int size)
 uint16_t
 pci_get_vendor(device_t dev)
 {
-	return pci_read_config(dev, PCI_vendor_id, 2);
+	pci_info* info = get_device_pci_info(dev);
+	return info->vendor_id;
 }
 
 
 uint16_t
 pci_get_device(device_t dev)
 {
-	return pci_read_config(dev, PCI_device_id, 2);
+	pci_info* info = get_device_pci_info(dev);
+	return info->device_id;
 }
 
 
 uint16_t
 pci_get_subvendor(device_t dev)
 {
-	return pci_read_config(dev, PCI_subsystem_vendor_id, 2);
+	pci_info* info = get_device_pci_info(dev);
+	return info->u.h0.subsystem_vendor_id;
 }
 
 
 uint16_t
 pci_get_subdevice(device_t dev)
 {
-	return pci_read_config(dev, PCI_subsystem_id, 2);
+	pci_info* info = get_device_pci_info(dev);
+	return info->u.h0.subsystem_id;
 }
 
 
 uint8_t
 pci_get_revid(device_t dev)
 {
-	return pci_read_config(dev, PCI_revision, 1);
+	pci_info* info = get_device_pci_info(dev);
+	return info->revision;
 }
 
 
@@ -125,14 +130,15 @@ pci_get_domain(device_t dev)
 uint32_t
 pci_get_devid(device_t dev)
 {
-	return pci_read_config(dev, PCI_device_id, 2) << 16 |
-		pci_read_config(dev, PCI_vendor_id, 2);
+	return pci_get_device(dev) << 16 |
+		pci_get_vendor(dev);
 }
 
 uint8_t
 pci_get_cachelnsz(device_t dev)
 {
-	return pci_read_config(dev, PCI_line_size, 1);
+	pci_info* info = get_device_pci_info(dev);
+	return info->line_size;
 }
 
 uint8_t *
