@@ -386,6 +386,9 @@ do_sync_handler(iframe * frame)
 			syscall_dispatcher(syscall, (void*)args, &frame->x[0]);
 			return;
 		}
+
+		default:
+			panic("unhandled exception: %" B_PRIu64, ESR_ELx_EXCEPTION(frame->esr));
 	}
 
 	if (isUser) {
