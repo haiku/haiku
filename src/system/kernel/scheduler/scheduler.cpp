@@ -485,14 +485,14 @@ scheduler_reschedule(int32 nextState)
 	ASSERT(!are_interrupts_enabled());
 	SCHEDULER_ENTER_FUNCTION();
 
+	Thread* thread = thread_get_current_thread();
 	if (!sSchedulerEnabled) {
-		Thread* thread = thread_get_current_thread();
 		if (thread != NULL && nextState != B_THREAD_READY)
-			panic("scheduler_reschedule_no_op() called in non-ready thread");
+			panic("scheduler_reschedule called in non-ready thread");
 		return;
 	}
 
-	if (thread_get_current_thread()->cpu->reschedule_disabled) {
+	if (thread->cpu->reschedule_disabled) {
 		ASSERT(nextState == B_THREAD_READY);
 		return;
 	}
