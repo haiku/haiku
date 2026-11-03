@@ -604,8 +604,10 @@ VMKernelAddressSpace::_AllocateRange(
 	switch (addressRestrictions->address_specification) {
 		case B_EXACT_ADDRESS:
 		{
-			if (address % B_PAGE_SIZE != 0)
+			if ((address % B_PAGE_SIZE) != 0) {
+				KDEBUG_ONLY(panic("address not page-aligned: %" B_PRIxADDR, address));
 				return B_BAD_VALUE;
+			}
 			break;
 		}
 
@@ -626,6 +628,7 @@ VMKernelAddressSpace::_AllocateRange(
 			break;
 
 		default:
+			ASSERT(false);
 			return B_BAD_VALUE;
 	}
 
