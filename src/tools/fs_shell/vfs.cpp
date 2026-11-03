@@ -1724,6 +1724,19 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 }
 
 
+/*!	Clears memory specified by an iovec array.
+*/
+static void
+zero_iovecs(const fssh_iovec* vecs, fssh_size_t vecCount, fssh_size_t bytes)
+{
+	for (size_t i = 0; i < vecCount && bytes > 0; i++) {
+		fssh_size_t length = fssh_min_c(vecs[i].iov_len, bytes);
+		memset(vecs[i].iov_base, 0, length);
+		bytes -= length;
+	}
+}
+
+
 /*!	Does the dirty work of combining the file_io_vecs with the iovecs
 	and calls the file system hooks to read/write the request to disk.
 */
@@ -1741,59 +1754,63 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 
 	fssh_size_t numBytes = *_numBytes;
 	uint32_t fileVecIndex;
+	fssh_off_t fileVecOffset;
 	fssh_size_t vecOffset = *_vecOffset;
 	uint32_t vecIndex = *_vecIndex;
 	fssh_status_t status;
 	fssh_size_t size;
 
-	if (!doWrite && vecOffset == 0) {
+	if (!doWrite && vecOffset == 0 && fileVecs[0].length >= (fssh_off_t)vecs[vecIndex].iov_len) {
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
+		// TODO: we could also write directly
 
-		size = fileVecs[0].length;
-		if (size > numBytes)
-			size = numBytes;
+		size = 0;
+		uint32_t directVecCount = 0;
+		for (uint32_t i = vecIndex; i < vecCount; i++) {
+			fssh_size_t nextSize = size + vecs[i].iov_len;
+			if ((fssh_off_t)nextSize > fileVecs[0].length)
+				break;
 
-		status = fssh_read_pages(fd, fileVecs[0].offset, &vecs[vecIndex],
-			vecCount - vecIndex, &size);
-		if (status < FSSH_B_OK)
-			return status;
-
-		// TODO: this is a work-around for buggy device drivers!
-		//	When our own drivers honour the length, we can:
-		//	a) also use this direct I/O for writes (otherwise, it would
-		//	   overwrite precious data)
-		//	b) panic if the term below is true (at least for writes)
-		if ((uint64_t)size > (uint64_t)fileVecs[0].length) {
-			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
-			size = fileVecs[0].length;
+			size = nextSize;
+			directVecCount++;
 		}
 
-		ASSERT(size <= fileVecs[0].length);
+		if (fileVecs[0].offset >= 0) {
+			status = fssh_read_pages(fd,  fileVecs[0].offset,
+				&vecs[vecIndex], directVecCount, &size);
+		} else {
+			// sparse read
+			zero_iovecs(&vecs[vecIndex], directVecCount, size);
+			status = FSSH_B_OK;
+		}
+		if (status != FSSH_B_OK)
+			return status;
+
+		ASSERT((fssh_off_t)size <= fileVecs[0].length);
 
 		// If the file portion was contiguous, we're already done now
 		if (size == numBytes)
 			return FSSH_B_OK;
 
 		// if we reached the end of the file, we can return as well
-		if ((uint64_t)size != (uint64_t)fileVecs[0].length) {
+		if ((fssh_off_t)size == fileVecs[0].length && fileVecCount == 1) {
 			*_numBytes = size;
 			return FSSH_B_OK;
 		}
 
-		fileVecIndex = 1;
-
-		// first, find out where we have to continue in our iovecs
-		for (; vecIndex < vecCount; vecIndex++) {
-			if (size < vecs[vecIndex].iov_len)
-				break;
-
-			size -= vecs[vecIndex].iov_len;
+		// prepare to continue
+		if ((fssh_off_t)size == fileVecs[0].length) {
+			fileVecIndex = 1;
+			fileVecOffset = 0;
+		} else {
+			fileVecIndex = 0;
+			fileVecOffset = size;
 		}
-
-		vecOffset = size;
+		vecIndex += directVecCount;
 	} else {
 		fileVecIndex = 0;
+		fileVecOffset = 0;
 		size = 0;
 	}
 
@@ -1804,10 +1821,12 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 
 	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
 		const fssh_file_io_vec &fileVec = fileVecs[fileVecIndex];
-		fssh_off_t fileOffset = fileVec.offset;
-		fssh_off_t fileLeft = fssh_min_c((uint64_t)fileVec.length, (uint64_t)bytesLeft);
+		fssh_off_t fileOffset = fileVec.offset + fileVecOffset;
+		fssh_off_t fileLeft = fssh_min_c(fileVec.length - fileVecOffset, (fssh_off_t)bytesLeft);
+		fileVecOffset = 0;
 
-		TRACE(("FILE VEC [%lu] length %lld\n", fileVecIndex, fileLeft));
+		TRACE(("FILE VEC [%" B_PRIu32 "] length %" B_PRIdOFF "\n", fileVecIndex,
+			fileLeft));
 
 		// process the complete fileVec
 		while (fileLeft > 0) {
@@ -1819,7 +1838,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			size = 0;
 
 			// assign what is left of the current fileVec to the tempVecs
-			for (size = 0; (uint64_t)size < (uint64_t)fileLeft && vecIndex < vecCount
+			for (size = 0; (fssh_off_t)size < fileLeft && vecIndex < vecCount
 					&& tempCount < MAX_TEMP_IO_VECS;) {
 				// try to satisfy one iovec per iteration (or as much as
 				// possible)
@@ -1832,14 +1851,14 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 					continue;
 				}
 
-				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+				TRACE(("fill vec %" B_PRIu32 ", offset = %lu, size = %lu\n",
 					vecIndex, vecOffset, size));
 
 				// actually available bytes
 				fssh_size_t tempVecSize = fssh_min_c(vecLeft, fileLeft - size);
 
 				tempVecs[tempCount].iov_base
-					= (void *)((fssh_addr_t)vecs[vecIndex].iov_base + vecOffset);
+					= (void*)((fssh_addr_t)vecs[vecIndex].iov_base + vecOffset);
 				tempVecs[tempCount].iov_len = tempVecSize;
 				tempCount++;
 
@@ -1848,20 +1867,32 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			}
 
 			fssh_size_t bytes = size;
-			if (doWrite) {
-				status = fssh_write_pages(fd, fileOffset, tempVecs,
-					tempCount, &bytes);
+
+			if (fileOffset == -1) {
+				if (doWrite) {
+					fssh_panic("sparse write attempt: vnode %p", (void*)fd);
+					status = FSSH_B_IO_ERROR;
+				} else {
+					// sparse read
+					zero_iovecs(tempVecs, tempCount, bytes);
+					status = FSSH_B_OK;
+				}
+			} else if (doWrite) {
+				status = fssh_write_pages(fd, fileOffset,
+					tempVecs, tempCount, &bytes);
 			} else {
-				status = fssh_read_pages(fd, fileOffset, tempVecs,
-					tempCount, &bytes);
+				status = fssh_read_pages(fd, fileOffset,
+					tempVecs, tempCount, &bytes);
 			}
-			if (status < FSSH_B_OK)
+			if (status != FSSH_B_OK)
 				return status;
 
 			totalSize += bytes;
 			bytesLeft -= size;
-			fileOffset += size;
+			if (fileOffset >= 0)
+				fileOffset += size;
 			fileLeft -= size;
+			//dprintf("-> file left = %Lu\n", fileLeft);
 
 			if (size != bytes || vecIndex >= vecCount) {
 				// there are no more bytes or iovecs, let's bail out

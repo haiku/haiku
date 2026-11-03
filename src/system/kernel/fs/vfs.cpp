@@ -3517,27 +3517,34 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 
 	size_t numBytes = *_numBytes;
 	uint32 fileVecIndex;
+	off_t fileVecOffset;
 	size_t vecOffset = *_vecOffset;
 	uint32 vecIndex = *_vecIndex;
 	status_t status;
 	size_t size;
 
-	if (!doWrite && vecOffset == 0) {
+	if (!doWrite && vecOffset == 0 && fileVecs[0].length >= (off_t)vecs[vecIndex].iov_len) {
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
 		// TODO: we could also write directly
 
-		if (fileVecs[0].length < (off_t)numBytes)
-			size = fileVecs[0].length;
-		else
-			size = numBytes;
+		size = 0;
+		uint32 directVecCount = 0;
+		for (uint32 i = vecIndex; i < vecCount; i++) {
+			size_t nextSize = size + vecs[i].iov_len;
+			if ((off_t)nextSize > fileVecs[0].length)
+				break;
+
+			size = nextSize;
+			directVecCount++;
+		}
 
 		if (fileVecs[0].offset >= 0) {
 			status = FS_CALL(vnode, read_pages, cookie, fileVecs[0].offset,
-				&vecs[vecIndex], vecCount - vecIndex, &size);
+				&vecs[vecIndex], directVecCount, &size);
 		} else {
 			// sparse read
-			zero_iovecs(&vecs[vecIndex], vecCount - vecIndex, size);
+			zero_iovecs(&vecs[vecIndex], directVecCount, size);
 			status = B_OK;
 		}
 		if (status != B_OK)
@@ -3550,24 +3557,23 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 			return B_OK;
 
 		// if we reached the end of the file, we can return as well
-		if ((off_t)size != fileVecs[0].length) {
+		if ((off_t)size == fileVecs[0].length && fileVecCount == 1) {
 			*_numBytes = size;
 			return B_OK;
 		}
 
-		fileVecIndex = 1;
-
-		// first, find out where we have to continue in our iovecs
-		for (; vecIndex < vecCount; vecIndex++) {
-			if (size < vecs[vecIndex].iov_len)
-				break;
-
-			size -= vecs[vecIndex].iov_len;
+		// prepare to continue
+		if ((off_t)size == fileVecs[0].length) {
+			fileVecIndex = 1;
+			fileVecOffset = 0;
+		} else {
+			fileVecIndex = 0;
+			fileVecOffset = size;
 		}
-
-		vecOffset = size;
+		vecIndex += directVecCount;
 	} else {
 		fileVecIndex = 0;
+		fileVecOffset = 0;
 		size = 0;
 	}
 
@@ -3578,8 +3584,9 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 
 	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
 		const file_io_vec &fileVec = fileVecs[fileVecIndex];
-		off_t fileOffset = fileVec.offset;
-		off_t fileLeft = min_c(fileVec.length, (off_t)bytesLeft);
+		off_t fileOffset = fileVec.offset + fileVecOffset;
+		off_t fileLeft = min_c(fileVec.length - fileVecOffset, (off_t)bytesLeft);
+		fileVecOffset = 0;
 
 		TRACE(("FILE VEC [%" B_PRIu32 "] length %" B_PRIdOFF "\n", fileVecIndex,
 			fileLeft));
