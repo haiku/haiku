@@ -211,7 +211,7 @@ bluetooth_print_address(const sockaddr* address, char** _buffer, bool printPort)
 	}
 
 	const bdaddr_t* addr = get_bdaddr(address);
-	if (addr != NULL) {
+	if (addr == NULL) {
 		*_buffer = strdup("<invalid>");
 		return B_OK;
 	}
