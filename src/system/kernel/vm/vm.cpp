@@ -3818,7 +3818,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isExecute,
 						? SEGV_ACCERR : SEGV_MAPERR,
 					EFAULT, thread->team->id);
 				signal.SetAddress((void*)address);
-				send_signal_to_thread(thread, signal, 0);
+				send_signal_to_thread_forced(thread, signal);
 			}
 		}
 	}

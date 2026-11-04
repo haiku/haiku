@@ -215,6 +215,7 @@ status_t send_signal_to_thread(Thread* thread, const Signal& signal,
 	uint32 flags);
 status_t send_signal_to_thread_id(thread_id threadID, const Signal& signal,
 	uint32 flags);
+status_t send_signal_to_thread_forced(Thread* thread, const Signal& signal);
 
 status_t send_signal_to_team_locked(Team* team, uint32 signalNumber,
 	Signal* signal, uint32 flags);

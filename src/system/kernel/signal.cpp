@@ -1604,6 +1604,39 @@ send_signal_to_thread_id(thread_id threadID, const Signal& signal, uint32 flags)
 }
 
 
+/*!	Sends the given signal to the given thread, not blockable, not ignored.
+
+	\param thread The thread the signal shall be sent to.
+	\param signal The signal to be delivered. If the signal's number is \c 0, no
+		actual signal will be delivered. Only delivery checks will be performed.
+		The given object will be copied. The caller retains ownership.
+	\return \c B_OK, when the signal was delivered successfully, another error
+		code otherwise.
+*/
+status_t
+send_signal_to_thread_forced(Thread* thread, const Signal& signal)
+{
+	// Clone the signal -- the clone will be queued. If something fails and the
+	// caller doesn't require queuing, we will add an unqueued signal.
+	Signal* signalToQueue = NULL;
+	status_t error = Signal::CreateQueuable(signal, false, signalToQueue);
+	if (error != B_OK)
+		return error;
+
+	InterruptsReadSpinLocker teamLocker(thread->team_lock);
+	struct sigaction& teamHandler = thread->team->SignalActionFor(signal.Number());
+	sigset_t mask = SIGNAL_TO_MASK(signal.Number());
+	if (teamHandler.sa_handler == SIG_IGN || (thread->sig_block_mask & mask) != 0) {
+		teamHandler.sa_handler = SIG_DFL;
+		thread->sig_block_mask &= ~mask;
+	}
+
+	SpinLocker locker(thread->team->signal_lock);
+
+	return send_signal_to_thread_locked(thread, signal.Number(), signalToQueue, 0);
+}
+
+
 /*!	Sends the given signal to the given team.
 
 	The caller must hold \c signal_lock.
