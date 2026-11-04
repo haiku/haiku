@@ -370,8 +370,6 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 		case IEEE80211_IOC_HAIKU_JOIN: {
 			if (op != SIOCS80211)
 				return B_BAD_VALUE;
-			if (ireq.i_len > sizeof(struct ieee80211_haiku_join_req))
-				return B_BAD_VALUE;
 
 			struct ieee80211_haiku_join_req* haiku_join =
 				(struct ieee80211_haiku_join_req*)calloc(1, ireq.i_len);
