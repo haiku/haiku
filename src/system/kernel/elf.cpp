@@ -1473,6 +1473,14 @@ error1:
 
 
 class UserSymbolLookup {
+private:
+	struct MatchResult {
+		addr_t deltaFound = INT_MAX;
+		bool exactMatch = false;
+		elf_sym symbolFound;
+		MatchResult() : deltaFound(INT_MAX), exactMatch(false) {}
+	};
+
 public:
 	static UserSymbolLookup& Default()
 	{
@@ -1485,8 +1493,8 @@ public:
 		return B_OK;
 	}
 
-	status_t LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
-		const char **_symbolName, const char **_imageName, bool *_exactMatch)
+	status_t LookupSymbolAddress(addr_t address, addr_t* _baseAddress,
+		const char** _symbolName, const char** _imageName, bool* _exactMatch)
 	{
 		// Note, that this function doesn't find all symbols that we would like
 		// to find. E.g. static functions do not appear in the symbol table
@@ -1498,7 +1506,7 @@ public:
 		// from the shared object.
 
 		// get the image for the address
-		struct image *image;
+		struct image* image;
 		status_t error = _FindImageAtAddress(address, image);
 		if (error != B_OK)
 			return error;
@@ -1517,74 +1525,21 @@ public:
 		}
 
 		const extended_image_info& info = image->info;
-		const uint32 *symhash = (uint32 *)info.symbol_hash;
-		elf_sym *syms = (elf_sym *)info.symbol_table;
+		const addr_t loadDelta = (addr_t)info.basic_info.text;
 
 		strlcpy(fImageName, info.basic_info.name, sizeof(fImageName));
 
-		// symbol hash table size
-		uint32 hashTabSize;
-		if (!_Read(symhash, hashTabSize))
-			return B_BAD_ADDRESS;
+		MatchResult result;
 
-		// remote pointers to hash buckets and chains
-		const uint32* hashBuckets = symhash + 2;
-		const uint32* hashChains = symhash + 2 + hashTabSize;
+		if (info.gnuhash.buckets != NULL)
+			error = _LookupSymbolAddressGnuhash(address, info, result);
+		else if (info.symbol_hash != 0)
+			error = _LookupSymbolAddressSysv(address, info, result);
+		else
+			error = B_ENTRY_NOT_FOUND;
 
-		const addr_t loadDelta = (addr_t)info.basic_info.text;
-
-		// search the image for the symbol
-		elf_sym symbolFound;
-		addr_t deltaFound = INT_MAX;
-		bool exactMatch = false;
-
-		// to get rid of the erroneous "uninitialized" warnings
-		symbolFound.st_name = 0;
-		symbolFound.st_value = 0;
-
-		for (uint32 i = 0; i < hashTabSize; i++) {
-			uint32 bucket;
-			if (!_Read(&hashBuckets[i], bucket))
-				return B_BAD_ADDRESS;
-
-			for (uint32 j = bucket; j != STN_UNDEF;
-					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
-
-				elf_sym symbol;
-				if (!_Read(syms + j, symbol))
-					continue;
-
-				// The symbol table contains not only symbols referring to
-				// functions and data symbols within the shared object, but also
-				// referenced symbols of other shared objects, as well as
-				// section and file references. We ignore everything but
-				// function and data symbols that have an st_value != 0 (0
-				// seems to be an indication for a symbol defined elsewhere
-				// -- couldn't verify that in the specs though).
-				if ((symbol.Type() != STT_FUNC && symbol.Type() != STT_OBJECT)
-					|| symbol.st_value == 0
-					|| (symbol.st_value + symbol.st_size) > (elf_addr)info.basic_info.text_size) {
-					continue;
-				}
-
-				// skip symbols starting after the given address
-				addr_t symbolAddress = symbol.st_value + loadDelta;
-				if (symbolAddress > address)
-					continue;
-				addr_t symbolDelta = address - symbolAddress;
-
-				if (symbolDelta < deltaFound) {
-					deltaFound = symbolDelta;
-					symbolFound = symbol;
-
-					if (symbolDelta >= 0 && symbolDelta < symbol.st_size) {
-						// exact match
-						exactMatch = true;
-						break;
-					}
-				}
-			}
-		}
+		if (error != B_OK)
+			return error;
 
 		if (_imageName)
 			*_imageName = fImageName;
@@ -1592,30 +1547,31 @@ public:
 		if (_symbolName) {
 			*_symbolName = NULL;
 
-			if (deltaFound < INT_MAX) {
-				if (_ReadString(info, symbolFound.st_name, fSymbolName,
+			if (result.deltaFound < INT_MAX) {
+				if (_ReadString(info, result.symbolFound.st_name, fSymbolName,
 						sizeof(fSymbolName))) {
 					*_symbolName = fSymbolName;
 				} else {
 					// we can't get its name, so forget the symbol
-					deltaFound = INT_MAX;
+					result.deltaFound = INT_MAX;
 				}
 			}
 		}
 
 		if (_baseAddress) {
-			if (deltaFound < INT_MAX)
-				*_baseAddress = symbolFound.st_value + loadDelta;
+			if (result.deltaFound < INT_MAX)
+				*_baseAddress = result.symbolFound.st_value + loadDelta;
 			else
 				*_baseAddress = loadDelta;
 		}
 
 		if (_exactMatch)
-			*_exactMatch = exactMatch;
+			*_exactMatch = result.exactMatch;
 
 		return B_OK;
 	}
 
+private:
 	status_t _FindImageAtAddress(addr_t address, struct image*& _image)
 	{
 		for (struct image* image = fTeam->image_list.First();
@@ -1634,6 +1590,109 @@ public:
 		}
 
 		return B_ENTRY_NOT_FOUND;
+	}
+
+	bool _MatchSymbol(addr_t address, uint32 index, elf_sym* syms, const extended_image_info& info,
+		MatchResult& result)
+	{
+		elf_sym symbol;
+		if (!_Read(syms + index, symbol))
+			return false;
+
+		// The symbol table contains not only symbols referring to
+		// functions and data symbols within the shared object, but also
+		// referenced symbols of other shared objects, as well as
+		// section and file references. We ignore everything but
+		// function and data symbols that have an st_value != 0 (0
+		// seems to be an indication for a symbol defined elsewhere
+		// -- couldn't verify that in the specs though).
+		if ((symbol.Type() != STT_FUNC && symbol.Type() != STT_OBJECT)
+			|| symbol.st_value == 0
+			|| (symbol.st_value + symbol.st_size) > (elf_addr)info.basic_info.text_size) {
+			return false;
+		}
+
+		const addr_t loadDelta = (addr_t)info.basic_info.text;
+
+		// skip symbols starting after the given address
+		addr_t symbolAddress = symbol.st_value + loadDelta;
+		if (symbolAddress > address)
+			return false;
+		addr_t symbolDelta = address - symbolAddress;
+
+		if (symbolDelta < result.deltaFound) {
+			result.deltaFound = symbolDelta;
+			result.symbolFound = symbol;
+
+			if (symbolDelta >= 0 && symbolDelta < symbol.st_size) {
+				// exact match
+				result.exactMatch = true;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	status_t _LookupSymbolAddressSysv(addr_t address, const extended_image_info& info,
+		MatchResult& result)
+	{
+		elf_sym* syms = (elf_sym *)info.symbol_table;
+		const uint32* symhash = (uint32 *)info.symbol_hash;
+
+		// symbol hash table size
+		uint32 hashTabSize;
+		if (!_Read(symhash, hashTabSize))
+			return B_BAD_ADDRESS;
+
+		// remote pointers to hash buckets and chains
+		const uint32* hashBuckets = symhash + 2;
+		const uint32* hashChains = symhash + 2 + hashTabSize;
+
+		// to get rid of the erroneous "uninitialized" warnings
+		result.symbolFound.st_name = 0;
+		result.symbolFound.st_value = 0;
+
+		for (uint32 i = 0; i < hashTabSize; i++) {
+			uint32 bucket;
+			if (!_Read(&hashBuckets[i], bucket))
+				return B_BAD_ADDRESS;
+
+			for (uint32 j = bucket; j != STN_UNDEF;
+					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
+
+				if (_MatchSymbol(address, j, syms, info, result))
+					return B_OK;
+			}
+		}
+		return B_OK;
+	}
+
+	status_t _LookupSymbolAddressGnuhash(addr_t address, const extended_image_info& info,
+		MatchResult& result)
+	{
+		elf_sym* syms = (elf_sym*)info.symbol_table;
+
+		// to get rid of the erroneous "uninitialized" warnings
+		result.symbolFound.st_name = 0;
+		result.symbolFound.st_value = 0;
+
+		for (uint32 i = 0; i < info.gnuhash.bucket_count; i++) {
+			uint32 bucket;
+			if (!_Read(&info.gnuhash.buckets[i], bucket))
+				return B_BAD_ADDRESS;
+
+			const uint32* chain0 = info.gnuhash.chain0;
+			const uint32* hashValue = &chain0[bucket];
+			uint32 hash = 0;
+			do {
+				uint32 symIndex = hashValue - chain0;
+				if (_MatchSymbol(address, symIndex, syms, info, result))
+					return B_OK;
+				if (!_Read(hashValue++, hash))
+					return B_BAD_ADDRESS;
+			} while ((hash & 1) == 0);
+		}
+		return B_OK;
 	}
 
 	bool _ReadString(const extended_image_info& info, uint32 offset, char* buffer,

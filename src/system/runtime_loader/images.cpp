@@ -541,6 +541,12 @@ register_image(image_t* image, int fd, const char* path)
 	info.text_delta = image->regions[0].delta;
 	info.symbol_table = image->syms;
 	info.symbol_hash = image->symhash;
+
+	info.gnuhash.buckets = image->gnuhash.buckets;
+	if (info.gnuhash.buckets != NULL) {
+		info.gnuhash.bucket_count = image->gnuhash.bucket_count;
+		info.gnuhash.chain0 = image->gnuhash.chain0;
+	}
 	info.string_table = image->strtab;
 	image->id = _kern_register_image(&info, sizeof(info));
 }

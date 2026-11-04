@@ -23,6 +23,12 @@ typedef struct extended_image_info {
 	void*		symbol_table;
 	void*		symbol_hash;
 	void*		string_table;
+
+	struct {
+		uint32	bucket_count;
+		uint32*	buckets;
+		uint32*	chain0;
+	} gnuhash;
 } extended_image_info;
 
 
