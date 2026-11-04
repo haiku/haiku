@@ -2460,6 +2460,9 @@ device_manager_probe(const char* path, uint32 updateCycle)
 	TRACE(("device_manager_probe(\"%s\")\n", path));
 	RecursiveLocker _(sLock);
 
+	if (sRootNode == NULL || !sRootNode->IsRegistered())
+		return B_NO_INIT;
+
 	// first, publish directories in the driver directory
 	publish_directories(path);
 

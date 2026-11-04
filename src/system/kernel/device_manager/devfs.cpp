@@ -236,9 +236,11 @@ scan_for_drivers_if_needed(devfs_vnode* dir)
 
 	// scan for drivers at this path
 	static int32 updateCycle = 1;
-	device_manager_probe(path.Path(), updateCycle++);
-	legacy_driver_probe(path.Path());
+	status_t status = device_manager_probe(path.Path(), updateCycle++);
+	if (status != B_OK)
+		return status;
 
+	legacy_driver_probe(path.Path());
 	dir->stream.u.dir.scanned = scan_mode();
 	return B_OK;
 }
