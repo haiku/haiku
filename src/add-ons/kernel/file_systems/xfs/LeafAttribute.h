@@ -56,13 +56,13 @@ class AttrLeafHeaderV4 : public AttrLeafHeader {
 public:
 			struct OnDiskData {
 			public:
+				BlockInfo			info;
 				uint16				count;
 				uint16				usedbytes;
 				uint16				firstused;
 				uint8				holes;
 				uint8				pad1;
 				AttrLeafMap			freemap[3];
-				BlockInfo			info;
 			};
 
 								AttrLeafHeaderV4(const char* buffer);
@@ -84,6 +84,7 @@ class AttrLeafHeaderV5 : public AttrLeafHeader {
 public:
 			struct OnDiskData {
 			public:
+				BlockInfoV5			info;
 				uint16				count;
 				uint16				usedbytes;
 				uint16				firstused;
@@ -91,7 +92,6 @@ public:
 				uint8				pad1;
 				AttrLeafMap			freemap[3];
 				uint32				pad2;
-				BlockInfoV5			info;
 			};
 
 								AttrLeafHeaderV5(const char* buffer);
