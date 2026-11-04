@@ -248,6 +248,7 @@ parse_dynamic_segment(image_t* image)
 	image->symhash = 0;
 	image->syms = 0;
 	image->strtab = 0;
+	image->gnuhash.buckets = 0;
 
 	d = (elf_dyn*)image->dynamic_ptr;
 	if (!d)
@@ -394,7 +395,7 @@ parse_dynamic_segment(image_t* image)
 	}
 
 	// lets make sure we found all the required sections
-	if (!image->symhash || !image->syms || !image->strtab)
+	if ((image->symhash == 0 && image->gnuhash.buckets == NULL) || !image->syms || !image->strtab)
 		return false;
 
 	if (sonameOffset >= 0)
