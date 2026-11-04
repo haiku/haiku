@@ -11,6 +11,8 @@
 #include <string.h>
 
 #include <ByteOrder.h>
+#include <KernelExport.h>
+#include <OS.h>
 #include <util/AutoLock.h>
 
 #include "virtio_balloon.h"
@@ -35,6 +37,8 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 	fVirtio(NULL),
 	fVirtioDevice(NULL),
 	fStatus(B_NO_INIT),
+	fBuffer(NULL),
+	fArea(-1),
 	fDesiredSize(0),
 	fActualSize(0)
 {
@@ -44,7 +48,22 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 	fQueueCondition.Init(this, "virtio balloon transfer");
 	fConfigCondition.Init(this, "virtio balloon config");
 
-	get_memory_map(fBuffer, sizeof(fBuffer), &fEntry, 1);
+	fArea = create_area("virtio_balloon buffer", (void**)&fBuffer, B_ANY_KERNEL_ADDRESS,
+		B_PAGE_SIZE, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	if (fArea < B_OK) {
+		fStatus = fArea;
+		ERROR("Failed to allocate buffer for virtio balloon: (%s)\n", strerror(fStatus));
+		return;
+	}
+
+	fStatus = get_memory_map(fBuffer, sizeof(fBuffer), &fEntry, 1);
+	if (fStatus < B_OK) {
+		delete_area(fArea);
+		fArea = -1;
+		ERROR("Failed to map the memory: (%s)\n", strerror(fStatus));
+		return;
+	}
 
 	// get the Virtio device from our parent's parent
 	device_node* parent = gDeviceManager->get_parent_node(node);
@@ -55,8 +74,7 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 		(void**)&fVirtioDevice);
 	gDeviceManager->put_node(virtioParent);
 
-	fVirtio->negotiate_features(fVirtioDevice,
-		0, &fFeatures, &get_feature_name);
+	fVirtio->negotiate_features(fVirtioDevice, 0, &fFeatures, &get_feature_name);
 
 	fStatus = fVirtio->alloc_queues(fVirtioDevice, 2, fVirtioQueues, NULL);
 	if (fStatus != B_OK) {
@@ -70,22 +88,19 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 		return;
 	}
 
-	fStatus = fVirtio->queue_setup_interrupt(fVirtioQueues[0],
-		_QueueCallback, fVirtioQueues[0]);
+	fStatus = fVirtio->queue_setup_interrupt(fVirtioQueues[0], _QueueCallback, fVirtioQueues[0]);
 	if (fStatus != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
 	}
 
-	fStatus = fVirtio->queue_setup_interrupt(fVirtioQueues[1],
-		_QueueCallback, fVirtioQueues[1]);
+	fStatus = fVirtio->queue_setup_interrupt(fVirtioQueues[1], _QueueCallback, fVirtioQueues[1]);
 	if (fStatus != B_OK) {
 		ERROR("queue interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
 	}
 
-	fThread = spawn_kernel_thread(&_ThreadEntry, "virtio balloon thread",
-		B_NORMAL_PRIORITY, this);
+	fThread = spawn_kernel_thread(&_ThreadEntry, "virtio balloon thread", B_NORMAL_PRIORITY, this);
 	if (fThread < 0) {
 		fStatus = fThread;
 		return;
@@ -102,6 +117,9 @@ VirtioBalloonDevice::~VirtioBalloonDevice()
 		wait_for_thread(fThread, &result);
 		fThread = -1;
 	}
+
+	if (fArea != -1)
+		delete_area(fArea);
 }
 
 
@@ -135,8 +153,8 @@ VirtioBalloonDevice::_Thread()
 				continue;
 
 			fDesiredSize = _DesiredSize();
-			TRACE("finished waiting: requested %" B_PRIu32 " instead of %" B_PRIu32
-				"\n", fDesiredSize, fActualSize);
+			TRACE("finished waiting: requested %" B_PRIu32 " instead of %" B_PRIu32 "\n",
+				fDesiredSize, fActualSize);
 		}
 		::virtio_queue queue;
 		if (fDesiredSize > fActualSize) {
@@ -147,9 +165,8 @@ VirtioBalloonDevice::_Thread()
 			vm_page_reservation reservation;
 			vm_page_reserve_pages(&reservation, count, VM_PRIORITY_SYSTEM);
 			for (int i = 0; i < count; i++) {
-				//TRACE("allocating page %" B_PRIu32 " pages\n", i);
-				vm_page* page = vm_page_allocate_page(&reservation,
-					PAGE_STATE_WIRED);
+				// TRACE("allocating page %" B_PRIu32 " pages\n", i);
+				vm_page* page = vm_page_allocate_page(&reservation, PAGE_STATE_WIRED);
 				if (page == NULL) {
 					TRACE("allocating failed\n");
 					count = i;
@@ -237,8 +254,7 @@ VirtioBalloonDevice::_DesiredSize()
 	uint32 desiredSize;
 
 	status_t status = fVirtio->read_device_config(fVirtioDevice,
-		offsetof(struct virtio_balloon_config, num_pages),
-		&desiredSize, sizeof(desiredSize));
+		offsetof(struct virtio_balloon_config, num_pages), &desiredSize, sizeof(desiredSize));
 	if (status != B_OK)
 		return 0;
 
@@ -253,6 +269,5 @@ VirtioBalloonDevice::_UpdateSize()
 	TRACE("_UpdateSize %u\n", fActualSize);
 	uint32 actualSize = B_HOST_TO_LENDIAN_INT32(fActualSize);
 	return fVirtio->write_device_config(fVirtioDevice,
-		offsetof(struct virtio_balloon_config, actual),
-		&actualSize, sizeof(actualSize));
+		offsetof(struct virtio_balloon_config, actual), &actualSize, sizeof(actualSize));
 }

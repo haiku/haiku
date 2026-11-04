@@ -12,7 +12,7 @@
 #include <vm/vm_page.h>
 
 
-//#define TRACE_VIRTIO_BALLOON
+// #define TRACE_VIRTIO_BALLOON
 #ifdef TRACE_VIRTIO_BALLOON
 #	define TRACE(x...) dprintf("virtio_balloon: " x)
 #else
@@ -25,7 +25,7 @@
 extern device_manager_info* gDeviceManager;
 
 
-#define PAGES_COUNT	256
+#define PAGES_COUNT	1024
 
 
 struct PageInfo : DoublyLinkedListLinkImpl<PageInfo> {
@@ -65,7 +65,8 @@ private:
 			::virtio_queue		fVirtioQueues[2];
 
 			physical_entry 		fEntry;
-			uint32				fBuffer[PAGES_COUNT];
+			uint32*				fBuffer;
+			area_id				fArea;
 
 			thread_id			fThread;
 			uint32				fDesiredSize;
