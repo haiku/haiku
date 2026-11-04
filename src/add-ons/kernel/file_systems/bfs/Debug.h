@@ -18,11 +18,7 @@
 // The DEBUGGER() macro actually has no effect if DEBUG is not defined,
 // use the DIE() macro if you really want to die.
 #ifdef DEBUG
-#	ifdef USER
-#		define DEBUGGER(x) debugger x
-#	else
-#		define DEBUGGER(x) kernel_debugger x
-#	endif
+#	define DEBUGGER(x) debugger x
 #else
 #	define DEBUGGER(x) ;
 #endif
@@ -30,7 +26,7 @@
 #ifdef USER
 #	define DIE(x) debugger x
 #else
-#	define DIE(x) kernel_debugger x
+#	define DIE(x) panic x
 #endif
 
 // Short overview over the debug output macros:
@@ -80,6 +76,10 @@
 #endif
 
 #ifdef DEBUG
+#	if _BOOT_MODE
+	namespace BFS {
+#	endif
+
 	struct block_run;
 	struct bplustree_header;
 	struct bplustree_node;
@@ -98,6 +98,10 @@
 	extern void dump_bplustree_node(const bplustree_node *node,
 					const bplustree_header *header = NULL, Volume *volume = NULL);
 	extern void dump_block(const char *buffer, int size);
+
+#	if _BOOT_MODE
+	} // namespace BFS
+#	endif
 #endif
 #ifdef BFS_DEBUGGER_COMMANDS
 	extern void remove_debugger_commands();

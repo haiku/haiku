@@ -740,7 +740,7 @@ BPlusTree::SetTo(Inode* stream)
 		//fHeader.maximum_size = HOST_ENDIAN_TO_BFS_INT64(stream->Size());
 	}
 	if (!fHeader.IsValid()) {
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(_BOOT_MODE)
 		dump_bplustree_header(&fHeader);
 		dump_block((const char*)&fHeader, 128);
 #endif
@@ -761,9 +761,11 @@ BPlusTree::SetTo(Inode* stream)
 		|| ((stream->Mode() & S_INDEX_DIR) != 0
 			&& kToMode[fHeader.DataType()] != mode)
 		|| !stream->IsContainer()) {
+#ifndef _BOOT_MODE
 		D(	dump_bplustree_header(&fHeader);
 			dump_inode(&stream->Node());
 		);
+#endif
 		RETURN_ERROR(fStatus = B_BAD_TYPE);
 	}
 
