@@ -6417,14 +6417,13 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		case F_DUPFD_CLOEXEC:
 		case F_DUPFD_CLOFORK:
 		{
+			WriteLocker contextLocker(context->lock);
 			status = new_fd_etc(context, descriptor.Get(), (int)argument);
 			if (status >= 0) {
-				rw_lock_write_lock(&context->lock);
 				if (op == F_DUPFD_CLOEXEC)
 					fd_set_close_on_exec(context, status, true);
 				else if (op == F_DUPFD_CLOFORK)
 					fd_set_close_on_fork(context, status, true);
-				rw_lock_write_unlock(&context->lock);
 
 				atomic_add(&descriptor->ref_count, 1);
 			}
