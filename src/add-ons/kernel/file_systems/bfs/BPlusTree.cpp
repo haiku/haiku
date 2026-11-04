@@ -497,6 +497,7 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 		fNode = (bplustree_node*)(block + offset
 			- (fileOffset + (blockOffset << volume->BlockShift())));
 	} else {
+		fNode = NULL;
 		RETURN_ERROR(B_IO_ERROR);
 	}
 
