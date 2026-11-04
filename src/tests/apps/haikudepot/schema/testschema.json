@@ -1,0 +1,37 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"id": "http://depot.haiku-os.org/schema/pkg/dumpexport.json",
+	"title": "TestSchemaObject",
+	"javaType": "org.haiku.TestSchemaObject",
+	"type": "object",
+	"required": [
+		"username"
+	],
+	"properties": {
+		"name": {
+			"type": "string",
+			"minLength": 2,
+			"maxLength": 16
+		},
+		"username": {
+			"type": "string"
+		},
+		"age": {
+			"type": "integer",
+			"format": "int64",
+			"minimum": 10,
+			"maximum": 120
+		},
+		"ageDecade": {
+			"type": "integer",
+			"format": "int64",
+			"multipleOf": 10
+		},
+		"height": {
+			"type": "integer",
+			"format": "int64",
+			"exclusiveMinimum": 4,
+			"exclusiveMaximum": 200
+		}
+	}
+}

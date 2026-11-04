@@ -29,20 +29,26 @@ for sourceDir in $(sourceDirs) {
 }
 local genServerRepositoryGenDirectory =
 	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) dumpexportrepository ] ;
+local genTestSchemaGenDirectory =
+	[ FDirName $(HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY) testschema ] ;
 
 SEARCH_SOURCE += $(genServerRepositoryGenDirectory) ;
-
-local genServerDumpExportRepositorySchema =
-	[ FDirName $(HAIKU_TOP) src apps haikudepot server schema dumpexportrepository.json ] ;
+SEARCH_SOURCE += $(genTestSchemaGenDirectory) ;
 
 local genServerRepositoryGenFiles =
 	DumpExportRepositoryModel.cpp DumpExportRepositoryJsonListener.cpp ;
+
+local genTestSchemaGenFiles =
+	TestSchemaObjectModel.cpp TestSchemaObjectJsonListener.cpp ;
 
 UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
 
 	DataIOUtils.cpp
 	DataIOUtilsTest.cpp
+
+	$(genTestSchemaGenFiles)
+	TestSchemaValidationTest.cpp
 
 	$(genServerRepositoryGenFiles)
 	DumpExportRepositoryJsonListenerTest.cpp
@@ -121,6 +127,13 @@ Application TextDocumentTest :
 	UndoableEditListener.cpp
 
 	: be translation shared [ TargetLibsupc++ ]
+;
+
+JsonSchemaModelAndParser
+	$(genTestSchemaGenDirectory)
+	: $(genTestSchemaGenFiles)
+	: [ FGristFiles TestSchemaValidationTest.cpp ]
+	: [ FDirName $(HAIKU_TOP) src tests apps haikudepot schema testschema.json ]
 ;
 
 JsonSchemaModelAndParser

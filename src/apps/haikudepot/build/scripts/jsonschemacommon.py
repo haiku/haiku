@@ -38,6 +38,11 @@ CPP_DEFAULT_BOOLEAN = "false"
 CPP_DEFAULT_INTEGER = "0"
 CPP_DEFAULT_NUMBER = "0.0"
 
+# Keys which can be defined on a property in the schema to specify validations
+# on values of the property.
+PROPERTY_VALIDATION_KEYS = ["minimum", "maximum", "exclusiveMinimum",
+                            "exclusiveMaximum", "multipleOf", "minLength",
+                            "maxLength"]
 
 class TemplateType(Enum):
     """Type of template to load."""
@@ -73,7 +78,7 @@ def prop_metadata_to_cpp_default_value(prop_metadata: dict[str, Any]) -> str:
 
     Returns: The function will return a string representation of the C++ value.
     """
-    type = prop_metadata['type']
+    type = prop_metadata["type"]
 
     if type == JSON_TYPE_STRING:
         return CPP_DEFAULT_STRING
@@ -263,7 +268,7 @@ def augment_schema(schema: dict[str, Any]) -> None:
     def augment_object(obj: dict[str, Any]) -> None:
         def has_any_list_properties() -> bool:
             for _, prop in obj['properties'].items():
-                if prop['type'] == JSON_TYPE_ARRAY:
+                if prop["type"] == JSON_TYPE_ARRAY:
                     return True
             return False
 
@@ -277,11 +282,26 @@ def augment_schema(schema: dict[str, Any]) -> None:
         # allows the object to know the top level object that contains it
         obj["toplevelcppname"] = top_level_cpp_name
 
+        required_property_names = []
+
+        if "required" in obj:
+            required_property_names = obj["required"]
+
         properties = obj['properties'].items()
 
+        # Do some pre-flight checks on any constraints.
+
+        for _, prop in properties:
+            if "multipleOf" in prop:
+                if prop["multipleOf"] <= 0:
+                    raise RuntimeError(f"bad multiple of [{prop['multipleOf']}]")
+
         for prop_name, prop in properties:
-            prop["cppname"] = prop_name_to_cpp_name(prop_name)
+            prop_cpp_name = prop_name_to_cpp_name(prop_name)
+            prop["cppname"] = prop_cpp_name
             prop["cppmembername"] = prop_name_to_cpp_member_name(prop_name)
+            prop["isrequired"] = prop_name in required_property_names
+            prop["hasvaluevalidationconstraints"] = next((True for item in PROPERTY_VALIDATION_KEYS if item in prop), False)
             augment_property(prop)
 
         # mustache is not able to iterate over a dictionary; it can only

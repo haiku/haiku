@@ -4,10 +4,18 @@
 
 #include "{{outputheaderfile}}"{{#objects}}
 
+#include <Catalog.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "{{cppname}}"
+
 
 {{#propertyarray}}/*static*/ const uint16 {{cppname}}::k{{property.cppname}}Bitmask = {{cppbitmaskexpression}};
 {{/propertyarray}}
 
+{{#propertyarray}}/*static*/ const char* {{cppname}}::k{{property.cppname}}PropertyName = "{{property.cppname}}";
+{{/propertyarray}}
 
 {{cppname}}::{{cppname}}()
     :
@@ -100,6 +108,28 @@ bool
 }
 
 
+status_t
+{{cppname}}::IsValid() const
+{
+    return IsValid(NULL);
+}
+
+
+status_t
+{{cppname}}::IsValid(ValidationFailures* failures) const
+{
+    status_t result = B_OK;
+
+{{#propertyarray}}    {
+        status_t propResult = IsValid{{property.cppname}}(failures);
+        if (propResult != B_OK && result == B_OK)
+            result = propResult;
+    }
+{{/propertyarray}}
+    return result;
+}
+
+
 {{#propertyarray}}void
 {{#property.iscppscalartype}}{{cppname}}::_Set{{property.cppname}}({{property.cpptype}} value)
 {{/property.iscppscalartype}}{{^property.iscppscalartype}}{{cppname}}::_Set{{property.cppname}}(const {{property.cpptype}}& value)
@@ -125,6 +155,117 @@ bool
 {{cppname}}::IsSet{{property.cppname}}() const
 {
     return 0 != (fHasValueBitmask & k{{property.cppname}}Bitmask);
+}
+
+
+status_t
+{{cppname}}::IsValid{{property.cppname}}() const
+{
+    return IsValid{{property.cppname}}(NULL);
+}
+
+
+status_t
+{{cppname}}::IsValid{{property.cppname}}(ValidationFailures* failures) const
+{
+    status_t result = B_OK;
+{{#property.isrequired}}    if (!IsSet{{property.cppname}}()) {
+        if (failures != NULL) {
+            BString message = B_TRANSLATE("required but is missing");
+            failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+        }
+        if (result == B_OK)
+            result = B_BAD_VALUE;
+    }
+{{/property.isrequired}}{{#property.hasvaluevalidationconstraints}}    if (IsSet{{property.cppname}}()) {
+{{#property.isinteger}}
+        const {{property.cpptype}} propValue = {{property.cppname}}();
+{{#property.minimum}}        if (propValue < {{property.minimum}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("%PropertyValue% less than %Minimum%");
+                message.ReplaceAll("%PropertyValue%", BString() << propValue);
+                message.ReplaceAll("%Minimum%", "{{property.minimum}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.minimum}}
+{{#property.maximum}}        if (propValue > {{property.maximum}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("%PropertyValue% greater than %Maximum%");
+                message.ReplaceAll("%PropertyValue%", BString() << propValue);
+                message.ReplaceAll("%Maximum%", "{{property.maximum}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.maximum}}
+{{#property.exclusiveMinimum}}        if (propValue <= {{property.exclusiveMinimum}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("%PropertyValue% less than or equal %ExclusiveMinimum%");
+                message.ReplaceAll("%PropertyValue%", BString() << propValue);
+                message.ReplaceAll("%ExclusiveMinimum%", "{{property.exclusiveMinimum}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.exclusiveMinimum}}
+{{#property.exclusiveMaximum}}        if (propValue >= {{property.exclusiveMaximum}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("%PropertyValue% greater than or equal %ExclusiveMaximum%");
+                message.ReplaceAll("%PropertyValue%", BString() << propValue);
+                message.ReplaceAll("%ExclusiveMaximum%", "{{property.exclusiveMaximum}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.exclusiveMaximum}}
+{{#property.multipleOf}}        if (0 != propValue % {{property.multipleOf}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("%PropertyValue% not multiple of %MultipleOf%");
+                message.ReplaceAll("%PropertyValue%", BString() << propValue);
+                message.ReplaceAll("%MultipleOf%", "{{property.multipleOf}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.multipleOf}}
+{{/property.isinteger}}
+{{#property.isstring}}
+        const {{property.cpptype}} propValue = {{property.cppname}}();
+{{#property.minLength}}        if (propValue.Length() < {{property.minLength}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("[%PropertyValue%] (%PropertyLength%) string length less than %MinLength%");
+                message.ReplaceAll("%PropertyValue%", propValue);
+                message.ReplaceAll("%PropertyLength%", BString() << propValue.Length());
+                message.ReplaceAll("%MinLength%", "{{property.minLength}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.minLength}}
+{{#property.maxLength}}        if (propValue.Length() > {{property.maxLength}}) {
+            if (failures != NULL) {
+                BString message = B_TRANSLATE("[%PropertyValue%] (%PropertyLength%) string length greater than %MaxLength%");
+                message.ReplaceAll("%PropertyValue%", propValue);
+                message.ReplaceAll("%PropertyLength%", BString() << propValue.Length());
+                message.ReplaceAll("%MaxLength%", "{{property.maxLength}}");
+                failures->AddFailure({{cppname}}::k{{property.cppname}}PropertyName, message);
+            }
+            if (result == B_OK)
+                result = B_BAD_VALUE;
+        }
+{{/property.maxLength}}
+{{/property.isstring}}
+    }{{/property.hasvaluevalidationconstraints}}
+
+    return result;
 }
 
 

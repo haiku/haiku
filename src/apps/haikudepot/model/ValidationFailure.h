@@ -44,6 +44,7 @@ public:
 								ValidationFailures();
 	virtual						~ValidationFailures();
 
+			ValidationFailure*	GetFailure(const BString& property) const;
 			void				AddFailure(const BString& property,
 									const BString& message);
 			int32				CountFailures() const;
@@ -57,7 +58,6 @@ public:
 
 private:
 			void				_AddFromMessage(const BMessage* from);
-			ValidationFailure*	_GetFailure(const BString& property) const;
 			ValidationFailure*	_GetOrCreateFailure(const BString& property);
 
 private:

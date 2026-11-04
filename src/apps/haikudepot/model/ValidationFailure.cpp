@@ -148,7 +148,7 @@ ValidationFailures::IsEmpty() const
 bool
 ValidationFailures::Contains(const BString& property) const
 {
-	ValidationFailure* failure = _GetFailure(property);
+	ValidationFailure* failure = GetFailure(property);
 	return failure != NULL && !failure->IsEmpty();
 }
 
@@ -157,7 +157,7 @@ bool
 ValidationFailures::Contains(const BString& property,
 	const BString& message) const
 {
-	ValidationFailure* failure = _GetFailure(property);
+	ValidationFailure* failure = GetFailure(property);
 	return failure != NULL && failure->Contains(message);
 }
 
@@ -190,7 +190,7 @@ ValidationFailures::Archive(BMessage* into, bool deep) const
 
 
 ValidationFailure*
-ValidationFailures::_GetFailure(const BString& property) const
+ValidationFailures::GetFailure(const BString& property) const
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		ValidationFailure* item = fItems.ItemAt(i);
@@ -205,7 +205,7 @@ ValidationFailures::_GetFailure(const BString& property) const
 ValidationFailure*
 ValidationFailures::_GetOrCreateFailure(const BString& property)
 {
-	ValidationFailure* item = _GetFailure(property);
+	ValidationFailure* item = GetFailure(property);
 
 	if (item == NULL) {
 		item = new ValidationFailure(property);
