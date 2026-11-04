@@ -473,12 +473,17 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 			if (fBlock == NULL)
 				RETURN_ERROR(B_NO_MEMORY);
 		}
+		fNode = NULL;
 
-		if (read_pos(volume->Device(), newBlockNumber << volume->BlockShift(),
-				fBlock, volume->BlockSize()) == (ssize_t)volume->BlockSize()) {
-			block = fBlock;
-		}
+		ssize_t result = read_pos(volume->Device(),
+			newBlockNumber << volume->BlockShift(),
+			fBlock, volume->BlockSize());
+		if (result < 0)
+			RETURN_ERROR(result);
+		if (result != (ssize_t)volume->BlockSize())
+			RETURN_ERROR(B_IO_ERROR);
 
+		block = fBlock;
 		fWritable = false;
 #endif // _BOOT_MODE
 	}
@@ -492,7 +497,6 @@ CachedNode::InternalSetTo(Transaction* transaction, off_t offset)
 		fNode = (bplustree_node*)(block + offset
 			- (fileOffset + (blockOffset << volume->BlockShift())));
 	} else {
-		fNode = NULL;
 		RETURN_ERROR(B_IO_ERROR);
 	}
 
