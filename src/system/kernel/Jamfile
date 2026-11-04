@@ -121,7 +121,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: --orphan-handling=warn -L $(HAIKU_TOP)/src/system/ldscripts/common/
 	  -Bdynamic -export-dynamic -dynamic-linker /foo/bar
-	  $(TARGET_KERNEL_PIC_LINKFLAGS) --no-undefined
+	  $(TARGET_KERNEL_PIC_LINKFLAGS) --no-undefined --hash-style=sysv
 	:
 ;
 

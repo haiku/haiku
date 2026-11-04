@@ -11,6 +11,7 @@ SECTIONS
 	.hash : { *(.hash) }
 	.dynsym : { *(.dynsym) }
 	.dynstr : { *(.dynstr) }
+	.gnu.hash : { *(.gnu.hash) }
 	.gnu.version : { *(.gnu.version) }
 	.gnu.version_d : { *(.gnu.version_d) }
 	.gnu.version_r : { *(.gnu.version_r) }

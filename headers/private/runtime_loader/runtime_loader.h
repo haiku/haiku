@@ -83,6 +83,7 @@ typedef struct elf_region_t {
 
 typedef struct elf_version_info {
 	uint32		hash;			// version name hash
+	uint32		gnuhash;
 	const char	*name;			// version name
 	const char	*file_name;		// dependency file name (needed versions only)
 } elf_version_info;

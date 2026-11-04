@@ -39,11 +39,21 @@ struct elf_image_info {
 
 	elf_ehdr*		elf_header;
 
-	// pointer to symbol participation data structures
+	// symbol participation data structures
 	char*			needed;
 	uint32*			symhash;
 	elf_sym*		syms;
 	char*			strtab;
+	struct {
+		uint32			mask_words_count_mask;
+		uint32			shift2;
+		uint32			bucket_count;
+		elf_addr		*bloom;
+		uint32			*buckets;
+		uint32			*chain0;
+	} gnuhash;
+
+	// relocation information
 	elf_rel*		rel;
 	int				rel_len;
 	elf_rela*		rela;

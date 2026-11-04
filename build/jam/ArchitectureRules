@@ -370,7 +370,7 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
 	HAIKU_KERNEL_PIC_CCFLAGS = ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = -Bsymbolic-functions ;
-	HAIKU_KERNEL_ADDON_LINKFLAGS = -Bsymbolic-functions ;
+	HAIKU_KERNEL_ADDON_LINKFLAGS = -Bsymbolic-functions -Wl,--hash-style=sysv ;
 
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
 		HAIKU_KERNEL_PIC_LINKFLAGS += -z noseparate-code -z norelro --no-rosegment ;
