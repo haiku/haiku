@@ -25,8 +25,6 @@
 // BFS::Stream from the bootloader has the same API as Inode.
 #	define Inode BFS::Stream
 
-#	define strerror(x)		"error message unavailable"
-
 namespace BFS {
 #endif
 
