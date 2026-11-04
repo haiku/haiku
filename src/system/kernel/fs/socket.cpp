@@ -410,18 +410,17 @@ create_socket_fd(net_socket* socket, int flags, bool kernel)
 
 	// publish it
 	io_context* context = get_current_io_context(kernel);
+	WriteLocker contextLocker(context->lock);
 	int fd = new_fd(context, descriptor);
 	if (fd < 0) {
+		contextLocker.Unlock();
 		descriptor->ops = NULL;
 		put_fd(descriptor);
 		return fd;
 	}
 
-	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (oflags & O_CLOEXEC) != 0);
 	fd_set_close_on_fork(context, fd, (oflags & O_CLOFORK) != 0);
-	rw_lock_write_unlock(&context->lock);
-
 	return fd;
 }
 
