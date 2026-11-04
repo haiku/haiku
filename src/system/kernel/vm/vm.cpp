@@ -5198,8 +5198,11 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 				cacheChainLocker.Unlock();
 				range->~VMAreaWiredRange();
 				free_etc(range, mallocFlags);
-			} else
+			} else {
+				// remove the part we couldn't wire before bailing out with unlock_memory_etc()
+				range->size -= areaEnd - nextAddress;
 				cacheChainLocker.Unlock();
+			}
 
 			break;
 		}
