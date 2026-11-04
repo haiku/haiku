@@ -413,6 +413,7 @@ unix_process_ancillary_data(net_protocol *self,
 			// reference and open reference acquired in unix_add_ancillary_data()
 			// will be released when the container is destroyed.
 			inc_fd_ref_count(descriptors[k]);
+			WriteLocker contextLocker(ioContext->lock);
 			fds[i] = new_fd(ioContext, descriptors[k]);
 
 			if (fds[i] < 0) {
@@ -425,7 +426,6 @@ unix_process_ancillary_data(net_protocol *self,
 				break;
 			}
 
-			WriteLocker locker(ioContext->lock);
 			if ((flags & MSG_CMSG_CLOEXEC) != 0)
 				fd_set_close_on_exec(ioContext, fds[i], true);
 			if ((flags & MSG_CMSG_CLOFORK) != 0)
