@@ -21,14 +21,19 @@ main()
 	if (fd < 0)
 		return -2;
 
+	const size_t kSize = PAGESIZE * 2;
+
 	// write some data
 	char buffer[512];
 	memset(buffer, 0xdd, sizeof(buffer));
-	if (write(fd, buffer, sizeof(buffer)) != (ssize_t)sizeof(buffer))
-		return -3;
+	for (size_t size = 0; size < kSize; ) {
+		if (write(fd, buffer, sizeof(buffer)) != (ssize_t)sizeof(buffer))
+			return -3;
+		size += sizeof(buffer);
+	}
 
 	// map the page
-	void* address = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	void* address = mmap(NULL, kSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (address == MAP_FAILED)
 		return -4;
 
@@ -40,8 +45,16 @@ main()
 	if (memcmp(address, buffer, 512) != 0)
 		return -6;
 
-	if (munmap(address, 4096) != 0)
+	// mprotect the second part
+	if (mprotect((void*)((addr_t)address + PAGESIZE), PAGESIZE, PROT_READ) != 0)
 		return -7;
+
+	// self-read across that part (should fail)
+	if (pread(fd, (void*)((addr_t)address + PAGESIZE - 1), sizeof(buffer), 0) != -1)
+		return -8;
+
+	if (munmap(address, kSize) != 0)
+		return -9;
 
 	return 0;
 }
