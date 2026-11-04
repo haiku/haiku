@@ -20,6 +20,7 @@
 #include <boot/net/IP.h>
 #include <boot/net/NetStack.h>
 
+#include "efi/types.h"
 #include "efi_platform.h"
 #include <efi/protocol/simple-network.h>
 #include <efi/protocol/loaded-image.h>
@@ -154,7 +155,7 @@ EFIEthernetInterface::Init()
 		return B_ERROR;
 	}
 
-	TRACE_ALWAYS("EFI reports network avaiable\n");
+	TRACE_ALWAYS("EFI reports network available\n");
 
 	// Attempt to locate IP address from command line arguments passed by
 	// the bootloader (for example, U-Boot bootargs variable)
@@ -298,16 +299,21 @@ EFIEthernetInterface::Init()
 
 	status = fNetwork->Start(fNetwork);
 
-	if (status != EFI_SUCCESS) {
-		TRACE_ALWAYS("error starting network\n");
+	if (status != EFI_SUCCESS && status != EFI_ALREADY_STARTED) {
+		TRACE_ALWAYS("error starting network: %lx\n", status);
 		return B_ERROR;
 	}
 
 	status = fNetwork->Initialize(fNetwork, 0, 0);
 
 	if (status != EFI_SUCCESS) {
-		TRACE_ALWAYS("error initializing network\n");
-		return B_ERROR;
+		TRACE_ALWAYS("error initializing network: %lx, trying Reset()...\n", status);
+		status = fNetwork->Reset(fNetwork, false);
+		if (status != EFI_SUCCESS) {
+			TRACE_ALWAYS("\nerror resetting network: %lx\n", status);
+			return B_ERROR;
+		}
+		TRACE_ALWAYS("success\n");
 	}
 
 	if (FindMACAddress() != B_OK) {
