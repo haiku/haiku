@@ -383,6 +383,12 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	if $(HOST_PLATFORM) != netbsd {
 		HOST_LINKFLAGS += -ldl ;
 	}
+
+	# NetBSD seems to require libatomic to be linked separately
+	if $(HOST_PLATFORM) = netbsd {
+		HOST_LINKFLAGS += -latomic ;
+	}
+
 	HOST_LIBSTDC++ = stdc++ ;
 	if $(HOST_PLATFORM) = darwin {
 		HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
