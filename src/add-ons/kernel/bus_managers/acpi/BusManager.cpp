@@ -220,6 +220,9 @@ acpi_std_ops(int32 op,...)
 					"AcpiInitializeSubsystem failed"))
 				goto err_dpc;
 
+			// Enable "slack" interpreter mode that tolerates common mistakes in BIOSes
+			AcpiGbl_EnableInterpreterSlack = TRUE;
+
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
 					"AcpiInitializeTables failed"))
 				goto err_acpi;
