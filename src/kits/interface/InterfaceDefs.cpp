@@ -1489,6 +1489,10 @@ _init_menu_info_()
 	if (link.FlushWithReply(status) == B_OK && status == B_OK)
 		link.Read<menu_info>(&BMenu::sMenuInfo);
 
+#ifdef __HAIKU_BEOS_COMPATIBLE
+	_menu_info_ptr_ = &BMenu::sMenuInfo;
+#endif
+
 	return status;
 }
 
@@ -1563,10 +1567,6 @@ _init_interface_kit_()
 	status = BPrivate::MenuPrivate::CreateBitmaps();
 	if (status != B_OK)
 		return status;
-
-#ifdef __HAIKU_BEOS_COMPATIBLE
-	_menu_info_ptr_ = &BMenu::sMenuInfo;
-#endif
 
 	status = _init_menu_info_();
 	if (status != B_OK)
