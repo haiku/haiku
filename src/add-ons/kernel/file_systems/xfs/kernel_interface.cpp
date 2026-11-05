@@ -226,14 +226,14 @@ xfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 
 	status = iterator->Lookup(name, strlen(name), (xfs_ino_t*)_vnodeID);
 	if (status != B_OK) {
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), name);
 		delete iterator;
 		return status;
 	}
 
-	TRACE("XFS_LOOKUP: ID: (%ld)\n", *_vnodeID);
-	status = get_vnode(volume->FSVolume(), *_vnodeID, NULL);
-	TRACE("get_vnode status: (%d)\n", status);
-	return status;
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
+	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
 
 
