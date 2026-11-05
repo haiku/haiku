@@ -626,9 +626,8 @@ Desktop::BroadcastToAllApps(int32 code)
 {
 	BAutolock locker(fApplicationsLock);
 
-	for (int32 i = fApplications.CountItems(); i-- > 0;) {
+	for (int32 i = fApplications.CountItems(); i-- > 0;)
 		fApplications.ItemAt(i)->PostMessage(code);
-	}
 }
 
 
@@ -643,6 +642,17 @@ Desktop::BroadcastToAllWindows(int32 code)
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->PostMessage(code);
 	}
+}
+
+
+/*!	\brief Send a message to all client applications.
+*/
+void
+Desktop::BroadcastToAllClients(BMessage* message)
+{
+	BAutolock appListLock(fApplicationsLock);
+	for (int32 i = fApplications.CountItems(); i-- > 0;)
+		fApplications.ItemAt(i)->SendMessageToClient(message);
 }
 
 
@@ -2999,10 +3009,7 @@ Desktop::_FlushPendingColors()
 	}
 
 	// Notify client applications
-	BAutolock appListLock(fApplicationsLock);
-	for (int32 index = 0; index < fApplications.CountItems(); ++index) {
-		fApplications.ItemAt(index)->SendMessageToClient(&clientMessage);
-	}
+	BroadcastToAllClients(&clientMessage);
 
 	fPendingColors.MakeEmpty();
 }

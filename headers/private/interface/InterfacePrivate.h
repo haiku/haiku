@@ -14,6 +14,8 @@
 
 
 void _init_global_fonts_();
+status_t _init_menu_info_();
+extern "C" status_t _init_interface_kit_();
 extern "C" status_t _fini_interface_kit_();
 
 

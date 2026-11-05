@@ -515,8 +515,5 @@ void			set_ui_color(const color_which& which, const rgb_color& color);
 void			set_ui_colors(const BMessage* colors);
 rgb_color		tint_color(rgb_color color, float tint);
 
-extern "C" status_t _init_interface_kit_();
-	// for convenience, should be removed including the friend declarations
-	// in Menu.h, ...
 
 #endif	// _INTERFACE_DEFS_H

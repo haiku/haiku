@@ -47,6 +47,7 @@
 #include <MenuPrivate.h>
 #include <MenuWindow.h>
 #include <ServerProtocol.h>
+#include <ViewPrivate.h>
 
 #include "utf8_functions.h"
 
@@ -236,6 +237,8 @@ const char* BPrivate::kEmptyMenuLabel = "<empty>";
 struct BMenu::LayoutData {
 	BSize	preferred;
 	uint32	lastResizingMode;
+
+	bool	usesMenuFont;
 };
 
 
@@ -421,6 +424,13 @@ BMenu::AttachedToWindow()
 	if (Superitem() == NULL)
 		_Install(Window());
 
+	if (dynamic_cast<BMenuWindow*>(Window()) == NULL) {
+		// If we're not in a MenuWindow, and we aren't in layouts mode,
+		// then we should not update our font automatically.
+		if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
+			fLayoutData->usesMenuFont = false;
+	}
+
 	// The menu should be added to the menu hierarchy and made visible if:
 	// * the mouse is over the menu,
 	// * the user has requested the menu via the keyboard.
@@ -429,12 +439,11 @@ BMenu::AttachedToWindow()
 	bool keyDown = Supermenu() != NULL
 		? Supermenu()->fState == MENU_STATE_KEY_TO_SUBMENU : false;
 	fAttachAborted = _AddDynamicItems(keyDown);
+	if (fAttachAborted)
+		return;
 
-	if (!fAttachAborted) {
-		_CacheFontInfo();
-		_LayoutItems(0);
-		_UpdateWindowViewSize(false);
-	}
+	fUseCachedMenuLayout = false;
+	_RelayoutIfNeeded();
 }
 
 
@@ -512,6 +521,28 @@ BMenu::MessageReceived(BMessage* message)
 				// inform parent to update its modifier keys and relayout
 				BMessenger(fSuper).SendMessage(Window()->CurrentMessage());
 			}
+			break;
+
+		case B_MENU_INFO_UPDATED:
+			if (fLayoutData->usesMenuFont) {
+				BFont font;
+				font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);
+				font.SetSize(sMenuInfo.font_size);
+				BView::SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
+
+				InvalidateLayout();
+			}
+
+			// We need to propagate this message through any children
+			// which aren't currently attached to a window.
+			for (int32 i = 0; i < fItems.CountItems(); i++) {
+				BMenuItem* item = ItemAt(i);
+				BMenu* submenu = item->Submenu();
+				if (submenu != NULL && submenu->Window() == NULL)
+					BView::Private(submenu).PropagateMessage(message);
+			}
+
+			BView::MessageReceived(message);
 			break;
 
 		default:
@@ -653,6 +684,16 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 			break;
 		}
 	}
+}
+
+
+void
+BMenu::SetFont(const BFont* font, uint32 mask)
+{
+	fLayoutData->usesMenuFont = false;
+	BView::SetFont(font, mask);
+
+	InvalidateLayout();
 }
 
 
@@ -1565,7 +1606,7 @@ BMenu::_InitData(BMessage* archive)
 	BFont font;
 	font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);
 	font.SetSize(sMenuInfo.font_size);
-	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
+	BView::SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 
 	fExtraMenuData = new (nothrow) BPrivate::ExtraMenuData();
 
@@ -1575,6 +1616,7 @@ BMenu::_InitData(BMessage* archive)
 
 	fLayoutData = new LayoutData;
 	fLayoutData->lastResizingMode = ResizingMode();
+	fLayoutData->usesMenuFont = true;
 
 	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -1712,7 +1754,8 @@ BMenu::_Hide()
 }
 
 
-void BMenu::_ScriptReceived(BMessage* message)
+void
+BMenu::_ScriptReceived(BMessage* message)
 {
 	BMessage replyMsg(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
@@ -1981,7 +2024,8 @@ void BMenu::_ItemScriptReceived(BMessage* message, BMenuItem* item)
 }
 
 
-status_t BMenu::_ResolveItemSpecifier(const BMessage& specifier, int32 what,
+status_t
+BMenu::_ResolveItemSpecifier(const BMessage& specifier, int32 what,
 	BMenuItem*& item, int32 *_index)
 {
 	status_t err;
@@ -2017,7 +2061,8 @@ status_t BMenu::_ResolveItemSpecifier(const BMessage& specifier, int32 what,
 }
 
 
-status_t BMenu::_InsertItemAtSpecifier(const BMessage& specifier, int32 what,
+status_t
+BMenu::_InsertItemAtSpecifier(const BMessage& specifier, int32 what,
 	BMenuItem* item)
 {
 	status_t err;
@@ -3477,49 +3522,6 @@ BMenu::_QuitTracking(bool onlyThis)
 	}
 
 	_Hide();
-}
-
-
-//	#pragma mark - menu_info functions
-
-
-// TODO: Maybe the following two methods would fit better into
-// InterfaceDefs.cpp
-// In R5, they do all the work client side, we let the app_server handle the
-// details.
-status_t
-set_menu_info(menu_info* info)
-{
-	if (!info)
-		return B_BAD_VALUE;
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_SET_MENU_INFO);
-	link.Attach<menu_info>(*info);
-
-	status_t status = B_ERROR;
-	if (link.FlushWithReply(status) == B_OK && status == B_OK)
-		BMenu::sMenuInfo = *info;
-		// Update also the local copy, in case anyone relies on it
-
-	return status;
-}
-
-
-status_t
-get_menu_info(menu_info* info)
-{
-	if (!info)
-		return B_BAD_VALUE;
-
-	BPrivate::AppServerLink link;
-	link.StartMessage(AS_GET_MENU_INFO);
-
-	status_t status = B_ERROR;
-	if (link.FlushWithReply(status) == B_OK && status == B_OK)
-		link.Read<menu_info>(info);
-
-	return status;
 }
 
 

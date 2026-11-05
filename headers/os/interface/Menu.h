@@ -69,6 +69,9 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 
+	virtual	void				SetFont(const BFont* font,
+									uint32 mask = B_FONT_ALL);
+
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -180,7 +183,7 @@ private:
 	friend class BMenuBar;
 	friend class BSeparatorItem;
 	friend class BPrivate::MenuPrivate;
-	friend status_t _init_interface_kit_();
+	friend status_t _init_menu_info_();
 	friend status_t	set_menu_info(menu_info* info);
 	friend status_t	get_menu_info(menu_info* info);
 

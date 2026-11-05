@@ -82,6 +82,7 @@ public:
 
 			void				BroadcastToAllApps(int32 code);
 			void				BroadcastToAllWindows(int32 code);
+			void				BroadcastToAllClients(BMessage* message);
 
 			int32				GetAllWindowTargets(DelayedMessage& message);
 			int32				GetAllAppTargets(DelayedMessage& message);

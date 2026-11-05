@@ -70,6 +70,7 @@ enum system_message_code {
 	B_ZOOM						= '_WZM',
 	B_COLORS_UPDATED			= '_CLU',
 	B_FONTS_UPDATED				= '_FNU',
+	B_MENU_INFO_UPDATED			= '_MIU',
 	B_TRACKER_ADDON_MESSAGE		= '_TAM',
 	_APP_MENU_					= '_AMN',
 	_BROWSER_MENUS_				= '_BRM',

@@ -64,8 +64,6 @@ public:
 	virtual	status_t			SetIcon(const BBitmap* icon, uint32 flags = 0);
 
 private:
-	friend	status_t			_init_interface_kit_();
-
 	virtual	void				_ReservedRadioButton1();
 	virtual	void				_ReservedRadioButton2();
 

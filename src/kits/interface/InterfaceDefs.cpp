@@ -1476,6 +1476,57 @@ shift_color(rgb_color color, float shift)
 }
 
 
+//	#pragma mark - menu_info functions
+
+
+status_t
+_init_menu_info_()
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_MENU_INFO);
+
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK)
+		link.Read<menu_info>(&BMenu::sMenuInfo);
+
+	return status;
+}
+
+
+status_t
+set_menu_info(menu_info* info)
+{
+	if (!info)
+		return B_BAD_VALUE;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_SET_MENU_INFO);
+	link.Attach<menu_info>(*info);
+
+	status_t status = B_ERROR;
+	link.FlushWithReply(status);
+
+	// Don't update the local sMenuInfo, as it'll be re-fetched
+	// when we get B_MENU_INFO_UPDATED.
+
+	return status;
+}
+
+
+status_t
+get_menu_info(menu_info* info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	*info = BMenu::sMenuInfo;
+	return B_OK;
+}
+
+
+//	#pragma mark - initialization/destruction
+
+
 extern "C" status_t
 _init_interface_kit_()
 {
@@ -1517,7 +1568,7 @@ _init_interface_kit_()
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
 #endif
 
-	status = get_menu_info(&BMenu::sMenuInfo);
+	status = _init_menu_info_();
 	if (status != B_OK)
 		return status;
 

@@ -6738,14 +6738,12 @@ BView::_DrawAfterChildren(BRect updateRect)
 
 
 void
-BView::_FontsUpdated(BMessage* message)
+BView::_PropagateMessage(BMessage* message)
 {
 	MessageReceived(message);
 
-	for (BView* child = fFirstChild; child != NULL;
-			child = child->fNextSibling) {
-		child->_FontsUpdated(message);
-	}
+	for (BView* child = fFirstChild; child != NULL;	child = child->fNextSibling)
+		child->_PropagateMessage(message);
 }
 
 

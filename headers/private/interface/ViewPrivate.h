@@ -79,6 +79,9 @@ public:
 			bool				RemoveSelf()
 									{ return fView->_RemoveSelf(); }
 
+			void				PropagateMessage(BMessage* message)
+									{ return fView->_PropagateMessage(message); }
+
 private:
 			BView* fView;
 };

@@ -1414,6 +1414,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.StartMessage(B_OK);
 			fLink.Flush();
+
+			BMessage message(B_MENU_INFO_UPDATED);
+			fDesktop->BroadcastToAllClients(&message);
 			break;
 		}
 

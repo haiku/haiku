@@ -142,6 +142,7 @@ private:
 			int32				_CountWindows(bool includeMenus) const;
 			BWindow*			_WindowAt(uint32 index,
 									bool includeMenus) const;
+			void				_MessageAllWindows(BMessage* message) const;
 
 	static	void				_InitAppResources();
 
