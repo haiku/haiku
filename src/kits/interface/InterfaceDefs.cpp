@@ -57,6 +57,8 @@
 
 using namespace BPrivate;
 
+
+#ifdef __HAIKU_BEOS_COMPATIBLE
 // some other weird struct exported by BeOS, it's not initialized, though
 struct general_ui_info {
 	rgb_color	background_color;
@@ -69,6 +71,7 @@ struct general_ui_info {
 struct general_ui_info general_info;
 
 menu_info *_menu_info_ptr_;
+#endif
 
 extern "C" const char B_NOTIFICATION_SENDER[] = "be:sender";
 
@@ -1510,17 +1513,21 @@ _init_interface_kit_()
 	if (status != B_OK)
 		return status;
 
+#ifdef __HAIKU_BEOS_COMPATIBLE
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
+#endif
 
 	status = get_menu_info(&BMenu::sMenuInfo);
 	if (status != B_OK)
 		return status;
 
+#ifdef __HAIKU_BEOS_COMPATIBLE
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
 	general_info.mark_color = ui_color(B_CONTROL_MARK_COLOR);
 	general_info.highlight_color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	general_info.window_frame_color = ui_color(B_WINDOW_TAB_COLOR);
 	general_info.color_frame = true;
+#endif
 
 	// TODO: fill the other static members
 
