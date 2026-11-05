@@ -225,6 +225,7 @@ Volume::Unmount()
 	// delete the root directory
 	if (fRootDirectory) {
 		// deleting the root directory destroys the complete hierarchy
+		PutVNode(fRootDirectory);
 		delete fRootDirectory;
 		fRootDirectory = NULL;
 	}
