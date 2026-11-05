@@ -2650,7 +2650,9 @@ vm_change_cache_of_clones(area_id areaId, struct VMCache* toCache)
 {
 	AddressSpaceReadLocker addressSpaceLocker;
 	VMArea* fromArea;
-	addressSpaceLocker.SetFromArea(areaId, fromArea);
+	status_t status = addressSpaceLocker.SetFromArea(areaId, fromArea);
+	if (status != B_OK)
+		return status;
 
 	VMCache* cache = vm_area_get_locked_cache(fromArea);
 	addressSpaceLocker.Unlock();
