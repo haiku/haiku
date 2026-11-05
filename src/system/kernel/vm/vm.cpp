@@ -3130,6 +3130,7 @@ vm_set_area_protection(area_id areaID, uint32 newProtection,
 	TRACE(("vm_set_area_protection(team = %#" B_PRIx32 ", area = %#" B_PRIx32
 		", protection = %#" B_PRIx32 ")\n", team_get_current_team_id(), areaID, newProtection));
 
+	const uint32 nonPageProtectionMask = B_OVERCOMMITTING_AREA | B_SHARED_AREA | B_KERNEL_AREA;
 	bool becomesWritable
 		= (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
 
@@ -3186,6 +3187,9 @@ vm_set_area_protection(area_id areaID, uint32 newProtection,
 			return B_NOT_ALLOWED;
 		}
 
+		// keep non-page-protection area flags
+		newProtection &= ~nonPageProtectionMask;
+		newProtection |= area->protection & nonPageProtectionMask;
 		if (area->protection == newProtection)
 			return B_OK;
 
@@ -6009,6 +6013,11 @@ _user_unmap_memory(void* _address, size_t size)
 status_t
 _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 {
+	// the flags allowed for this call
+	const uint32 userProtectionMask = B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA;
+	const uint32 protectionMask
+		= userProtectionMask | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA;
+
 	// check address range
 	addr_t address = (addr_t)_address;
 	size = PAGE_ALIGN(size);
@@ -6020,7 +6029,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		return ENOMEM;
 	}
 
-	if ((protection & ~(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)) != 0)
+	if ((protection & ~userProtectionMask) != 0)
 		return B_BAD_VALUE;
 
 	team_id team = team_get_current_team_id();
@@ -6131,7 +6140,8 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		sizeLeft -= rangeSize;
 
 		if (area->page_protections == NULL) {
-			if (area->protection == protection)
+			// only compare the masked protection
+			if ((area->protection & protectionMask) == protection)
 				continue;
 
 			if (offset == 0 && rangeSize == area->Size()) {
@@ -6192,8 +6202,10 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			}
 		}
 
-		if (area->page_protections == NULL)
-			area->protection = protection;
+		if (area->page_protections == NULL) {
+			// keep the non-page-protection flags
+			area->protection = (area->protection & ~protectionMask) | protection;
+		}
 
 		map->Lock();
 		for (addr_t pageAddress = area->Base() + offset;
