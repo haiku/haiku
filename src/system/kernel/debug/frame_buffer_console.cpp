@@ -429,13 +429,20 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 		"depth = %ld, bytesPerRow = %ld)\n", (void*)baseAddress, width, height,
 		depth, bytesPerRow));
 
+#ifndef _BOOT_MODE
+	if (baseAddress == 0 && sBootInfo.frame_buffer != 0) {
+		// Try to restore the boot framebuffer, if we can.
+		return frame_buffer_update(sBootInfo.frame_buffer, sBootInfo.width,
+			sBootInfo.height, sBootInfo.depth, sBootInfo.bytes_per_row);
+	}
+#endif
+
 	mutex_lock(&sConsole.lock);
 
-	if (width <= 1920 || height <= 1080) {
+	if (width <= 1920 || height <= 1080)
 		sConsole.font = &smallFont;
-	} else {
+	else
 		sConsole.font = &bigFont;
-	}
 
 	sConsole.frame_buffer = baseAddress;
 	sConsole.width = width;
