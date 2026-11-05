@@ -564,15 +564,21 @@ ModifiedPageQueue::_PageWriter()
 	page_num_t pagesSinceLastSuccessfulWrite = 0;
 
 	while (fWriterThread >= 0) {
-		if (queue.Count() < kNumPages) {
-			// wait the full amount when no one triggers us
+		if (queue.Count() < kNumPages && sUnderQuotaCondition.EntriesCount() == 0) {
+			// wait the full amount when nobody's waiting for us
 			if (!fPageWriterCondition.Wait(PAGES_FLUSH_DURATION_LOCAL_QUOTA, true))
 				continue;
 		}
 
 		page_num_t modifiedPages = queue.Count();
-		if (modifiedPages == 0)
+		if (modifiedPages == 0) {
+			if (!IsOverQuota()) {
+				// If write_modified_page_range() wrote out pages, or if
+				// modified pages were discarded, there could be waiters.
+				sUnderQuotaCondition.NotifyAll();
+			}
 			continue;
+		}
 
 		if (modifiedPages <= pagesSinceLastSuccessfulWrite) {
 			// We ran through the whole queue without being able to write a
