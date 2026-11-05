@@ -16,5 +16,6 @@ SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 SimpleTest resize_area_tests : resize_area_tests.cpp ;
 
 SimpleTest transfer_area_test : transfer_area_test.cpp ;
+SimpleTest fork-mprotect-cow : fork-mprotect-cow.c testutils.c ;
 
 SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
