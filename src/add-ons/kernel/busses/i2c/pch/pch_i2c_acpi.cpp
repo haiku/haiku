@@ -216,7 +216,6 @@ register_device(device_node* parent)
 static float
 supports_device(device_node* parent)
 {
-	CALLED();
 	const char* bus;
 
 	// make sure parent is a PCH I2C ACPI device node
@@ -228,8 +227,6 @@ supports_device(device_node* parent)
 	if (strcmp(bus, "acpi") != 0)
 		return 0.0f;
 
-	TRACE("found an acpi node\n");
-
 	// check whether it's really a device
 	uint32 device_type;
 	if (gDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
@@ -237,7 +234,6 @@ supports_device(device_node* parent)
 		|| device_type != ACPI_TYPE_DEVICE) {
 		return 0.0;
 	}
-	TRACE("found an acpi device\n");
 
 	// check whether it's a PCH I2C device
 	const char *name;
@@ -245,7 +241,6 @@ supports_device(device_node* parent)
 		false) != B_OK) {
 		return 0.0;
 	}
-	TRACE("found an acpi device hid %s\n", name);
 
 	size_t device = 0;
 

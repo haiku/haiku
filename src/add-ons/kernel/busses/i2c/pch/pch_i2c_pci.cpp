@@ -431,7 +431,6 @@ register_device(device_node* parent)
 static float
 supports_device(device_node* parent)
 {
-	CALLED();
 	const char* bus;
 	uint16 vendorID, deviceID;
 
