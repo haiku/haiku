@@ -334,8 +334,9 @@ pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 	}
 
 	if (crs.i2c_addr == UINT16_MAX) {
-		ERROR("Could not find i2c address in device resources");
-		return B_BAD_DATA;
+		ERROR("Could not find i2c address in device resources\n");
+		// Continue scanning, skip this device
+		return B_OK;
 	}
 
 	TRACE("pch_i2c_scan_bus_callback deviceAddress %x speed %x\n", crs.i2c_addr, crs.bus_speed);
