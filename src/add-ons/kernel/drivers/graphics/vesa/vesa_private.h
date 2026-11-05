@@ -37,6 +37,7 @@ struct vesa_info {
 	addr_t			frame_buffer;
 	addr_t			physical_frame_buffer;
 	size_t			physical_frame_buffer_size;
+	bool			owns_frame_buffer;
 	bool			complete_frame_buffer_mapped;
 };
 

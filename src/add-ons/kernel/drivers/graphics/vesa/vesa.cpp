@@ -329,10 +329,12 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 			updated = true;
 
 			vm_change_clones_to_null_areas(info.frame_buffer_area);
-			delete_area(info.frame_buffer_area);
+			if (info.owns_frame_buffer)
+				delete_area(info.frame_buffer_area);
 
 			info.frame_buffer = frameBuffer;
 			info.frame_buffer_area = area;
+			info.owns_frame_buffer = true;
 
 			// Turn on write combining for the area
 			vm_set_area_memory_type(area, base, B_WRITE_COMBINING_MEMORY);
@@ -388,7 +390,6 @@ vesa_init(vesa_info& info)
 		return info.shared_area;
 
 	vesa_shared_info& sharedInfo = *info.shared_info;
-
 	memset(&sharedInfo, 0, sizeof(vesa_shared_info));
 
 	if (modes != NULL) {
@@ -399,6 +400,7 @@ vesa_init(vesa_info& info)
 	}
 
 	info.frame_buffer_area = bufferInfo->area;
+	info.owns_frame_buffer = false;
 
 	remap_frame_buffer(info, bufferInfo->physical_frame_buffer,
 		bufferInfo->width, bufferInfo->height, bufferInfo->depth,
@@ -475,7 +477,10 @@ vesa_uninit(vesa_info& info)
 	dprintf(DEVICE_NAME": vesa_uninit()\n");
 
 	vm_change_clones_to_null_areas(info.frame_buffer_area);
-	delete_area(info.frame_buffer_area);
+	if (info.owns_frame_buffer) {
+		frame_buffer_update(0, 0, 0, 0, 0);
+		delete_area(info.frame_buffer_area);
+	}
 	delete_area(info.shared_area);
 }
 

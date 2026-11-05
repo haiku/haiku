@@ -25,6 +25,7 @@ struct framebuffer_info {
 
 	area_id			frame_buffer_area;
 	addr_t			frame_buffer;
+	bool			owns_frame_buffer;
 };
 
 extern status_t framebuffer_init(framebuffer_info& info);
