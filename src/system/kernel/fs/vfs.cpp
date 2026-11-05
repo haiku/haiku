@@ -5013,6 +5013,7 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 		tableSize = DEFAULT_FD_TABLE_SIZE;
 
 	if (vfs_resize_fd_table(context, tableSize) != B_OK) {
+		contextLocker.Unlock();
 		free(context);
 		return NULL;
 	}
