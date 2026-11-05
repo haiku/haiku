@@ -98,15 +98,26 @@ struct smbios_system {
 static bool
 smbios_match_vendor_product(const char* vendor, const char* product)
 {
-	if (vendor == NULL && product == NULL)
+	if (vendor == NULL && product == NULL) {
+		// It's not allowed to match neither vendor nor product, you need at least one
 		return false;
+	}
 
-	bool match = true;
-	if (vendor != NULL && sHardwareVendor != NULL)
-		match = strcmp(vendor, sHardwareVendor) == 0;
-	if (match && product != NULL && sHardwareProduct != NULL)
-		match = strcmp(product, sHardwareProduct) == 0;
-	return match;
+	if (vendor != NULL) {
+		if ((sHardwareVendor == NULL) || (strcmp(vendor, sHardwareVendor) != 0)) {
+			// Vendor does not match
+			return false;
+		}
+	}
+
+	if (product != NULL) {
+		if ((sHardwareProduct == NULL) || (strcmp(product, sHardwareProduct) != 0)) {
+			// Product does not match
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
