@@ -1342,13 +1342,272 @@ command_ioctl(int argc, const char* const* argv)
 
 
 static void
+dump_raw_attr_data(const char* buffer, size_t size)
+{
+	const uint32_t kChunkSize = 16;
+	uint32_t dumpPosition = 0;
+
+	while (dumpPosition < size) {
+		// Position for this line
+		printf("\t%04" FSSH_B_PRIx32 ": ", dumpPosition);
+
+		// Print the bytes in form of hexadecimal numbers
+		for (uint32_t i = 0; i < kChunkSize; i++) {
+			if (dumpPosition + i < size)
+				printf("%02x ", (uint8_t)buffer[dumpPosition + i]);
+			else
+				printf("   ");
+		}
+
+		// Print the bytes in form of printable characters
+		// (whenever possible)
+		printf(" ");
+		for (uint32_t i = 0; i < kChunkSize; i++) {
+			if (dumpPosition < size) {
+				char c = buffer[dumpPosition];
+				putchar(isgraph(c) ? c : '.');
+			} else {
+				putchar(' ');
+			}
+			dumpPosition++;
+		}
+		printf("\n");
+	}
+}
+
+
+static void
+show_attr_contents(int attrFd, struct fssh_stat* st)
+{
+	// limit size of the attribute, only the first kLimit byte will make it on screen
+	int kLimit = 256;
+	off_t size = st->fssh_st_size;
+	if (size > kLimit)
+		size = kLimit;
+	char buffer[kLimit];
+	ssize_t bytesRead = _kern_read(attrFd, 0, buffer, size);
+	if (bytesRead != size) {
+		fprintf(stderr, "Could only read %" FSSH_B_PRIdOFF " bytes from attribute!\n", bytesRead);
+		return;
+	}
+	buffer[fssh_min_c(bytesRead, kLimit - 1)] = '\0';
+	switch (st->fssh_st_type) {
+		case FSSH_B_INT8_TYPE:
+			printf("%" FSSH_B_PRId8 "\n", *((int8_t*)buffer));
+			break;
+		case FSSH_B_UINT8_TYPE:
+			printf("%" FSSH_B_PRIu8 "\n", *((uint8_t*)buffer));
+			break;
+		case FSSH_B_INT16_TYPE:
+			printf("%" FSSH_B_PRId16 "\n", *((int16_t*)buffer));
+			break;
+		case FSSH_B_UINT16_TYPE:
+			printf("%" FSSH_B_PRIu16 "\n", *((uint16_t*)buffer));
+			break;
+		case FSSH_B_INT32_TYPE:
+			printf("%" FSSH_B_PRId32 "\n", *((int32_t*)buffer));
+			break;
+		case FSSH_B_UINT32_TYPE:
+			printf("%" FSSH_B_PRIu32 "\n", *((uint32_t*)buffer));
+			break;
+		case FSSH_B_INT64_TYPE:
+			printf("%" FSSH_B_PRId64 "\n", *((int64_t*)buffer));
+			break;
+		case FSSH_B_UINT64_TYPE:
+			printf("%" FSSH_B_PRIu64 "\n", *((uint64_t*)buffer));
+			break;
+		case FSSH_B_FLOAT_TYPE:
+			printf("%f\n", *((float*)buffer));
+			break;
+		case FSSH_B_DOUBLE_TYPE:
+			printf("%f\n", *((double*)buffer));
+			break;
+		case FSSH_B_BOOL_TYPE:
+			printf("%d\n", *((unsigned char*)buffer));
+			break;
+		case FSSH_B_TIME_TYPE:
+		{
+			char stringBuffer[256];
+			struct tm timeInfo;
+			localtime_r((time_t*)buffer, &timeInfo);
+			strftime(stringBuffer, sizeof(stringBuffer), "%c", &timeInfo);
+			printf("%s\n", stringBuffer);
+			break;
+		}
+		case FSSH_B_STRING_TYPE:
+		case FSSH_B_MIME_STRING_TYPE:
+		case 'MSIG':
+		case 'MSDC':
+		case 'MPTH':
+			printf("%s\n", buffer);
+			break;
+		default:
+			// The rest of the attributes types are displayed as raw data
+			putchar('\n');
+			dump_raw_attr_data(buffer, size);
+			putchar('\n');
+			break;
+	}
+}
+
+
+static const char*
+fssh_get_attr_type(fssh_type_code type)
+{
+	static char buffer[32];
+
+	switch (type) {
+		case FSSH_B_MIME_STRING_TYPE:
+			return "MIME String";
+		case FSSH_B_RAW_TYPE:
+			return "Raw Data";
+
+		case FSSH_B_STRING_TYPE:
+			return "Text";
+		case FSSH_B_INT64_TYPE:
+			return "Int-64";
+		case FSSH_B_UINT64_TYPE:
+			return "Uint-64";
+		case FSSH_B_INT32_TYPE:
+			return "Int-32";
+		case FSSH_B_UINT32_TYPE:
+			return "Uint-32";
+		case FSSH_B_INT16_TYPE:
+			return "Int-16";
+		case FSSH_B_UINT16_TYPE:
+			return "Uint-16";
+		case FSSH_B_INT8_TYPE:
+			return "Int-8";
+		case FSSH_B_UINT8_TYPE:
+			return "Uint-8";
+		case FSSH_B_BOOL_TYPE:
+			return "Boolean";
+		case FSSH_B_FLOAT_TYPE:
+			return "Float";
+		case FSSH_B_DOUBLE_TYPE:
+			return "Double";
+
+		case FSSH_B_MINI_ICON_TYPE:
+			return "Mini Icon";
+		case FSSH_B_LARGE_ICON_TYPE:
+			return "Icon";
+
+		default:
+		{
+			int32_t missed = 0, shift = 24;
+			uint8_t value[4];
+			for (int32_t i = 0; i < 4; i++, shift -= 8) {
+				value[i] = uint8_t(type >> shift);
+				if (value[i] < ' ' || value[i] > 127) {
+					value[i] = '.';
+					missed++;
+				}
+			}
+
+			if (missed < 2)
+				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2], value[3]);
+			else
+				sprintf(buffer, "0x%08" FSSH_B_PRIx32, type);
+
+			return buffer;
+		}
+	}
+}
+
+
+static fssh_status_t
+command_listattr(int argc, const char* const* argv)
+{
+	bool printContents = false;
+	if (argc > 2 && (!strcmp(argv[1], "--long") || !strcmp(argv[1], "-l"))) {
+		printContents = true;
+		argc--;
+		argv++;
+	}
+
+	if (argc < 2 || !strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
+		printf("usage: listattr [-l|--long] 'filename' ['filename' ...]\n"
+			"  -l, --long  Shows the attribute contents as well.\n");
+		return FSSH_B_OK;
+	}
+
+	const char* const* files;
+	files = argv + 1;
+	off_t total = 0;
+	fssh_status_t error;
+	for (; *files; files++) {
+		const char* file = *files;
+		printf("%s:\n", file);
+		int fFd = _kern_open_attr_dir(-1, file);
+		if (fFd < 0) {
+			fprintf(stderr, "Error: Failed to open attr dir \"%s\": %s\n", file,
+				fssh_strerror(fFd));
+			continue;
+		}
+
+		const int kTypeWidth = 12;
+		const int kSizeWidth = 10;
+		const int kNameWidth = 36;
+		printf("%*s %*s  %-*s%s\n", kTypeWidth, "Type", kSizeWidth, "Size", kNameWidth, "Name",
+			printContents ? "Contents" : "");
+
+		// iterate through the attributes
+		char buffer[sizeof(fssh_dirent) + FSSH_B_ATTR_NAME_LENGTH];
+		fssh_dirent* entry = (fssh_dirent*)buffer;
+		fssh_ssize_t entriesRead = 0;
+		while ((entriesRead = _kern_read_dir(fFd, entry, sizeof(buffer), 1)) == 1) {
+			struct fssh_stat st;
+			int attrFd = _kern_open_attr(fFd, entry->d_name, FSSH_O_RDONLY);
+			if (attrFd < 0) {
+				fprintf(stderr, "Error: Failed to open attr \"%s\": %s\n", entry->d_name,
+					fssh_strerror(attrFd));
+				continue;
+			}
+			error = _kern_read_stat(attrFd, NULL, false, &st, sizeof(st));
+			if (error != FSSH_B_OK) {
+				fprintf(stderr, "Error: Failed to stat() attribute \"%s\": %s\n", entry->d_name,
+					fssh_strerror(error));
+				continue;
+			}
+			printf("%*s", kTypeWidth, fssh_get_attr_type(st.fssh_st_type));
+			printf("% *" FSSH_B_PRId64 "  ", kSizeWidth, st.fssh_st_size);
+			printf("\"%s\"\n", entry->d_name);
+			// Print attribute values if option is enabled
+			if (printContents)
+				show_attr_contents(attrFd, &st);
+			total += st.fssh_st_size;
+			// close attr
+			error = _kern_close(attrFd);
+			if (error != FSSH_B_OK) {
+				fprintf(stderr, "Error: closing attribute \"%s\" (fd: %d) failed: %s\n",
+					entry->d_name, attrFd, fssh_strerror(error));
+			}
+		}
+
+		if (entriesRead < 0) {
+			fprintf(stderr, "Error: reading attr dir \"%s\" failed: %s\n", file,
+				fssh_strerror(entriesRead));
+		}
+		// close attribute dir
+		error = _kern_close(fFd);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: closing attribute dir \"%s\" (fd: %d) failed: %s\n", file, fFd,
+				fssh_strerror(error));
+		}
+	}
+	printf("\n%" FSSH_B_PRId64 " bytes total in attributes.\n", total);
+	return FSSH_B_OK;
+}
+
+
+static void
 register_commands()
 {
 	CommandManager::Default()->AddCommands(
 		command_cd,			"cd",			"change current directory",
 		command_chmod,		"chmod",		"change file permissions",
 		command_cp,			"cp",			"copy files and directories",
-		command_cat,		"cat",	"concatenate file(s) to stdout",
+		command_cat,		"cat",			"concatenate file(s) to stdout",
 		command_help,		"help",			"list supported commands",
 		command_info,		"info",			"prints volume informations",
 		command_ioctl,		"ioctl",		"ioctl() on root, for FS debugging only",
@@ -1362,6 +1621,7 @@ register_commands()
 		command_rm,			"rm",			"remove files and directories",
 		command_sync,		"sync",			"syncs the file system",
 		command_touch,		"touch",		"create empty file",
+		command_listattr,	"listattr",		"lists the name of all attributes",
 		NULL
 	);
 }
