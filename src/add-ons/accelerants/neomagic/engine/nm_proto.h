@@ -15,7 +15,9 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 #define LOG(level_bit, args) do { \
 	uint32 mod = (si->settings.logmask &  0xfffffff0) & MODULE_BIT; \
 	uint32 lev = (si->settings.logmask & ~0xfffffff0) & level_bit; \
-	if (mod && lev) nm_log args; \
+	if (mod && lev) { \
+		nm_log args; \
+	} \
 } while (0)
 
 /*support functions*/

@@ -288,7 +288,8 @@ static void nm_bes_calc_move_overlay(move_overlay_info *moi)
 	moi->a1orgv += ((hsrcstv >> 16) * 2);
 	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
 	moi->a1orgv &= ~0x03;
-	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n", moi->a1orgv));
+	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n",
+		moi->a1orgv));
 }
 
 static void nm_bes_program_move_overlay(move_overlay_info moi)

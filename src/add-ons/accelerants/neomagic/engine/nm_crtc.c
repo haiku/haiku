@@ -159,8 +159,12 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		LOG(4,("CRTC: CRT only mode, setting full timing...\n"));
 
 		/* log the mode that will be set */
-		LOG(2,("CRTC:\n\tHTOT:%x\n\tHDISPEND:%x\n\tHBLNKS:%x\n\tHBLNKE:%x\n\tHSYNCS:%x\n\tHSYNCE:%x\n\t",htotal,hdisp_e,hblnk_s,hblnk_e,hsync_s,hsync_e));
-		LOG(2,("VTOT:%x\n\tVDISPEND:%x\n\tVBLNKS:%x\n\tVBLNKE:%x\n\tVSYNCS:%x\n\tVSYNCE:%x\n",vtotal,vdisp_e,vblnk_s,vblnk_e,vsync_s,vsync_e));
+		LOG(2,("CRTC:\n\tHTOT:%" B_PRIx32 "\n\tHDISPEND:%" B_PRIx32 "\n\tHBLNKS:%" B_PRIx32
+			"\n\tHBLNKE:%" B_PRIx32 "\n\tHSYNCS:%" B_PRIx32 "\n\tHSYNCE:%" B_PRIx32 "\n\t",
+			htotal,hdisp_e,hblnk_s,hblnk_e,hsync_s,hsync_e));
+		LOG(2,("VTOT:%" B_PRIx32 "\n\tVDISPEND:%" B_PRIx32 "\n\tVBLNKS:%" B_PRIx32 "\n\tVBLNKE:%"
+			B_PRIx32 "\n\tVSYNCS:%" B_PRIx32 "\n\tVSYNCE:%" B_PRIx32 "\n",vtotal,vdisp_e,vblnk_s,
+			vblnk_e,vsync_s,vsync_e));
 
 		/* actually program the card! */
 		/* unlock CRTC registers at index 0-7 */
@@ -526,7 +530,7 @@ status_t nm_crtc_set_display_pitch()
 	/* figure out offset value hardware needs: same for all Neomagic cards */
 	offset = si->fbc.bytes_per_row / 8;
 
-	LOG(2,("CRTC: offset register set to: $%04x\n", offset));
+	LOG(2,("CRTC: offset register set to: $%" B_PRIx32 "\n", offset));
 
 	/* program the card */
 	ISACRTCW(PITCHL, (offset & 0xff));
@@ -544,9 +548,9 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	uint8 val;
 	uint32 timeout = 0;
 
-	LOG(2,("CRTC: relative startadd: $%06x\n",startadd));
-	LOG(2,("CRTC: frameRAM: $%08x\n",si->framebuffer));
-	LOG(2,("CRTC: framebuffer: $%08x\n",si->fbc.frame_buffer));
+	LOG(2,("CRTC: relative startadd: $%" B_PRIx32 "\n",startadd));
+	LOG(2,("CRTC: frameRAM: $%p\n",si->framebuffer));
+	LOG(2,("CRTC: framebuffer: $%p\n",si->fbc.frame_buffer));
 
 	/* make sure we _just_ left retrace, because otherwise distortions */
 	/* might occur during our reprogramming (no double buffering) */

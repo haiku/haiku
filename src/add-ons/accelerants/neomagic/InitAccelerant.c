@@ -39,7 +39,7 @@ static status_t init_common(int the_fd)
 			goto error0;
 	}
 	// LOG is now available, si !NULL
-	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d\n",
+	LOG(4,("init_common: logmask 0x%" B_PRIx32 ", memory %" B_PRId32 "MB, hardcursor %d, usebios %d\n",
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios));
 
 	/* clone register area(s) */

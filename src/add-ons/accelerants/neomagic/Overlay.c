@@ -52,7 +52,7 @@ const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm)
 uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space)
 // This method is never used AFAIK. On R5.0.3 and DANO it is not even exported!
 {
-	LOG(4,("Overlay: supported_features: color_space $%08x\n",a_color_space));
+	LOG(4,("Overlay: supported_features: color_space $0x%" B_PRIx32 "\n", a_color_space));
 
 	/* check what features are supported for the current overlaybitmap colorspace */
 	switch (a_color_space)
@@ -75,9 +75,9 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 	/* acquire the shared benaphore */
 	AQUIRE_BEN(si->overlay.lock)
 
-	LOG(4,("Overlay: cardRAM_start = $%p\n",((uint8*)si->framebuffer)));
-	LOG(4,("Overlay: cardRAM_start_DMA = $%p\n",((uint8*)si->framebuffer_pci)));
-	LOG(4,("Overlay: cardRAM_size = %dKb\n",si->ps.memory_size));
+	LOG(4,("Overlay: cardRAM_start = $%p\n", ((uint8*)si->framebuffer)));
+	LOG(4,("Overlay: cardRAM_start_DMA = $%p\n", ((uint8*)si->framebuffer_pci)));
+	LOG(4,("Overlay: cardRAM_size = %" B_PRIu32 "Kb\n",si->ps.memory_size));
 
 	/* find first empty slot (room for another buffer?) */
 	for (offset = 0; offset < MAXBUFFERS; offset++)
@@ -181,7 +181,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		 * card top:        - hardware cursor bitmap (if used) */
 		adress2 = (((uint32)((uint8*)si->fbc.frame_buffer)) +	/* cursor not yet included here */
 			(si->fbc.bytes_per_row * si->dm.virtual_height));	/* size in bytes of screen(s) */
-		LOG(4,("Overlay: first free cardRAM virtual adress $%08x\n", adress2));
+		LOG(4,("Overlay: first free cardRAM virtual adress $0x%" B_PRIuADDR  "\n", adress2));
 
 		/* calculate 'preliminary' buffer size including slopspace */
 		oldsize = si->overlay.myBufInfo[offset].size;
@@ -192,7 +192,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		adress = (((uint32)((uint8*)si->framebuffer)) + (si->ps.memory_size * 1024));
 		/* take cursor into account (if it exists) */
 		if(si->settings.hardcursor) adress -= si->ps.curmem_size;
-		LOG(4,("Overlay: last free cardRAM virtual adress $%08x\n", (adress - 1)));
+		LOG(4,("Overlay: last free cardRAM virtual adress $0x%" B_PRIuADDR "\n", (adress - 1)));
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;
@@ -212,7 +212,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			/* update the (already calculated) adress to get it aligned */
 			adress -= (temp32 - (temp32 & 0xfffffff0));
 		}
-		LOG(4,("Overlay: new buffer needs virtual adress $%08x\n", adress));
+		LOG(4,("Overlay: new buffer needs virtual adress $0x%" B_PRIuADDR "\n", adress));
 
 		/* First check now if buffer to be defined is 'last one' in memory (speaking backwards):
 		 * this is done to prevent a large buffer getting created in the space a small buffer 
@@ -239,7 +239,8 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					adress -= (oldsize - si->overlay.myBufInfo[offset].size);
 					si->overlay.myBufInfo[offset].size = oldsize;
 					LOG(4,("Overlay: 'squeezing' in buffer:\n"
-						   "Overlay: resetting it to virtual adress $%08x and size $%08x\n", adress,oldsize));
+						   "Overlay: resetting it to virtual adress $0x%" B_PRIuADDR
+						   " and size $0x%" B_PRIuADDR "\n", adress,oldsize));
 					/* force exiting the FOR loop */
 					cnt = MAXBUFFERS;
 				}
@@ -286,11 +287,12 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		/* this adress is already aligned to the scaler's requirements (via the already modified sizes) */
 		si->overlay.myBuffer[offset].buffer_dma = (void *) adress;
 
-		LOG(4,("Overlay: New buffer: addr $%08x, dma_addr $%08x, color space $%08x\n",
-			(uint32)((uint8*)si->overlay.myBuffer[offset].buffer),
+		LOG(4,("Overlay: New buffer: addr $0x%" B_PRIuADDR ", dma_addr $0x%" B_PRIuADDR
+			", color space $%x\n", (uint32)((uint8*)si->overlay.myBuffer[offset].buffer),
 			(uint32)((uint8*)si->overlay.myBuffer[offset].buffer_dma), cs));
-		LOG(4,("Overlay: New buffer's size is $%08x\n", si->overlay.myBufInfo[offset].size));
-			
+		LOG(4,("Overlay: New buffer's size is $0x%" B_PRIuADDR "\n",
+			si->overlay.myBufInfo[offset].size));
+
 		/* release the shared benaphore */
 		RELEASE_BEN(si->overlay.lock)
 

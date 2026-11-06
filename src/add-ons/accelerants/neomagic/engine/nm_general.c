@@ -14,7 +14,7 @@ static void nm_dump_configuration_space (void)
 {
 #define DUMP_CFG(reg, type) if (si->ps.card_type >= type) do { \
 	uint32 value = CFGR(reg); \
-	MSG(("configuration_space 0x%02x %20s 0x%08x\n", \
+	MSG(("configuration_space 0x%02x %20s 0x%" B_PRIx32 "\n", \
 		NMCFG_##reg, #reg, value)); \
 } while (0)
 	DUMP_CFG (DEVID,	0);
@@ -148,7 +148,7 @@ status_t nm_general_powerup()
 		sprintf(si->adi.chipset, "NM2380");
 		break;
 	default:
-		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
+		LOG(8,("POWERUP: Failed to detect valid card 0x%" B_PRIx32 "\n",CFGR(DEVID)));
 		return B_ERROR;
 	}
 
@@ -456,7 +456,7 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			case B_RGB16: crtc_mask = 0x1f; depth = 16; break;
 			case B_RGB24: crtc_mask = 0x1f; depth = 24; break; 
 			default:
-				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
+				LOG(8,("INIT: unsupported colorspace: 0x%" B_PRIx32 "\n", target->space));
 				return B_ERROR;
 		}
 		break;
@@ -468,7 +468,7 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			case B_RGB16: crtc_mask = 0x03; depth = 16; break;
 			case B_RGB24: crtc_mask = 0x07; depth = 24; break; 
 			default:
-				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
+				LOG(8,("INIT: unsupported colorspace: 0x%" B_PRIx32 "\n", target->space));
 				return B_ERROR;
 		}
 		break;
@@ -613,10 +613,10 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	if (!*acc_mode)
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
 
-	LOG(2,("INIT: memory pitch will be set to %d pixels for colorspace 0x%08x\n",
+	LOG(2,("INIT: memory pitch will be set to %ld pixels for colorspace 0x%" B_PRIx32 "\n",
 														video_pitch, target->space)); 
 	if (target->virtual_width != video_pitch)
-		LOG(2,("INIT: effective mode slopspace is %d pixels\n", 
+		LOG(2,("INIT: effective mode slopspace is %ld pixels\n",
 											(video_pitch - target->virtual_width)));
 
 	/* now calculate bytes_per_row for this mode */

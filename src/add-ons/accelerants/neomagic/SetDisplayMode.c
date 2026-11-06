@@ -59,9 +59,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
 	/* show the mode bits */
-	LOG(1, ("SETMODE: (ENTER) initial modeflags: $%08x\n", target.flags));
-	LOG(1, ("SETMODE: requested target pixelclock %dkHz\n",  target.timing.pixel_clock));
-	LOG(1, ("SETMODE: requested virtual_width %d, virtual_height %d\n",
+	LOG(1, ("SETMODE: (ENTER) initial modeflags: $%" B_PRIx32 "\n", target.flags));
+	LOG(1, ("SETMODE: requested target pixelclock %" B_PRIu32 "kHz\n",  target.timing.pixel_clock));
+	LOG(1, ("SETMODE: requested virtual_width %u, virtual_height %u\n",
 										target.virtual_width, target.virtual_height));
 
 	/* See BOUNDS WARNING above... */
@@ -98,7 +98,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		case B_RGB16_LITTLE: colour_depth = 16; colour_mode = BPP16; break;
 		case B_RGB24_LITTLE: colour_depth = 24; colour_mode = BPP24; break;
 		default:
-			LOG(8,("SETMODE: Invalid colorspace $%08x\n", target.space));
+			LOG(8,("SETMODE: Invalid colorspace $%" B_PRIx32 "\n", target.space));
 			return B_ERROR;
 		}
 
@@ -251,7 +251,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 {
 	interrupt_enable(false);
 
-	LOG(4,("SET_DPMS_MODE: $%08x\n", dpms_flags));
+	LOG(4,("SET_DPMS_MODE: $%" B_PRIu32 "\n", dpms_flags));
 
 	/* note current DPMS state for our reference */
 	si->dpms_flags = dpms_flags;
@@ -271,7 +271,7 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 		nm_crtc_dpms(false, false, false);
 		break;
 	default:
-		LOG(8,("SET_DPMS_MODE: Invalid DPMS settings) $%08x\n", dpms_flags));
+		LOG(8,("SET_DPMS_MODE: Invalid DPMS settings) $%" B_PRIx32 "\n", dpms_flags));
 		interrupt_enable(true);
 		return B_ERROR;
 	}

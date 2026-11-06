@@ -267,7 +267,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	}
 
 	/* setup status flags */ 
-	LOG(1, ("PROPOSEMODE: initial modeflags: $%08x\n", target->flags));
+	LOG(1, ("PROPOSEMODE: initial modeflags: $%" B_PRIx32 "\n", target->flags));
 	/* preset to singlehead card without TVout, no overlay support and no hardcursor.
 	 * also advice system that app_server and acc engine may touch the framebuffer
 	 * simultaneously (fixed). */
@@ -306,7 +306,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	if (si->ps.card_type > NM2070)
 		target->flags |= B_SUPPORTS_OVERLAYS;
 
-	LOG(1, ("PROPOSEMODE: validated modeflags: $%08x\n", target->flags));
+	LOG(1, ("PROPOSEMODE: validated modeflags: $%" B_PRIx32 "\n", target->flags));
 
 	/* overrule timing command flags to be (fixed) blank_pedestal = 0.0IRE,
 	 * progressive scan (fixed), and sync_on_green not used */
@@ -323,7 +323,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 */
 uint32 ACCELERANT_MODE_COUNT(void)
 {
-	LOG(1, ("ACCELERANT_MODE_COUNT: the modelist contains %d modes\n",si->mode_count));
+	LOG(1, ("ACCELERANT_MODE_COUNT: the modelist contains %ld modes\n",si->mode_count));
 
 	return si->mode_count;
 }

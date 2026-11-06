@@ -237,17 +237,17 @@ void dump_specs(void)
 {
 	LOG(2,("INFO: cardspecs and settings follow:\n"));
 	LOG(2,("f_ref: %fMhz\n", si->ps.f_ref));
-	LOG(2,("max_system_vco: %dMhz\n", si->ps.max_system_vco));
-	LOG(2,("min_system_vco: %dMhz\n", si->ps.min_system_vco));
-	LOG(2,("max_pixel_vco: %dMhz\n", si->ps.max_pixel_vco));
-	LOG(2,("min_pixel_vco: %dMhz\n", si->ps.min_pixel_vco));
-	LOG(2,("std_engine_clock: %dMhz\n", si->ps.std_engine_clock));
-	LOG(2,("max_dac1_clock: %dMhz\n", si->ps.max_dac1_clock));
-	LOG(2,("max_dac1_clock_8: %dMhz\n", si->ps.max_dac1_clock_8));
-	LOG(2,("max_dac1_clock_16: %dMhz\n", si->ps.max_dac1_clock_16));
-	LOG(2,("max_dac1_clock_24: %dMhz\n", si->ps.max_dac1_clock_24));
-	LOG(2,("card memory_size: %dKbytes\n", si->ps.memory_size));
-	LOG(2,("card curmem_size: %dbytes\n", si->ps.curmem_size));
+	LOG(2,("max_system_vco: %ldMhz\n", si->ps.max_system_vco));
+	LOG(2,("min_system_vco: %ldMhz\n", si->ps.min_system_vco));
+	LOG(2,("max_pixel_vco: %ldMhz\n", si->ps.max_pixel_vco));
+	LOG(2,("min_pixel_vco: %ldMhz\n", si->ps.min_pixel_vco));
+	LOG(2,("std_engine_clock: %ldMhz\n", si->ps.std_engine_clock));
+	LOG(2,("max_dac1_clock: %ldMhz\n", si->ps.max_dac1_clock));
+	LOG(2,("max_dac1_clock_8: %ldMhz\n", si->ps.max_dac1_clock_8));
+	LOG(2,("max_dac1_clock_16: %ldMhz\n", si->ps.max_dac1_clock_16));
+	LOG(2,("max_dac1_clock_24: %ldMhz\n", si->ps.max_dac1_clock_24));
+	LOG(2,("card memory_size: %ldKbytes\n", si->ps.memory_size));
+	LOG(2,("card curmem_size: %ldbytes\n", si->ps.curmem_size));
 	LOG(2,("card max_crtc_width: %d\n", si->ps.max_crtc_width));
 	LOG(2,("card max_crtc_height: %d\n", si->ps.max_crtc_height));
 	switch (si->ps.panel_type)
