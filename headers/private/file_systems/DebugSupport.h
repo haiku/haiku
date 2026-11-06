@@ -7,6 +7,7 @@
 #define DEBUG_SUPPORT_H
 
 
+#include <SupportDefs.h>
 #include <string.h>
 
 
