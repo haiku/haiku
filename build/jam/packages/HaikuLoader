@@ -6,8 +6,7 @@ HaikuPackage $(haikuLoaderPackage) ;
 AddFilesToPackage : haiku_loader.$(HAIKU_KERNEL_PLATFORM) ;
 
 
-# Force no compression, so the stage one loader can directly execute the boot
-# loader.
+# Force no compression, so the stage-1 loader can directly read the bootloader.
 HAIKU_PACKAGE_COMPRESSION_LEVEL on $(haikuLoaderPackage) = 0 ;
 
 BuildHaikuPackage $(haikuLoaderPackage) : haiku_loader ;

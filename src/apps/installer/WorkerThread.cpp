@@ -290,8 +290,8 @@ WorkerThread::InstallEFILoader(partition_id id, bool rename)
 	BString archLoaderBackup = arch_efi_default_prefix();
 	archLoaderBackup.Append("_old.EFI");
 
-	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &loaderPath) != B_OK
-		|| loaderPath.Append("platform_loaders/haiku_loader.efi") != B_OK
+	if (find_directory(B_SYSTEM_DIRECTORY, &loaderPath) != B_OK
+		|| loaderPath.Append("haiku_loader.efi") != B_OK
 		|| loaderToCopy.SetTo(loaderPath.Path(), B_READ_ONLY) != B_OK
 		|| loaderToCopy.InitCheck() != B_OK
 		|| loaderToCopy.GetSize(&size) != B_OK)
