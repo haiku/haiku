@@ -323,7 +323,6 @@ static status_t map_device(device_info *di)
 	shared_info *si = di->si;
 	uint32	tmpUlong;
 	pci_info *pcii = &(di->pcii);
-	system_info sysinfo;
 
 	/* variables for making copy of ROM */
 	uint8* rom_temp;
@@ -343,17 +342,6 @@ static status_t map_device(device_info *di)
 	tmpUlong |= PCI_command_memory;
 	tmpUlong |= PCI_command_master;
 	set_pci(PCI_command, 4, tmpUlong);
-
- 	/*work out which version of BeOS is running*/
- 	get_system_info(&sysinfo);
- 	if (0)//sysinfo.kernel_build_date[0]=='J')/*FIXME - better ID version*/
- 	{
- 		si->use_clone_bugfix = 1;
- 	}
- 	else
- 	{
- 		si->use_clone_bugfix = 0;
- 	}
 
 	/* map card's register area's */
 	switch (di->pcii.device_id)
@@ -379,12 +367,9 @@ static status_t map_device(device_info *di)
 			di->pcii.u.h0.base_registers[registers],
 			di->pcii.u.h0.base_register_sizes[registers],
 			B_ANY_KERNEL_ADDRESS,
-			B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+			B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			(void **)&(di->regs));
- 		si->clone_bugfix_regs = (uint32 *) di->regs;
-
-		/* if mapping registers to vmem failed then pass on error */
-		if (si->regs_area < 0) return si->regs_area;
+ 		si->regs = (uint32 *) di->regs;
 
 		/* work out a name for the register mapping */
 		sprintf(buffer, DEVICE_FORMAT " regs2",
@@ -396,9 +381,8 @@ static status_t map_device(device_info *di)
 			di->pcii.u.h0.base_registers[registers2],
 			di->pcii.u.h0.base_register_sizes[registers2],
 			B_ANY_KERNEL_ADDRESS,
-			B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+			B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			(void **)&(di->regs2));
-	 	si->clone_bugfix_regs2 = (uint32 *) di->regs2;
 
 		/* if mapping registers to vmem failed then pass on error */
 		if (si->regs2_area < 0)
@@ -429,7 +413,7 @@ static status_t map_device(device_info *di)
 			di->pcii.u.h0.rom_base_pci,
 			di->pcii.u.h0.rom_size,
 			B_ANY_KERNEL_ADDRESS,
-			B_READ_AREA,
+			B_KERNEL_READ_AREA,
 			(void **)&(rom_temp)
 		);
 
@@ -452,7 +436,7 @@ static status_t map_device(device_info *di)
 			0x000c0000,
 			65536,
 			B_ANY_KERNEL_ADDRESS,
-			B_READ_AREA,
+			B_KERNEL_READ_AREA,
 			(void **)&(rom_temp)
 		);
 	}
@@ -531,13 +515,13 @@ static status_t map_device(device_info *di)
 	case 0x0001:
 		/* NM2070 cards */
 		di->regs = (uint32 *)((uint8 *)si->framebuffer + 0x100000);
- 		si->clone_bugfix_regs = (uint32 *) di->regs;
+ 		si->regs = (uint32 *) di->regs;
 		break;
 	case 0x0002:
 	case 0x0003:
 		/* NM2090 and NM2093 cards */
 		di->regs = (uint32 *)((uint8 *)si->framebuffer + 0x200000);
- 		si->clone_bugfix_regs = (uint32 *) di->regs;
+ 		si->regs = (uint32 *) di->regs;
 		break;
 	}
 
@@ -650,7 +634,6 @@ nm_interrupt(void *data)
 	}
 	/* get regs */
 	regs = di->regs;
-	regs2 = di->regs2;
 
 	/* was it a VBI? */
 	if (caused_vbi(regs, regs2)) {
@@ -695,7 +678,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	sprintf(shared_name, DEVICE_FORMAT " shared",
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
-	/* create this area with NO user-space read or write permissions, to prevent accidental dammage */
+	/* create this area with NO user-space read or write permissions, to prevent accidental damage */
 	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS, ((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di->shared_area < 0) {

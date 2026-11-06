@@ -100,10 +100,7 @@ typedef struct {
   /* used to return status for INIT_ACCELERANT and CLONE_ACCELERANT */
 	bool	accelerant_in_use;
 
-  /* bug workaround for 4.5.0 */
-	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
-	uint32 * clone_bugfix_regs;
-	uint32 * clone_bugfix_regs2;
+	uint32 * regs;
 
 	/* old cards have their registers mapped inside the framebuffer area */
 	bool regs_in_fb;

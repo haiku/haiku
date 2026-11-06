@@ -49,41 +49,30 @@ static status_t init_common(int the_fd)
 		LOG(2,("InitACC: Can't clone register area, integrated in framebuffer!\n"));
 
 		/* the kerneldriver already did some calcs for us */
-		regs = si->clone_bugfix_regs;
+		regs = si->regs;
 		/* not used */
 		regs2 = 0;
 	}
 	else
  	{
- 		/*Check for R4.5.0 and if it is running, use work around*/
- 		if (si->use_clone_bugfix)
- 		{
- 			/*check for R4.5.0 bug and attempt to work around*/
- 			LOG(2,("InitACC: Found R4.5.0 bug - attempting to work around\n"));
- 			regs = si->clone_bugfix_regs;
- 			regs2 = si->clone_bugfix_regs2;
- 		}
- 		else
- 		{
-			/* clone the memory mapped registers for our use  - does not work on <4.5.2 (but is better this way)*/
-			regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA, si->regs_area);
-			if (regs_area < 0)
+		/* clone the memory mapped registers for our use */
+		regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
+			B_READ_AREA | B_WRITE_AREA, si->regs_area);
+		if (regs_area < 0)
+		{
+			result = regs_area;
+			goto error1;
+		}
+		else
+		{
+			regs2_area = clone_area(DRIVER_PREFIX " regs2", (void **)&regs2, B_ANY_ADDRESS,
+			B_READ_AREA | B_WRITE_AREA, si->regs2_area);
+			if (regs2_area < 0)
 			{
-				result = regs_area;
-				goto error1;
+				result = regs2_area;
+				goto error2;
 			}
-			else
-			{
-				regs2_area = clone_area(DRIVER_PREFIX " regs2", (void **)&regs2, B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA, si->regs2_area);
-				if (regs2_area < 0)
-				{
-					result = regs2_area;
-					goto error2;
-				}
-			}
- 		}
+		}
  	}
 
 	/*FIXME - print dma addresses*/
