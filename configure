@@ -336,6 +336,13 @@ standard_gcc_settings()
 				fi
 				exit 1
 			fi
+
+			if [ "$boot32Libgcc" = "$bootLibgcc" ]; then
+				# Seems we don't really have 32-bit libraries.
+				boot32Libgcc=""
+				boot32LibSupCxx=""
+			fi
+
 			local headersBase=$gccdir/../../../..
 			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
 			if [ ! -d $headers ]; then

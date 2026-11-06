@@ -300,7 +300,11 @@ rule KernelArchitectureSetup architecture
 		case x86_64 :
 			# x86_64 completely shares the x86 bootloader for MBR.
 			HAIKU_KERNEL_PLATFORM ?= bios_ia32 ;
-			HAIKU_BOOT_TARGETS += bios_ia32 efi pxe_ia32 ;
+			if $(HAIKU_BOOT_32_LIBGCC_x86_64) != "" {
+				HAIKU_BOOT_TARGETS = bios_ia32 efi pxe_ia32 ;
+			} else {
+				HAIKU_BOOT_TARGETS = efi ;
+			}
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
