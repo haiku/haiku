@@ -1160,7 +1160,7 @@ x86_init_user_debug()
 		"Sets respectively clears the breakpoint at address <address>.\n", 0);
 	add_debugger_command_etc("watchpoint", &debugger_watchpoint,
 		"Set/clears a watchpoint",
-		"<address> <address> ( [ rw ] [ <size> ] | clear )\n"
+		"<address> ( [ rw ] [ <size> ] | clear )\n"
 		"Sets respectively clears the watchpoint at address <address>.\n"
 		"If \"rw\" is given the new watchpoint is a read/write watchpoint\n"
 		"otherwise a write watchpoint only.\n", 0);
