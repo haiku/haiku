@@ -3466,7 +3466,7 @@ dump_io_context(int argc, char** argv)
 }
 
 
-int
+static int
 dump_vnode_usage(int argc, char** argv)
 {
 	if (argc != 1) {
@@ -3483,6 +3483,7 @@ dump_vnode_usage(int argc, char** argv)
 		count - sUnusedVnodes);
 	return 0;
 }
+
 
 #endif	// ADD_DEBUGGER_COMMANDS
 
@@ -5047,8 +5048,8 @@ vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 
 			context->fds[i] = descriptor;
 			context->num_used_fds++;
-			atomic_add(&descriptor->ref_count, 1);
-			atomic_add(&descriptor->open_count, 1);
+			inc_fd_ref_count(descriptor);
+			inc_fd_open_count(descriptor);
 
 			if (closeOnExec)
 				fd_set_close_on_exec(context, i, true);
@@ -6426,7 +6427,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 				else if (op == F_DUPFD_CLOFORK)
 					fd_set_close_on_fork(context, status, true);
 
-				atomic_add(&descriptor->ref_count, 1);
+				inc_fd_ref_count(descriptor.Get());
 			}
 			break;
 		}

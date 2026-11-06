@@ -431,8 +431,8 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 		evicted = context->fds[newfd];
 		select_info* selectInfos = context->select_infos[newfd];
 		context->select_infos[newfd] = NULL;
-		atomic_add(&context->fds[oldfd]->ref_count, 1);
-		atomic_add(&context->fds[oldfd]->open_count, 1);
+		inc_fd_ref_count(context->fds[oldfd]);
+		inc_fd_open_count(context->fds[oldfd]);
 		context->fds[newfd] = context->fds[oldfd];
 
 		if (evicted == NULL)
