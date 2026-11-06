@@ -57,7 +57,7 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 		return;
 	}
 
-	fStatus = get_memory_map(fBuffer, sizeof(fBuffer), &fEntry, 1);
+	fStatus = get_memory_map(fBuffer, B_PAGE_SIZE, &fEntry, 1);
 	if (fStatus < B_OK) {
 		delete_area(fArea);
 		fArea = -1;
