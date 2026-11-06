@@ -243,17 +243,24 @@ ramfs_get_vnode(fs_volume* _volume, ino_t vnid, fs_vnode* node, int* _type,
 
 
 static status_t
-ramfs_write_vnode(fs_volume* /*fs*/, fs_vnode* DARG(_node), bool /*reenter*/)
+ramfs_put_vnode(fs_volume* _volume, fs_vnode* _node, bool /*reenter*/)
 {
 // DANGER: If dbg_printf() is used, this thread will enter another FS and
 // even perform a write operation. The is dangerous here, since this hook
 // may be called out of the other FSs, since, for instance a put_vnode()
 // called from another FS may cause the VFS layer to free vnodes and thus
 // invoke this hook.
-//	FUNCTION_START();
-//FUNCTION(("node: %lld\n", ((Node*)_node)->GetID()));
-	status_t error = B_OK;
-	RETURN_ERROR(error);
+//FUNCTION(("node: %lld\n", ((Node*)_node->private_node)->GetID()));
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Node* node = (Node*)_node->private_node;
+
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	node->UnsetKnownToVFS();
+	RETURN_ERROR(B_OK);
 }
 
 
@@ -269,6 +276,7 @@ ramfs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool /*reenter*/)
 		RETURN_ERROR(B_ERROR);
 
 	status_t error = B_OK;
+	node->UnsetKnownToVFS();
 	volume->NodeRemoved(node);
 	delete node;
 	RETURN_ERROR(error);
@@ -2204,7 +2212,7 @@ fs_vnode_ops gRamFSVnodeOps = {
 	/* vnode operations */
 	&ramfs_lookup,			// lookup
 	NULL,					// get name
-	&ramfs_write_vnode,		// write
+	&ramfs_put_vnode,		// write
 	&ramfs_remove_vnode,	// remove
 
 	/* VM file access */

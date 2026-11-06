@@ -43,6 +43,8 @@ public:
 	void RemoveReference();
 	int32 GetRefCount()	{ return fRefCount; }
 
+	void UnsetKnownToVFS() { fIsKnownToVFS = false; }
+
 	virtual status_t Link(Entry *entry);
 	virtual status_t Unlink(Entry *entry);
 

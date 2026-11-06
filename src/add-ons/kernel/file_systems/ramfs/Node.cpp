@@ -51,6 +51,7 @@ Node::Node(Volume *volume, uint8 type)
 Node::~Node()
 {
 	ASSERT(fRefCount == 0);
+	ASSERT(!fIsKnownToVFS);
 
 	// delete all attributes
 	while (Attribute *attribute = fAttributes.First()) {
