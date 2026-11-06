@@ -528,7 +528,6 @@ map_device(device_info *di)
 	uint32	tmpUlong, tmpROMshadow;
 	pci_info *pcii = &(di->pcii);
 	phys_addr_t physicalAddress;
-	system_info sysinfo;
 
 	CALLED();
 	/* variables for making copy of ROM */
@@ -548,17 +547,6 @@ map_device(device_info *di)
 	/* disable ISA I/O access */
 	tmpUlong &= ~PCI_command_io;
 	set_pci(PCI_command, 2, tmpUlong);
-
- 	/*work out which version of BeOS is running*/
- 	get_system_info(&sysinfo);
- 	if (0)//sysinfo.kernel_build_date[0]=='J')/*FIXME - better ID version*/
- 	{
- 		si->use_clone_bugfix = 1;
- 	}
- 	else
- 	{
- 		si->use_clone_bugfix = 0;
- 	}
 
 	/* work out a name for the register mapping */
 	sprintf(buffer, DEVICE_FORMAT " regs",
@@ -581,7 +569,6 @@ map_device(device_info *di)
 		B_ANY_KERNEL_ADDRESS,
 		B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&(di->regs));
-	si->clone_bugfix_regs = (uint32 *) di->regs;
 
 	/* if mapping registers to vmem failed then pass on error */
 	if (si->regs_area < 0) return si->regs_area;

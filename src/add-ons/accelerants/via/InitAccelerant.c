@@ -44,25 +44,13 @@ static status_t init_common(int the_fd) {
 	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d\n",
 		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel));
 
- 	/*Check for R4.5.0 and if it is running, use work around*/
- 	{
- 		if (si->use_clone_bugfix)
- 		{
- 			/*check for R4.5.0 bug and attempt to work around*/
- 			LOG(2,("InitACC: Found R4.5.0 bug - attempting to work around\n"));
- 			regs = si->clone_bugfix_regs;
- 		}
- 		else
- 		{
-			/* clone the memory mapped registers for our use  - does not work on <4.5.2 (but is better this way)*/
-			regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA, si->regs_area);
-			if (regs_area < 0) {
-				result = regs_area;
-				goto error1;
-			}
- 		}
- 	}
+	/* clone the memory mapped registers for our use */
+	regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, si->regs_area);
+	if (regs_area < 0) {
+		result = regs_area;
+		goto error1;
+	}
 
 	/*FIXME - print dma addresses*/
 	//LOG(4,("DMA_virtual:%x\tDMA_physical:%x\tDMA_area:%x\n",si->dma_buffer,si->dma_buffer_pci,si->dma_buffer_area));

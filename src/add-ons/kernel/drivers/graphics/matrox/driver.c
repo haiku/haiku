@@ -307,7 +307,6 @@ static status_t map_device(device_info *di)
 	shared_info *si = di->si;
 	uint32	tmpUlong;
 	pci_info *pcii = &(di->pcii);
-	system_info sysinfo;
 
 	/*storage for the physical to virtual table (used for dma buffer)*/
 //	physical_entry physical_memory[2];
@@ -337,17 +336,6 @@ static status_t map_device(device_info *di)
 	tmpUlong &= 0xfffffffe;
 	set_pci(PCI_command, 4, tmpUlong);
 
- 	/*work out which version of BeOS is running*/
- 	get_system_info(&sysinfo);
- 	if (0)//sysinfo.kernel_build_date[0]=='J')/*FIXME - better ID version*/
- 	{
- 		si->use_clone_bugfix = 1;
- 	}
- 	else
- 	{
- 		si->use_clone_bugfix = 0;
- 	}
-
 	/* work out a name for the register mapping */
 	sprintf(buffer, DEVICE_FORMAT " regs",
 		di->pcii.vendor_id, di->pcii.device_id,
@@ -359,9 +347,8 @@ static status_t map_device(device_info *di)
 		di->pcii.u.h0.base_registers[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
- 		B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+ 		B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&(di->regs));
- 	si->clone_bugfix_regs = (uint32 *) di->regs;
 
 	/* if mapping registers to vmem failed then pass on error */
 	if (si->regs_area < 0) return si->regs_area;

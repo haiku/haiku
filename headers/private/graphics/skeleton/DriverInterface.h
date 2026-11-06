@@ -107,10 +107,6 @@ typedef struct {
 	uint8	device;		/* PCI device number on bus, from pci_info */
 	uint8	function;	/* PCI function number in device, from pci_info */
 
-  /* bug workaround for 4.5.0 */
-	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
-	uint32 * clone_bugfix_regs;
-
   /*memory mappings*/
 	area_id	regs_area;	/* Kernel's area_id for the memory mapped registers.
 							It will be cloned into the accelerant's	address

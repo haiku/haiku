@@ -46,25 +46,14 @@ static status_t init_common(int the_fd) {
 	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz, force_ws %d, block_acc %d, check_edid %d\n",
 		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk, si->settings.force_ws, si->settings.block_acc, si->settings.check_edid));
 
- 	/*Check for R4.5.0 and if it is running, use work around*/
- 	{
- 		if (si->use_clone_bugfix)
- 		{
- 			/*check for R4.5.0 bug and attempt to work around*/
- 			LOG(2,("InitACC: Found R4.5.0 bug - attempting to work around\n"));
- 			regs = si->clone_bugfix_regs;
- 		}
- 		else
- 		{
-			/* clone the memory mapped registers for our use  - does not work on <4.5.2 (but is better this way)*/
-			regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA, si->regs_area);
-			if (regs_area < 0) {
-				result = regs_area;
-				goto error1;
-			}
- 		}
- 	}
+
+	/* clone the memory mapped registers for our use */
+	regs_area = clone_area(DRIVER_PREFIX " regs", (void **)&regs, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, si->regs_area);
+	if (regs_area < 0) {
+		result = regs_area;
+		goto error1;
+	}
 
 	/* all done */
 	goto error0;

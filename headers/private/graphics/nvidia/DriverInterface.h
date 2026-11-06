@@ -274,10 +274,6 @@ typedef struct {
   /* used to return status for INIT_ACCELERANT and CLONE_ACCELERANT */
 	bool	accelerant_in_use;
 
-  /* bug workaround for 4.5.0 */
-	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/
-	uint32 * clone_bugfix_regs;
-
   /*memory mappings*/
 	area_id	regs_area;	/* Kernel's area_id for the memory mapped registers.
 							It will be cloned into the accelerant's	address
