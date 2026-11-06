@@ -620,13 +620,15 @@ _user_event_queue_create(int openFlags)
 	descriptor->open_mode = O_RDWR | openFlags;
 
 	io_context* context = get_current_io_context(false);
+	rw_lock_write_lock(&context->lock);
 	int fd = new_fd(context, descriptor);
 	if (fd < 0) {
-		free(descriptor);
+		rw_lock_write_unlock(&context->lock);
+		descriptor->ops = NULL;
+		put_fd(descriptor);
 		return fd;
 	}
 
-	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (openFlags & O_CLOEXEC) != 0);
 	fd_set_close_on_fork(context, fd, (openFlags & O_CLOFORK) != 0);
 	rw_lock_write_unlock(&context->lock);
