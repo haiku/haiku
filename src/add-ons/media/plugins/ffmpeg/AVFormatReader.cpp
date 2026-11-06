@@ -265,6 +265,9 @@ StreamBase::Open()
 	}
 
 	fContext = avformat_alloc_context();
+	if (fContext == NULL)
+		return B_NO_MEMORY;
+
 	fContext->pb = fIOContext;
 
 	// Allocate our context and probe the input format

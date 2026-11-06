@@ -305,6 +305,9 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 	}
 
 	fCodecContext = avcodec_alloc_context3(fCodec);
+	if (fCodecContext == NULL)
+		return B_NO_MEMORY;
+
 	fCodecInitDone = false;
 
 	system_info info;
@@ -440,8 +443,9 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
+	// sets the passed pointer to NULL
+	swr_free(&fResampleContext);
 	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt)) {
-		fResampleContext = NULL;
 		swr_alloc_set_opts2(&fResampleContext,
 			&fCodecContext->ch_layout,
 			fCodecContext->request_sample_fmt,
@@ -1677,8 +1681,11 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		posix_memalign(reinterpret_cast<void**>(&fDecodedData),
 			kOptimalAlignmentForColorConversion, fDecodedDataSizeInBytes + 63);
 	}
-	if (fDecodedData == NULL)
+	if (fDecodedData == NULL) {
+		if (useDeinterlacedPicture)
+			av_freep(&deinterlacedPicture.data[0]);
 		return B_NO_MEMORY;
+	}
 
 	fPostProcessedDecodedPicture->data[0] = fDecodedData;
 	fPostProcessedDecodedPicture->linesize[0]
