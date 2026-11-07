@@ -1,7 +1,9 @@
-1	friulian	x-vnd.Haiku-Expander	2735024965
+1	friulian	x-vnd.Haiku-Expander	676459718
+Cancel	PasswordAlert		Anule
 Destination	ExpanderWindow		Destinazion
 Other	ExpanderPreferences		Altri
 Automatically show contents listing	ExpanderPreferences		Mostre in automatic il listât dai contignûts
+Ignore all	ExpanderWindow		Ignore dut
 Expander	System name		Espansôr
 Set source…	ExpanderMenu		Stabilìs la sorzint…
 OK	ExpanderWindow		Va ben
@@ -14,6 +16,7 @@ Create	ExpanderWindow		Cree
 Creating listing for '%s'…	ExpanderWindow		Creazion de liste par '%s'…
 Show contents	ExpanderMenu		Mostre contignût
 %appname% settings	ExpanderPreferences		Impostazions di %appname%
+Ignore	ExpanderWindow		Ignore
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Fermâ pardabon la espansion di chest archivi? Al è pussibil che i elements espandûts a sedin incomplets.
 Settings	ExpanderMenu		Impostazions
 Expand	ExpanderWindow		Espant
@@ -38,6 +41,7 @@ Expansion	ExpanderPreferences		Espansion
 Set destination…	ExpanderMenu		Stabilìs destinazion…
 Continue	ExpanderWindow		Continue
  is not supported	ExpanderWindow		 nol è supuartât
+OK	PasswordAlert		Va ben
 Cancel	ExpanderPreferences		Cancele
 Use:	ExpanderPreferences		Dopre:
 Destination folder	ExpanderPreferences		Cartele di destinazion

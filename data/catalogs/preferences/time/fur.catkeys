@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Time	1111403326
+1	friulian	x-vnd.Haiku-Time	365252571
 OK	Time		Va ben
 Message receiving failed	Time		Ricezion dal messaç falide
 Australia	Time		Australie
@@ -22,6 +22,7 @@ Local time (Windows compatible)	Time		Ore locâl (compatibil Windows)
 Hardware clock set to:	Time		Orloi hardware configurât su:
 Arctic	Time		Artide
 Antarctica	Time		Antartide
+The following error occurred while synchronizing:\n%s: %s	Time		Chest erôr al è capitât intant che si stave sincronizant:\n%s: %s
 GMT (UNIX compatible)	Time		GMT (UTC, compatibil UNIX)
 Africa	Time		Afriche
 Stop	Time		Ferme
@@ -42,6 +43,6 @@ Synchronize at boot	Time		Sincronize al inviament
 Indian	Time		Indian
 Revert	Time		Ripristine
 Date and time	Time		Date e ore
-The following error occured while synchronizing:\n%s	Time		Si è verificât l'erôr chi sot intant che si sincronizave:\n%s
+The following error occured while synchronizing:\n%s	Time		Chest erôr al è capitât intant che si stave sincronizant:\n%s
 Synchronize	Time		Sincronize
 Add	Time		Zonte

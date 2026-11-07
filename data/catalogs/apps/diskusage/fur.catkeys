@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DiskUsage	2951688400
+1	friulian	x-vnd.Haiku-DiskUsage	464111389
 Path	Info Window		Percors
 Open with	Pie View		Vierç cun
 file unavailable	Pie View		file no disponibil
@@ -8,6 +8,7 @@ Scanning %refName%	Scanner		Scansion di %refName%
 {0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
 Size	Info Window		Dimension
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d files
+%volume_name% volume scanner	Scanner		Analizadôr volum %volume_name%
 %a, %d %b %Y, %r	Info Window		%a, %d di %b dal %Y, %r
 Scan	Status View		Scansion
 Abort	Status View		Interomp

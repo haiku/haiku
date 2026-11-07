@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2375910306
+1	friulian	x-vnd.Haiku-HaikuDepot	468765170
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 User ratings loading…	PackageInfoView		Cjariament valutazions dai utents…
 Available packages	MainWindow		Pachets disponibii
@@ -15,6 +15,7 @@ It was not possible to extract necessary captcha information from the data sent 
 Install %PackageTitle%	PackageAction		Instale %PackageTitle%
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Inzorne cundizions di utilizazion
+Details: %Details%	PackageKitUtils		Detais: %Details%
 No usage conditions	UserUsageConditions		Nissune cundizion di utilizazion
 Active	PackageListView		Atîf
 Login or Create account	MainWindow		Jentre o Regjistriti
@@ -31,6 +32,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
 Logout	ToLatestUserUsageConditionsWindow		Jes
 Password requirements	UserLoginWindow		Recuisîts de password
+Transaction Result: %TxnResultFullErrorMessage%	PackageKitUtils		Risultât de transazion: %TxnResultFullErrorMessage%
 The following additional package changes have to be made:	PackageResult		Al è necessari fâ chestis modifichis adizionâls al pachets:
 %Appname% communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		%Appname% al comuniche cuntun component di servidôr clamât HaikuDepotServer. Chestis a son lis cundizions di utilizazion che l'utent '%Nickname%' al à fatis buinis ai %AgreedToTimestamp% in relazion ae utilizazion dal servizi HaikuDepotServer.
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
@@ -43,9 +45,11 @@ Available	PackageListView		Disponibil
 Click a package to view information	PackageInfoView		Fâs clic suntun pachet par viodi plui informazions
 Cancel	UserLoginWindow		Anule
 Rating not possible	MainWindow		Valutazion dineade
+Install failure	InstallPackageProcess		Instalazion falide
 Package update error	MainWindow		Erôr di inzornament dal pachet
 Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Fâs clic achì
 No screenshot available.	PackageInfoView		Nissune videade disponibile.
+Try installing anyway	MainWindow		Prove a instalâ distès
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Daûr a recuperâ lis valutazions dai utents pal pachet
 Reboot required	PackageManager		Tornâ a inviâ necessari
@@ -74,8 +78,10 @@ Usage conditions agreed	ToLatestUserUsageConditionsWindow		Cundizions di utiliza
 Size	PackageListView		Dimension
 All categories	FilterView		Dutis lis categoriis
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
+Downloading and installing \"%MainPackageName%\"	InstallPackageProcess		Daûr a discjariâ e instalâ \"%MainPackageName%\"
 ignore problem for now	PackageProblem		ignore il probleme pal moment
 n/a	PackageInfoView		n/d
+Error: %Errstr% (%Errno%)	PackageKitUtils		Erôr: %Errstr% (%Errno%)
 Checking user details	UserDetailVerifierProcess		Verifiche dai detais utent
 Cancel	MainWindow		Anule
 Refresh repositories	MainWindow		Inzorne dipuesits
@@ -110,6 +116,7 @@ Search terms:	FilterView		Tiermins di ricercje:
 Quit	App		Siere
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Il sorenon al è malformât. Il sorenon al pues contignî dome numars e caratars latins minuscui. Il sorenon al scugne jessi lunc tra cuatri e sedis caratars.
 Authentication failed	UserLoginWindow		Autenticazion falide
+Downloading and installing \"%MainPackageName%\" + %CountOtherPackages% other(s)	InstallPackageProcess		Daûr a discjariâ e instalâ \"%MainPackageName%\" + altris %CountOtherPackages%
 Captcha error	UserLoginWindow		Erôr captcha
 Manage repositories…	MainWindow		Gjestìs dipuesits…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un altri sorenon.
@@ -169,6 +176,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condivît dâts
 Close	PackageManager		Siere
 Changelog	PackageInfoView		Regjistri modifichis
  to search all packages.	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	  par cirî ducj i pachets.
+Prepare installation for \"%MainPackageName%\"	InstallPackageProcess		Predispon la instalazion par \"%MainPackageName%\"
 About	PackageInfoView		Informazions su
 Password requirements download problem	UserLoginWindow		Probleme tal tirâ jù i recuisîts de password
 Password:	UserLoginWindow		Peraule d'ordin:
@@ -195,6 +203,7 @@ Login issue	MainWindow		Probleme di acès
 Your rating:	RatePackageWindow		La tô valutazion:
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Repositories	MainWindow		Dipuesits
+Uninstall failure	UninstallPackageAction		Disinstalazion falide
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Intant che si inzornave i dâts di un pachet, al è vignût fûr un probleme che al podarès fâ pierdi i dâts o rindiju obsolets rispiet ae visualizazion de aplicazion. Detais adizionâi in merit si puedin otignî dai regjistris de aplicazion.\nLis informazions su ce mût viodi i regjistris a son disponibilis te sezion di HaikuDepot de Vuide utent di Haiku.
 This rating is visible to other users	RatePackageWindow		Altris utents a puedin viodi cheste valutazion
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Al è vignût fûr un erôr tal discjamâ lis cundizions di utilizazion. Controle il regjistri pai detais e torne prove. \nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
@@ -211,6 +220,7 @@ Comment language:	RatePackageWindow		Lenghe dal coment:
 The password has been incorrectly repeated.	UserLoginWindow		La peraule d'ordin e je stade ripetude sbaliade.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La peraule d'ordin furnide in precedence pal utent [%Nickname%] no je pal moment valide. L'utent al vignarà disconetût di cheste aplicazion e tu varâs di jentrâ di gnûf cu la peraule d'ordin inzornade.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Visualize lis cundizions di utilizazion
+To install package %PackageName% requires %PackageBytesDescription% of free disk space, but only %FreeBytesDescription% is available. The installation may fail.	MainWindow		Par instalâ il pachet %PackageName% al à bisugne di %PackageBytesDescription% di spazi libar su disc, ma a son disponibii nome %FreeBytesDescription%. Al è facil che la instalazion no ledi a bon fin.
 OK	ServerHelper		Va ben
 Reading repository data	LocalPkgDataLoadProcess		Leture dâts dal dipuesit
 Native desktop packages only	MainWindow		Nome pachets natîfs pal scritori
@@ -239,5 +249,6 @@ No results? 	FeaturedPackagesView		Nissun risultât?
 User creation error	UserLoginWindow		Erôr di creazion dal utent
 You need to be logged into an account before you can rate packages.	MainWindow		Tu âs di acedi a un account prime di podê valutâ i pachets.
 Cleaning up…	ShuttingDownWindow		Netisie…
+Insufficient storage capacity	MainWindow		Capacitât di archiviazion insuficiente
 %appname% is stopping or completing running operations before quitting.	ShuttingDownWindow		%appname% si sta fermant o al sta completant operzions in cors prime di jessî.
 Repeat password:	UserLoginWindow		Ripet peraule d'ordin:

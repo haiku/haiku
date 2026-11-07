@@ -1,4 +1,5 @@
-1	friulian	x-vnd.Haiku-ShowImage	549295024
+1	friulian	x-vnd.Haiku-ShowImage	549474543
+ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
 Previous file	Menus		File precedent
 View	Menus		Visualize
@@ -25,6 +26,7 @@ Zoom in	Menus		Ingrandìs
 Last page	Menus		Ultime pagjine
 Cancel	ClosePrompt		Anule
 Attributes	Menus		Atribûts
+Show boundaries marks	Menus		Mostre i segns dai confins
 High-quality zooming	Menus		Ingrandiment alte-cualitât
 Close	Menus		Siere
 Selection mode	Menus		Modalitât selezion

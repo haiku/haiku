@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Devices	2752258547
+1	friulian	x-vnd.Haiku-Devices	1928422885
 ACPI bus	DevicesView		Bus ACPI
 USB bus	DevicesView		Bus USB
 Class info	DevicePCI		Informazions classe
@@ -6,6 +6,7 @@ USB bus	Device		Bus USB
 Communications	DeviceSCSI		Comunicazions
 Mass storage controller	Device		Controlôr memorie di masse
 Printer	DeviceSCSI		Stampadore
+Enable driver	DevicesView		Abilite driver
 Manufacturer	Device		Fabricant
 Memory controller	Device		Controlôr de memorie
 Unknown device	DevicesView		Dispositîf no cognossût
@@ -14,6 +15,7 @@ Graphics peripheral	DeviceSCSI		Periferiche grafiche
 Manufacturer	DeviceSCSI		Fabricant
 unknown	DeviceACPI		no cognossût
 Satellite communications controller	Device		Controlôr di comunicazions satelitârs
+OK	DevicesView		Va ben
 PCI bus	DevicesView		Bus PCI
 Device	Device		Dispositîf
 Changer	DeviceSCSI		Modificadôr
@@ -32,37 +34,49 @@ Other	DeviceSCSI		Altri
 Order by:	DevicesView		Ordene par:
 Intelligent controller	Device		Controlôr inteligjent
 ACPI processor namespace '%2'	DeviceACPI		Spazi dai nons dal processôr ACPI '%2'
+The driver path is not in a package volume: 	DevicesView		Il percors dal driver nol è intun volum di pachet: 
 Multimedia controller	Device		Controlôr multimediâl
+Blocked entry:\n	DevicesView		Vôs blocade:\n
 Quit	DevicesView		Jes
+Filter:	DevicesView		Filtri:
 Processor	DeviceSCSI		Processôr
+Disabling non-packaged drivers is not supported.	DevicesView		La disabilitazion dai drivers in "non-packaged" no je supuartade.
 Card reader	DeviceSCSI		Letôr di schedis
 Bridge	Device		Puint
 ACPI button '%1'	DeviceACPI		Boton ACPI '%1'
 Attributes	PropertyList		Atribûts
+The driver has been disabled. A reboot is required for the change to take effect.\n\nAfter rebooting, this device may no longer appear in the device list as the system will not be able to identify it without its driver.\n\nTo re-enable the driver, find the device in the %devices% application and click \"Enable driver\". If the device is no longer visible, remove the corresponding blocked entry from the packages settings file:\n	DevicesView		Il driver al è stât disabilitât. Al covente tornâ a inviâ il sisteme par disabilitâlu a ducj i efiets.\n\nDopo che tu âs tornât a inviâ, al è pussibil che chest dispositîf nol vegni fûr te liste dai dispositîfs, stant che il sisteme nol rivarà a identificâlu cence il so driver.\n\nPar tornâ a abilitâ il driver, cjate il dispositîf te aplicazion %devices% e fâs clic su  \"Abilite driver\". Se il dispositîf nol sarà plui visibil, gjave la vôs blocade relative tal file des impostazions "packages":\n
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 ACPI system bus	DeviceACPI		Bus di sisteme ACPI
 Signal processing controller	Device		Controlôr di elaborazion segnâi
 Docking station	Device		Stazion di bordament
 Unclassified device	Device		Dispositîf no classificât
+Error	DevicesView		Erôr
 ACPI controller	Device		Controlôr ACPI
 ACPI bus	Device		Bus ACPI
 Encryption controller	Device		Controlôr di cifradure
 Devices	System name		Dispositîfs
 Generate system information	DevicesView		Gjenere informazions di sisteme
 Processor	Device		Processôr
+Disable driver	DevicesView		Disabilite driver
+Reboot needed	DevicesView		Al covente tornâ a inviâ
 Computer	DevicesView		Computer
 ACPI thermal zone	DeviceACPI		Zone termiche ACPI
 Connection	DevicesView		Conession
+Failed to write to the settings file.	DevicesView		Impussibil scrivi sul file des impostazions.
 Scanner	DeviceSCSI		Scansionadôr
 ACPI node '%1'	DeviceACPI		Grop ACPI '%1'
+Clear	DevicesView		Nete
 Device name	Device		Non dal dispositîf
 Device class	DeviceSCSI		Classe dispositîf
 Input device controller	Device		Controlôr dispositîfs di input
+Restart computer	DevicesView		Torne invie il computer
 Serial bus controller	Device		Controlôr bus seriâl
 RBC	DeviceSCSI		RBC
 Wireless controller	Device		Controlôr dispositîfs cence fîi
 Device name	DeviceACPI		Non dal dispositîf
+Shutdown failed with error: 	DevicesView		Il distudament al è lât strucj cul erôr: 
 unknown	DevicePCI		no cognossût
 ACPI <unknown>	DeviceACPI		ACPI <no cognossût>
 Report compatibility	DevicesView		Segnale compatibilitât
@@ -70,6 +84,9 @@ Computer	Device		Computer
 Tape drive	DeviceSCSI		Unitât a nastri
 Enclosure	DeviceSCSI		Cente
 PCI bus	Device		Bus PCI
+none	Device		nissun
+Disabling critical system drivers is not allowed.	DevicesView		No je consintude la disabilitazion di drivers di sisteme fondamentâi.
+Driver disabled	DevicesView		Driver disabilitât
 ISA bus	Device		Bus ISA
 Basic information	PropertyList		Informazions di base
 ISA bus	DevicesView		Bus ISA

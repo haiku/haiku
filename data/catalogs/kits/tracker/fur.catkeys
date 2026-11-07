@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	798058031
+1	friulian	x-vnd.Haiku-libtracker	1752805840
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -57,6 +57,7 @@ Identify	ContainerWindow		Identifiche
 Create link	ContainerWindow		Cree colegament
 starts with	FindPanel		al tache cun
 Replace	FSUtils		Sostituìs
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		In %func \nfind_directory() al à falît. \nMotîf: %error
 ?+* follows nothing.	libtracker		?+* nol continue cun nuie.
 Include Trash	FindPanel		Inclût la Scovacere
 Rectangle	AttributesView		Retangul
@@ -171,6 +172,7 @@ Preferences…	ContainerWindow		Preferencis…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nol è stât pussibil vierzi \"%document\" parcè che la aplicazion \"%app\" e je te Scovacere. 
 Work Phone	Person Query Columns		Telefon di vore
 Select folders	FindPanel		Selezione cartelis
+OK	TrackerInitialState		Va ben
 Close	ContainerWindow		Siere
 Get info	ContainerWindow		Oten informazions
 MIME Type	AttributesView		Gjenar MIME
@@ -287,6 +289,7 @@ Execute	FilePermissionsView		Esecuzion
 no	AttributesView		no
 Show volumes on Desktop	SettingsView		Mostre volums sul Scritori
 Recent folders	ContainerWindow		Cartelis resintis
+Error deleting items: %error	FSUtils		Erôr tal eliminâ i elements: %error
 Desktop	Model		Scritori
 Select all	ContainerWindow		Selezione ducj
 {0, plural, other{#/%total %filter}}	CountView	Number of selected items from a filtered set: \"10/30 view\"	{0, plural, other{#/%total %filter}}
@@ -425,6 +428,7 @@ Move here	ContainerWindow		Sposte chi
 the config folder	FSUtils		la cartele di configurazion
 Sorry, could not create a new folder.	FSUtils		Nol è stât pussibil creâ une gnove cartele
 MIME Signature	AttributesView		Firme MIME
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut
 Add current folder	FilePanelPriv		Zonte cartele atuâl
