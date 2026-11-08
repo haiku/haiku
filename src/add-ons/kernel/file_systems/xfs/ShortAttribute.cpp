@@ -81,7 +81,7 @@ ShortAttribute::Stat(attr_cookie* cookie, struct stat& stat)
 
 	// We have valid attribute entry to stat
 	stat.st_type = B_XATTR_TYPE;
-	stat.st_size = _DataLength(fEntry);
+	stat.st_size = fEntry->valuelen;
 
 	return B_OK;
 }
@@ -113,7 +113,8 @@ ShortAttribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* leng
 	char* ptrToOffset = (char*) fHeader + sizeof(AShortFormHeader)
 		+ 3 * sizeof(uint8) + fEntry->namelen;
 
-	memcpy(buffer, ptrToOffset, lengthToRead);
+	if (user_memcpy(buffer, ptrToOffset, lengthToRead) != B_OK)
+		return B_BAD_ADDRESS;
 
 	*length = lengthToRead;
 

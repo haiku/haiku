@@ -178,11 +178,11 @@ NodeAttribute::Stat(attr_cookie* cookie, struct stat& stat)
 	if (fLocalEntry != NULL) {
 		uint16 valuelen = B_BENDIAN_TO_HOST_INT16(fLocalEntry->valuelen);
 		stat.st_type = B_XATTR_TYPE;
-		stat.st_size = valuelen + fLocalEntry->namelen;
+		stat.st_size = valuelen;
 	} else {
 		uint32 valuelen = B_BENDIAN_TO_HOST_INT32(fRemoteEntry->valuelen);
 		stat.st_type = B_XATTR_TYPE;
-		stat.st_size = valuelen + fRemoteEntry->namelen;
+		stat.st_size = valuelen;
 	}
 
 	return B_OK;
@@ -220,7 +220,8 @@ NodeAttribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* lengt
 		char* ptrToOffset = (char*) fLocalEntry + sizeof(uint16)
 		+ sizeof(uint8) + fLocalEntry->namelen;
 
-		memcpy(buffer, ptrToOffset, lengthToRead);
+		if (user_memcpy(buffer, ptrToOffset, lengthToRead) != B_OK)
+			return B_BAD_ADDRESS;
 
 		*length = lengthToRead;
 
