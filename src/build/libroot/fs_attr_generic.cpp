@@ -339,10 +339,8 @@ get_attribute_path(NodeRef ref, const char *path, int fd,
 
 	// make sure the attribute dir for the node exits
 	status_t error = ensure_attribute_dir_exists(ref, path, fd);
-	if (error != B_OK) {
-		errno = error;
-		return -1;
-	}
+	if (error != B_OK)
+		return error;
 
 	// construct the attribute path
 	attrPath = get_attribute_dir_path(ref, path, fd) + '/';
@@ -385,7 +383,7 @@ get_attribute_path(int fd, const char *attribute, string &attrPath,
 	if (get_descriptor(fd)) {
 		// This is a virtual file descriptor -- we have a special function
 		// for handling it.
-		return  get_attribute_path_virtual_fd(fd, attribute, attrPath,
+		return get_attribute_path_virtual_fd(fd, attribute, attrPath,
 			typePath);
 	} else {
 		// This is a real (i.e. system) file descriptor -- fstat() it and
