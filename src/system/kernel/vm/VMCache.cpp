@@ -857,6 +857,13 @@ VMCache::RemovePage(vm_page* page)
 
 	T2(RemovePage(this, page));
 
+	if (page->State() == PAGE_STATE_MODIFIED) {
+		// pages can't be in MODIFIED state unless inside a cache
+		// (assume callers don't care about remaining data)
+		page->modified = false;
+		vm_page_set_state(page, PAGE_STATE_CACHED);
+	}
+
 	pages.Remove(page);
 	page_count--;
 	page->SetCacheRef(NULL);
@@ -1145,12 +1152,6 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 		// remove the page and put it into the free queue
 		DEBUG_PAGE_ACCESS_START(page);
 		vm_remove_all_page_mappings(page);
-
-		if (page->State() == PAGE_STATE_MODIFIED) {
-			// pages can't be freed in MODIFIED state
-			page->modified = false;
-			vm_page_set_state(page, PAGE_STATE_CACHED);
-		}
 
 		RemovePage(page);
 			// Note: When iterating through a IteratableSplayTree
