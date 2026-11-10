@@ -44,7 +44,6 @@ static const char* const kIDAttributeName = "id";
 #endif
 
 
-// init_attribute_dir_base_dir
 static status_t
 init_attribute_dir_base_dir()
 {
@@ -75,7 +74,7 @@ init_attribute_dir_base_dir()
 	return initError;
 }
 
-// escape_attr_name
+
 static string
 escape_attr_name(const char *name)
 {
@@ -95,7 +94,7 @@ escape_attr_name(const char *name)
 	return escapedName;
 }
 
-// deescape_attr_name
+
 static string
 deescape_attr_name(const char *name)
 {
@@ -278,7 +277,6 @@ get_attribute_dir_path_needed(NodeRef ref, const char *path, int fd,
 #endif
 
 
-// ensure_attribute_dir_exists
 static status_t
 ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 {
@@ -313,7 +311,7 @@ ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 	return B_OK;
 }
 
-// open_attr_dir
+
 static DIR *
 open_attr_dir(NodeRef ref, const char *path, int fd)
 {
@@ -329,7 +327,7 @@ open_attr_dir(NodeRef ref, const char *path, int fd)
 	return opendir(dirPath.c_str());
 }
 
-// get_attribute_path
+
 static status_t
 get_attribute_path(NodeRef ref, const char *path, int fd,
 	const char *attribute, string &attrPath, string &typePath)
@@ -352,7 +350,7 @@ get_attribute_path(NodeRef ref, const char *path, int fd,
 }
 
 
-// get_attribute_path_virtual_fd
+
 static status_t
 get_attribute_path_virtual_fd(int fd, const char *attribute, string &attrPath,
 	string &typePath)
@@ -375,7 +373,7 @@ get_attribute_path_virtual_fd(int fd, const char *attribute, string &attrPath,
 }
 
 
-// get_attribute_path
+
 static status_t
 get_attribute_path(int fd, const char *attribute, string &attrPath,
 	string &typePath)
@@ -403,7 +401,7 @@ get_attribute_path(int fd, const char *attribute, string &attrPath,
 // # pragma mark - Public API
 
 
-// fs_open_attr_dir
+
 DIR *
 fs_open_attr_dir(const char *path)
 {
@@ -414,7 +412,7 @@ fs_open_attr_dir(const char *path)
 	return open_attr_dir(NodeRef(st), path, -1);
 }
 
-// fs_fopen_attr_dir
+
 DIR *
 fs_fopen_attr_dir(int fd)
 {
@@ -437,14 +435,14 @@ fs_fopen_attr_dir(int fd)
 		(pathValid ? -1 : fd));
 }
 
-// fs_close_attr_dir
+
 int
 fs_close_attr_dir(DIR *dir)
 {
 	return closedir(dir);
 }
 
-// fs_read_attr_dir
+
 struct dirent *
 fs_read_attr_dir(DIR *dir)
 {
@@ -464,14 +462,14 @@ fs_read_attr_dir(DIR *dir)
 	}
 }
 
-// fs_rewind_attr_dir
+
 void
 fs_rewind_attr_dir(DIR *dir)
 {
 	rewinddir(dir);
 }
 
-// fs_fopen_attr
+
 int
 fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
@@ -529,14 +527,14 @@ fs_fopen_attr(int fd, const char *attribute, uint32 type, int openMode)
 	return attrFD;
 }
 
-// fs_close_attr
+
 int
 fs_close_attr(int fd)
 {
 	return close(fd);
 }
 
-// fs_read_attr
+
 ssize_t
 fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	void *buffer, size_t readBytes)
@@ -561,7 +559,7 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	return bytesRead;
 }
 
-// fs_write_attr
+
 ssize_t
 fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	const void *buffer, size_t readBytes)
@@ -596,7 +594,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos,
 	return bytesWritten;
 }
 
-// fs_remove_attr
+
 int
 fs_remove_attr(int fd, const char *attribute)
 {
@@ -623,7 +621,7 @@ fs_remove_attr(int fd, const char *attribute)
 	return B_OK;
 }
 
-// fs_stat_attr
+
 int
 fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 {
@@ -674,7 +672,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 // #pragma mark - Private Syscalls
 
 
-// _kern_open_attr_dir
+
 int
 _kern_open_attr_dir(int fd, const char *path)
 {
@@ -707,7 +705,7 @@ _kern_open_attr_dir(int fd, const char *path)
 	return add_descriptor(descriptor);
 }
 
-// _kern_rename_attr
+
 status_t
 _kern_rename_attr(int fromFile, const char *fromName, int toFile,
 	const char *toName)
@@ -746,7 +744,7 @@ _kern_rename_attr(int fromFile, const char *fromName, int toFile,
 	return B_OK;
 }
 
-// _kern_remove_attr
+
 status_t
 _kern_remove_attr(int fd, const char *name)
 {
@@ -771,7 +769,6 @@ _kern_remove_attr(int fd, const char *name)
 }
 
 
-// __get_attribute_dir_path
 extern "C" bool __get_attribute_dir_path(const struct stat* st,
 	const char* path, char* buffer);
 bool
