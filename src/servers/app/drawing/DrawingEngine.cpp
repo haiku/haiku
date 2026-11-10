@@ -1488,7 +1488,7 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 {
 	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
 	int32 yIncrement;
-	const bool needMemmove = (yOffset == 0 && (uint32)abs(xOffset) <= width);
+	const bool needMemmove = (yOffset == 0 && (uint32)abs((int)xOffset) <= width);
 
 	if (yOffset > 0) {
 		// copy from bottom to top
