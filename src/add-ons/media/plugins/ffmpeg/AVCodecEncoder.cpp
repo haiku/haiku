@@ -280,6 +280,11 @@ AVCodecEncoder::_Setup()
 		avcodec_free_context(&fCodecContext);
 	}
 
+	if (fSwsContext != NULL) {
+		sws_freeContext(fSwsContext);
+		fSwsContext = NULL;
+	}
+
 	fCodecContext = avcodec_alloc_context3(fCodec);
 	if (fCodecContext == NULL)
 		return B_NO_INIT;
