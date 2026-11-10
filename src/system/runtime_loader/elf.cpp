@@ -797,12 +797,13 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 
 status_t
-get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
-	int32 *_nameLength, int32 *_type, void **_location)
+get_nth_symbol(image_id imageID, int32 num, char* nameBuffer,
+	int32* _nameLength, int32* _type, void** _location)
 {
 	int32 count = 0, j;
 	uint32 i;
-	image_t *image;
+	image_t* image;
+	elf_sym* symbol;
 
 	RecursiveLocker _(sLock);
 
@@ -812,40 +813,56 @@ get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
 		return B_BAD_IMAGE_ID;
 
 	// iterate through all the hash buckets until we've found the one
-	for (i = 0; i < HASHTABSIZE(image); i++) {
-		for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
-			elf_sym *symbol = &image->syms[j];
-
-			if (count == num) {
-				const char* symbolName = SYMNAME(image, symbol);
-				strlcpy(nameBuffer, symbolName, *_nameLength);
-				*_nameLength = strlen(symbolName);
-
-				void* location = (void*)(symbol->st_value
-					+ image->regions[0].delta);
-				int32 type;
-				if (symbol->Type() == STT_FUNC)
-					type = B_SYMBOL_TYPE_TEXT;
-				else if (symbol->Type() == STT_OBJECT)
-					type = B_SYMBOL_TYPE_DATA;
-				else
-					type = B_SYMBOL_TYPE_ANY;
-					// TODO: check with the return types of that BeOS function
-
-				patch_defined_symbol(image, symbolName, &location, &type);
-
-				if (_type != NULL)
-					*_type = type;
-				if (_location != NULL)
-					*_location = location;
-				goto out;
+	if (image->gnuhash.buckets != NULL) {
+		for (uint32 i = 0; i < image->gnuhash.bucket_count; i++) {
+			const uint32 bucket = image->gnuhash.buckets[i];
+			if (bucket == 0)
+				continue;
+			const uint32* chain0 = image->gnuhash.chain0;
+			const uint32* hashValue = &chain0[bucket];
+			do {
+				uint32 symIndex = hashValue - chain0;
+				symbol = &image->syms[symIndex];
+				if (count == num)
+					goto out;
+				count++;
+			} while ((*hashValue++ & 1) == 0);
+		}
+	} else {
+		for (i = 0; i < HASHTABSIZE(image); i++) {
+			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+				symbol = &image->syms[j];
+				if (count == num)
+					goto out;
+				count++;
 			}
-			count++;
 		}
 	}
+
+	return B_BAD_INDEX;
+
 out:
-	if (num != count)
-		return B_BAD_INDEX;
+	const char* symbolName = SYMNAME(image, symbol);
+	strlcpy(nameBuffer, symbolName, *_nameLength);
+	*_nameLength = strlen(symbolName);
+
+	void* location = (void*)(symbol->st_value
+		+ image->regions[0].delta);
+	int32 type;
+	if (symbol->Type() == STT_FUNC)
+		type = B_SYMBOL_TYPE_TEXT;
+	else if (symbol->Type() == STT_OBJECT)
+		type = B_SYMBOL_TYPE_DATA;
+	else
+		type = B_SYMBOL_TYPE_ANY;
+		// TODO: check with the return types of that BeOS function
+
+	patch_defined_symbol(image, symbolName, &location, &type);
+
+	if (_type != NULL)
+		*_type = type;
+	if (_location != NULL)
+		*_location = location;
 
 	return B_OK;
 }
@@ -888,20 +905,46 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 	elf_sym* foundSymbol = NULL;
 	addr_t foundLocation = (addr_t)NULL;
 
-	for (uint32 i = 0; i < HASHTABSIZE(image) && !exactMatch; i++) {
-		for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
-				j = HASHCHAINS(image)[j]) {
-			elf_sym *symbol = &image->syms[j];
-			addr_t location = symbol->st_value + image->regions[0].delta;
+	if (image->gnuhash.buckets != NULL) {
+		for (uint32 i = 0; i < image->gnuhash.bucket_count && !exactMatch; i++) {
+			const uint32 bucket = image->gnuhash.buckets[i];
+			if (bucket == 0)
+				continue;
+			const uint32* chain0 = image->gnuhash.chain0;
+			const uint32* hashValue = &chain0[bucket];
+			do {
+				uint32 symIndex = hashValue - chain0;
+				elf_sym *symbol = &image->syms[symIndex];
+				addr_t location = symbol->st_value + image->regions[0].delta;
 
-			if (location <= (addr_t)address	&& location >= foundLocation) {
-				foundSymbol = symbol;
-				foundLocation = location;
+				if (location <= (addr_t)address	&& location >= foundLocation) {
+					foundSymbol = symbol;
+					foundLocation = location;
 
-				// jump out if we have an exact match
-				if (location + symbol->st_size > (addr_t)address) {
-					exactMatch = true;
-					break;
+					// jump out if we have an exact match
+					if (location + symbol->st_size > (addr_t)address) {
+						exactMatch = true;
+						break;
+					}
+				}
+			} while ((*hashValue++ & 1) == 0);
+		}
+	} else {
+		for (uint32 i = 0; i < HASHTABSIZE(image) && !exactMatch; i++) {
+			for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+					j = HASHCHAINS(image)[j]) {
+				elf_sym* symbol = &image->syms[j];
+				addr_t location = symbol->st_value + image->regions[0].delta;
+
+				if (location <= (addr_t)address	&& location >= foundLocation) {
+					foundSymbol = symbol;
+					foundLocation = location;
+
+					// jump out if we have an exact match
+					if (location + symbol->st_size > (addr_t)address) {
+						exactMatch = true;
+						break;
+					}
 				}
 			}
 		}

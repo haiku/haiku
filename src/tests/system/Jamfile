@@ -8,3 +8,4 @@ if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 0 {
 }
 SubInclude HAIKU_TOP src tests system libroot ;
 SubInclude HAIKU_TOP src tests system network ;
+SubInclude HAIKU_TOP src tests system runtime_loader ;

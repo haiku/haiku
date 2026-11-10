@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tests system runtime_loader ;
+
+UsePrivateHeaders runtime_loader ;
+UsePrivateSystemHeaders ;
+
+SimpleTest hook_test : hook_test.cpp ;
