@@ -1035,6 +1035,10 @@ BContainerWindow::UpdateBackgroundImage()
 		// The default image will still work though.
 		fBackgroundImage = BackgroundImage::Refresh(fBackgroundImage, opener.Node(),
 			isDesktop, PoseView());
+	} else {
+		fBackgroundImage->Remove();
+		delete fBackgroundImage;
+		fBackgroundImage = NULL;
 	}
 
 	// look for default background image info
