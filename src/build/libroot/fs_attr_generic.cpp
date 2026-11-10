@@ -45,6 +45,36 @@ static const char* const kIDAttributeName = "id";
 
 
 static status_t
+make_directory(const char* path)
+{
+	// see if it already exists
+	struct stat st;
+	if (lstat(path, &st) == 0) {
+		if (!S_ISDIR(st.st_mode))
+			return B_NOT_A_DIRECTORY;
+
+		return B_OK;
+	}
+
+	// doesn't exist yet: create it
+	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO) == 0)
+		return B_OK;
+
+	if (errno == EEXIST) {
+		// we must've raced; check again to see if it's a directory
+		if (lstat(path, &st) == 0) {
+			if (!S_ISDIR(st.st_mode))
+				return B_NOT_A_DIRECTORY;
+
+			return B_OK;
+		}
+	}
+
+	return errno;
+}
+
+
+static status_t
 init_attribute_dir_base_dir()
 {
 	static bool initialized = false;
@@ -53,21 +83,12 @@ init_attribute_dir_base_dir()
 	if (initialized)
 		return initError;
 
-	// stat the dir
-	struct stat st;
-	initError = B_OK;
-	if (lstat(sAttributeDirBasePath, &st) == 0) {
-		if (!S_ISDIR(st.st_mode)) {
-			// the attribute dir base dir is no directory
-			fprintf(stderr, "init_attribute_dir_base_dir(): The Attribute "
-				"directory base directory exists, but is no directory!\n");
-			initError = B_FILE_ERROR;
-		}
-
-	} else {
-		// doesn't exist yet: create it
-		if (mkdir(sAttributeDirBasePath, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
-			initError = errno;
+	initError = make_directory(sAttributeDirBasePath);
+	if (initError == B_NOT_A_DIRECTORY) {
+		// the attribute dir base dir is no directory
+		fprintf(stderr, "init_attribute_dir_base_dir(): The Attribute "
+			"directory base directory exists, but is no directory!\n");
+		initError = B_FILE_ERROR;
 	}
 
 	initialized = true;
@@ -290,25 +311,14 @@ ensure_attribute_dir_exists(NodeRef ref, const char *path, int fd)
 	if (error != B_OK)
 		return error;
 
-	// stat the dir
-	struct stat st;
-	if (lstat(attrDirPath.c_str(), &st) == 0) {
-		if (!S_ISDIR(st.st_mode)) {
-			// the attribute dir is no directory
-			fprintf(stderr, "ensure_attribute_dir_exists(): Attribute "
-				"directory for node %lld exists, but is no directory!\n",
-				(long long)ref.node);
-			return B_FILE_ERROR;
-		}
-
-		return B_OK;
+	error = make_directory(attrDirPath.c_str());
+	if (error == B_NOT_A_DIRECTORY) {
+		fprintf(stderr, "make_directory(): Attribute "
+			"directory for node %lld exists, but is no directory!\n",
+			(long long)ref.node);
+		return B_FILE_ERROR;
 	}
-
-	// doesn't exist yet: create it
-	if (mkdir(attrDirPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) < 0)
-		return errno;
-
-	return B_OK;
+	return error;
 }
 
 
