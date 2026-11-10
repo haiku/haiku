@@ -152,7 +152,7 @@ status_t fat_volume_uninit(msdosfsmount* volume);
 typedef struct IdentifyCookie {
 	uint32 fBytesPerSector;
 	uint32 fTotalSectors;
-	char fName[12];
+	char fName[SHORT_TO_UTF8_SIZE];
 } IdentifyCookie;
 
 typedef struct FileCookie {
@@ -418,7 +418,7 @@ dosfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 			= dummyVolume.pm_fatblk + dummyVolume.pm_FATs * dummyVolume.pm_FATsecs;
 	}
 
-	char name[LABEL_CSTRING];
+	char name[SHORT_TO_UTF8_SIZE];
 	strcpy(name, "no name");
 	read_label(&dummyVolume, fd, buf, name);
 
@@ -427,7 +427,7 @@ dosfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 		return -1;
 	cookie->fBytesPerSector = dummyVolume.pm_BytesPerSec;
 	cookie->fTotalSectors = dummyVolume.pm_HugeSectors;
-	strlcpy(cookie->fName, name, 12);
+	strlcpy(cookie->fName, name, SHORT_TO_UTF8_SIZE);
 
 	*_cookie = cookie;
 
