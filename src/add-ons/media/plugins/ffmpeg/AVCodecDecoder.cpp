@@ -148,7 +148,8 @@ AVCodecDecoder::~AVCodecDecoder()
 
 	av_frame_free(&fPostProcessedDecodedPicture);
 	av_frame_free(&fRawDecodedPicture);
-	av_free(fRawDecodedAudio->opaque);
+	if (fRawDecodedAudio != NULL)
+		av_free(fRawDecodedAudio->opaque);
 	av_frame_free(&fRawDecodedAudio);
 	if (fCodecContext != NULL) {
 		fCodecContext->extradata = NULL;
@@ -187,6 +188,11 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 	if (ioEncodedFormat->type != B_MEDIA_ENCODED_AUDIO
 		&& ioEncodedFormat->type != B_MEDIA_ENCODED_VIDEO)
 		return B_ERROR;
+
+	// Frames are allocated in the constructor, which can't report errors.
+	if (fPostProcessedDecodedPicture == NULL || fRawDecodedPicture == NULL
+			|| fRawDecodedAudio == NULL || fDecodedDataBuffer == NULL)
+	return B_NO_MEMORY;
 
 	fIsAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
 	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio ? 'a' : 'v');
@@ -304,11 +310,10 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 		avcodec_free_context(&fCodecContext);
 	}
 
+	fCodecInitDone = false;
 	fCodecContext = avcodec_alloc_context3(fCodec);
 	if (fCodecContext == NULL)
 		return B_NO_MEMORY;
-
-	fCodecInitDone = false;
 
 	system_info info;
 	get_system_info(&info);
