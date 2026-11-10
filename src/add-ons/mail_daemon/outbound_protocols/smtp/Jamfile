@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src add-ons mail_daemon outbound_protocols smtp ;
 
-
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 UsePrivateHeaders mail shared ;
 
@@ -11,10 +10,10 @@ AddResources SMTP : SMTP.rdef ;
 Addon SMTP :
 	ConfigView.cpp
 	SMTP.cpp
-	md5c.c
-	: be libbnetapi.so libmail.so localestub
-		[ TargetLibstdc++ ] [ TargetLibsupc++ ]
-		$(TARGET_NETWORK_LIBS)
+	:
+	be libbnetapi.so libmail.so localestub shared
+	[ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	$(TARGET_NETWORK_LIBS)
 ;
 
 DoCatalogs SMTP :

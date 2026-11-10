@@ -812,9 +812,9 @@ POP3Protocol::MD5Digest(unsigned char* in, char* asciiDigest)
 
 	MD5_CTX context;
 
-	MD5Init(&context);
-	MD5Update(&context, in, ::strlen((char*)in));
-	MD5Final(digest, &context);
+	MD5_Init(&context);
+	MD5_Update(&context, in, ::strlen((char*)in));
+	MD5_Final(digest, &context);
 
 	for (int i = 0;  i < 16;  i++) {
 		sprintf(asciiDigest + 2 * i, "%02x", digest[i]);

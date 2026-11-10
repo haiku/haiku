@@ -11,10 +11,10 @@ Addon POP3 :
 	ConfigView.cpp
 	MessageIO.cpp
 	POP3.cpp
-	md5c.c
-	: be libbnetapi.so libmail.so localestub
-		[ TargetLibstdc++ ] [ TargetLibsupc++ ]
-		$(TARGET_NETWORK_LIBS)
+	:
+	be libbnetapi.so libmail.so localestub shared
+	[ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	$(TARGET_NETWORK_LIBS)
 ;
 
 DoCatalogs POP3 :
