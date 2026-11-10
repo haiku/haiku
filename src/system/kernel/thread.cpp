@@ -3181,6 +3181,8 @@ user_unblock_thread(thread_id threadID, status_t status)
 
 	if (thread->user_thread == NULL)
 		return B_NOT_ALLOWED;
+	if (status > 0)
+		return B_BAD_VALUE;
 
 	InterruptsSpinLocker locker(thread->scheduler_lock);
 
@@ -3199,7 +3201,7 @@ user_unblock_thread(thread_id threadID, status_t status)
 		// case that this thread is actually blocked on something else.
 		if (thread->wait.status > 0
 				&& thread->wait.type == THREAD_BLOCK_TYPE_USER) {
-			thread_unblock_locked(thread, status);
+			thread_unblock_locked(thread, B_OK);
 		}
 	}
 	return B_OK;
@@ -3968,21 +3970,15 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	threadLocker.Lock();
 
 	// Interruptions or timeouts can race with other threads unblocking us.
-	// Favor a wake-up by another thread, i.e. if someone changed the wait
-	// status, use that.
-	status_t oldStatus;
-	if (user_memcpy(&oldStatus, &thread->user_thread->wait_status,
-		sizeof(oldStatus)) < B_OK) {
+	// Favor an actual wake-up, if one happened.
+	if (user_memcpy(&waitStatus, &thread->user_thread->wait_status,
+			sizeof(waitStatus)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
-	if (oldStatus > 0) {
-		if (user_memcpy(&thread->user_thread->wait_status, &status,
-				sizeof(status)) < B_OK) {
-			return B_BAD_ADDRESS;
-		}
-	} else {
-		status = oldStatus;
-	}
+	if (waitStatus <= 0)
+		status = waitStatus;
+	else
+		ASSERT(status != B_OK);
 
 	threadLocker.Unlock();
 
