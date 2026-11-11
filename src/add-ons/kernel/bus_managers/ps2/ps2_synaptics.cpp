@@ -702,6 +702,7 @@ synaptics_close(void *_cookie)
 		150000);
 
 	delete_packet_buffer(cookie->synaptics_ring_buffer);
+	cookie->synaptics_ring_buffer = NULL;
 	delete_sem(cookie->synaptics_sem);
 
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_OPEN);

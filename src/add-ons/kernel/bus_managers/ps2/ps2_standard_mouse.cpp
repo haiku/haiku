@@ -196,7 +196,7 @@ standard_mouse_read_event(standard_mouse_cookie* cookie,
 //	#pragma mark - Interrupt handler functions
 
 
-void
+static void
 standard_mouse_disconnect(ps2_dev* dev)
 {
 	// the mouse device might not be opened at this point
@@ -212,7 +212,7 @@ standard_mouse_disconnect(ps2_dev* dev)
 	by read() operations. The full data is obtained using 3 consecutive
 	calls to the handler, each holds a different byte on the data port.
 */
-int32
+static int32
 standard_mouse_handle_int(ps2_dev* dev)
 {
 	standard_mouse_cookie* cookie = (standard_mouse_cookie*)dev->cookie;
@@ -414,6 +414,7 @@ standard_mouse_close(void* _cookie)
 		150000);
 
 	delete_packet_buffer(cookie->standard_mouse_buffer);
+	cookie->standard_mouse_buffer = NULL;
 	delete_sem(cookie->standard_mouse_sem);
 
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_OPEN);
