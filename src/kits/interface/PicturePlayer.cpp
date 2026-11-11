@@ -721,9 +721,10 @@ PictureOpToString(int op)
 
 
 PicturePlayer::PicturePlayer(const void *data, size_t size, BList *pictures)
-	:	fData(data),
-		fSize(size),
-		fPictures(pictures)
+	:
+	fData(data),
+	fSize(size),
+	fPictures(pictures)
 {
 }
 
@@ -1221,6 +1222,8 @@ PicturePlayer::_Play(PicturePlayerCallbacks& callbacks,
 				const BPoint* where;
 				const int32* token;
 				if (!reader.Get(where) || !reader.Get(token))
+					break;
+				if (fPictures == NULL)
 					break;
 
 				callbacks.DrawPicture(*where, *token);
