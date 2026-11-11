@@ -114,7 +114,7 @@ ServerRuntimeInformationVerifierProcess::_CheckAndNotifyExcessCurrentTimestampDe
 			"settings and correct the current time if necessary.");
 
 		BString discrepancySecondsString;
-		discrepancySecondsString.SetToFormat("%" B_PRIi64, millisDelta),
+		discrepancySecondsString.SetToFormat("%" B_PRIi64, millisDelta/1000),
 			message.ReplaceAll("%DiscrepancySeconds%", discrepancySecondsString);
 
 		AppUtils::NotifySimpleError(SimpleAlert(B_TRANSLATE("Timestamp discrepancy"), message));
