@@ -99,7 +99,7 @@ NodeAttribute::_FillMapEntry(xfs_extnum_t num)
 xfs_fsblock_t
 NodeAttribute::_LogicalToFileSystemBlock(uint32 logicalBlock)
 {
-	xfs_extnum_t totalExtents = fInode->AttrExtentsCount();
+	xfs_aextnum_t totalExtents = fInode->AttrExtentsCount();
 
 	// If logicalBlock is lesser than or equal to ExtentsCount then
 	// simply read and return extent block count.

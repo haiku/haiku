@@ -20,13 +20,11 @@ Inode::_SwapEndian()
 	fNode->di_uid = B_BENDIAN_TO_HOST_INT32(fNode->di_uid);
 	fNode->di_gid = B_BENDIAN_TO_HOST_INT32(fNode->di_gid);
 	fNode->di_nlink = B_BENDIAN_TO_HOST_INT32(fNode->di_nlink);
-	fNode->di_projid = B_BENDIAN_TO_HOST_INT16(fNode->di_projid);
-	fNode->di_flushiter = B_BENDIAN_TO_HOST_INT16(fNode->di_flushiter);
+	fNode->di_projid_lo = B_BENDIAN_TO_HOST_INT16(fNode->di_projid_lo);
+	fNode->di_projid_hi = B_BENDIAN_TO_HOST_INT16(fNode->di_projid_hi);
 	fNode->di_size = B_BENDIAN_TO_HOST_INT64(fNode->di_size);
 	fNode->di_nblocks = B_BENDIAN_TO_HOST_INT64(fNode->di_nblocks);
 	fNode->di_extsize = B_BENDIAN_TO_HOST_INT32(fNode->di_extsize);
-	fNode->di_nextents = B_BENDIAN_TO_HOST_INT32(fNode->di_nextents);
-	fNode->di_naextents = B_BENDIAN_TO_HOST_INT16(fNode->di_naextents);
 	fNode->di_dmevmask = B_BENDIAN_TO_HOST_INT32(fNode->di_dmevmask);
 	fNode->di_dmstate = B_BENDIAN_TO_HOST_INT16(fNode->di_dmstate);
 	fNode->di_flags = B_BENDIAN_TO_HOST_INT16(fNode->di_flags);
@@ -71,6 +69,16 @@ Inode::_SwapEndian()
 		lts->t_sec = B_BENDIAN_TO_HOST_INT32(lts->t_sec);
 		lts->t_nsec = B_BENDIAN_TO_HOST_INT32(lts->t_nsec);
 		fNode->di_crtime = _ConvertLegacyToBigTimestamp(lts);
+	}
+
+	if (_IsLargeExtentsEnabled()) {
+		fNode->di_big_nextents = B_BENDIAN_TO_HOST_INT64(fNode->di_big_nextents);
+		fNode->di_big_anextents = B_BENDIAN_TO_HOST_INT32(fNode->di_big_anextents);
+	} else {
+		fNode->di_nextents = B_BENDIAN_TO_HOST_INT32(fNode->di_nextents);
+		fNode->di_naextents = B_BENDIAN_TO_HOST_INT16(fNode->di_naextents);
+		if (Version() == 2)
+			fNode->di_flushiter = B_BENDIAN_TO_HOST_INT16(fNode->di_flushiter);
 	}
 }
 
@@ -318,6 +326,12 @@ Inode::VerifyInode() const
 		return false;
 	}
 
+	// Large extents can only happen on large extents enabled filesystems
+	if (_IsLargeExtentsEnabled() && !fVolume->IsLargeExtentsEnabled()) {
+		ERROR("Large extents inodes can only be supported on large extents enabled filesystem");
+		return false;
+	}
+
 	return true;
 }
 
@@ -329,6 +343,24 @@ Inode::CoreInodeSize() const
 		return sizeof(Dinode);
 
 	return offsetof(Dinode, di_crc);
+}
+
+
+xfs_extnum_t
+Inode::DataExtentsCount() const
+{
+	if (_IsLargeExtentsEnabled())
+		return fNode->di_big_nextents;
+	return fNode->di_nextents;
+}
+
+
+xfs_aextnum_t
+Inode::AttrExtentsCount() const
+{
+	if (_IsLargeExtentsEnabled())
+		return fNode->di_big_anextents;
+	return fNode->di_naextents;
 }
 
 
@@ -418,7 +450,7 @@ Inode::ReadExtentsFromExtentBasedInode()
 	fExtents = new(std::nothrow) ExtentMapEntry[DataExtentsCount()];
 	char* dataStart = (char*) DIR_DFORK_PTR(Buffer(), CoreInodeSize());
 	uint64 wrappedExtent[2];
-	for (int i = 0; i < DataExtentsCount(); i++) {
+	for (xfs_extnum_t i = 0; i < DataExtentsCount(); i++) {
 		wrappedExtent[0] = *(uint64*)(dataStart);
 		wrappedExtent[1] = *(uint64*)(dataStart + sizeof(uint64));
 		dataStart += 2 * sizeof(uint64);
@@ -618,7 +650,7 @@ Inode::ReadExtents()
 int
 Inode::SearchMapInAllExtent(uint64 blockNo)
 {
-	for (int i = 0; i < DataExtentsCount(); i++) {
+	for (xfs_extnum_t i = 0; i < DataExtentsCount(); i++) {
 		if (fExtents[i].br_startoff <= blockNo
 			&& (blockNo <= fExtents[i].br_startoff
 				+ fExtents[i].br_blockcount - 1)) {

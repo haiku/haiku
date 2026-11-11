@@ -256,7 +256,9 @@ enum xfs_dinode_fmt_t {
 
 // Values for di_flags2
 #define XFS_DIFLAG2_BIGTIME_BIT 3
+#define XFS_DIFLAG2_NREXT64_BIT 4
 #define XFS_DIFLAG2_BIGTIME (1ULL << XFS_DIFLAG2_BIGTIME_BIT)
+#define XFS_DIFLAG2_NREXT64 (1ULL << XFS_DIFLAG2_NREXT64_BIT)
 
 
 /*
@@ -275,27 +277,46 @@ public:
 		uint32				di_uid;
 		uint32				di_gid;
 		uint32				di_nlink;
-		uint16				di_projid;
-		uint8				di_pad[8];
-		uint16				di_flushiter;
+		uint16				di_projid_lo;
+		uint16				di_projid_hi;
+		union {
+			uint64			di_big_nextents;
+				// Number of extents if NREXT64 is set
+			uint64			di_v3_pad;
+				// Padding for V3 inodes without NREXT64 set
+
+			// Padding and inode flush counter for V2 inodes
+			struct {
+				uint8		di_v2_pad[6];
+				uint16		di_flushiter;
+			};
+		};
 		xfs_timestamp_t		di_atime;
 		xfs_timestamp_t		di_mtime;
 		xfs_timestamp_t		di_ctime;
 		xfs_fsize_t			di_size;
-		// size in bytes or length if link
+			// size in bytes or length if link
 		xfs_rfsblock_t		di_nblocks;
-		// blocks used including metadata
-		// extended attributes not included
+			// blocks used including metadata, extended attributes not included
 		xfs_extlen_t		di_extsize;
-		// extent size
-		xfs_extnum_t		di_nextents;
-		// number of data extents
-		xfs_aextnum_t		di_naextents;
-		// number of EA extents
+			// extent size
+		union {
+			// Number of extents for V2 inodes and V3 inodes without NREXT63 set
+			struct {
+				uint32		di_nextents;
+				uint16		di_naextents;
+			} __attribute__((packed));
+
+			// Number of attribute extents if NREXT64 is set
+			struct {
+				uint32		di_big_anextents;
+				uint16		di_nrext64_pad;
+			} __attribute__((packed));
+		} __attribute__((packed));
 		uint8				di_forkoff;
-		// decides where di_a starts
+			// decides where di_a starts
 		int8				di_aformat;
-		// similar to di_format
+			// similar to di_format
 		uint32				di_dmevmask;
 		uint16				di_dmstate;
 		uint16				di_flags;
@@ -385,10 +406,8 @@ public:
 			uint32				UserId() const { return fNode->di_uid; }
 			uint32				GroupId() const { return fNode->di_gid; }
 			bool				HasFileTypeField() const;
-			xfs_extnum_t		DataExtentsCount() const
-									{ return fNode->di_nextents; }
-			xfs_extnum_t		AttrExtentsCount() const
-									{ return fNode->di_naextents; }
+			xfs_extnum_t		DataExtentsCount() const;
+			xfs_aextnum_t		AttrExtentsCount() const;
 			uint64				FileSystemBlockToAddr(uint64 block);
 			uint8				ForkOffset() const
 									{ return fNode->di_forkoff; }
@@ -415,6 +434,9 @@ private:
 			bool				_IsBigtimeEnabled() const
 									{ return Version() == 3
 										&& fNode->di_flags2 & XFS_DIFLAG2_BIGTIME; }
+			bool				_IsLargeExtentsEnabled() const
+									{ return Version() == 3
+										&& fNode->di_flags2 & XFS_DIFLAG2_NREXT64; }
 			void				_SwapEndian();
 			status_t			_GetFromDisk();
 

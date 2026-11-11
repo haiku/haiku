@@ -175,6 +175,13 @@ XfsSuperBlock::IsBigtimeEnabled() const
 }
 
 
+bool
+XfsSuperBlock::IsLargeExtentsEnabled() const
+{
+	return (sb_features_incompat & XFS_SB_FEAT_INCOMPAT_NREXT64) != 0;
+}
+
+
 uint16
 XfsSuperBlock::Version() const
 {

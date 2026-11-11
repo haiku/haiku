@@ -36,9 +36,7 @@ NodeDirectory::~NodeDirectory()
 xfs_extnum_t
 NodeDirectory::FirstLeafMapIndex()
 {
-	int len = fInode->DataExtentsCount();
-
-	for (int i = 0; i < len; i++) {
+	for (xfs_extnum_t i = 0; i < fInode->DataExtentsCount(); i++) {
 		void* directoryFork = DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize());
 		void* pointerToMap = (void*)((char*)directoryFork + i * EXTENT_SIZE);
 
@@ -78,7 +76,7 @@ NodeDirectory::Init()
 bool
 NodeDirectory::IsNodeType()
 {
-	if (fFirstLeafMapIndex == -1)
+	if (fFirstLeafMapIndex == -1UL)
 		return false;
 	return true;
 }
@@ -241,9 +239,7 @@ NodeDirectory::EntrySize(int len) const
 void
 NodeDirectory::SearchAndFillDataMap(uint64 blockNo)
 {
-	int len = fInode->DataExtentsCount();
-
-	for (int i = 0; i <= len - fFirstLeafMapIndex; i++) {
+	for (xfs_extnum_t i = 0; i <= fInode->DataExtentsCount() - fFirstLeafMapIndex; i++) {
 		FillMapEntry(i, fDataMap);
 		if (fDataMap->br_startoff <= blockNo
 			&& (blockNo <= fDataMap->br_startoff + fDataMap->br_blockcount - 1))
@@ -389,7 +385,7 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 	TRACE("rightMapOffset:(%" B_PRIu32 ")\n", rightMapOffset);
 
-	for (int i = fFirstLeafMapIndex; i < fInode->DataExtentsCount(); i++) {
+	for (xfs_extnum_t i = fFirstLeafMapIndex; i < fInode->DataExtentsCount(); i++) {
 		FillMapEntry(i, fLeafMap);
 		fCurLeafMapNumber = 2;
 		status = FillBuffer(LEAF, fLeafBuffer,
