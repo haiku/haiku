@@ -15,10 +15,10 @@
 
 
 #define TRACE_PCI
-#ifndef TRACE_PCI
-#	define TRACE(x)
-#else
+#ifdef TRACE_PCI
 #	define TRACE(x) dprintf x
+#else
+#	define TRACE(x)
 #endif
 
 struct PCIDev;
@@ -184,6 +184,13 @@ private:
 			PCIBus *		_CreateBus(PCIDev *parent, uint8 domain,
 								uint8 bus);
 
+			status_t		_ReadConfig(domain_data *domain, uint8 bus, uint8 device,
+								uint8 function, uint16 offset, uint8 size,
+								uint32 *value);
+			status_t		_WriteConfig(domain_data *domain, uint8 bus, uint8 device,
+								uint8 function, uint16 offset, uint8 size,
+								uint32 value);
+
 			status_t		_GetNthInfo(PCIBus *bus, long *currentIndex,
 								long wantIndex, pci_info *outInfo);
 			void			_ReadBasicInfo(PCIDev *dev);
@@ -212,7 +219,7 @@ private:
 			status_t		_CreateVirtualBus(uint8 domain, uint8 bus,
 								uint8 *virtualBus);
 
-			int				_NumFunctions(uint8 domain, uint8 bus,
+			int				_NumFunctions(domain_data *domain, uint8 bus,
 								uint8 device);
 			PCIDev *		_FindDevice(PCIBus *current, uint8 domain,
 								uint8 bus, uint8 device, uint8 function);
