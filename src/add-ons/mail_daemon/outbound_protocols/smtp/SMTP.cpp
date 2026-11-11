@@ -305,8 +305,10 @@ SMTPProtocol::Connect()
 			<< B_TRANSLATE(". The server said:\n") << fLog;
 		errorMessage.ReplaceFirst("%serv",
 			fSettingsMessage.FindString("server"));
-
 		ShowError(errorMessage.String());
+
+		Close();
+		return status;
 	}
 	return B_OK;
 }
