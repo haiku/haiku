@@ -956,7 +956,7 @@ handle_signals(Thread* thread)
 
 	// determine syscall restart behavior
 	uint32 restartFlags = atomic_and(&thread->flags,
-		~THREAD_FLAGS_DONT_RESTART_SYSCALL);
+		~(THREAD_FLAGS_DONT_RESTART_SYSCALL | THREAD_FLAGS_ALWAYS_RESTART_SYSCALL));
 	bool alwaysRestart
 		= (restartFlags & THREAD_FLAGS_ALWAYS_RESTART_SYSCALL) != 0;
 	bool restart = alwaysRestart
