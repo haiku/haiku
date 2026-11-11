@@ -25,14 +25,14 @@ hda_open(const char* name, uint32 flags, void** cookie)
 	if (controller == NULL)
 		return ENODEV;
 
-	if (atomic_get(&controller->opened) != 0)
+	if (atomic_get_and_set(&controller->opened, 1) != 0)
 		return B_BUSY;
 
 	status_t status = hda_hw_init(controller);
-	if (status != B_OK)
+	if (status != B_OK) {
+		atomic_set(&controller->opened, 0);
 		return status;
-
-	atomic_add(&controller->opened, 1);
+	}
 
 	*cookie = controller;
 
@@ -75,7 +75,7 @@ hda_close(void* cookie)
 {
 	hda_controller* controller = (hda_controller*)cookie;
 	hda_hw_stop(controller);
-	atomic_add(&controller->opened, -1);
+	atomic_set(&controller->opened, 0);
 
 	return B_OK;
 }
