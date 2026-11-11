@@ -539,8 +539,11 @@ FUNCTION(x86_64_syscall_entry):
 	call	x86_init_user_debug_at_kernel_exit
 1:
 	// On this return path it is possible that the frame has been modified,
-	// for example to execute a signal handler. In this case it is safer to
-	// return via IRET.
+	// for example to execute a signal handler, so we need to return via IRET.
+
+	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
+	je		.Lrestore_fpu
+
 	CLEAR_FPU_STATE()
 	jmp .Liret
 
