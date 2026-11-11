@@ -593,7 +593,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		// so we skip that for now.
 		SendCommand(CRLF);	// finish off authentication
 		res = fLog.String();
-		if (atol(res) < 500)
+		if (atol(res) == 235)
 			return B_OK;
 	}
 	if (fAuthType & CRAM_MD5) {
@@ -629,7 +629,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		SendCommand(postResponse.String());
 
 		res = fLog.String();
-		if (atol(res) < 500)
+		if (atol(res) == 235)
 			return B_OK;
 	}
 	if (fAuthType & LOGIN) {
@@ -663,7 +663,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		delete[] login64;
 
 		res = fLog.String();
-		if (atol(res) < 500)
+		if (atol(res) == 235)
 			return B_OK;
 	}
 	if (fAuthType & PLAIN) {
@@ -692,7 +692,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		SendCommand(postResponse.String());
 
 		const char *res = fLog.String();
-		if (atol(res) < 500)
+		if (atol(res) == 235)
 			return B_OK;
 	}
 	return B_ERROR;
