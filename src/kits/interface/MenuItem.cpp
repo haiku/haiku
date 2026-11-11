@@ -866,16 +866,62 @@ BMenuItem::_OldSetShortcut(char shortcut, uint32 modifiers)
 
 
 extern "C" void
-B_IF_GCC_2(SetShortcut__9BMenuItemcUl, _ZN9BMenuItem11SetShortcutEcj)(
-	BMenuItem* menuItem, char shortcut, uint32 modifiers)
+#if defined(__HAIKU_BEOS_COMPATIBLE_TYPES)
+B_IF_GCC_2(SetShortcut__9BMenuItemcUl, _ZN9BMenuItem11SetShortcutEcm)
+#else
+_ZN9BMenuItem11SetShortcutEcj
+#endif
+	(BMenuItem* menuItem, char shortcut, uint32 modifiers)
 {
 	menuItem->SetShortcut(shortcut, modifiers);
 }
 
 
+#if __GNUC__ == 2
 extern "C" void
-B_IF_GCC_2(__9BMenuItemPCcP8BMessagecUl, _ZN9BMenuItemC2EPKcP8BMessagecj)(
-	void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+__9BMenuItemPCcP8BMessagecUl
+	(void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
 {
 	new(memory) BMenuItem(label, message, shortcut, modifiers);
 }
+#elif defined(__HAIKU_BEOS_COMPATIBLE_TYPES)
+extern "C" void _ZN9BMenuItemC1EPKcP8BMessagemm
+	(void* memory, const char* label, BMessage* message, uint32 shortcut, uint32 modifiers);
+
+extern "C" void
+_ZN9BMenuItemC1EPKcP8BMessagecm
+	(void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+{
+	_ZN9BMenuItemC1EPKcP8BMessagemm(memory, label, message, shortcut, modifiers);
+}
+
+extern "C" void _ZN9BMenuItemC2EPKcP8BMessagemm
+	(void* memory, const char* label, BMessage* message, uint32 shortcut, uint32 modifiers);
+
+extern "C" void
+_ZN9BMenuItemC2EPKcP8BMessagecm
+	(void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+{
+	_ZN9BMenuItemC2EPKcP8BMessagemm(memory, label, message, shortcut, modifiers);
+}
+#else
+extern "C" void _ZN9BMenuItemC1EPKcP8BMessagejj
+	(void* memory, const char* label, BMessage* message, uint32 shortcut, uint32 modifiers);
+
+extern "C" void
+_ZN9BMenuItemC1EPKcP8BMessagecj
+	(void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+{
+	_ZN9BMenuItemC1EPKcP8BMessagejj(memory, label, message, shortcut, modifiers);
+}
+
+extern "C" void _ZN9BMenuItemC2EPKcP8BMessagejj
+	(void* memory, const char* label, BMessage* message, uint32 shortcut, uint32 modifiers);
+
+extern "C" void
+_ZN9BMenuItemC2EPKcP8BMessagecj
+	(void* memory, const char* label, BMessage* message, char shortcut, uint32 modifiers)
+{
+	_ZN9BMenuItemC2EPKcP8BMessagejj(memory, label, message, shortcut, modifiers);
+}
+#endif
