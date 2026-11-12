@@ -315,6 +315,9 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 	if (fCodecContext == NULL)
 		return B_NO_MEMORY;
 
+	// The AVFormatReader hands over pts/dts/duration in microseconds
+	fCodecContext->pkt_timebase = av_make_q(1, 1000000);
+
 	system_info info;
 	get_system_info(&info);
 
