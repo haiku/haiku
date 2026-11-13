@@ -38,7 +38,6 @@
 #endif
 
 #if defined(__NetBSD__)
-#include <sys/cpu.h>
 #include <uvm/uvm_object.h>
 #include <uvm/uvm_extern.h>
 #include <uvm/uvm_page.h>
@@ -174,13 +173,11 @@ extern os_vmmap_t *os_curproc_map;
 #define os_mtx_destroy(lock)	mutex_destroy(lock)
 #define os_mtx_lock(lock)	mutex_enter(lock)
 #define os_mtx_unlock(lock)	mutex_exit(lock)
-#define os_mtx_owned(lock)	mutex_owned(lock)
 #elif defined(__DragonFly__)
 #define os_mtx_init(lock)	lockinit(lock, "nvmmmtx", 0, 0)
 #define os_mtx_destroy(lock)	lockuninit(lock)
 #define os_mtx_lock(lock)	lockmgr(lock, LK_EXCLUSIVE)
 #define os_mtx_unlock(lock)	lockmgr(lock, LK_RELEASE)
-#define os_mtx_owned(lock)	(lockstatus(lock, curthread) == LK_EXCLUSIVE)
 #elif defined(__HAIKU__)
 #define os_mtx_init(lock)	mutex_init(lock, NULL)
 #define os_mtx_destroy(lock)	mutex_destroy(lock)
@@ -313,7 +310,6 @@ uint64 os_curcpu_idt();
 
 /* Cpusets. */
 #if defined(__NetBSD__)
-#include <sys/kcpuset.h>
 typedef kcpuset_t		os_cpuset_t;
 #define os_cpuset_init(s)	kcpuset_create(s, true)
 #define os_cpuset_destroy(s)	kcpuset_destroy(s)
@@ -368,15 +364,27 @@ bool os_preempt_disabled();
 /* Asserts. */
 #if defined(__NetBSD__)
 #define OS_ASSERT		KASSERT
+#define OS_ASSERT_MTX_OWNED(m)	OS_ASSERT(mutex_owned(m))
 #elif defined(__DragonFly__)
 #define OS_ASSERT		KKASSERT
+#define OS_ASSERT_MTX_OWNED(m)	OS_ASSERT(lockstatus(m, curthread) == LK_EXCLUSIVE)
 #elif defined(__HAIKU__)
 #define OS_ASSERT		ASSERT
+#define OS_ASSERT_MTX_OWNED(m) ASSERT_LOCKED_MUTEX(m)
 #endif
 
-/* Misc. */
-#if defined(__DragonFly__) || defined(__HAIKU__)
-#define uimin(a, b)		((u_int)a < (u_int)b ? (u_int)a : (u_int)b)
+/* Userspace access. */
+#if defined(__NetBSD__) || defined(__DragonFly__)
+#define os_copy_from_user	copyin
+#define os_copy_to_user		copyout
+#elif defined(__HAIKU__)
+#define os_copy_from_user	user_memcpy
+#define os_copy_to_user		user_memcpy
+#endif
+
+/* Vmspace. */
+#if defined(__NetBSD__)
+#define os_vmspace_get_vmmap(_vm_)	(&(_vm_)->vm_map)
 #endif
 
 /* Memory protection */
@@ -384,11 +392,12 @@ bool os_preempt_disabled();
 #define PROT_READ	B_READ_AREA
 #define PROT_WRITE	B_WRITE_AREA
 #define PROT_EXEC	B_EXECUTE_AREA
-#define copyin(from, to, size)	user_memcpy(to, from, size)
-#define copyout(from, to, size)	user_memcpy(to, from, size)
 #endif
 
-/* -------------------------------------------------------------------------- */
+/* Misc. */
+#if defined(__DragonFly__) || defined(__HAIKU__)
+#define uimin(a, b)		((u_int)a < (u_int)b ? (u_int)a : (u_int)b)
+#endif
 
 os_vmspace_t *	os_vmspace_create(vaddr_t, vaddr_t);
 void		os_vmspace_destroy(os_vmspace_t *);
@@ -398,9 +407,11 @@ os_vmobj_t *	os_vmobj_create(voff_t);
 void		os_vmobj_ref(os_vmobj_t *);
 void		os_vmobj_rel(os_vmobj_t *);
 
-int		os_vmobj_map(os_vmmap_t *, vaddr_t *, vsize_t, os_vmobj_t *,
-		    voff_t, bool, bool, bool, int, int);
-void		os_vmobj_unmap(os_vmmap_t *map, vaddr_t, vaddr_t);
+int		os_vmobj_map_user(os_vmmap_t *, vaddr_t *, vsize_t,
+		    os_vmobj_t *, voff_t, bool, bool, bool, int, int);
+int		os_vmobj_map_kern(os_vmmap_t *, vaddr_t *, vsize_t,
+		    os_vmobj_t *, voff_t, bool, bool, bool, int, int);
+void		os_vmobj_unmap(os_vmmap_t *, vaddr_t, vaddr_t, bool);
 
 void *		os_pagemem_zalloc(size_t);
 void		os_pagemem_free(void *, size_t);

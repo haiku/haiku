@@ -52,6 +52,29 @@
 #define	PSL_RF		0x00010000	/* resume flag bit */
 #endif
 
+#ifdef ASM_NVMM
+
+#define ASM_FUNCTION(_symname_)		\
+	.text;				\
+	.align 16, 0xCC;		\
+	.globl _symname_;		\
+	.type _symname_, @function;	\
+	_symname_:
+
+#define ASM_END(_symname_)		\
+	.size _symname_, . - _symname_
+
+#if defined(__NetBSD__)
+#include "assym.h"
+#include <machine/asm.h>
+#include <machine/segments.h>
+#define DS_ES_VALUE	GSEL(GUDATA_SEL, SEL_UPL)
+#elif defined(__HAIKU__)
+#define DS_ES_VALUE	GSEL(GUDATA_SEL, SEL_UPL)
+#endif
+
+#endif /* ASM_NVMM */
+
 /*
  * Undefine all the macros to avoid redefinition warnings.
  *
@@ -130,6 +153,7 @@
 #undef NB_CFG_INITAPICCPUIDLO
 #undef MSR_CMPHALT
 #undef MSR_VM_HSAVE_PA
+#undef MSR_LS_CFG
 #undef MSR_IC_CFG
 #undef MSR_DE_CFG
 #undef MSR_VM_CR

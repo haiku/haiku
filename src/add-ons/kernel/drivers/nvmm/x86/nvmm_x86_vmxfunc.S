@@ -26,27 +26,8 @@
  * SUCH DAMAGE.
  */
 
-#if defined(__NetBSD__)
-/* Override user-land alignment before including asm.h */
-#define ALIGN_DATA	.align	8
-#define ALIGN_TEXT	.align 16,0x90
-#define _ALIGN_TEXT	ALIGN_TEXT
-#define _LOCORE
-#include "assym.h"
-#include <machine/asm.h>
-#elif defined(__DragonFly__)
-#define _C_LABEL(x)	x
-#include <machine/asmacros.h>
-#include "assym.s"
-#elif defined(__HAIKU__)
-#define _C_LABEL(x)	x
-#include <machine/asmacros.h>
-#endif
-
 #define ASM_NVMM
 #include "nvmm_x86_internal.h"
-
-	.text
 
 /* redef */
 #define VMCS_HOST_RSP				0x00006C14
@@ -121,7 +102,7 @@
 /*
  * %rdi = VA of guest GPR state
  */
-ENTRY(vmx_vmlaunch)
+ASM_FUNCTION(vmx_vmlaunch)
 	/* Save the Host GPRs. */
 	HOST_SAVE_GPRS
 
@@ -149,12 +130,12 @@ ENTRY(vmx_vmlaunch)
 	HOST_RESTORE_GPRS
 	movq	$-1,%rax
 	retq
-END(vmx_vmlaunch)
+ASM_END(vmx_vmlaunch)
 
 /*
  * %rdi = VA of guest GPR state
  */
-ENTRY(vmx_vmresume)
+ASM_FUNCTION(vmx_vmresume)
 	/* Save the Host GPRs. */
 	HOST_SAVE_GPRS
 
@@ -182,12 +163,12 @@ ENTRY(vmx_vmresume)
 	HOST_RESTORE_GPRS
 	movq	$-1,%rax
 	retq
-END(vmx_vmresume)
+ASM_END(vmx_vmresume)
 
 /*
  * The CPU jumps here after a #VMEXIT.
  */
-ENTRY(vmx_resume_rip)
+ASM_FUNCTION(vmx_resume_rip)
 	/* Save the Guest GPRs. RAX done manually. */
 	pushq	%rax
 	movq	8(%rsp),%rax
@@ -204,27 +185,17 @@ ENTRY(vmx_resume_rip)
 
 	xorq	%rax,%rax
 	retq
-END(vmx_resume_rip)
+ASM_END(vmx_resume_rip)
 
-ENTRY(vmx_insn_failvalid)
-// this is a (hopefully) temporary workaround
-#ifdef __HAIKU__
-	movq	0,%rdi
-#else
-	movq	$.Lvmx_validstr,%rdi
-#endif
-	call	_C_LABEL(panic)
-END(vmx_insn_failvalid)
+ASM_FUNCTION(vmx_insn_failvalid)
+	leaq	.Lvmx_validstr(%rip),%rdi
+	call	panic
+ASM_END(vmx_insn_failvalid)
 
-ENTRY(vmx_insn_failinvalid)
-// this is a (hopefully) temporary workaround
-#ifdef __HAIKU__
-	movq	0,%rdi
-#else
-	movq	$.Lvmx_invalidstr,%rdi
-#endif
-	call	_C_LABEL(panic)
-END(vmx_insn_failinvalid)
+ASM_FUNCTION(vmx_insn_failinvalid)
+	leaq	.Lvmx_invalidstr(%rip),%rdi
+	call	panic
+ASM_END(vmx_insn_failinvalid)
 
 	.section ".rodata"
 

@@ -31,12 +31,6 @@
 
 #include <sys/types.h>
 #include <sys/mman.h>
-#if !defined(__HAIKU__)
-#include <machine/segments.h>
-#include <machine/psl.h>
-#else
-#include "haiku_defs.h"
-#endif
 
 /* CR0/CR4/MSR_EFER bits in use. */
 #define CR0_PE		__BIT(0)
@@ -47,12 +41,28 @@
 #define CR0_AM		__BIT(18)
 #define CR0_PG		__BIT(31)
 #define CR4_PAE		__BIT(5)
+#define CR4_SMEP	__BIT(20)
+#define CR4_SMAP	__BIT(21)
 #define EFER_SCE	__BIT(0)
 #define EFER_LME	__BIT(8)
 #define EFER_LMA	__BIT(10)
+#define EFER_NXE	__BIT(11)
 
-#define PSL_MBO		0x00000002	/* Must be one bits */
+#define RFLAGS_MBO	0x00000002	/* Must be one bits */
+#define RFLAGS_IF	0x00000200	/* Interrupt flag */
+#define RFLAGS_AC	0x00040000	/* Alignment check flag */
+
+#define GSEL(s,r)	(((s) << 3) | r)
+#define GCODE_SEL	1
+#define GDATA_SEL	2
+#define SEL_RING0	0
+
+#define SDT_SYSLDT	2		/* System LDT */
 #define SDT_SYS386BSY	11		/* System 386 TSS busy */
+
+#define SDT_MEMRWA	19		/* Memory read write accessed */
+#define SDT_MEMRWDA	23		/* Memory read write expand-down accessed */
+#define SDT_MEMERA	27		/* Memory execute read accessed */
 
 typedef uint64_t pt_entry_t;
 

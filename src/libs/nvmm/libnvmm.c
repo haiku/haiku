@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -39,6 +39,8 @@
 #include <errno.h>
 
 #include "nvmm.h"
+
+#define NO_INTERPOSE	__attribute__((visibility("protected")))
 
 static struct nvmm_capability __capability;
 
@@ -376,7 +378,7 @@ nvmm_vcpu_configure(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	return 0;
 }
 
-int
+NO_INTERPOSE int
 nvmm_vcpu_setstate(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
     uint64_t flags)
 {
@@ -389,7 +391,7 @@ nvmm_vcpu_setstate(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	return 0;
 }
 
-int
+NO_INTERPOSE int
 nvmm_vcpu_getstate(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
     uint64_t flags)
 {
@@ -414,7 +416,7 @@ nvmm_vcpu_getstate(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
 	return 0;
 }
 
-int
+NO_INTERPOSE int
 nvmm_vcpu_inject(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
 	struct nvmm_comm_page *comm;
@@ -533,7 +535,7 @@ nvmm_hva_unmap(struct nvmm_machine *mach, uintptr_t hva, size_t size)
  * nvmm_gva_to_gpa(): architecture-specific.
  */
 
-int
+NO_INTERPOSE int
 nvmm_gpa_to_hva(struct nvmm_machine *mach, gpaddr_t gpa, uintptr_t *hva,
     nvmm_prot_t *prot)
 {

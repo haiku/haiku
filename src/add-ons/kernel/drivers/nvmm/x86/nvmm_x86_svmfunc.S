@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 Maxime Villard, m00nbsd.net
+ * Copyright (c) 2018-2026 Maxime Villard, m00nbsd.net
  * All rights reserved.
  *
  * This code is part of the NVMM hypervisor.
@@ -26,28 +26,8 @@
  * SUCH DAMAGE.
  */
 
-#if defined(__NetBSD__)
-/* Override user-land alignment before including asm.h */
-#define ALIGN_DATA	.align	8
-#define ALIGN_TEXT	.align 16,0x90
-#define _ALIGN_TEXT	ALIGN_TEXT
-#define _LOCORE
-#include "assym.h"
-#include <machine/asm.h>
-#include <machine/segments.h>
-#elif defined(__DragonFly__)
-#include <machine/asmacros.h>
-#include <machine/segments.h>
-#include "assym.s"
-#elif defined(__HAIKU__)
-#define _C_LABEL(x)	x
-#include <machine/asmacros.h>
-#endif
-
 #define ASM_NVMM
 #include "nvmm_x86_internal.h"
-
-	.text
 
 #define HOST_SAVE_GPRS		\
 	pushq	%rbx		;\
@@ -66,7 +46,7 @@
 	popq	%rbx
 
 #define HOST_SAVE_MSR(msr)	\
-	movq	$msr,%rcx	;\
+	movl	$msr,%ecx	;\
 	rdmsr			;\
 	pushq	%rdx		;\
 	pushq	%rax
@@ -74,42 +54,20 @@
 #define HOST_RESTORE_MSR(msr)	\
 	popq	%rax		;\
 	popq	%rdx		;\
-	movq	$msr,%rcx	;\
+	movl	$msr,%ecx	;\
 	wrmsr
 
 #define HOST_SAVE_TR		\
+	pushq	%rdx		;\
 	strw	%ax		;\
-	pushq	%rdx	;/*Haiku*/\
-	pushq	%rax	;\
+	pushq	%rax
 
-#if defined(__NetBSD__)
 #define HOST_RESTORE_TR				\
 	popq	%rax				;\
 	movzwq	%ax,%rdx			;\
-	movq	CPUVAR(GDT),%rax		;\
-	/* Clear the busy bit for reloading. */	\
+	popq	%rax				;\
 	andq	$~0x0200,4(%rax,%rdx, 1)	;\
 	ltrw	%dx
-#elif defined(__DragonFly__)
-/* In DragonFly, PCPU(tss_gdt) points directly to the gdt[] entry for the
- * current CPU's TSS descriptor; while NetBSD's CPUVAR(GDT) points to the
- * gdtstore[] table. */
-#define HOST_RESTORE_TR				\
-	popq	%rax				;\
-	movzwq	%ax,%rdx			;\
-	movq	PCPU(tss_gdt),%rax		;\
-	/* Clear the busy bit for reloading. */	\
-	andq	$~0x0200,4(%rax)		;\
-	ltrw	%dx
-#elif defined(__HAIKU__)
-#define HOST_RESTORE_TR				\
-	popq	%rax				;\
-	movzwq	%ax,%rdx			;\
-	popq	%rax				;\
-	/* Clear the busy bit for reloading. */	\
-	andq	$~0x0200,4(%rax,%rdx, 1)	;\
-	ltrw	%dx
-#endif
 
 #define HOST_SAVE_LDT		\
 	sldtw	%ax		;\
@@ -158,9 +116,9 @@
 /*
  * %rdi = PA of VMCB
  * %rsi = VA of guest GPR state
- * %rdx = VA of GDT entry
+ * %rdx = VA of host GDT
  */
-ENTRY(svm_vmrun)
+ASM_FUNCTION(svm_vmrun)
 	/* Save the Host GPRs. */
 	HOST_SAVE_GPRS
 
@@ -171,7 +129,7 @@ ENTRY(svm_vmrun)
 	HOST_SAVE_MSR(MSR_GSBASE)
 
 	/* Reset DS and ES. */
-	movq	$GSEL(GUDATA_SEL, SEL_UPL),%rax
+	movq	$DS_ES_VALUE,%rax
 	movw	%ax,%ds
 	movw	%ax,%es
 
@@ -218,4 +176,4 @@ ENTRY(svm_vmrun)
 	HOST_RESTORE_GPRS
 
 	retq
-END(svm_vmrun)
+ASM_END(svm_vmrun)

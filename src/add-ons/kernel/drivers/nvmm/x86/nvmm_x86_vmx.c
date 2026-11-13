@@ -778,10 +778,6 @@ static uint64_t vmx_xcr0_mask __read_mostly;
 #define MSRBM_NPAGES	1
 #define MSRBM_SIZE	(MSRBM_NPAGES * PAGE_SIZE)
 
-/* Guest/host CR0 mask: bits owned by the host */
-#define CR0_STATIC_MASK \
-	(CR0_ET | CR0_NW | CR0_CD)
-
 /*
  * Guest real CR0 bits that must be handled specially:
  * - CR0_ET: hardwired to 1 in modern CPUs; must always be 1
@@ -793,32 +789,9 @@ static uint64_t vmx_xcr0_mask __read_mostly;
 #define CR0_FORCE_ONE \
 	(CR0_ET | CR0_NE)
 
-#define CR4_VALID \
-	(CR4_VME |			\
-	 CR4_PVI |			\
-	 CR4_TSD |			\
-	 CR4_DE |			\
-	 CR4_PSE |			\
-	 CR4_PAE |			\
-	 CR4_MCE |			\
-	 CR4_PGE |			\
-	 CR4_PCE |			\
-	 CR4_OSFXSR |			\
-	 CR4_OSXMMEXCPT |		\
-	 CR4_UMIP |			\
-	 /* CR4_LA57 excluded */	\
-	 /* CR4_VMXE excluded */	\
-	 /* CR4_SMXE excluded */	\
-	 CR4_FSGSBASE |			\
-	 CR4_PCIDE |			\
-	 CR4_OSXSAVE |			\
-	 CR4_SMEP |			\
-	 CR4_SMAP			\
-	 /* CR4_PKE excluded */		\
-	 /* CR4_CET excluded */		\
-	 /* CR4_PKS excluded */)
-#define CR4_INVALID \
-	(0xFFFFFFFFFFFFFFFFULL & ~CR4_VALID)
+/* Guest/host CR0 mask: bits owned by the host */
+#define CR0_STATIC_MASK \
+	(CR0_FORCE_ZERO | CR0_FORCE_ONE)
 
 #define EFER_TLB_FLUSH \
 	(EFER_NXE|EFER_LMA|EFER_LME)
@@ -881,6 +854,11 @@ struct vmx_cpudata {
 	uint64_t gtsc_offset;
 	uint64_t gtsc_last;
 	struct nvmm_x86_xsave gxsave __aligned(64);
+
+	/* Limits. */
+	uint64_t cr4_valid;
+	uint64_t efer_valid;
+	uint64_t xcr0_valid;
 
 	/* VCPU configuration. */
 	bool cpuidpresent[VMX_NCPUIDS];
@@ -1140,7 +1118,7 @@ vmx_vcpu_inject(struct nvmm_cpu *vcpu)
 {
 	struct nvmm_comm_page *comm = vcpu->comm;
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
-	int type = 0, err = 0, ret = EINVAL;
+	int type = 0, has_error = 0, ret = EINVAL;
 	uint64_t rflags, info, error;
 	u_int evtype;
 	uint8_t vector;
@@ -1154,16 +1132,20 @@ vmx_vcpu_inject(struct nvmm_cpu *vcpu)
 
 	switch (evtype) {
 	case NVMM_VCPU_EVENT_EXCP:
-		if (vector == 2 || vector >= 32)
+		if (vector == 2 || vector == 3 || vector == 4) {
 			goto out;
-		if (vector == 3 || vector == 0)
+		}
+		if (vector >= 32) {
 			goto out;
+		}
 		if (vmx_excp_has_rf(vector)) {
 			rflags = vmx_vmread(VMCS_GUEST_RFLAGS);
 			vmx_vmwrite(VMCS_GUEST_RFLAGS, rflags | PSL_RF);
 		}
 		type = INTR_TYPE_HW_EXC;
-		err = vmx_excp_has_error(vector);
+		if ((vmx_vmread(VMCS_GUEST_CR0) & CR0_PE) != 0) {
+			has_error = vmx_excp_has_error(vector);
+		}
 		break;
 	case NVMM_VCPU_EVENT_INTR:
 		type = INTR_TYPE_EXT_INT;
@@ -1171,7 +1153,6 @@ vmx_vcpu_inject(struct nvmm_cpu *vcpu)
 			type = INTR_TYPE_NMI;
 			vmx_event_waitexit_enable(vcpu, true);
 		}
-		err = 0;
 		break;
 	default:
 		goto out;
@@ -1180,10 +1161,12 @@ vmx_vcpu_inject(struct nvmm_cpu *vcpu)
 	info =
 	    __SHIFTIN((uint64_t)vector, INTR_INFO_VECTOR) |
 	    __SHIFTIN((uint64_t)type, INTR_INFO_TYPE) |
-	    __SHIFTIN((uint64_t)err, INTR_INFO_ERROR) |
+	    __SHIFTIN((uint64_t)has_error, INTR_INFO_ERROR) |
 	    __SHIFTIN((uint64_t)1, INTR_INFO_VALID);
 	vmx_vmwrite(VMCS_ENTRY_INTR_INFO, info);
-	vmx_vmwrite(VMCS_ENTRY_EXCEPTION_ERROR, error);
+	if (has_error) {
+		vmx_vmwrite(VMCS_ENTRY_EXCEPTION_ERROR, error);
+	}
 
 	cpudata->evt_pending = true;
 	ret = 0;
@@ -1306,26 +1289,9 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     uint32_t eax, uint32_t ecx)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
-	unsigned int ncpus;
+	unsigned int nvcpus;
 	uint32_t clevel;
 	uint64_t cr4;
-
-	if (eax < 0x40000000) {
-		if (__predict_false(eax > vmx_cpuid_max_basic)) {
-			eax = vmx_cpuid_max_basic;
-			vmx_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	} else if (eax < 0x80000000) {
-		if (__predict_false(eax > VMX_CPUID_MAX_HYPERVISOR)) {
-			eax = vmx_cpuid_max_basic;
-			vmx_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	} else {
-		if (__predict_false(eax > vmx_cpuid_max_extended)) {
-			eax = vmx_cpuid_max_basic;
-			vmx_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	}
 
 	switch (eax) {
 	case 0x00000000:
@@ -1338,9 +1304,9 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(vcpu->cpuid,
 		    CPUID_0_01_EBX_LOCAL_APIC_ID);
 
-		ncpus = os_atomic_load_uint(&mach->ncpus);
+		nvcpus = os_atomic_load_uint(&mach->ncpus);
 		cpudata->gprs[NVMM_X64_GPR_RBX] &= ~CPUID_0_01_EBX_HTT_CORES;
-		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(ncpus,
+		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(nvcpus,
 		    CPUID_0_01_EBX_HTT_CORES);
 
 		cpudata->gprs[NVMM_X64_GPR_RCX] &= nvmm_cpuid_00000001.ecx;
@@ -1366,7 +1332,7 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
 		break;
 	case 0x00000004: /* Deterministic Cache Parameters */
-		ncpus = os_atomic_load_uint(&mach->ncpus);
+		nvcpus = os_atomic_load_uint(&mach->ncpus);
 		clevel = __SHIFTOUT(cpudata->gprs[NVMM_X64_GPR_RAX],
 		    CPUID_0_04_EAX_CACHELEVEL);
 
@@ -1374,7 +1340,7 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		if (clevel >= 3) {
 			/* L3 and above: all CPUs. */
 			cpudata->gprs[NVMM_X64_GPR_RAX] |=
-			    __SHIFTIN(ncpus - 1, CPUID_0_04_EAX_SHARING);
+			    __SHIFTIN(nvcpus - 1, CPUID_0_04_EAX_SHARING);
 		} else {
 			/* L2 and below: one LP per CPU. */
 			cpudata->gprs[NVMM_X64_GPR_RAX] |=
@@ -1383,7 +1349,7 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 
 		cpudata->gprs[NVMM_X64_GPR_RAX] &= ~CPUID_0_04_EAX_CORE_P_PKG;
 		cpudata->gprs[NVMM_X64_GPR_RAX] |=
-		    __SHIFTIN(ncpus - 1, CPUID_0_04_EAX_CORE_P_PKG);
+		    __SHIFTIN(nvcpus - 1, CPUID_0_04_EAX_CORE_P_PKG);
 		break;
 	case 0x00000005: /* MONITOR/MWAIT */
 	case 0x00000006: /* Thermal and Power Management */
@@ -1438,9 +1404,9 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 			cpudata->gprs[NVMM_X64_GPR_RDX] = vcpu->cpuid;
 			break;
 		case 1: /* Cores */
-			ncpus = os_atomic_load_uint(&mach->ncpus);
-			cpudata->gprs[NVMM_X64_GPR_RAX] = ilog2(ncpus);
-			cpudata->gprs[NVMM_X64_GPR_RBX] = ncpus;
+			nvcpus = os_atomic_load_uint(&mach->ncpus);
+			cpudata->gprs[NVMM_X64_GPR_RAX] = ilog2(nvcpus);
+			cpudata->gprs[NVMM_X64_GPR_RBX] = nvcpus;
 			cpudata->gprs[NVMM_X64_GPR_RCX] =
 			    __SHIFTIN(ecx, CPUID_0_0B_ECX_LVLNUM) |
 			    __SHIFTIN(CPUID_0_0B_ECX_LVLTYPE_CORE, CPUID_0_0B_ECX_LVLTYPE);
@@ -1461,18 +1427,18 @@ vmx_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
 		break;
 	case 0x0000000D: /* Processor Extended State Enumeration */
-		if (vmx_xcr0_mask == 0) {
+		if (cpudata->xcr0_valid == 0) {
 			break;
 		}
 		switch (ecx) {
 		case 0:
 			/* Supported XCR0 bits. */
-			cpudata->gprs[NVMM_X64_GPR_RAX] = vmx_xcr0_mask & 0xFFFFFFFF;
-			cpudata->gprs[NVMM_X64_GPR_RDX] = vmx_xcr0_mask >> 32;
+			cpudata->gprs[NVMM_X64_GPR_RAX] = cpudata->xcr0_valid & 0xFFFFFFFF;
+			cpudata->gprs[NVMM_X64_GPR_RDX] = cpudata->xcr0_valid >> 32;
 			/* XSAVE size for currently enabled XCR0 features. */
 			cpudata->gprs[NVMM_X64_GPR_RBX] = nvmm_x86_xsave_size(cpudata->gxcr0);
 			/* XSAVE size for all supported XCR0 features. */
-			cpudata->gprs[NVMM_X64_GPR_RCX] = nvmm_x86_xsave_size(vmx_xcr0_mask);
+			cpudata->gprs[NVMM_X64_GPR_RCX] = nvmm_x86_xsave_size(cpudata->xcr0_valid);
 			break;
 		case 1:
 			cpudata->gprs[NVMM_X64_GPR_RAX] &=
@@ -1565,6 +1531,25 @@ vmx_exit_insn(struct nvmm_vcpu_exit *exit, uint64_t reason)
 	exit->reason = reason;
 }
 
+static struct nvmm_vcpu_conf_cpuid *
+vmx_find_cpuid_conf(struct vmx_cpudata *cpudata, uint32_t eax)
+{
+	struct nvmm_vcpu_conf_cpuid *cpuid;
+	size_t i;
+
+	for (i = 0; i < VMX_NCPUIDS; i++) {
+		if (!cpudata->cpuidpresent[i]) {
+			continue;
+		}
+		cpuid = &cpudata->cpuid[i];
+		if (cpuid->leaf == eax) {
+			return cpuid;
+		}
+	}
+
+	return NULL;
+}
+
 static void
 vmx_exit_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     struct nvmm_vcpu_exit *exit)
@@ -1572,28 +1557,34 @@ vmx_exit_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
 	struct nvmm_vcpu_conf_cpuid *cpuid;
 	uint32_t eax, ecx;
-	size_t i;
 
 	eax = (cpudata->gprs[NVMM_X64_GPR_RAX] & 0xFFFFFFFF);
 	ecx = (cpudata->gprs[NVMM_X64_GPR_RCX] & 0xFFFFFFFF);
+
+	cpuid = vmx_find_cpuid_conf(cpudata, eax);
+	if (__predict_false(cpuid != NULL && cpuid->exit)) {
+		vmx_exit_insn(exit, NVMM_VCPU_EXIT_CPUID);
+		return;
+	}
+
+	if (eax < 0x40000000) {
+		if (__predict_false(eax > vmx_cpuid_max_basic)) {
+			eax = vmx_cpuid_max_basic;
+		}
+	} else if (eax < 0x80000000) {
+		if (__predict_false(eax > VMX_CPUID_MAX_HYPERVISOR)) {
+			eax = vmx_cpuid_max_basic;
+		}
+	} else {
+		if (__predict_false(eax > vmx_cpuid_max_extended)) {
+			eax = vmx_cpuid_max_basic;
+		}
+	}
+
 	vmx_inkernel_exec_cpuid(cpudata, eax, ecx);
 	vmx_inkernel_handle_cpuid(mach, vcpu, eax, ecx);
 
-	for (i = 0; i < VMX_NCPUIDS; i++) {
-		if (!cpudata->cpuidpresent[i]) {
-			continue;
-		}
-		cpuid = &cpudata->cpuid[i];
-		if (cpuid->leaf != eax) {
-			continue;
-		}
-
-		if (cpuid->exit) {
-			vmx_exit_insn(exit, NVMM_VCPU_EXIT_CPUID);
-			return;
-		}
-		OS_ASSERT(cpuid->mask);
-
+	if (__predict_false(cpuid != NULL)) {
 		/* del */
 		cpudata->gprs[NVMM_X64_GPR_RAX] &= ~cpuid->u.mask.del.eax;
 		cpudata->gprs[NVMM_X64_GPR_RBX] &= ~cpuid->u.mask.del.ebx;
@@ -1605,8 +1596,6 @@ vmx_exit_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RBX] |= cpuid->u.mask.set.ebx;
 		cpudata->gprs[NVMM_X64_GPR_RCX] |= cpuid->u.mask.set.ecx;
 		cpudata->gprs[NVMM_X64_GPR_RDX] |= cpuid->u.mask.set.edx;
-
-		break;
 	}
 
 	vmx_inkernel_advance();
@@ -1735,7 +1724,7 @@ vmx_inkernel_handle_cr4(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		gpr = cpudata->gprs[gpr];
 	}
 
-	if (gpr & CR4_INVALID) {
+	if ((gpr & ~cpudata->cr4_valid) != 0) {
 		return -1;
 	}
 	cr4 = gpr | CR4_VMXE;
@@ -1758,7 +1747,7 @@ vmx_inkernel_handle_cr8(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     uint64_t qual, struct nvmm_vcpu_exit *exit)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
-	uint64_t type, gpr;
+	uint64_t type, gpr, newval;
 	bool write;
 
 	type = __SHIFTOUT(qual, VMX_QUAL_CR_TYPE);
@@ -1775,13 +1764,14 @@ vmx_inkernel_handle_cr8(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 
 	if (write) {
 		if (gpr == NVMM_X64_GPR_RSP) {
-			cpudata->gcr8 = vmx_vmread(VMCS_GUEST_RSP);
+			newval = vmx_vmread(VMCS_GUEST_RSP);
 		} else {
-			cpudata->gcr8 = cpudata->gprs[gpr];
+			newval = cpudata->gprs[gpr];
 		}
-		if (cpudata->tpr.exit_changed) {
+		if (cpudata->tpr.exit_changed && (newval < cpudata->gcr8)) {
 			exit->reason = NVMM_VCPU_EXIT_TPR_CHANGED;
 		}
+		cpudata->gcr8 = newval;
 	} else {
 		if (gpr == NVMM_X64_GPR_RSP) {
 			vmx_vmwrite(VMCS_GUEST_RSP, cpudata->gcr8);
@@ -2035,16 +2025,18 @@ vmx_exit_xsetbv(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     struct nvmm_vcpu_exit *exit)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
+	uint32_t ecx;
 	uint64_t val;
 
 	exit->reason = NVMM_VCPU_EXIT_NONE;
 
+	ecx = cpudata->gprs[NVMM_X64_GPR_RCX] & 0xFFFFFFFF;
 	val = (cpudata->gprs[NVMM_X64_GPR_RDX] << 32) |
 	    (cpudata->gprs[NVMM_X64_GPR_RAX] & 0xFFFFFFFF);
 
-	if (__predict_false(cpudata->gprs[NVMM_X64_GPR_RCX] != 0)) {
+	if (__predict_false(ecx != 0)) {
 		goto error;
-	} else if (__predict_false((val & ~vmx_xcr0_mask) != 0)) {
+	} else if (__predict_false((val & ~cpudata->xcr0_valid) != 0)) {
 		goto error;
 	} else if (__predict_false((val & XCR0_X87) == 0)) {
 		goto error;
@@ -2095,18 +2087,10 @@ vmx_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_save_fpu();
-#elif defined(__DragonFly__)
-	/*
-	 * NOTE: Host FPU state depends on whether the user program used the
-	 *       FPU or not.  Need to use npxpush()/npxpop() to handle this.
-	 */
-	npxpush(&cpudata->hstate.hmctx);
-#endif
 
-	x86_restore_fpu(&cpudata->gxsave, vmx_xcr0_mask);
-	if (vmx_xcr0_mask != 0) {
+	x86_restore_fpu(&cpudata->gxsave, cpudata->xcr0_valid);
+	if (cpudata->xcr0_valid != 0) {
 		x86_set_xcr(0, cpudata->gxcr0);
 	}
 }
@@ -2116,16 +2100,12 @@ vmx_vcpu_guest_fpu_leave(struct nvmm_cpu *vcpu)
 {
 	struct vmx_cpudata *cpudata = vcpu->cpudata;
 
-	if (vmx_xcr0_mask != 0) {
+	if (cpudata->xcr0_valid != 0) {
 		x86_set_xcr(0, vmx_global_hstate.xcr0);
 	}
-	x86_save_fpu(&cpudata->gxsave, vmx_xcr0_mask);
+	x86_save_fpu(&cpudata->gxsave, cpudata->xcr0_valid);
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_restore_fpu();
-#elif defined(__DragonFly__)
-	npxpop(&cpudata->hstate.hmctx);
-#endif
 }
 
 static void
@@ -2231,12 +2211,7 @@ vmx_htlb_flush(struct nvmm_machine *mach, struct vmx_cpudata *cpudata)
 	struct ept_desc ept_desc;
 	uint64_t machgen;
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	machgen = machdata->mach_htlb_gen;
-#elif defined(__DragonFly__)
-	clear_xinvltlb();
-	machgen = vmspace_pmap(mach->vm)->pm_invgen;
-#endif
 	if (__predict_true(machgen == cpudata->vcpu_htlb_gen)) {
 		return machgen;
 	}
@@ -2260,7 +2235,7 @@ vmx_htlb_flush_ack(struct vmx_cpudata *cpudata, uint64_t machgen)
 static inline void
 vmx_exit_evt(struct vmx_cpudata *cpudata)
 {
-	uint64_t info, err, inslen;
+	uint64_t info, err;
 
 	cpudata->evt_pending = false;
 
@@ -2268,18 +2243,25 @@ vmx_exit_evt(struct vmx_cpudata *cpudata)
 	if (__predict_true((info & INTR_INFO_VALID) == 0)) {
 		return;
 	}
-	err = vmx_vmread(VMCS_IDT_VECTORING_ERROR);
 
-	vmx_vmwrite(VMCS_ENTRY_INTR_INFO, info);
-	vmx_vmwrite(VMCS_ENTRY_EXCEPTION_ERROR, err);
-
+	/*
+	 * Software events originate from an instruction executed by the guest.
+	 * Don't reinject them, rather let the guest re-execute the instruction
+	 * on the next entry.
+	 */
 	switch (__SHIFTOUT(info, INTR_INFO_TYPE)) {
 	case INTR_TYPE_SW_INT:
 	case INTR_TYPE_PRIV_SW_EXC:
 	case INTR_TYPE_SW_EXC:
-		inslen = vmx_vmread(VMCS_EXIT_INSTRUCTION_LENGTH);
-		vmx_vmwrite(VMCS_ENTRY_INSTRUCTION_LENGTH, inslen);
+		return;
 	}
+
+	/*
+	 * Re-inject the event.
+	 */
+	err = vmx_vmread(VMCS_IDT_VECTORING_ERROR);
+	vmx_vmwrite(VMCS_ENTRY_INTR_INFO, info);
+	vmx_vmwrite(VMCS_ENTRY_EXCEPTION_ERROR, err);
 
 	cpudata->evt_pending = true;
 }
@@ -2302,12 +2284,10 @@ vmx_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	vmx_vcpu_state_commit(vcpu);
 	comm->state_cached = 0;
 
-#ifndef __DragonFly__
 	if (__predict_false(vmx_vcpu_event_commit(vcpu) != 0)) {
 		vmx_vmcs_leave(vcpu);
 		return EINVAL;
 	}
-#endif
 
 	hcpu = os_curcpu_number();
 	launched = cpudata->vmcs_launched;
@@ -2322,15 +2302,6 @@ vmx_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		vmx_vmwrite(VMCS_HOST_GS_BASE, rdmsr(MSR_GSBASE));
 		cpudata->gtsc_want_update = true;
 		vcpu->hcpu_last = hcpu;
-
-#ifdef __DragonFly__
-		/*
-		 * XXX: We aren't tracking overloaded CPUs (multiple vCPUs
-		 *      scheduled on the same physical CPU) yet so there are
-		 *      currently no calls to pmap_del_cpu().
-		 */
-		pmap_add_cpu(mach->vm, hcpu);
-#endif
 	}
 
 	vmx_vcpu_guest_dbregs_enter(vcpu);
@@ -2352,43 +2323,6 @@ vmx_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		vmx_cli();
 		vmx_vcpu_guest_fpu_enter(vcpu);
 		machgen = vmx_htlb_flush(mach, cpudata);
-
-#ifdef __DragonFly__
-		/*
-		 * Check for pending host events (e.g., interrupt, AST)
-		 * to make the state safe to VM Entry.  This check must
-		 * be done after the cli to avoid gd_reqflags pending
-		 * races.
-		 *
-		 * Emulators may assume that event injection succeeds, but
-		 * we have to return to process these events.  To deal with
-		 * this, use ERESTART mechanics.
-		 */
-		if (__predict_false(mycpu->gd_reqflags & RQF_HVM_MASK)) {
-			/* INVEPT executed, so ack hTLB flush. */
-			vmx_htlb_flush_ack(cpudata, machgen);
-			vmx_vcpu_guest_fpu_leave(vcpu);
-			vmx_sti();
-			exit->reason = NVMM_VCPU_EXIT_NONE;
-			error = ERESTART;
-			break;
-		}
-
-		/*
-		 * Only commit event requests when we are absolutely
-		 * sure that we can issue the vmlaunch/vmresume.
-		 */
-		if (__predict_false(vmx_vcpu_event_commit(vcpu) != 0)) {
-			/* INVEPT executed, so ack hTLB flush. */
-			vmx_htlb_flush_ack(cpudata, machgen);
-			vmx_vcpu_guest_fpu_leave(vcpu);
-			vmx_sti();
-			exit->reason = NVMM_VCPU_EXIT_NONE;
-			error = EINVAL;
-			break;
-		}
-#endif
-
 		x86_set_cr2(cpudata->gcr2);
 		if (launched) {
 			ret = vmx_vmresume(cpudata->gprs);
@@ -2686,14 +2620,15 @@ vmx_vcpu_setstate(struct nvmm_cpu *vcpu)
 
 		/* CR4_VMXE is mandatory. */
 		vmx_vmwrite(VMCS_GUEST_CR4,
-		    (state->crs[NVMM_X64_CR_CR4] & CR4_VALID) | CR4_VMXE);
+		    (state->crs[NVMM_X64_CR_CR4] & cpudata->cr4_valid) |
+		    CR4_VMXE);
 
 		cpudata->gcr8 = state->crs[NVMM_X64_CR_CR8];
 
-		if (vmx_xcr0_mask != 0) {
+		if (cpudata->xcr0_valid != 0) {
 			/* Clear illegal XCR0 bits, set mandatory X87 bit. */
 			cpudata->gxcr0 = state->crs[NVMM_X64_CR_XCR0];
-			cpudata->gxcr0 &= vmx_xcr0_mask;
+			cpudata->gxcr0 &= cpudata->xcr0_valid;
 			cpudata->gxcr0 |= XCR0_X87;
 		}
 	}
@@ -2719,7 +2654,7 @@ vmx_vcpu_setstate(struct nvmm_cpu *vcpu)
 		    state->msrs[NVMM_X64_MSR_KERNELGSBASE];
 
 		vmx_vmwrite(VMCS_GUEST_IA32_EFER,
-		    state->msrs[NVMM_X64_MSR_EFER]);
+		    state->msrs[NVMM_X64_MSR_EFER] & cpudata->efer_valid);
 		vmx_vmwrite(VMCS_GUEST_IA32_PAT,
 		    state->msrs[NVMM_X64_MSR_PAT]);
 		vmx_vmwrite(VMCS_GUEST_IA32_SYSENTER_CS,
@@ -2782,9 +2717,9 @@ vmx_vcpu_setstate(struct nvmm_cpu *vcpu)
 		fpustate->fx_mxcsr_mask &= x86_fpu_mxcsr_mask;
 		fpustate->fx_mxcsr &= fpustate->fx_mxcsr_mask;
 
-		if (vmx_xcr0_mask != 0) {
+		if (cpudata->xcr0_valid != 0) {
 			/* Reset XSTATE_BV, to force a reload. */
-			cpudata->gxsave.xstate_bv = vmx_xcr0_mask;
+			cpudata->gxsave.xstate_bv = cpudata->xcr0_valid;
 		}
 	}
 
@@ -2967,6 +2902,48 @@ vmx_vcpu_init(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	struct msr_entry *gmsr = cpudata->gmsr;
 	uint64_t rev, eptp;
 
+	cpudata->cr4_valid =
+	    CR4_VME |
+	    CR4_PVI |
+	    CR4_TSD |
+	    CR4_DE |
+	    CR4_PSE |
+	    CR4_PAE |
+	    CR4_MCE |
+	    CR4_PGE |
+	    CR4_PCE |
+	    CR4_OSFXSR |
+	    CR4_OSXMMEXCPT |
+	    CR4_UMIP |
+	    /* CR4_LA57 excluded */
+	    /* CR4_VMXE excluded */
+	    /* CR4_SMXE excluded */
+	    CR4_FSGSBASE |
+	    CR4_PCIDE |
+	    CR4_OSXSAVE |
+	    CR4_SMEP |
+	    CR4_SMAP
+	    /* CR4_PKE excluded */
+	    /* CR4_CET excluded */
+	    /* CR4_PKS excluded */;
+
+	cpudata->efer_valid =
+	    EFER_SCE |
+	    EFER_LME |
+	    EFER_LMA |
+	    EFER_NXE
+	    /* EFER_SVME excluded */
+	    /* EFER_LMSLE excluded */
+	    /* EFER_FFXSR excluded */
+	    /* EFER_TCE excluded */
+	    /* EFER_MCOMMIT excluded */
+	    /* EFER_INTWB excluded */
+	    /* EFER_UAIE excluded */
+	    /* EFER_AIBRSE excluded */
+	    /* EFER_ETLBI excluded */;
+
+	cpudata->xcr0_valid = vmx_xcr0_mask;
+
 	rev = vmx_get_revision();
 
 	memset(vmcs, 0, VMCS_SIZE);
@@ -3026,7 +3003,7 @@ vmx_vcpu_init(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	vmx_vmwrite(VMCS_CR0_MASK, CR0_STATIC_MASK);
 
 	/* Force unsupported CR4 fields to zero. */
-	vmx_vmwrite(VMCS_CR4_MASK, CR4_INVALID);
+	vmx_vmwrite(VMCS_CR4_MASK, ~cpudata->cr4_valid);
 	vmx_vmwrite(VMCS_CR4_SHADOW, 0);
 
 	/* Set the Host state for resuming. */
@@ -3063,7 +3040,7 @@ vmx_vcpu_init(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	    (IA32_MISC_BTS_UNAVAIL|IA32_MISC_PEBS_UNAVAIL);
 
 	/* Init XSAVE header. */
-	cpudata->gxsave.xstate_bv = vmx_xcr0_mask;
+	cpudata->gxsave.xstate_bv = cpudata->xcr0_valid;
 	cpudata->gxsave.xcomp_bv = 0;
 
 	/* Install the RESET state. */
@@ -3589,13 +3566,13 @@ vmx_init(void)
 	cpuid_desc_t descs;
 	os_cpu_t *cpu;
 	uint64_t msr;
-	size_t ncpus;
+	size_t max_cpus;
 	paddr_t pa;
 	vaddr_t va;
 	int error;
 
-	ncpus = OS_MAXCPUS;
-	vmxoncpu = os_mem_zalloc(ncpus * sizeof(struct vmxoncpu));
+	max_cpus = OS_MAXCPUS;
+	vmxoncpu = os_mem_zalloc(max_cpus * sizeof(struct vmxoncpu));
 
 	/* Init the ASID bitmap (VPID). */
 	vmx_init_asid(VPID_MAX);
@@ -3672,17 +3649,17 @@ vmx_fini_asid(void)
 static void
 vmx_fini(void)
 {
-	size_t i, ncpus;
+	size_t i, max_cpus;
 
 	os_ipi_broadcast(vmx_change_cpu, (void *)false);
 
-	ncpus = OS_MAXCPUS;
-	for (i = 0; i < ncpus; i++) {
+	max_cpus = OS_MAXCPUS;
+	for (i = 0; i < max_cpus; i++) {
 		if (vmxoncpu[i].pa != 0)
 			os_contigpa_free(vmxoncpu[i].pa, vmxoncpu[i].va, 1);
 	}
 
-	os_mem_free(vmxoncpu, ncpus * sizeof(struct vmxoncpu));
+	os_mem_free(vmxoncpu, max_cpus * sizeof(struct vmxoncpu));
 
 	vmx_fini_asid();
 }

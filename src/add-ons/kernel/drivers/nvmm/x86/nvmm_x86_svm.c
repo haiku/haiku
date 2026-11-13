@@ -30,11 +30,7 @@
 #include "../nvmm_internal.h"
 #include "nvmm_x86_internal.h"
 
-#ifdef __HAIKU__
-void svm_vmrun(paddr_t, uint64_t *, uint64_t *);
-#else
-void svm_vmrun(paddr_t, uint64_t *);
-#endif
+void svm_vmrun(paddr_t, uint64_t *, void *);
 
 static inline void
 svm_clgi(void)
@@ -55,6 +51,7 @@ svm_stgi(void)
 
 #define MSR_CMPHALT		0xC0010055
 #define MSR_VM_HSAVE_PA		0xC0010117
+#define MSR_LS_CFG		0xC0011020
 #define MSR_IC_CFG		0xC0011021
 #define MSR_DE_CFG		0xC0011029
 
@@ -550,7 +547,6 @@ struct svm_cpudata {
 	/* General. */
 	bool shared_asid;
 	bool gtlb_want_flush;
-	bool htlb_want_flush;
 	bool gtsc_want_update;
 	uint64_t vcpu_htlb_gen;
 
@@ -588,6 +584,7 @@ struct svm_cpudata {
 	/* Limits. */
 	uint64_t cr4_valid;
 	uint64_t efer_valid;
+	uint64_t xcr0_valid;
 
 	/* VCPU configuration. */
 	bool cpuidpresent[SVM_NCPUIDS];
@@ -612,28 +609,6 @@ svm_vmcb_cache_default(struct vmcb *vmcb)
 	    VMCB_CTRL_VMCB_CLEAN_LBR |
 	    VMCB_CTRL_VMCB_CLEAN_AVIC |
 	    VMCB_CTRL_VMCB_CLEAN_CET;
-}
-
-static void
-svm_vmcb_cache_update(struct vmcb *vmcb, uint64_t flags)
-{
-	if (flags & NVMM_X64_STATE_SEGS) {
-		vmcb->ctrl.vmcb_clean &=
-		    ~(VMCB_CTRL_VMCB_CLEAN_SEG | VMCB_CTRL_VMCB_CLEAN_DT);
-	}
-	if (flags & NVMM_X64_STATE_CRS) {
-		vmcb->ctrl.vmcb_clean &=
-		    ~(VMCB_CTRL_VMCB_CLEAN_CR | VMCB_CTRL_VMCB_CLEAN_CR2 |
-		      VMCB_CTRL_VMCB_CLEAN_TPR);
-	}
-	if (flags & NVMM_X64_STATE_DRS) {
-		vmcb->ctrl.vmcb_clean &= ~VMCB_CTRL_VMCB_CLEAN_DR;
-	}
-	if (flags & NVMM_X64_STATE_MSRS) {
-		/* CR for EFER, NP for PAT. */
-		vmcb->ctrl.vmcb_clean &=
-		    ~(VMCB_CTRL_VMCB_CLEAN_CR | VMCB_CTRL_VMCB_CLEAN_NP);
-	}
 }
 
 static inline void
@@ -682,13 +657,40 @@ svm_event_waitexit_disable(struct nvmm_cpu *vcpu, bool nmi)
 		vmcb->ctrl.intercept_misc1 &= ~VMCB_CTRL_INTERCEPT_IRET;
 		cpudata->nmi_window_exit = false;
 	} else {
-		vmcb->ctrl.intercept_misc1 &= ~VMCB_CTRL_INTERCEPT_VINTR;
+		if (!cpudata->tpr.exit_changed) {
+			vmcb->ctrl.intercept_misc1 &= ~VMCB_CTRL_INTERCEPT_VINTR;
+		}
 		vmcb->ctrl.v &= ~(VMCB_CTRL_V_IRQ | VMCB_CTRL_V_IGN_TPR);
 		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_TPR);
 		cpudata->int_window_exit = false;
 	}
 
 	svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_I);
+}
+
+static inline void
+svm_tprtrap_arm(struct svm_cpudata *cpudata)
+{
+	struct vmcb *vmcb = cpudata->vmcb;
+	uint64_t tpr, v;
+
+	if (!cpudata->tpr.exit_changed || cpudata->int_window_exit) {
+		return;
+	}
+
+	/*
+	 * Set V_INTR_PRIO = V_TPR, so that we get a VINTR VMEXIT if the guest
+	 * lowers its TPR.
+	 */
+
+	tpr = __SHIFTOUT(vmcb->ctrl.v, VMCB_CTRL_V_TPR);
+	v = vmcb->ctrl.v;
+	v &= ~(VMCB_CTRL_V_IGN_TPR | VMCB_CTRL_V_INTR_PRIO);
+	v |= VMCB_CTRL_V_IRQ | __SHIFTIN(tpr, VMCB_CTRL_V_INTR_PRIO);
+	if (vmcb->ctrl.v != v) {
+		vmcb->ctrl.v = v;
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_TPR);
+	}
 }
 
 static inline bool
@@ -733,7 +735,7 @@ svm_vcpu_inject(struct nvmm_cpu *vcpu)
 	u_int evtype;
 	uint8_t vector;
 	uint64_t error;
-	int type = 0, err = 0;
+	int type = 0, has_error = 0;
 
 	evtype = comm->event.type;
 	vector = comm->event.vector;
@@ -743,14 +745,18 @@ svm_vcpu_inject(struct nvmm_cpu *vcpu)
 	switch (evtype) {
 	case NVMM_VCPU_EVENT_EXCP:
 		type = SVM_EVENT_TYPE_EXC;
-		if (vector == 2 || vector >= 32)
+		if (vector == 2 || vector == 3 || vector == 4) {
 			return EINVAL;
-		if (vector == 3 || vector == 0)
+		}
+		if (vector >= 32) {
 			return EINVAL;
+		}
 		if (svm_excp_has_rf(vector)) {
 			vmcb->state.rflags |= PSL_RF;
 		}
-		err = svm_excp_has_error(vector);
+		if ((vmcb->state.cr0 & CR0_PE) != 0) {
+			has_error = svm_excp_has_error(vector);
+		}
 		break;
 	case NVMM_VCPU_EVENT_INTR:
 		type = SVM_EVENT_TYPE_HW_INT;
@@ -758,7 +764,6 @@ svm_vcpu_inject(struct nvmm_cpu *vcpu)
 			type = SVM_EVENT_TYPE_NMI;
 			svm_event_waitexit_enable(vcpu, true);
 		}
-		err = 0;
 		break;
 	default:
 		return EINVAL;
@@ -767,7 +772,7 @@ svm_vcpu_inject(struct nvmm_cpu *vcpu)
 	vmcb->ctrl.eventinj =
 	    __SHIFTIN((uint64_t)vector, VMCB_CTRL_EVENTINJ_VECTOR) |
 	    __SHIFTIN((uint64_t)type, VMCB_CTRL_EVENTINJ_TYPE) |
-	    __SHIFTIN((uint64_t)err, VMCB_CTRL_EVENTINJ_EV) |
+	    __SHIFTIN((uint64_t)has_error, VMCB_CTRL_EVENTINJ_EV) |
 	    __SHIFTIN((uint64_t)1, VMCB_CTRL_EVENTINJ_V) |
 	    __SHIFTIN((uint64_t)error, VMCB_CTRL_EVENTINJ_ERRORCODE);
 
@@ -850,25 +855,9 @@ svm_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     uint32_t eax, uint32_t ecx)
 {
 	struct svm_cpudata *cpudata = vcpu->cpudata;
-	unsigned int ncpus;
+	unsigned int nvcpus;
+	uint32_t clevel;
 	uint64_t cr4;
-
-	if (eax < 0x40000000) {
-		if (__predict_false(eax > svm_cpuid_max_basic)) {
-			eax = svm_cpuid_max_basic;
-			svm_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	} else if (eax < 0x80000000) {
-		if (__predict_false(eax > SVM_CPUID_MAX_HYPERVISOR)) {
-			eax = svm_cpuid_max_basic;
-			svm_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	} else {
-		if (__predict_false(eax > svm_cpuid_max_extended)) {
-			eax = svm_cpuid_max_basic;
-			svm_inkernel_exec_cpuid(cpudata, eax, ecx);
-		}
-	}
 
 	switch (eax) {
 	case 0x00000000:
@@ -881,9 +870,9 @@ svm_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(vcpu->cpuid,
 		    CPUID_0_01_EBX_LOCAL_APIC_ID);
 
-		ncpus = os_atomic_load_uint(&mach->ncpus);
+		nvcpus = os_atomic_load_uint(&mach->ncpus);
 		cpudata->gprs[NVMM_X64_GPR_RBX] &= ~CPUID_0_01_EBX_HTT_CORES;
-		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(ncpus,
+		cpudata->gprs[NVMM_X64_GPR_RBX] |= __SHIFTIN(nvcpus,
 		    CPUID_0_01_EBX_HTT_CORES);
 
 		cpudata->gprs[NVMM_X64_GPR_RCX] &= nvmm_cpuid_00000001.ecx;
@@ -934,20 +923,20 @@ svm_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
 		break;
 	case 0x0000000D: /* Processor Extended State Enumeration */
-		if (svm_xcr0_mask == 0) {
+		if (cpudata->xcr0_valid == 0) {
 			break;
 		}
 		switch (ecx) {
 		case 0:
 			/* Supported XCR0 bits. */
-			cpudata->vmcb->state.rax = svm_xcr0_mask & 0xFFFFFFFF;
-			cpudata->gprs[NVMM_X64_GPR_RDX] = svm_xcr0_mask >> 32;
+			cpudata->vmcb->state.rax = cpudata->xcr0_valid & 0xFFFFFFFF;
+			cpudata->gprs[NVMM_X64_GPR_RDX] = cpudata->xcr0_valid >> 32;
 			/* XSAVE size for currently enabled XCR0 features. */
 			cpudata->gprs[NVMM_X64_GPR_RBX] =
 			    nvmm_x86_xsave_size(cpudata->gxcr0);
 			/* XSAVE size for all supported XCR0 features. */
 			cpudata->gprs[NVMM_X64_GPR_RCX] =
-			    nvmm_x86_xsave_size(svm_xcr0_mask);
+			    nvmm_x86_xsave_size(cpudata->xcr0_valid);
 			break;
 		case 1:
 			cpudata->vmcb->state.rax &=
@@ -998,12 +987,12 @@ svm_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RDX] &= nvmm_cpuid_80000007.edx;
 		break;
 	case 0x80000008: /* Processor Capacity Parameters and Ext Feat Ident */
-		ncpus = os_atomic_load_uint(&mach->ncpus);
+		nvcpus = os_atomic_load_uint(&mach->ncpus);
 		cpudata->vmcb->state.rax &= nvmm_cpuid_80000008.eax;
 		cpudata->gprs[NVMM_X64_GPR_RBX] &= nvmm_cpuid_80000008.ebx;
 		cpudata->gprs[NVMM_X64_GPR_RBX] |= CPUID_8_08_EBX_EferLmsleUnsupp;
 		cpudata->gprs[NVMM_X64_GPR_RCX] =
-		    __SHIFTIN(ncpus - 1, CPUID_8_08_ECX_NC) |
+		    __SHIFTIN(nvcpus - 1, CPUID_8_08_ECX_NC) |
 		    __SHIFTIN(ilog2(NVMM_MAX_VCPUS), CPUID_8_08_ECX_ApicIdSize);
 		cpudata->gprs[NVMM_X64_GPR_RDX] &= nvmm_cpuid_80000008.edx;
 		break;
@@ -1039,8 +1028,31 @@ svm_inkernel_handle_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
 		break;
 	case 0x8000001D: /* Cache Topology Information */
+		nvcpus = os_atomic_load_uint(&mach->ncpus);
+		clevel = __SHIFTOUT(cpudata->vmcb->state.rax,
+		    CPUID_8_1D_EAX_CacheLevel);
+
+		cpudata->vmcb->state.rax &= ~CPUID_8_1D_EAX_NumSharingCache;
+		if (clevel >= 3) {
+			/* L3 and above: all CPUs. */
+			cpudata->vmcb->state.rax |=
+			    __SHIFTIN(nvcpus - 1, CPUID_8_1D_EAX_NumSharingCache);
+		} else {
+			/* L2 and below: one LP per CPU. */
+			cpudata->vmcb->state.rax |=
+			    __SHIFTIN(0, CPUID_8_1D_EAX_NumSharingCache);
+		}
+		break;
 	case 0x8000001E: /* Processor Topology Information */
-		break; /* TODO? */
+		cpudata->vmcb->state.rax = vcpu->cpuid;
+		cpudata->gprs[NVMM_X64_GPR_RBX] =
+		    __SHIFTIN(vcpu->cpuid, CPUID_8_1E_EBX_ComputeUnitId) |
+		    __SHIFTIN(0, CPUID_8_1E_EBX_ThreadsPerCU);
+		cpudata->gprs[NVMM_X64_GPR_RCX] =
+		    __SHIFTIN(0, CPUID_8_1E_ECX_NodeId) |
+		    __SHIFTIN(0, CPUID_8_1E_ECX_NodesPerProc);
+		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
+		break;
 	case 0x8000001F: /* Encrypted Memory Capabilities */
 		cpudata->vmcb->state.rax = 0;
 		cpudata->gprs[NVMM_X64_GPR_RBX] = 0;
@@ -1097,30 +1109,23 @@ svm_exit_wcr4(struct nvmm_cpu *vcpu, struct nvmm_vcpu_exit *exit)
 	exit->reason = NVMM_VCPU_EXIT_NONE;
 }
 
-static void
-svm_exit_wcr8(struct nvmm_cpu *vcpu, struct nvmm_vcpu_exit *exit)
+static struct nvmm_vcpu_conf_cpuid *
+svm_find_cpuid_conf(struct svm_cpudata *cpudata, uint32_t eax)
 {
-	struct svm_cpudata *cpudata = vcpu->cpudata;
-	struct vmcb *vmcb = cpudata->vmcb;
-	uint64_t info, gpr, newval;
+	struct nvmm_vcpu_conf_cpuid *cpuid;
+	size_t i;
 
-	info = vmcb->ctrl.exitinfo1;
-	gpr = __SHIFTOUT(info, SVM_EXIT_CRDR_GPR);
-	if (gpr == NVMM_X64_GPR_RAX) {
-		newval = vmcb->state.rax;
-	} else if (gpr == NVMM_X64_GPR_RSP) {
-		newval = vmcb->state.rsp;
-	} else {
-		newval = cpudata->gprs[gpr];
+	for (i = 0; i < SVM_NCPUIDS; i++) {
+		if (!cpudata->cpuidpresent[i]) {
+			continue;
+		}
+		cpuid = &cpudata->cpuid[i];
+		if (cpuid->leaf == eax) {
+			return cpuid;
+		}
 	}
 
-	vmcb->ctrl.v &= ~VMCB_CTRL_V_TPR;
-	vmcb->ctrl.v |= __SHIFTIN(newval, VMCB_CTRL_V_TPR);
-
-	svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_TPR);
-
-	svm_inkernel_advance(vmcb);
-	exit->reason = NVMM_VCPU_EXIT_TPR_CHANGED;
+	return NULL;
 }
 
 static void
@@ -1130,28 +1135,43 @@ svm_exit_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 	struct nvmm_vcpu_conf_cpuid *cpuid;
 	uint32_t eax, ecx;
-	size_t i;
+	bool allzero;
 
+	allzero = false;
 	eax = (cpudata->vmcb->state.rax & 0xFFFFFFFF);
 	ecx = (cpudata->gprs[NVMM_X64_GPR_RCX] & 0xFFFFFFFF);
-	svm_inkernel_exec_cpuid(cpudata, eax, ecx);
-	svm_inkernel_handle_cpuid(mach, vcpu, eax, ecx);
 
-	for (i = 0; i < SVM_NCPUIDS; i++) {
-		if (!cpudata->cpuidpresent[i]) {
-			continue;
-		}
-		cpuid = &cpudata->cpuid[i];
-		if (cpuid->leaf != eax) {
-			continue;
-		}
+	cpuid = svm_find_cpuid_conf(cpudata, eax);
+	if (__predict_false(cpuid != NULL && cpuid->exit)) {
+		svm_exit_insn(cpudata->vmcb, exit, NVMM_VCPU_EXIT_CPUID);
+		return;
+	}
 
-		if (cpuid->exit) {
-			svm_exit_insn(cpudata->vmcb, exit, NVMM_VCPU_EXIT_CPUID);
-			return;
+	if (eax < 0x40000000) {
+		if (__predict_false(eax > svm_cpuid_max_basic)) {
+			allzero = true;
 		}
-		OS_ASSERT(cpuid->mask);
+	} else if (eax < 0x80000000) {
+		if (__predict_false(eax > SVM_CPUID_MAX_HYPERVISOR)) {
+			allzero = true;
+		}
+	} else {
+		if (__predict_false(eax > svm_cpuid_max_extended)) {
+			allzero = true;
+		}
+	}
 
+	if (allzero) {
+		cpudata->vmcb->state.rax = 0;
+		cpudata->gprs[NVMM_X64_GPR_RBX] = 0;
+		cpudata->gprs[NVMM_X64_GPR_RCX] = 0;
+		cpudata->gprs[NVMM_X64_GPR_RDX] = 0;
+	} else {
+		svm_inkernel_exec_cpuid(cpudata, eax, ecx);
+		svm_inkernel_handle_cpuid(mach, vcpu, eax, ecx);
+	}
+
+	if (__predict_false(cpuid != NULL)) {
 		/* del */
 		cpudata->vmcb->state.rax &= ~cpuid->u.mask.del.eax;
 		cpudata->gprs[NVMM_X64_GPR_RBX] &= ~cpuid->u.mask.del.ebx;
@@ -1163,8 +1183,6 @@ svm_exit_cpuid(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		cpudata->gprs[NVMM_X64_GPR_RBX] |= cpuid->u.mask.set.ebx;
 		cpudata->gprs[NVMM_X64_GPR_RCX] |= cpuid->u.mask.set.ecx;
 		cpudata->gprs[NVMM_X64_GPR_RDX] |= cpuid->u.mask.set.edx;
-
-		break;
 	}
 
 	svm_inkernel_advance(cpudata->vmcb);
@@ -1244,10 +1262,11 @@ svm_exit_io(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 }
 
 static const uint64_t msr_ignore_list[] = {
+	MSR_UCODE_AMD_PATCHLEVEL,
 	MSR_CMPHALT,
-	MSR_DE_CFG,
+	MSR_LS_CFG,
 	MSR_IC_CFG,
-	MSR_UCODE_AMD_PATCHLEVEL
+	MSR_DE_CFG
 };
 
 static bool
@@ -1409,18 +1428,20 @@ svm_exit_xsetbv(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 {
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 	struct vmcb *vmcb = cpudata->vmcb;
+	uint32_t ecx;
 	uint64_t val;
 
 	exit->reason = NVMM_VCPU_EXIT_NONE;
 
+	ecx = cpudata->gprs[NVMM_X64_GPR_RCX] & 0xFFFFFFFF;
 	val = (cpudata->gprs[NVMM_X64_GPR_RDX] << 32) |
 	    (vmcb->state.rax & 0xFFFFFFFF);
 
-	if (__predict_false(cpudata->gprs[NVMM_X64_GPR_RCX] != 0)) {
+	if (__predict_false(ecx != 0)) {
 		goto error;
 	} else if (__predict_false(vmcb->state.cpl != 0)) {
 		goto error;
-	} else if (__predict_false((val & ~svm_xcr0_mask) != 0)) {
+	} else if (__predict_false((val & ~cpudata->xcr0_valid) != 0)) {
 		goto error;
 	} else if (__predict_false((val & XCR0_X87) == 0)) {
 		goto error;
@@ -1449,18 +1470,10 @@ svm_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_save_fpu();
-#elif defined(__DragonFly__)
-	/*
-	 * NOTE: Host FPU state depends on whether the user program used the
-	 *       FPU or not.  Need to use npxpush()/npxpop() to handle this.
-	 */
-	npxpush(&cpudata->hstate.hmctx);
-#endif
 
-	x86_restore_fpu(&cpudata->gxsave, svm_xcr0_mask);
-	if (svm_xcr0_mask != 0) {
+	x86_restore_fpu(&cpudata->gxsave, cpudata->xcr0_valid);
+	if (cpudata->xcr0_valid != 0) {
 		x86_set_xcr(0, cpudata->gxcr0);
 	}
 }
@@ -1470,16 +1483,12 @@ svm_vcpu_guest_fpu_leave(struct nvmm_cpu *vcpu)
 {
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 
-	if (svm_xcr0_mask != 0) {
+	if (cpudata->xcr0_valid != 0) {
 		x86_set_xcr(0, svm_global_hstate.xcr0);
 	}
-	x86_save_fpu(&cpudata->gxsave, svm_xcr0_mask);
+	x86_save_fpu(&cpudata->gxsave, cpudata->xcr0_valid);
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	x86_curthread_restore_fpu();
-#elif defined(__DragonFly__)
-	npxpop(&cpudata->hstate.hmctx);
-#endif
 }
 
 static void
@@ -1566,17 +1575,11 @@ svm_htlb_flush(struct nvmm_machine *mach, struct svm_cpudata *cpudata)
 	struct vmcb *vmcb = cpudata->vmcb;
 	uint64_t machgen;
 
-#if defined(__NetBSD__) || defined(__HAIKU__)
 	machgen = machdata->mach_htlb_gen;
-#elif defined(__DragonFly__)
-	clear_xinvltlb();
-	machgen = vmspace_pmap(mach->vm)->pm_invgen;
-#endif
 	if (__predict_true(machgen == cpudata->vcpu_htlb_gen)) {
 		return machgen;
 	}
 
-	cpudata->htlb_want_flush = true;
 	vmcb->ctrl.tlb_ctrl = svm_ctrl_tlb_flush;
 	return machgen;
 }
@@ -1588,19 +1591,40 @@ svm_htlb_flush_ack(struct svm_cpudata *cpudata, uint64_t machgen)
 
 	if (__predict_true(vmcb->ctrl.exitcode != VMCB_EXITCODE_INVALID)) {
 		cpudata->vcpu_htlb_gen = machgen;
-		cpudata->htlb_want_flush = false;
 	}
 }
 
 static inline void
 svm_exit_evt(struct svm_cpudata *cpudata, struct vmcb *vmcb)
 {
+	uint64_t exitintinfo = vmcb->ctrl.exitintinfo;
+	uint64_t type, vector;
+
 	cpudata->evt_pending = false;
 
-	if (__predict_false(vmcb->ctrl.exitintinfo & VMCB_CTRL_EXITINTINFO_V)) {
-		vmcb->ctrl.eventinj = vmcb->ctrl.exitintinfo;
-		cpudata->evt_pending = true;
+	if (__predict_true(!(exitintinfo & VMCB_CTRL_EXITINTINFO_V))) {
+		return;
 	}
+
+	type = __SHIFTOUT(exitintinfo, VMCB_CTRL_EXITINTINFO_TYPE);
+	vector = __SHIFTOUT(exitintinfo, VMCB_CTRL_EXITINTINFO_VECTOR);
+
+	/*
+	 * Software events originate from an instruction executed by the guest.
+	 * Don't reinject them, rather let the guest re-execute the instruction
+	 * on the next entry.
+	 */
+	if (type == SVM_EVENT_TYPE_SW_INT ||
+	    (type == SVM_EVENT_TYPE_EXC && (vector == 3 || vector == 4))) {
+		return;
+	}
+
+	/*
+	 * Re-inject the event.
+	 */
+	vmcb->ctrl.eventinj = exitintinfo;
+
+	cpudata->evt_pending = true;
 }
 
 static int
@@ -1611,19 +1635,20 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	struct svm_cpudata *cpudata = vcpu->cpudata;
 	struct vmcb *vmcb = cpudata->vmcb;
 	uint64_t machgen;
+	void *hgdt;
 	int hcpu;
 
 	svm_vcpu_state_commit(vcpu);
 	comm->state_cached = 0;
 
-#ifndef __DragonFly__
 	if (__predict_false(svm_vcpu_event_commit(vcpu) != 0)) {
 		return EINVAL;
 	}
-#endif
 
 	os_preempt_disable();
+
 	hcpu = os_curcpu_number();
+	hgdt = os_curcpu_gdt();
 
 	svm_gtlb_catchup(vcpu, hcpu);
 	svm_htlb_catchup(vcpu, hcpu);
@@ -1631,24 +1656,15 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 	if (vcpu->hcpu_last != hcpu) {
 		svm_vmcb_cache_flush_all(vmcb);
 		cpudata->gtsc_want_update = true;
-
-#ifdef __DragonFly__
-		/*
-		 * XXX: We aren't tracking overloaded CPUs (multiple vCPUs
-		 *      scheduled on the same physical CPU) yet so there are
-		 *      currently no calls to pmap_del_cpu().
-		 */
-		pmap_add_cpu(mach->vm, hcpu);
-#endif
 	}
+
+	svm_tprtrap_arm(cpudata);
 
 	svm_vcpu_guest_dbregs_enter(vcpu);
 	svm_vcpu_guest_misc_enter(vcpu);
 
 	while (1) {
-		if (__predict_false(cpudata->gtlb_want_flush ||
-				    cpudata->htlb_want_flush))
-		{
+		if (cpudata->gtlb_want_flush) {
 			vmcb->ctrl.tlb_ctrl = svm_ctrl_tlb_flush;
 		} else {
 			vmcb->ctrl.tlb_ctrl = 0;
@@ -1662,43 +1678,7 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		svm_clgi();
 		svm_vcpu_guest_fpu_enter(vcpu);
 		machgen = svm_htlb_flush(mach, cpudata);
-
-#ifdef __DragonFly__
-		/*
-		 * Check for pending host events (e.g., interrupt, AST)
-		 * to make the state safe to VM Entry.  This check must
-		 * be done after the clgi to avoid gd_reqflags pending
-		 * races.
-		 *
-		 * Emulators may assume that event injection succeeds, but
-		 * we have to return to process these events.  To deal with
-		 * this, use ERESTART mechanics.
-		 */
-		if (__predict_false(mycpu->gd_reqflags & RQF_HVM_MASK)) {
-			/* No hTLB flush ack, because it's not executed. */
-			svm_vcpu_guest_fpu_leave(vcpu);
-			svm_stgi();
-			exit->reason = NVMM_VCPU_EXIT_NONE;
-			error = ERESTART;
-			break;
-		}
-
-		/*
-		 * Don't try to inject an event until we are absolutely
-		 * sure that the vmrun will be executed, otherwise we
-		 * might overwrite/miss an event.
-		 */
-		if (__predict_false(svm_vcpu_event_commit(vcpu) != 0)) {
-			/* No hTLB flush ack, because it's not executed. */
-			svm_vcpu_guest_fpu_leave(vcpu);
-			svm_stgi();
-			exit->reason = NVMM_VCPU_EXIT_NONE;
-			error = EINVAL;
-			break;
-		}
-#endif
-
-		svm_vmrun(cpudata->vmcb_pa, cpudata->gprs, os_curcpu_gdt());
+		svm_vmrun(cpudata->vmcb_pa, cpudata->gprs, hgdt);
 		svm_htlb_flush_ack(cpudata, machgen);
 		svm_vcpu_guest_fpu_leave(vcpu);
 		svm_stgi();
@@ -1716,16 +1696,18 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		case VMCB_EXITCODE_CR4_WRITE:
 			svm_exit_wcr4(vcpu, exit);
 			break;
-		case VMCB_EXITCODE_CR8_WRITE:
-			svm_exit_wcr8(vcpu, exit);
-			break;
 		case VMCB_EXITCODE_INTR:
 		case VMCB_EXITCODE_NMI:
 			exit->reason = NVMM_VCPU_EXIT_NONE;
 			break;
 		case VMCB_EXITCODE_VINTR:
-			svm_event_waitexit_disable(vcpu, false);
-			exit->reason = NVMM_VCPU_EXIT_INT_READY;
+			if (cpudata->int_window_exit) {
+				svm_event_waitexit_disable(vcpu, false);
+				exit->reason = NVMM_VCPU_EXIT_INT_READY;
+			} else {
+				/* TPR trap: the guest lowered its TPR. */
+				exit->reason = NVMM_VCPU_EXIT_TPR_CHANGED;
+			}
 			break;
 		case VMCB_EXITCODE_IRET:
 			svm_event_waitexit_disable(vcpu, true);
@@ -1953,6 +1935,9 @@ svm_vcpu_setstate(struct nvmm_cpu *vcpu)
 		    &vmcb->state.tr);
 
 		vmcb->state.cpl = state->segs[NVMM_X64_SEG_SS].attrib.dpl;
+
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_SEG |
+		                           VMCB_CTRL_VMCB_CLEAN_DT);
 	}
 
 	CTASSERT(sizeof(cpudata->gprs) == sizeof(state->gprs));
@@ -1976,12 +1961,16 @@ svm_vcpu_setstate(struct nvmm_cpu *vcpu)
 		vmcb->ctrl.v |= __SHIFTIN(state->crs[NVMM_X64_CR_CR8],
 		    VMCB_CTRL_V_TPR);
 
-		if (svm_xcr0_mask != 0) {
+		if (cpudata->xcr0_valid != 0) {
 			/* Clear illegal XCR0 bits, set mandatory X87 bit. */
 			cpudata->gxcr0 = state->crs[NVMM_X64_CR_XCR0];
-			cpudata->gxcr0 &= svm_xcr0_mask;
+			cpudata->gxcr0 &= cpudata->xcr0_valid;
 			cpudata->gxcr0 |= XCR0_X87;
 		}
+
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_CR |
+		                           VMCB_CTRL_VMCB_CLEAN_CR2 |
+		                           VMCB_CTRL_VMCB_CLEAN_TPR);
 	}
 
 	CTASSERT(sizeof(cpudata->drs) == sizeof(state->drs));
@@ -1990,6 +1979,8 @@ svm_vcpu_setstate(struct nvmm_cpu *vcpu)
 
 		vmcb->state.dr6 = state->drs[NVMM_X64_DR_DR6];
 		vmcb->state.dr7 = state->drs[NVMM_X64_DR_DR7];
+
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_DR);
 	}
 
 	if (flags & NVMM_X64_STATE_MSRS) {
@@ -2025,6 +2016,10 @@ svm_vcpu_setstate(struct nvmm_cpu *vcpu)
 			    state->msrs[NVMM_X64_MSR_TSC] - rdtsc();
 			cpudata->gtsc_want_update = true;
 		}
+
+		/* CR for EFER, NP for PAT. */
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_CR |
+		                           VMCB_CTRL_VMCB_CLEAN_NP);
 	}
 
 	if (flags & NVMM_X64_STATE_INTR) {
@@ -2055,13 +2050,11 @@ svm_vcpu_setstate(struct nvmm_cpu *vcpu)
 		fpustate->fx_mxcsr_mask &= x86_fpu_mxcsr_mask;
 		fpustate->fx_mxcsr &= fpustate->fx_mxcsr_mask;
 
-		if (svm_xcr0_mask != 0) {
+		if (cpudata->xcr0_valid != 0) {
 			/* Reset XSTATE_BV, to force a reload. */
-			cpudata->gxsave.xstate_bv = svm_xcr0_mask;
+			cpudata->gxsave.xstate_bv = cpudata->xcr0_valid;
 		}
 	}
-
-	svm_vmcb_cache_update(vmcb, flags);
 
 	comm->state_wanted = 0;
 	comm->state_cached |= flags;
@@ -2286,6 +2279,8 @@ svm_vcpu_init(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	    /* EFER_AIBRSE excluded */
 	    /* EFER_ETLBI excluded */;
 
+	cpudata->xcr0_valid = svm_xcr0_mask;
+
 	/*
 	 * If DecodeAssists are supported:
 	 *
@@ -2408,7 +2403,7 @@ svm_vcpu_init(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 	vmcb->ctrl.n_cr3 = os_vmspace_pdirpa(mach->vm);
 
 	/* Init XSAVE header. */
-	cpudata->gxsave.xstate_bv = svm_xcr0_mask;
+	cpudata->gxsave.xstate_bv = cpudata->xcr0_valid;
 	cpudata->gxsave.xcomp_bv = 0;
 
 	/* Install the RESET state. */
@@ -2551,19 +2546,6 @@ svm_vcpu_configure_tpr(struct svm_cpudata *cpudata, void *data)
 	struct nvmm_vcpu_conf_tpr *tpr = data;
 	struct vmcb *vmcb = cpudata->vmcb;
 
-	/*
-	 * If DecodeAssists are supported:
-	 *
-	 *  - Intercept writes to CR8 and deliver TPR_CHANGED VMEXITs to the
-	 *    emulator. If not, then we have no way to precisely track CR8
-	 *    updates, and rely on the emulator to do best-effort tracking
-	 *    based on the CR8 exitstate.
-	 */
-
-	if (!svm_decode_assist) {
-		return ENOTSUP;
-	}
-
 	if (cpudata->tpr.exit_changed == tpr->exit_changed) {
 		return 0;
 	}
@@ -2571,9 +2553,11 @@ svm_vcpu_configure_tpr(struct svm_cpudata *cpudata, void *data)
 	cpudata->tpr.exit_changed = tpr->exit_changed;
 
 	if (cpudata->tpr.exit_changed) {
-		vmcb->ctrl.intercept_cr |= VMCB_CTRL_INTERCEPT_WCR(8);
-	} else {
-		vmcb->ctrl.intercept_cr &= ~VMCB_CTRL_INTERCEPT_WCR(8);
+		vmcb->ctrl.intercept_misc1 |= VMCB_CTRL_INTERCEPT_VINTR;
+	} else if (!cpudata->int_window_exit) {
+		vmcb->ctrl.intercept_misc1 &= ~VMCB_CTRL_INTERCEPT_VINTR;
+		vmcb->ctrl.v &= ~VMCB_CTRL_V_IRQ;
+		svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_TPR);
 	}
 
 	svm_vmcb_cache_flush(vmcb, VMCB_CTRL_VMCB_CLEAN_I);
@@ -2770,10 +2754,10 @@ svm_init(void)
 {
 	cpuid_desc_t descs;
 	os_cpu_t *cpu;
-	size_t ncpus;
+	size_t max_cpus;
 
-	ncpus = OS_MAXCPUS;
-	hsave = os_mem_zalloc(ncpus * sizeof(struct svm_hsave));
+	max_cpus = OS_MAXCPUS;
+	hsave = os_mem_zalloc(max_cpus * sizeof(struct svm_hsave));
 
 	x86_get_cpuid(0x8000000a, &descs);
 
@@ -2838,12 +2822,12 @@ svm_fini_asid(void)
 static void
 svm_fini(void)
 {
-	size_t i, ncpus;
+	size_t i, max_cpus;
 
 	os_ipi_broadcast(svm_change_cpu, (void *)false);
 
-	ncpus = OS_MAXCPUS;
-	for (i = 0; i < ncpus; i++) {
+	max_cpus = OS_MAXCPUS;
+	for (i = 0; i < max_cpus; i++) {
 		if (hsave[i].pa != 0)
 #if defined(__HAIKU__)
 			os_contigpa_free(hsave[i].pa, hsave[i].va, 1);
@@ -2852,7 +2836,7 @@ svm_fini(void)
 #endif
 	}
 
-	os_mem_free(hsave, ncpus * sizeof(struct svm_hsave));
+	os_mem_free(hsave, max_cpus * sizeof(struct svm_hsave));
 
 	svm_fini_asid();
 }
@@ -2862,10 +2846,8 @@ svm_capability(struct nvmm_capability *cap)
 {
 	cap->arch.mach_conf_support = 0;
 	cap->arch.vcpu_conf_support =
-	    NVMM_CAP_ARCH_VCPU_CONF_CPUID;
-	if (svm_decode_assist) {
-		cap->arch.vcpu_conf_support |= NVMM_CAP_ARCH_VCPU_CONF_TPR;
-	}
+	    NVMM_CAP_ARCH_VCPU_CONF_CPUID |
+	    NVMM_CAP_ARCH_VCPU_CONF_TPR;
 	cap->arch.xcr0_mask = svm_xcr0_mask;
 	cap->arch.mxcsr_mask = x86_fpu_mxcsr_mask;
 	cap->arch.conf_cpuid_maxops = SVM_NCPUIDS;

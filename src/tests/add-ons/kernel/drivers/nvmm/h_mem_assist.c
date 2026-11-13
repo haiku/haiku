@@ -42,6 +42,7 @@
 static uint8_t mmiobuf[PAGE_SIZE];
 static uint8_t *instbuf;
 static uint8_t *rambuf;
+static pt_entry_t *L4, *L3, *L2, *L1;
 
 /* -------------------------------------------------------------------------- */
 
@@ -223,23 +224,31 @@ init_seg(struct nvmm_x64_state_seg *seg, int type, int sel)
 }
 
 static void
-reset_machine64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+reset_vcpu64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
-	struct nvmm_x64_state *state = vcpu->state;
+	struct nvmm_x64_state *state;
+
+	if (nvmm_vcpu_destroy(mach, vcpu) == -1)
+		err(errno, "nvmm_vcpu_destroy");
+	if (nvmm_vcpu_create(mach, 0, vcpu) == -1)
+		err(errno, "nvmm_vcpu_create");
+	nvmm_vcpu_configure(mach, vcpu, NVMM_VCPU_CONF_CALLBACKS, &callbacks);
 
 	if (nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_ALL) == -1)
 		err(errno, "nvmm_vcpu_getstate");
 
+	state = vcpu->state;
+
 	memset(state, 0, sizeof(*state));
 
 	/* Default. */
-	state->gprs[NVMM_X64_GPR_RFLAGS] = PSL_MBO;
-	init_seg(&state->segs[NVMM_X64_SEG_CS], SDT_MEMERA, GSEL(GCODE_SEL, SEL_KPL));
-	init_seg(&state->segs[NVMM_X64_SEG_SS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_KPL));
-	init_seg(&state->segs[NVMM_X64_SEG_DS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_KPL));
-	init_seg(&state->segs[NVMM_X64_SEG_ES], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_KPL));
-	init_seg(&state->segs[NVMM_X64_SEG_FS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_KPL));
-	init_seg(&state->segs[NVMM_X64_SEG_GS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_KPL));
+	state->gprs[NVMM_X64_GPR_RFLAGS] = RFLAGS_MBO;
+	init_seg(&state->segs[NVMM_X64_SEG_CS], SDT_MEMERA, GSEL(GCODE_SEL, SEL_RING0));
+	init_seg(&state->segs[NVMM_X64_SEG_SS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_RING0));
+	init_seg(&state->segs[NVMM_X64_SEG_DS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_RING0));
+	init_seg(&state->segs[NVMM_X64_SEG_ES], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_RING0));
+	init_seg(&state->segs[NVMM_X64_SEG_FS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_RING0));
+	init_seg(&state->segs[NVMM_X64_SEG_GS], SDT_MEMRWA, GSEL(GDATA_SEL, SEL_RING0));
 
 	/* Blank. */
 	init_seg(&state->segs[NVMM_X64_SEG_GDT], 0, 0);
@@ -268,14 +277,18 @@ reset_machine64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 static int
 run_test64_insn_lastpage(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 {
-	struct nvmm_x64_state *state = vcpu->state;
-	struct nvmm_vcpu_exit *exit = vcpu->exit;
+	struct nvmm_x64_state *state;
+	struct nvmm_vcpu_exit *exit;
 	/* movb $0x5a,(%rax) */
 	static const uint8_t insn[] = { 0xc6, 0x00, 0x5a };
 	size_t off = PAGE_SIZE - sizeof(insn);
 	int ret;
 
-	reset_machine64(mach, vcpu);
+	reset_vcpu64(mach, vcpu);
+
+	state = vcpu->state;
+	exit = vcpu->exit;
+
 	memset(instbuf, 0, PAGE_SIZE);
 	memcpy(instbuf + off, insn, sizeof(insn));
 	memset(mmiobuf, 0, PAGE_SIZE);
@@ -314,9 +327,20 @@ run_test64_insn_lastpage(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 }
 
 static void
+reset_tree64(void)
+{
+	const pt_entry_t pte = PTE_P | PTE_W | PTE_U;
+
+	L4[0] = pte | 0x4000;
+	L3[0] = pte | 0x5000;
+	L2[0] = pte | 0x6000;
+	L1[0x2000 / PAGE_SIZE] = pte | 0x2000;
+	L1[0x1000 / PAGE_SIZE] = pte | 0x1000;
+}
+
+static void
 map_pages64(struct nvmm_machine *mach)
 {
-	pt_entry_t *L4, *L3, *L2, *L1;
 	int ret;
 
 	instbuf = mmap(NULL, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE,
@@ -379,11 +403,110 @@ map_pages64(struct nvmm_machine *mach)
 	memset(L2, 0, PAGE_SIZE);
 	memset(L1, 0, PAGE_SIZE);
 
-	L4[0] = PTE_P | PTE_W | 0x4000;
-	L3[0] = PTE_P | PTE_W | 0x5000;
-	L2[0] = PTE_P | PTE_W | 0x6000;
-	L1[0x2000 / PAGE_SIZE] = PTE_P | PTE_W | 0x2000;
-	L1[0x1000 / PAGE_SIZE] = PTE_P | PTE_W | 0x1000;
+	reset_tree64();
+}
+
+enum walk64_expectation {
+	MUST_SUCCEED,
+	MUST_FAIL,
+	MUST_FAULT
+};
+
+static int
+check_walk64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu,
+    const char *name, bool fetch, enum walk64_expectation expect)
+{
+	struct nvmm_x64_state *state = vcpu->state;
+	struct nvmm_vcpu_exit *exit = vcpu->exit;
+	int ret;
+
+	instbuf[0] = 0xa4; /* movsb */
+	instbuf[0x100] = 0x5a;
+	state->gprs[NVMM_X64_GPR_RSI] = 0x2100;
+	state->gprs[NVMM_X64_GPR_RDI] = 0x1000;
+	if (nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_ALL) == -1)
+		err(errno, "nvmm_vcpu_setstate");
+
+	memset(mmiobuf, 0, sizeof(mmiobuf));
+	memset(exit, 0, sizeof(*exit));
+	exit->reason = NVMM_VCPU_EXIT_MEMORY;
+	exit->u.mem.gpa = 0x1000;
+	if (!fetch) {
+		exit->u.mem.inst_len = 1;
+		exit->u.mem.inst_bytes[0] = 0xa4;
+	}
+
+	ret = nvmm_assist_mem(mach, vcpu);
+	if (ret == -1) {
+		if (expect != MUST_FAIL) {
+			printf("*** Test '%s' failed (1)\n", name);
+			return 1;
+		}
+	} else {
+		if (expect == MUST_FAIL) {
+			printf("*** Test '%s' failed (2)\n", name);
+			return 1;
+		}
+		if ((expect != MUST_FAULT) && (mmiobuf[0] != 0x5a)) {
+			printf("*** Test '%s' failed (3)\n", name);
+			return 1;
+		}
+	}
+
+	printf("Test '%s' passed\n", name);
+	return 0;
+}
+
+static int
+test_page_walks64(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
+{
+	int nfail = 0;
+
+	/* Kernelmode access to non-present page. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	L4[0] &= ~PTE_P;
+	nfail += check_walk64(mach, vcpu, "64bit walk - present", false, MUST_FAULT);
+
+	/* Usermode access to non-user page. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	vcpu->state->segs[NVMM_X64_SEG_SS].attrib.dpl = 3;
+	L3[0] &= ~PTE_U;
+	nfail += check_walk64(mach, vcpu, "64bit walk - user", false, MUST_FAIL);
+
+	/* Kernelmode access to non-writable page with/without CR0.WP. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	L2[0] &= ~PTE_W;
+	nfail += check_walk64(mach, vcpu, "64bit walk - WP", false, MUST_FAIL);
+	vcpu->state->crs[NVMM_X64_CR_CR0] &= ~CR0_WP;
+	nfail += check_walk64(mach, vcpu, "64bit walk - no WP", false, MUST_SUCCEED);
+
+	/* Kernelmode instruction fetch from a non-executable page. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	vcpu->state->msrs[NVMM_X64_MSR_EFER] |= EFER_NXE;
+	L1[0x2000 / PAGE_SIZE] |= PTE_NX;
+	nfail += check_walk64(mach, vcpu, "64bit walk - NX", true, MUST_FAIL);
+
+	/* SMEP: kernelmode instruction fetch from a user page. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	vcpu->state->crs[NVMM_X64_CR_CR4] |= CR4_SMEP;
+	nfail += check_walk64(mach, vcpu, "64bit walk - SMEP", true, MUST_FAIL);
+
+	/* SMAP: kernelmode access to a user page with/without RFLAGS.AC. */
+	reset_vcpu64(mach, vcpu);
+	reset_tree64();
+	vcpu->state->crs[NVMM_X64_CR_CR4] |= CR4_SMAP;
+	nfail += check_walk64(mach, vcpu, "64bit walk - SMAP", false, MUST_FAIL);
+	vcpu->state->gprs[NVMM_X64_GPR_RFLAGS] |= RFLAGS_AC;
+	nfail += check_walk64(mach, vcpu, "64bit walk - SMAP + AC", false, MUST_SUCCEED);
+
+	reset_tree64();
+
+	return nfail;
 }
 
 /*
@@ -410,8 +533,10 @@ test_vm64(void)
 	map_pages64(&mach);
 
 	nfail = 0;
+	nfail += test_page_walks64(&mach, &vcpu);
+	printf("\n");
 	for (i = 0; tests64[i].name != NULL; i++) {
-		reset_machine64(&mach, &vcpu);
+		reset_vcpu64(&mach, &vcpu);
 		nfail += run_test(&mach, &vcpu, &tests64[i]);
 	}
 	printf("\n");
@@ -447,19 +572,19 @@ reset_machine32(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
 	memset(state, 0, sizeof(*state));
 
 	/* Default. */
-	state->gprs[NVMM_X64_GPR_RFLAGS] = PSL_MBO;
+	state->gprs[NVMM_X64_GPR_RFLAGS] = RFLAGS_MBO;
 	init_seg(&state->segs[NVMM_X64_SEG_CS], SDT_MEMERA,
-	    GSEL(GCODE_SEL, SEL_KPL));
+	    GSEL(GCODE_SEL, SEL_RING0));
 	init_seg(&state->segs[NVMM_X64_SEG_SS], SDT_MEMRWA,
-	    GSEL(GDATA_SEL, SEL_KPL));
+	    GSEL(GDATA_SEL, SEL_RING0));
 	init_seg(&state->segs[NVMM_X64_SEG_DS], SDT_MEMRWA,
-	    GSEL(GDATA_SEL, SEL_KPL));
+	    GSEL(GDATA_SEL, SEL_RING0));
 	init_seg(&state->segs[NVMM_X64_SEG_ES], SDT_MEMRWA,
-	    GSEL(GDATA_SEL, SEL_KPL));
+	    GSEL(GDATA_SEL, SEL_RING0));
 	init_seg(&state->segs[NVMM_X64_SEG_FS], SDT_MEMRWA,
-	    GSEL(GDATA_SEL, SEL_KPL));
+	    GSEL(GDATA_SEL, SEL_RING0));
 	init_seg(&state->segs[NVMM_X64_SEG_GS], SDT_MEMRWA,
-	    GSEL(GDATA_SEL, SEL_KPL));
+	    GSEL(GDATA_SEL, SEL_RING0));
 
 	for (i = NVMM_X64_SEG_ES; i <= NVMM_X64_SEG_GS; i++) {
 		state->segs[i].attrib.l = 0;

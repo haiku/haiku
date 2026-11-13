@@ -379,11 +379,11 @@ const struct nvmm_x86_cpuid_mask nvmm_cpuid_80000001 = {
 	    CPUID_8_01_ECX_3DNOWPF |
 	    /* CPUID_8_01_ECX_OSVW excluded */
 	    /* CPUID_8_01_ECX_IBS excluded */
-	    CPUID_8_01_ECX_XOP |
+	    /* CPUID_8_01_ECX_XOP excluded */
 	    /* CPUID_8_01_ECX_SKINIT excluded */
 	    /* CPUID_8_01_ECX_WDT excluded */
 	    /* CPUID_8_01_ECX_LWP excluded */
-	    CPUID_8_01_ECX_FMA4 |
+	    /* CPUID_8_01_ECX_FMA4 excluded */
 	    CPUID_8_01_ECX_TCE |
 	    /* CPUID_8_01_ECX_NODEID excluded */
 	    CPUID_8_01_ECX_TBM |

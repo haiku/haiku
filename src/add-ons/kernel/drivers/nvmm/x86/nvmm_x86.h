@@ -294,13 +294,13 @@ struct nvmm_x64_state_fpu {
 CTASSERT(sizeof(struct nvmm_x64_state_fpu) == 512);
 
 /* Flags. */
-#define NVMM_X64_STATE_SEGS	0x01
-#define NVMM_X64_STATE_GPRS	0x02
-#define NVMM_X64_STATE_CRS	0x04
-#define NVMM_X64_STATE_DRS	0x08
-#define NVMM_X64_STATE_MSRS	0x10
-#define NVMM_X64_STATE_INTR	0x20
-#define NVMM_X64_STATE_FPU	0x40
+#define NVMM_X64_STATE_SEGS	0x0001
+#define NVMM_X64_STATE_GPRS	0x0002
+#define NVMM_X64_STATE_CRS	0x0004
+#define NVMM_X64_STATE_DRS	0x0008
+#define NVMM_X64_STATE_MSRS	0x0010
+#define NVMM_X64_STATE_INTR	0x0020
+#define NVMM_X64_STATE_FPU	0x0040
 #define NVMM_X64_STATE_ALL	\
 	(NVMM_X64_STATE_SEGS | NVMM_X64_STATE_GPRS | NVMM_X64_STATE_CRS | \
 	 NVMM_X64_STATE_DRS | NVMM_X64_STATE_MSRS | NVMM_X64_STATE_INTR | \
@@ -664,6 +664,20 @@ struct nvmm_vcpu_conf_tpr {
 #define CPUID_8_0A_EDX_SSSCheck		__BIT(19)
 #define CPUID_8_0A_EDX_SpecCtrl		__BIT(20)
 #define CPUID_8_0A_EDX_TlbiCtl		__BIT(24)
+
+/* Fn8000_001D:EAX (Cache Topology Information) */
+#define CPUID_8_1D_EAX_CacheType	__BITS(4,0)
+#define CPUID_8_1D_EAX_CacheLevel	__BITS(7,5)
+#define CPUID_8_1D_EAX_SelfInit		__BIT(8)
+#define CPUID_8_1D_EAX_FullyAssociative	__BIT(9)
+#define CPUID_8_1D_EAX_NumSharingCache	__BITS(25,14)
+
+/* Fn8000_001E:EBX (Processor Topology Information) */
+#define CPUID_8_1E_EBX_ComputeUnitId	__BITS(7,0)
+#define CPUID_8_1E_EBX_ThreadsPerCU	__BITS(15,8)
+/* Fn8000_001E:ECX (Processor Topology Information) */
+#define CPUID_8_1E_ECX_NodeId		__BITS(7,0)
+#define CPUID_8_1E_ECX_NodesPerProc	__BITS(10,8)
 
 #endif /* ASM_NVMM */
 

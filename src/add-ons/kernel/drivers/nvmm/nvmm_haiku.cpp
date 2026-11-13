@@ -575,7 +575,7 @@ address_space_for(os_vmmap_t *map)
 
 
 //! shared indicates whether the mapping is inherit on fork calls or not
-extern "C" int
+static int
 os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 	voff_t offset, bool wired, bool fixed, bool shared __unused, int prot, int maxprot)
 {
@@ -618,9 +618,41 @@ os_vmobj_map(os_vmmap_t *map, vaddr_t *addr, vsize_t size, os_vmobj_t *vmobj,
 }
 
 
+extern "C" int
+os_vmobj_map_user(os_vmmap_t *map, vaddr_t *addr, vsize_t size,
+	os_vmobj_t *vmobj, voff_t offset, bool wired, bool fixed, bool shared,
+	int prot, int maxprot)
+{
+	return os_vmobj_map(map, addr, size, vmobj, offset, wired, fixed,
+		shared, prot, maxprot);
+}
+
+
+extern "C" int
+os_vmobj_map_kern(os_vmmap_t *map, vaddr_t *addr, vsize_t size,
+	os_vmobj_t *vmobj, voff_t offset, bool wired, bool fixed, bool shared,
+	int _prot, int _maxprot)
+{
+	int prot = 0;
+	if ((_prot & PROT_READ) != 0)
+		prot |= B_KERNEL_READ_AREA;
+	if ((_prot & PROT_WRITE) != 0)
+		prot |= B_KERNEL_WRITE_AREA;
+
+	int maxprot = 0;
+	if ((_maxprot & PROT_READ) != 0)
+		maxprot |= B_KERNEL_READ_AREA;
+	if ((_maxprot & PROT_WRITE) != 0)
+		maxprot |= B_KERNEL_WRITE_AREA;
+
+	return os_vmobj_map(map, addr, size, vmobj, offset, wired, fixed,
+		shared, prot, maxprot);
+}
+
+
 //! the range [start, end-1] will be unmapped
 extern "C" void
-os_vmobj_unmap(os_vmmap_t *map, vaddr_t start, vaddr_t end)
+os_vmobj_unmap(os_vmmap_t *map, vaddr_t start, vaddr_t end, bool wired __unused)
 {
 	VMAddressSpace* addressSpace = address_space_for(map);
 	addressSpace->WriteLock();

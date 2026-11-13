@@ -197,9 +197,9 @@ test10_begin:
 	movq	$0x1000,%rax
 	movq	$0x12345678,(%rax)
 
-	movq	$0xFFFFFFFFFFFFFFFF,%rbx
-	movzbl	(%rax),%ebx
-	movq	%rbx,(%rax)
+	movq	$0xFFFFFFFFFFFFFFFF,%rbp
+	movzbl	(%rax),%ebp
+	movq	%rbp,(%rax)
 
 	TEST_END
 test10_end:
