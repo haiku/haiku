@@ -372,23 +372,20 @@ NodeAttribute::Lookup(const char* name, size_t* nameLength)
 
 		uint32 offset = B_BENDIAN_TO_HOST_INT16(entry[left].nameidx);
 		TRACE("offset:(%" B_PRIu16 ")\n", offset);
-		int status;
 
 		// First check if its local or remote value
 		if (entry[left].flags & XFS_ATTR_LOCAL) {
 			AttrLeafNameLocal* local  = (AttrLeafNameLocal*)(fLeafBuffer + offset);
-			char* PtrToOffset = (char*)local + sizeof(uint8) + sizeof(uint16);
-			status = strncmp(name, PtrToOffset, *nameLength);
-			if (status == 0) {
+			char* ptrToOffset = (char*)local + sizeof(uint8) + sizeof(uint16);
+			if (xfs_name_comp(name, *nameLength, ptrToOffset, local->namelen)) {
 				fLocalEntry = local;
 				fRemoteEntry = NULL;
 				return B_OK;
 			}
 		} else {
 			AttrLeafNameRemote* remote  = (AttrLeafNameRemote*)(fLeafBuffer + offset);
-			char* PtrToOffset = (char*)remote + sizeof(uint8) + 2 * sizeof(uint32);
-			status = strncmp(name, PtrToOffset, *nameLength);
-			if (status == 0) {
+			char* ptrToOffset = (char*)remote + sizeof(uint8) + 2 * sizeof(uint32);
+			if (xfs_name_comp(name, *nameLength, ptrToOffset, remote->namelen)) {
 				fRemoteEntry = remote;
 				fLocalEntry = NULL;
 				return B_OK;
