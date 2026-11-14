@@ -6,7 +6,6 @@ UsePrivateHeaders app ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 # Let Jam know where to find some of our source files
-SEARCH_SOURCE += [ FDirName $(SUBDIR) bcursor ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessage ] ;
@@ -48,7 +47,6 @@ UnitTestLib libapptest.so
 		ClipboardReadWriteTest.cpp
 
 		# BCursor
-		BCursorTester.cpp
 		CursorTest.cpp
 
 		# BHandler
@@ -169,7 +167,6 @@ SEARCH on [ FGristFiles
 		RegistrarThreadManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
-SubInclude HAIKU_TOP src tests kits app bcursor ;
 #SubInclude HAIKU_TOP src tests kits app bhandler ;
 #SubInclude HAIKU_TOP src tests kits app blooper ;
 #SubInclude HAIKU_TOP src tests kits app bmessage ;
