@@ -393,7 +393,9 @@ MainWindow::Run()
 	}
 
 	// visit all disks in the system and show their contents
+	LockLooper();
 	_ScanDrives();
+	UnlockLooper();
 
 	// If DeskBar isn't running, DriveSetup was probably started from Installer.
 	// Make sure to show on all workspaces, so the window doesn't disappear when using the
