@@ -283,7 +283,7 @@ try_again:
 			return B_BAD_VALUE;
 		}
 
-		TRACE_ALWAYS("Receive read sequence: %x length in header %x length read %x\n",
+		TRACE("Receive read sequence: %x length in header %x length read %x\n",
 			(fReadHeader[7] << 8) | fReadHeader[6],
 			(fReadHeader[9] << 8) | fReadHeader[8],
 			fActualLengthRead);
@@ -388,7 +388,7 @@ NCMDevice::Write(const uint8 *buffer, size_t *numBytes)
 	header[26] = 0x00; //
 	header[27] = 0x00; //
 
-	TRACE_ALWAYS("Writing with sequence %x\n", fSequence);
+	TRACE("Writing with sequence %x\n", fSequence);
 	fSequence++;
 
 	iovec vec[2];
