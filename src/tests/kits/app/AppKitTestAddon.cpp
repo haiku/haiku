@@ -7,7 +7,6 @@
 #include <TestSuiteAddon.h>
 
 // ##### Include headers for your tests here #####
-#include "bclipboard/ClipboardTest.h"
 #include "bcursor/CursorTest.h"
 #include "bhandler/HandlerTest.h"
 #include "blooper/LooperTest.h"
@@ -23,7 +22,6 @@ BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("App");
 
 	// ##### Add test suites here #####
-	suite->addTest("BClipboard", ClipboardTestSuite());
 //	suite->addTest("BCursor", CursorTestSuite());
 	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
