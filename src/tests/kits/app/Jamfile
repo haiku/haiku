@@ -6,7 +6,6 @@ UsePrivateHeaders app ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 # Let Jam know where to find some of our source files
-SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessage ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
@@ -51,18 +50,10 @@ UnitTestLib libapptest.so
 
 		# BHandler
 		HandlerTest.cpp
-		AddFilterTest.cpp
-		BHandlerTester.cpp
-		IsWatchedTest.cpp
-		LockLooperTest.cpp
-		LockLooperTestCommon.cpp
-		LockLooperWithTimeoutTest.cpp
+		HandlerFilterTest.cpp
+		HandlerIsWatchedTest.cpp
 		HandlerLooperTest.cpp
-		NextHandlerTest.cpp
-		RemoveFilterTest.cpp
-		SetFilterListTest.cpp
-		SetNextHandlerTest.cpp
-		UnlockLooperTest.cpp
+		HandlerNextHandlerTest.cpp
 
 		# BLooper
 		LooperTest.cpp
@@ -167,7 +158,6 @@ SEARCH on [ FGristFiles
 		RegistrarThreadManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
-#SubInclude HAIKU_TOP src tests kits app bhandler ;
 #SubInclude HAIKU_TOP src tests kits app blooper ;
 #SubInclude HAIKU_TOP src tests kits app bmessage ;
 #SubInclude HAIKU_TOP src tests kits app bmessageQueue ;

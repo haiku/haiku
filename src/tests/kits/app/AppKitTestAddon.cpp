@@ -7,7 +7,6 @@
 #include <TestSuiteAddon.h>
 
 // ##### Include headers for your tests here #####
-#include "bhandler/HandlerTest.h"
 #include "blooper/LooperTest.h"
 #include "bmessage/MessageTest.h"
 #include "bmessagequeue/MessageQueueTest.h"
@@ -21,7 +20,6 @@ BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("App");
 
 	// ##### Add test suites here #####
-	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
 //	suite->addTest("BMessage", MessageTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
