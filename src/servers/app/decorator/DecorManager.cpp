@@ -21,12 +21,16 @@
 
 #include <syslog.h>
 
+#include <drivers/driver_settings.h>
+#include <drivers/safemode_settings.h>
+
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DesktopSettings.h"
 #include "ServerConfig.h"
 #include "SATDecorator.h"
 #include "Window.h"
+
 
 typedef float get_version(void);
 typedef DecorAddOn* create_decor_addon(image_id id, const char* name);
@@ -280,6 +284,13 @@ DecorManager::_LoadDecor(BString _path, status_t& error )
 		error = B_OK;
 		return &fDefaultDecor;
 	}
+
+	if (__get_safemode_boolean(B_SAFEMODE_SAFE_MODE, false)) {
+		error = B_ERROR;
+		return NULL;
+	}
+
+	// TODO: We should check for B_SAFEMODE_DISABLE_USER_ADD_ONS too.
 
 	BEntry entry(_path.String(), true);
 	if (!entry.Exists()) {
