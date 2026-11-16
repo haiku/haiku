@@ -19,9 +19,14 @@ typedef struct driver_settings {
 } driver_settings;
 
 
+#define B_SAFEMODE_SAFE_MODE		"safemode"
+#define B_SAFEMODE_DRIVER_SETTINGS	"/safemode/"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 extern void			*load_driver_settings(const char *driverName);
 extern void			*load_driver_settings_file(int fd);
@@ -39,11 +44,6 @@ extern bool			get_driver_boolean_parameter(void *handle, const char *key,
 
 extern const driver_settings *get_driver_settings(void *handle);
 
-/* Pass this in as drivername to access safe mode settings */
-#define B_SAFEMODE_DRIVER_SETTINGS	"/safemode/"
-
-/* Pass this as the key value to check if safe mode is enabled */
-#define B_SAFEMODE_SAFE_MODE		"safemode"
 
 #ifdef __cplusplus
 }

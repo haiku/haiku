@@ -32,6 +32,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			memory.cpp
 			parsedate.cpp
 			port.c
+			safemode_settings.cpp
 			scheduler.c
 			sem.c
 			stack_protector.cpp
