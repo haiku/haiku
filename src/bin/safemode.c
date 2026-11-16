@@ -1,10 +1,11 @@
 /*
- * (c) 2004, Jérôme DUVAL for Haiku
- * released under the MIT licence.
+ * Copyright 2004, Jérôme Duval, jerome.duval@gmail.com.
+ * Copyright 2026, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 
-
 #include <drivers/driver_settings.h>
+#include <drivers/safemode_settings.h>
 #include <syscalls.h>
 
 #include <stdio.h>
@@ -17,8 +18,6 @@ main(int argc, char **argv)
 {
 	const char *optionName = B_SAFEMODE_SAFE_MODE;
 	bool realString = false;
-	char buffer[B_FILE_NAME_LENGTH];
-	size_t size = sizeof(buffer);
 	status_t status;
 	int i;
 
@@ -36,22 +35,23 @@ main(int argc, char **argv)
 			optionName = argv[i];
 	}
 
-	status = _kern_get_safemode_option(optionName, buffer, &size);
-	if (status == B_OK) {
-		if (realString) {
-			puts(buffer);
+	if (realString) {
+		char buffer[B_FILE_NAME_LENGTH];
+		size_t size = sizeof(buffer);
+		status = _kern_get_safemode_option(optionName, buffer, &size);
+		if (status != B_OK) {
+			puts("no");
 			return 0;
 		}
-		if (!strncasecmp(buffer, "true", size)
-			|| !strncasecmp(buffer, "yes", size)
-			|| !strncasecmp(buffer, "on", size)
-			|| !strncasecmp(buffer, "enabled", size)) {
-			puts("yes");
-			return 1;
-		}
+		puts(buffer);
+		return 0;
+	}
+
+	if (__get_safemode_boolean(optionName, false)) {
+		puts("yes");
+		return 1;
 	}
 
 	puts("no");
 	return 0;
 }
-

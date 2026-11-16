@@ -31,7 +31,7 @@
 #include <locks.h>
 #include <MessengerPrivate.h>
 #include <RosterPrivate.h>
-#include <syscalls.h>
+#include <drivers/safemode_settings.h>
 #include <system_info.h>
 
 #include "multiuser_utils.h"
@@ -2038,17 +2038,7 @@ LaunchDaemon::_StartSession(const char* login)
 void
 LaunchDaemon::_RetrieveKernelOptions()
 {
-	char buffer[32];
-	size_t size = sizeof(buffer);
-	status_t status = _kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, buffer,
-		&size);
-	if (status == B_OK) {
-		fSafeMode = !strncasecmp(buffer, "true", size)
-			|| !strncasecmp(buffer, "yes", size)
-			|| !strncasecmp(buffer, "on", size)
-			|| !strncasecmp(buffer, "enabled", size);
-	} else
-		fSafeMode = false;
+	fSafeMode = __get_safemode_boolean(B_SAFEMODE_SAFE_MODE, false);
 }
 
 

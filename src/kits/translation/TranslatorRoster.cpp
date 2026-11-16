@@ -29,10 +29,10 @@
 #include <Path.h>
 #include <String.h>
 
-#include <driver_settings.h>
+#include <drivers/driver_settings.h>
+#include <drivers/safemode_settings.h>
 #include <image.h>
 #include <safemode_defs.h>
-#include <syscalls.h>
 
 #include "FuncTranslator.h"
 #include "TranslatorRosterPrivate.h"
@@ -134,24 +134,8 @@ BTranslatorRoster::Private::Private()
 	fLazyScanning(true),
 	fSafeMode(false)
 {
-	char parameter[32];
-	size_t parameterLength = sizeof(parameter);
-
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			fSafeMode = true;
-	}
-
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			fSafeMode = true;
-	}
+	fSafeMode = __get_safemode_boolean(B_SAFEMODE_SAFE_MODE, false)
+		|| __get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
 	// We might run in compatibility mode on a system with a different ABI. The
 	// translators matching our ABI can usually be found in respective

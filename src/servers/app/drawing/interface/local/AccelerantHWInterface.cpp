@@ -19,11 +19,8 @@
 #include <new>
 
 #include <dirent.h>
-#include <edid.h>
-#include <driver_settings.h>
 #include <graphic_driver.h>
 #include <image.h>
-#include <safemode_defs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -31,6 +28,10 @@
 #include <syscalls.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include <drivers/safemode_settings.h>
+#include <safemode_defs.h>
+#include <edid.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
@@ -62,34 +63,20 @@ using std::nothrow;
 #endif
 
 
-const int32 kDefaultParamsCount = 64;
+static const int32 kDefaultParamsCount = 64;
 
 
-bool
+static bool
 operator==(const display_mode& a, const display_mode& b)
 {
 	return memcmp(&a, &b, sizeof(display_mode)) == 0;
 }
 
 
-bool
+static bool
 use_fail_safe_video_mode()
 {
-	char buffer[B_FILE_NAME_LENGTH];
-	size_t size = sizeof(buffer);
-
-	status_t status = _kern_get_safemode_option(
-		B_SAFEMODE_FAIL_SAFE_VIDEO_MODE, buffer, &size);
-	if (status == B_OK) {
-		if (!strncasecmp(buffer, "true", size)
-			|| !strncasecmp(buffer, "yes", size)
-			|| !strncasecmp(buffer, "on", size)
-			|| !strncasecmp(buffer, "enabled", size)) {
-			return true;
-		}
-	}
-
-	return false;
+	return __get_safemode_boolean(B_SAFEMODE_FAIL_SAFE_VIDEO_MODE, false);
 }
 
 

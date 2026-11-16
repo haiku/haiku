@@ -19,9 +19,9 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
-#include <driver_settings.h>
+#include <drivers/driver_settings.h>
+#include <drivers/safemode_settings.h>
 #include <safemode_defs.h>
-#include <syscalls.h>
 
 
 #ifndef ADD_ON_STABLE_SECONDS
@@ -116,8 +116,6 @@ AddOnMonitorHandler::AddDirectory(const node_ref* nref, bool sync)
 status_t
 AddOnMonitorHandler::AddAddOnDirectories(const char* leafPath)
 {
-	char parameter[32];
-	size_t parameterLength = sizeof(parameter);
 	uint32 start = 0;
 
 	const directory_which addOnDirectories[] = {
@@ -127,24 +125,14 @@ AddOnMonitorHandler::AddAddOnDirectories(const char* leafPath)
 		B_SYSTEM_ADDONS_DIRECTORY
 	};
 
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
-			// skip user add on directories
-			start = 2;
-		}
+	if (__get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS, false)) {
+		// skip user add on directories
+		start = 2;
 	}
 
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
-			// safe mode, only B_SYSTEM_ADDONS_DIRECTORY is used
-			start = 3;
-		}
+	if (__get_safemode_boolean(B_SAFEMODE_SAFE_MODE, false)) {
+		// safe mode, only B_SYSTEM_ADDONS_DIRECTORY is used
+		start = 3;
 	}
 
 	for (uint32 i = start;
