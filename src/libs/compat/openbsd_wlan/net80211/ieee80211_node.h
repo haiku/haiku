@@ -611,6 +611,11 @@ void ieee80211_node_detach(struct ifnet *);
 void ieee80211_begin_scan(struct ifnet *);
 void ieee80211_next_scan(struct ifnet *);
 void ieee80211_end_scan(struct ifnet *);
+
+#ifdef __HAIKU__
+void ieee80211_notify_scan_done(struct ifnet *);
+#endif
+
 void ieee80211_reset_scan(struct ifnet *);
 struct ieee80211_node *ieee80211_alloc_node(struct ieee80211com *,
 		const u_int8_t *);

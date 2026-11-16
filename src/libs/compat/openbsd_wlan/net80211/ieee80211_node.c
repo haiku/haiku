@@ -1486,6 +1486,11 @@ ieee80211_end_scan(struct ifnet *ifp)
 	if (ic->ic_scan_count)
 		ic->ic_flags &= ~IEEE80211_F_ASCAN;
 
+#ifdef __HAIKU__
+	if (!bgscan)
+		ieee80211_notify_scan_done(ifp);
+#endif
+
 	if (ic->ic_opmode == IEEE80211_M_STA)
 		ieee80211_clean_inactive_nodes(ic, IEEE80211_INACT_SCAN);
 
