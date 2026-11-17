@@ -858,22 +858,6 @@ BMessage::_ValidateMessage()
 
 
 status_t
-BMessage::Unflatten(const char* flatBuffer)
-{
-	DEBUG_FUNCTION_ENTER;
-	if (flatBuffer == NULL)
-		return B_BAD_VALUE;
-
-	uint32 format = *(uint32*)flatBuffer;
-	if (format != MESSAGE_FORMAT_HAIKU)
-		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer, -1);
-
-	BMemoryIO io(flatBuffer, SSIZE_MAX);
-	return Unflatten(&io);
-}
-
-
-status_t
 BMessage::Unflatten(const void* flatBuffer, size_t flatBufferSize)
 {
 	DEBUG_FUNCTION_ENTER;
