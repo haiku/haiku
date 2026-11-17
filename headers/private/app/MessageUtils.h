@@ -34,88 +34,79 @@ byte_swap(T &/*data*/)
 }
 
 
-inline void
-write_helper(BDataIO *stream, const void *data, size_t size)
-{
-	status_t error = stream->Write(data, size);
-	if (error < B_OK)
-		throw error;
-}
-
-
 class TReadHelper {
 public:
-							TReadHelper(BDataIO *stream)
-								:	fStream(stream),
-									fError(B_OK),
-									fSwap(false)
-							{
-							}
+	TReadHelper(BDataIO *stream)
+		:	fStream(stream),
+			fError(B_OK),
+			fSwap(false)
+	{
+	}
 
-							TReadHelper(BDataIO *stream, bool swap)
-								:	fStream(stream),
-									fError(B_OK),
-									fSwap(swap)
-							{
-							}
+	TReadHelper(BDataIO *stream, bool swap)
+		:	fStream(stream),
+			fError(B_OK),
+			fSwap(swap)
+	{
+	}
 
-		template<class T>
-		inline void			operator()(T &data)
-							{
-								fError = fStream->Read((void *)&data, sizeof(T));
-								if (fError > B_OK) {
-									if (IsSwapping())
-										byte_swap(data);
-									return;
-								}
+	template<class T>
+	inline void operator()(T &data)
+	{
+		fError = fStream->Read((void *)&data, sizeof(T));
+		if (fError > B_OK) {
+			if (IsSwapping())
+				byte_swap(data);
+			return;
+		}
 
-								if (fError == 0)
-									fError = B_ERROR;
-								throw fError;
-							}
+		if (fError == 0)
+			fError = B_ERROR;
+		throw fError;
+	}
 
-		template<class T>
-		inline void			operator()(T data, size_t len)
-							{
-								fError = fStream->Read((void *)data, len);
-								if (fError >= B_OK)
-									return;
+	template<class T>
+	inline void operator()(T data, size_t len)
+	{
+		fError = fStream->Read((void *)data, len);
+		if (fError >= B_OK)
+			return;
 
-								throw fError;
-							}
+		throw fError;
+	}
 
-		status_t			Status() const { return fError >= B_OK ? B_OK : fError; }
+	status_t			Status() const { return fError >= B_OK ? B_OK : fError; }
 
-		void				SetSwap(bool yesNo) { fSwap = yesNo; }
-		bool				IsSwapping() const { return fSwap; }
+	void				SetSwap(bool yesNo) { fSwap = yesNo; }
+	bool				IsSwapping() const { return fSwap; }
 
 private:
-		BDataIO				*fStream;
-		status_t			fError;
-		bool				fSwap;
+	BDataIO				*fStream;
+	status_t			fError;
+	bool				fSwap;
 };
 
 
 class TChecksumHelper {
 public:
-							TChecksumHelper(uchar* buffer)
-								:	fBuffer(buffer),
-									fBufPtr(buffer)
-							{
-							}
+	TChecksumHelper(uchar* buffer)
+		:	fBuffer(buffer),
+			fBufPtr(buffer)
+	{
+	}
 
-		template<class T>
-		inline void			Cache(const T &data)
-							{
-								*((T*)fBufPtr) = data;
-								fBufPtr += sizeof (T);
-							}
+	template<class T>
+	inline void Cache(const T &data)
+	{
+		*((T*)fBufPtr) = data;
+		fBufPtr += sizeof (T);
+	}
 
-		int32    			CheckSum();
+	int32    			CheckSum();
 
 private:
-		uchar				*fBuffer;
-		uchar				*fBufPtr;
+	uchar				*fBuffer;
+	uchar				*fBufPtr;
 };
 
 
@@ -190,5 +181,6 @@ byte_swap(entry_ref &data)
 	byte_swap(data.device);
 	byte_swap(data.directory);
 }
+
 
 #endif	// _MESSAGE_UTILS_H_
