@@ -84,7 +84,8 @@ class BMessage {
 		ssize_t			FlattenedSize() const;
 		status_t		Flatten(char *buffer, ssize_t size) const;
 		status_t		Flatten(BDataIO *stream, ssize_t *size = NULL) const;
-		status_t		Unflatten(const char *flatBuffer);
+		status_t		Unflatten(const char *flatBuffer) _DEPRECATED;
+		status_t		Unflatten(const void *flatBuffer, size_t flatBufferSize);
 		status_t		Unflatten(BDataIO *stream);
 
 		// Specifiers (scripting)

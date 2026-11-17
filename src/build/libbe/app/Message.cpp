@@ -250,8 +250,8 @@ BMessage::HasSameData(const BMessage &other, bool ignoreFieldOrder,
 		bool needsMemCompare = true;
 		if (deep && field->type == B_MESSAGE_TYPE) {
 			BMessage message, otherMessage;
-			if (message.Unflatten((const char *)data) == B_OK
-				&& otherMessage.Unflatten((const char *)otherData) == B_OK) {
+			if (message.Unflatten(data, field->data_size) == B_OK
+				&& otherMessage.Unflatten(otherData, otherField->data_size) == B_OK) {
 				if (!message.HasSameData(ignoreFieldOrder, deep))
 					return false;
 				needsMemCompare = false;
@@ -616,7 +616,7 @@ BMessage::_PrintToStream(const char* indent) const
 					BMessage message;
 					size = *(uint32 *)pointer;
 					pointer += sizeof(uint32);
-					status_t result = message.Unflatten((const char *)pointer);
+					status_t result = message.Unflatten(pointer, size);
 					if (result != B_OK) {
 						printf("failed unflatten: %s\n", strerror(result));
 						break;
@@ -858,74 +858,41 @@ BMessage::_ValidateMessage()
 
 
 status_t
-BMessage::Unflatten(const char *flatBuffer)
+BMessage::Unflatten(const char* flatBuffer)
 {
 	DEBUG_FUNCTION_ENTER;
 	if (flatBuffer == NULL)
 		return B_BAD_VALUE;
 
-	uint32 format = *(uint32 *)flatBuffer;
+	uint32 format = *(uint32*)flatBuffer;
 	if (format != MESSAGE_FORMAT_HAIKU)
-		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer);
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer, -1);
 
-	// native message unflattening
-
-	_Clear();
-
-	fHeader = (message_header *)malloc(sizeof(message_header));
-	if (fHeader == NULL)
-		return B_NO_MEMORY;
-
-	memcpy(fHeader, flatBuffer, sizeof(message_header));
-	flatBuffer += sizeof(message_header);
-
-	if (fHeader->format != MESSAGE_FORMAT_HAIKU
-		|| (fHeader->flags & MESSAGE_FLAG_VALID) == 0) {
-		_InitHeader();
-		return B_BAD_VALUE;
-	}
-
-	what = fHeader->what;
-
-	if ((fHeader->flags & MESSAGE_FLAG_PASS_BY_AREA) != 0
-		&& fHeader->message_area >= 0) {
-//		status_t result = _Reference();
-//		if (result != B_OK)
-//			return result;
-	} else {
-		fHeader->message_area = -1;
-
-		if (fHeader->field_count > 0) {
-			size_t fieldsSize = fHeader->field_count * sizeof(field_header);
-			fFields = (field_header *)malloc(fieldsSize);
-			if (fFields == NULL) {
-				_InitHeader();
-				return B_NO_MEMORY;
-			}
-
-			memcpy(fFields, flatBuffer, fieldsSize);
-			flatBuffer += fieldsSize;
-		}
-
-		if (fHeader->data_size > 0) {
-			fData = (uint8 *)malloc(fHeader->data_size);
-			if (fData == NULL) {
-				free(fFields);
-				fFields = NULL;
-				_InitHeader();
-				return B_NO_MEMORY;
-			}
-
-			memcpy(fData, flatBuffer, fHeader->data_size);
-		}
-	}
-
-	return _ValidateMessage();
+	BMemoryIO io(flatBuffer, SSIZE_MAX);
+	return Unflatten(&io);
 }
 
 
 status_t
-BMessage::Unflatten(BDataIO *stream)
+BMessage::Unflatten(const void* flatBuffer, size_t flatBufferSize)
+{
+	DEBUG_FUNCTION_ENTER;
+	if (flatBuffer == NULL)
+		return B_BAD_VALUE;
+
+	uint32 format = *(uint32*)flatBuffer;
+	if (format != MESSAGE_FORMAT_HAIKU) {
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer,
+			(ssize_t)flatBufferSize);
+	}
+
+	BMemoryIO io(flatBuffer, flatBufferSize);
+	return Unflatten(&io);
+}
+
+
+status_t
+BMessage::Unflatten(BDataIO* stream)
 {
 	DEBUG_FUNCTION_ENTER;
 	if (stream == NULL)
@@ -940,12 +907,12 @@ BMessage::Unflatten(BDataIO *stream)
 
 	_Clear();
 
-	fHeader = (message_header *)malloc(sizeof(message_header));
+	fHeader = (message_header*)malloc(sizeof(message_header));
 	if (fHeader == NULL)
 		return B_NO_MEMORY;
 
 	fHeader->format = format;
-	uint8 *header = (uint8 *)fHeader;
+	uint8* header = (uint8*)fHeader;
 	ssize_t result = stream->Read(header + sizeof(uint32),
 		sizeof(message_header) - sizeof(uint32));
 	if (result != sizeof(message_header) - sizeof(uint32)
@@ -956,33 +923,52 @@ BMessage::Unflatten(BDataIO *stream)
 
 	what = fHeader->what;
 
-	fHeader->message_area = -1;
-
-	if (fHeader->field_count > 0) {
-		ssize_t fieldsSize = fHeader->field_count * sizeof(field_header);
-		fFields = (field_header *)malloc(fieldsSize);
-		if (fFields == NULL) {
+	if ((fHeader->flags & MESSAGE_FLAG_PASS_BY_AREA) != 0
+		&& fHeader->message_area >= 0) {
+#if 0
+		status_t result = _Reference();
+		if (result != B_OK) {
 			_InitHeader();
-			return B_NO_MEMORY;
+			return result;
+		}
+#else
+		return B_NOT_SUPPORTED;
+#endif
+	} else {
+		fHeader->message_area = -1;
+
+		if (fHeader->field_count > 0) {
+			ssize_t fieldsSize = fHeader->field_count * sizeof(field_header);
+			fFields = (field_header*)malloc(fieldsSize);
+			if (fFields == NULL) {
+				_InitHeader();
+				return B_NO_MEMORY;
+			}
+
+			result = stream->Read(fFields, fieldsSize);
+			if (result != fieldsSize)
+				return result < 0 ? result : B_BAD_VALUE;
 		}
 
-		result = stream->Read(fFields, fieldsSize);
-		if (result != fieldsSize)
-			return result < 0 ? result : B_BAD_VALUE;
-	}
+		if (fHeader->data_size > 0) {
+			fData = (uint8*)malloc(fHeader->data_size);
+			if (fData == NULL) {
+				free(fFields);
+				fFields = NULL;
+				_InitHeader();
+				return B_NO_MEMORY;
+			}
 
-	if (fHeader->data_size > 0) {
-		fData = (uint8 *)malloc(fHeader->data_size);
-		if (fData == NULL) {
-			free(fFields);
-			fFields = NULL;
-			_InitHeader();
-			return B_NO_MEMORY;
+			result = stream->Read(fData, fHeader->data_size);
+			if (result != (ssize_t)fHeader->data_size) {
+				free(fData);
+				fData = NULL;
+				free(fFields);
+				fFields = NULL;
+				_InitHeader();
+				return result < 0 ? result : B_BAD_VALUE;
+			}
 		}
-
-		result = stream->Read(fData, fHeader->data_size);
-		if (result != (ssize_t)fHeader->data_size)
-			return result < 0 ? result : B_BAD_VALUE;
 	}
 
 	return _ValidateMessage();
@@ -2021,7 +2007,7 @@ BMessage::FindMessage(const char *name, int32 index, BMessage *message) const
 		(const void **)&data, &size);
 
 	if (error == B_OK)
-		error = message->Unflatten((const char *)data);
+		error = message->Unflatten(data, size);
 	else
 		*message = BMessage();
 

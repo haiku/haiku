@@ -136,7 +136,7 @@ handle_reply(port_id replyPort, int32* _code, bigtime_t timeout,
 	if (result < 0 || *_code != kPortMessageCode)
 		return result < 0 ? result : B_ERROR;
 
-	result = reply->Unflatten(buffer);
+	result = reply->Unflatten(buffer, size);
 	return result;
 }
 
@@ -320,8 +320,8 @@ BMessage::HasSameData(const BMessage& other, bool ignoreFieldOrder,
 		bool needsMemCompare = true;
 		if (deep && field->type == B_MESSAGE_TYPE) {
 			BMessage message, otherMessage;
-			if (message.Unflatten((const char*)data) == B_OK
-				&& otherMessage.Unflatten((const char*)otherData) == B_OK) {
+			if (message.Unflatten(data, field->data_size) == B_OK
+				&& otherMessage.Unflatten(otherData, otherField->data_size) == B_OK) {
 				if (!message.HasSameData(ignoreFieldOrder, deep))
 					return false;
 				needsMemCompare = false;
@@ -733,7 +733,7 @@ BMessage::_PrintToStream(const char* indent) const
 					snprintf(buffer, sizeof(buffer), "%s        ", indent);
 
 					BMessage message;
-					status_t result = message.Unflatten((const char*)pointer);
+					status_t result = message.Unflatten(pointer, size);
 					if (result != B_OK) {
 						printf("failed unflatten: %s\n", strerror(result));
 						break;
@@ -1294,9 +1294,27 @@ BMessage::Unflatten(const char* flatBuffer)
 
 	uint32 format = *(uint32*)flatBuffer;
 	if (format != MESSAGE_FORMAT_HAIKU)
-		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer);
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer, -1);
 
 	BMemoryIO io(flatBuffer, SSIZE_MAX);
+	return Unflatten(&io);
+}
+
+
+status_t
+BMessage::Unflatten(const void* flatBuffer, size_t flatBufferSize)
+{
+	DEBUG_FUNCTION_ENTER;
+	if (flatBuffer == NULL)
+		return B_BAD_VALUE;
+
+	uint32 format = *(uint32*)flatBuffer;
+	if (format != MESSAGE_FORMAT_HAIKU) {
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer,
+			(ssize_t)flatBufferSize);
+	}
+
+	BMemoryIO io(flatBuffer, flatBufferSize);
 	return Unflatten(&io);
 }
 
@@ -3048,13 +3066,13 @@ BMessage::FindMessage(const char* name, int32 index, BMessage* message) const
 	if (message == NULL)
 		return B_BAD_VALUE;
 
-	void* data = NULL;
+	const void* data = NULL;
 	ssize_t size = 0;
 	status_t error = FindData(name, B_MESSAGE_TYPE, index,
-		(const void**)&data, &size);
+		&data, &size);
 
 	if (error == B_OK)
-		error = message->Unflatten((const char*)data);
+		error = message->Unflatten(data, size);
 	else
 		*message = BMessage();
 
@@ -3075,10 +3093,10 @@ BMessage::FindFlat(const char* name, int32 index, BFlattenable* object) const
 	if (object == NULL)
 		return B_BAD_VALUE;
 
-	void* data = NULL;
+	const void* data = NULL;
 	ssize_t numBytes = 0;
 	status_t error = FindData(name, object->TypeCode(), index,
-		(const void**)&data, &numBytes);
+		&data, &numBytes);
 
 	if (error == B_OK)
 		error = object->Unflatten(object->TypeCode(), data, numBytes);

@@ -116,6 +116,7 @@ public:
 			status_t			Flatten(BDataIO* stream,
 									ssize_t* size = NULL) const;
 			status_t			Unflatten(const char* flatBuffer);
+			status_t			Unflatten(const void* flatBuffer, size_t flatBufferSize);
 			status_t			Unflatten(BDataIO* stream);
 
 	// Specifiers (scripting)

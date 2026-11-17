@@ -166,12 +166,13 @@ MessageAdapter::Flatten(uint32 format, const BMessage *from, BDataIO *stream,
 
 
 /*static*/ status_t
-MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
+MessageAdapter::Unflatten(uint32 format, BMessage *into, const void *buffer, ssize_t size)
 {
 	if (format == KMessage::kMessageHeaderMagic) {
+		if (size < 0)
+			size = ((KMessage::Header *)buffer)->size;
 		KMessage message;
-		status_t result = message.SetTo(buffer,
-			((KMessage::Header *)buffer)->size);
+		status_t result = message.SetTo(buffer, size);
 		if (result != B_OK)
 			return result;
 
@@ -183,16 +184,18 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
 			case MESSAGE_FORMAT_R5:
 			{
 				r5_message_header *header = (r5_message_header *)buffer;
-				BMemoryIO stream(buffer + sizeof(uint32),
-					header->flattened_size - sizeof(uint32));
+				if (size < 0)
+					size = header->flattened_size;
+				BMemoryIO stream((uint8*)buffer + sizeof(uint32), size - sizeof(uint32));
 				return _UnflattenR5Message(format, into, &stream);
 			}
 
 			case MESSAGE_FORMAT_R5_SWAPPED:
 			{
 				r5_message_header *header = (r5_message_header *)buffer;
-				BMemoryIO stream(buffer + sizeof(uint32),
-					__swap_int32(header->flattened_size) - sizeof(uint32));
+				if (size < 0)
+					size = __swap_int32(header->flattened_size);
+				BMemoryIO stream((uint8*)buffer + sizeof(uint32), size - sizeof(uint32));
 				return _UnflattenR5Message(format, into, &stream);
 			}
 
@@ -200,11 +203,13 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
 			case MESSAGE_FORMAT_DANO_SWAPPED:
 			{
 				dano_section_header *header = (dano_section_header *)buffer;
-				ssize_t size = header->size;
-				if (header->code == MESSAGE_FORMAT_DANO_SWAPPED)
-					size = __swap_int32(size);
+				if (size < 0) {
+					size = header->size;
+					if (header->code == MESSAGE_FORMAT_DANO_SWAPPED)
+						size = __swap_int32(size);
+				}
 
-				BMemoryIO stream(buffer + sizeof(uint32), size - sizeof(uint32));
+				BMemoryIO stream((uint8*)buffer + sizeof(uint32), size - sizeof(uint32));
 				return _UnflattenDanoMessage(format, into, &stream);
 			}
 		}
