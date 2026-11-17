@@ -232,7 +232,12 @@ BAbstractSocket::Connect(const BNetworkAddress& peer, int type,
 		return fInitStatus;
 
 	BNetworkAddress normalized = peer;
-	if (connect(fSocket, normalized, normalized.Length()) != 0) {
+	while (true) {
+		if (connect(fSocket, normalized, normalized.Length()) == 0)
+			break;
+		if (errno == EINTR)
+			continue;
+
 		TRACE("%p: connecting to %s: %s\n", this,
 			normalized.ToString().c_str(), strerror(errno));
 		return fInitStatus = errno;
