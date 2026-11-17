@@ -1147,7 +1147,7 @@ BLooper::ConvertToMessage(void* buffer, int32 code)
 		return NULL;
 
 	BMessage* message = new BMessage();
-	if (message->Unflatten((const char*)buffer) != B_OK) {
+	if (message->Unflatten(buffer, SSIZE_MAX) != B_OK) {
 		PRINT(("BLooper::ConvertToMessage(): unflattening message failed\n"));
 		delete message;
 		message = NULL;

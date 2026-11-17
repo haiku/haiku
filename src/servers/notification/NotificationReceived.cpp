@@ -102,7 +102,7 @@ NotificationReceived::Unflatten(type_code code, const void* buffer,
 		return B_ERROR;
 
 	BMessage msg;
-	status_t error = msg.Unflatten((const char*)buffer);
+	status_t error = msg.Unflatten(buffer, numBytes);
 
 	if (error == B_OK) {
 		msg.FindString("notify_title", &fTitle);

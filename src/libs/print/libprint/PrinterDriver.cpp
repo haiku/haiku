@@ -185,7 +185,7 @@ PrinterDriver::_ReadSettings(const char* attrName, BMessage* settings)
 		if (!data.IsValid())
 			return false;
 		size = fSpoolFolder->ReadAttr(attrName, B_MESSAGE_TYPE, 0, data, info.size);
-		if (size == info.size && settings->Unflatten(data) == B_OK) {
+		if (size == info.size && settings->Unflatten(data, info.size) == B_OK) {
 			return true;
 		}
 	}

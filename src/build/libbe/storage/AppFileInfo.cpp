@@ -360,7 +360,7 @@ BAppFileInfo::GetSupportedTypes(BMessage* types) const
 	}
 	// unflatten the buffer
 	if (error == B_OK)
-		error = types->Unflatten((const char*)buffer);
+		error = types->Unflatten(buffer, read);
 	// clean up
 	free(buffer);
 	return error;

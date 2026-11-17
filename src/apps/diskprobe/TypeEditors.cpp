@@ -997,16 +997,14 @@ ImageView::_UpdateImage()
 			break;
 		case B_PNG_FORMAT:
 		{
-			BMemoryIO stream(data, fEditor.FileSize());
+			BMemoryIO stream(data, viewSize);
 			fBitmap = BTranslationUtils::GetBitmap(&stream);
 			break;
 		}
 		case B_MESSAGE_TYPE:
 		{
 			BMessage message;
-			// ToDo: this could be problematic if the data is not large
-			//		enough to contain the message...
-			if (message.Unflatten(data) == B_OK)
+			if (message.Unflatten(data, viewSize) == B_OK)
 				fBitmap = new BBitmap(&message);
 			break;
 		}
@@ -1234,7 +1232,7 @@ MessageView::_UpdateMessage()
 	const char *buffer;
 	if (fEditor.GetViewBuffer((const uint8 **)&buffer) == B_OK) {
 		BMessage message;
-		message.Unflatten(buffer);
+		message.Unflatten(buffer, viewSize);
 		SetTo(message);
 	}
 

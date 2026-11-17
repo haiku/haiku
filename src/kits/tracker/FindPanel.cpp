@@ -1194,7 +1194,7 @@ FindPanel::LoadDirectoryFiltersFromFile(const BNode* node)
 	}
 
 	BMessage message;
-	if (message.Unflatten(buffer) != B_OK)
+	if (message.Unflatten(buffer, info.size) != B_OK)
 		return;
 
 	int32 count;
@@ -3013,7 +3013,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 		if (node->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
 				(size_t)info.size) == info.size) {
 			BMessage message;
-			if (message.Unflatten(buffer) == B_OK) {
+			if (message.Unflatten(buffer, info.size) == B_OK) {
 				for (int32 index = 0; ;index++) {
 					ASSERT(index < 100);
 					BVolume volume;
@@ -3058,7 +3058,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 			if (node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
 					buffer, (size_t)info.size) == info.size) {
 				BMessage message;
-				if (message.Unflatten(buffer) == B_OK) {
+				if (message.Unflatten(buffer, info.size) == B_OK) {
 					for (int32 index = 0; index < count; index++)
 						RestoreAttrState(message, index);
 				}

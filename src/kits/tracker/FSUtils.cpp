@@ -3672,7 +3672,7 @@ LoaderErrorDetails(const entry_ref* app, BString &details)
 	}
 
 	BMessage message;
-	result = message.Unflatten((const char*)buffer);
+	result = message.Unflatten(buffer, bufferSize);
 	free(buffer);
 
 	if (result != B_OK)

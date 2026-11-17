@@ -102,7 +102,7 @@ Package::PackageFromEntry(BEntry &entry)
 		BMessage msg;
 		if ((node.ReadAttr(ICON_ATTRIBUTE, attributes.type, 0, buffer,
 				attributes.size) == attributes.size)
-			&& (msg.Unflatten(buffer) == B_OK)) {
+			&& (msg.Unflatten(buffer, attributes.size) == B_OK)) {
 			package->SetIcon(new BBitmap(&msg));
 		}
 	}

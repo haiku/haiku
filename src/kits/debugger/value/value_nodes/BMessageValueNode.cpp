@@ -311,7 +311,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		memcpy(tempBuffer, fData, fHeader->data_size);
 	}
 
-	error = fMessage.Unflatten((const char*)messageBuffer);
+	error = fMessage.Unflatten(messageBuffer, totalSize);
 	if (error != B_OK)
 		return error;
 

@@ -96,7 +96,7 @@ AppUsage::Unflatten(type_code code, const void* buffer,
 	BMessage msg;
 	status_t status = B_ERROR;
 
-	status = msg.Unflatten((const char*)buffer);
+	status = msg.Unflatten(buffer, numBytes);
 
 	if (status == B_OK) {
 		msg.FindString("name", &fAppName);

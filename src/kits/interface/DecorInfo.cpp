@@ -331,7 +331,7 @@ DecorInfo::_Init(bool isUpdate)
 	BMessage infoMessage;
 
 	if (infoData == NULL || infoSize == 0
-		|| infoMessage.Unflatten((const char*)infoData) != B_OK) {
+		|| infoMessage.Unflatten(infoData, infoSize) != B_OK) {
 		fprintf(stderr, "DecorInfo::_init()\tNo extended information found for"
 			" \"%s\"\n", fRef.name);
 	} else {

@@ -3885,7 +3885,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 			&& node->Read(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer)
 				== size) {
 			BMessage decorSettings;
-			if (decorSettings.Unflatten(buffer) == B_OK)
+			if (decorSettings.Unflatten(buffer, size) == B_OK)
 				SetDecoratorSettings(decorSettings);
 		}
 	}

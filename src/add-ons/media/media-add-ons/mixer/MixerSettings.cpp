@@ -429,7 +429,7 @@ MixerSettings::Load()
 	}
 
 	BMessage msg;
-	if (B_OK != msg.Unflatten(buffer)) {
+	if (B_OK != msg.Unflatten(buffer, size)) {
 		delete [] buffer;
 		fLocker->Unlock();
 		TRACE("MixerSettings: can't unflatten settings\n");

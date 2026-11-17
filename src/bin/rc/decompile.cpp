@@ -668,7 +668,7 @@ write_other(const char *name, type_code type,
 	const void *data, size_t length)
 {
 	BMessage msg;
-	if (msg.Unflatten((const char *)data) == B_OK)
+	if (msg.Unflatten(data, length) == B_OK)
 		write_message(name, msg, type);
 	else if (is_string(data, length))
 		write_string(name, type, data, length);

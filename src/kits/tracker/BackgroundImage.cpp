@@ -79,7 +79,7 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 	status_t error = node->ReadAttr(kBackgroundImageInfo, info.type, 0,
 		buffer, (size_t)info.size);
 	if (error == info.size)
-		error = container.Unflatten(buffer);
+		error = container.Unflatten(buffer, info.size);
 
 	delete[] buffer;
 

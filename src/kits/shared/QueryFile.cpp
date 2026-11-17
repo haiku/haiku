@@ -81,7 +81,7 @@ BQueryFile::SetTo(const entry_ref& ref)
 			return fStatus = B_NO_MEMORY;
 
 		BMessage message;
-		fStatus = message.Unflatten((const char*)buffer);
+		fStatus = message.Unflatten(buffer, info.size);
 		if (fStatus == B_OK) {
 			for (int32 index = 0; index < 100; index++) {
 				BVolume volume;

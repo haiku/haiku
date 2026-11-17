@@ -680,7 +680,7 @@ StackAndTile::_HandleMessage(BPrivate::LinkReceiver& link,
 				char buffer[size];
 				BMessage group;
 				if (link.Read(buffer, size) == B_OK
-					&& group.Unflatten(buffer) == B_OK) {
+					&& group.Unflatten(buffer, size) == B_OK) {
 					status_t status = SATGroup::RestoreGroup(group, this);
 					reply.StartMessage(status);
 					reply.Flush();

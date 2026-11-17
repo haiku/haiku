@@ -1567,7 +1567,7 @@ InputServer::_EventLoop()
 		if (length > 0) {
 			BMessage* event = new BMessage;
 
-			if ((err = event->Unflatten(buffer)) < 0) {
+			if ((err = event->Unflatten(buffer, length)) < 0) {
 				PRINTERR(("[InputServer] Unflatten() error: (0x%" B_PRIx32
 					") %s\n", err, strerror(err)));
 				delete event;

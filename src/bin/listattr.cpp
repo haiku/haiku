@@ -140,7 +140,7 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 		case B_MESSAGE_TYPE:
 		{
 			BMessage message;
-			if (!cut && message.Unflatten(buffer) == B_OK) {
+			if (!cut && message.Unflatten(buffer, size) == B_OK) {
 				putchar('\n');
 				message.PrintToStream();
 				putchar('\n');

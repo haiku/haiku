@@ -219,7 +219,7 @@ DatabaseLocation::ReadMessageAttribute(const char* type, const char* attribute,
 	if (bytesRead != info.size)
 		return bytesRead < 0 ? (status_t)bytesRead : (status_t)B_FILE_ERROR;
 
-	return _message.Unflatten((const char*)buffer);
+	return _message.Unflatten(buffer, info.size);
 }
 
 

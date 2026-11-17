@@ -1560,9 +1560,8 @@ BWindow::GetDecoratorSettings(BMessage* settings) const
 		if (status == B_OK) {
 			char buffer[size];
 			status = fLink->Read(buffer, size);
-			if (status == B_OK) {
-				status = settings->Unflatten(buffer);
-			}
+			if (status == B_OK)
+				status = settings->Unflatten(buffer, size);
 		}
 	}
 

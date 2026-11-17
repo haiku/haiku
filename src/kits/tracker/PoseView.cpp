@@ -2576,7 +2576,7 @@ BPoseView::MessageReceived(BMessage* message)
 					if (data->FindData("application/tracker-columns",
 							B_MIME_TYPE, &buffer, &size) == B_OK) {
 						BMessage state;
-						if (state.Unflatten((const char*)buffer) == B_OK) {
+						if (state.Unflatten(buffer, size) == B_OK) {
 							// remove all current columns (one always stays)
 							BColumn* old;
 							while ((old = ColumnAt(0)) != NULL) {

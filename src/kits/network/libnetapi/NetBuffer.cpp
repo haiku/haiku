@@ -373,7 +373,7 @@ BNetBuffer::RemoveMessage(BMessage& data)
 
 	status_t result = RemoveData(flattenedData, dataSize);
 	if (result == B_OK)
-		result = data.Unflatten(flattenedData);
+		result = data.Unflatten(flattenedData, dataSize);
 
 	delete[] flattenedData;
 

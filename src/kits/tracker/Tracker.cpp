@@ -1486,7 +1486,7 @@ TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
 	BMessage message;
 	if (deskDir.ReadAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
 			(size_t)attrInfo.size) != attrInfo.size
-		|| message.Unflatten(buffer) != B_OK) {
+		|| message.Unflatten(buffer, attrInfo.size) != B_OK) {
 		free(buffer);
 		return;
 	}

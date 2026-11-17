@@ -272,7 +272,7 @@ InputServerStream::_MessageFromPort(BMessage** _message, bigtime_t timeout)
 		return B_OK;
 	}
 
-	status_t status = message->Unflatten((const char*)buffer);
+	status_t status = message->Unflatten(buffer, bufferSize);
 	delete[] buffer;
 
 	if (status != B_OK) {

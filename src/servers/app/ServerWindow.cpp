@@ -977,7 +977,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				char buffer[size];
 				if (link.Read(buffer, size) == B_OK) {
 					BMessage settings;
-					if (settings.Unflatten(buffer) == B_OK)
+					if (settings.Unflatten(buffer, size) == B_OK)
 						fDesktop->SetWindowDecoratorSettings(
 							fWindow.Get(), settings);
 				}
@@ -2312,7 +2312,7 @@ fDesktop->LockSingleWindow();
 				char* buffer = new (nothrow) char[bufferSize];
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
-					&& dragMessage.Unflatten(buffer) == B_OK) {
+					&& dragMessage.Unflatten(buffer, bufferSize) == B_OK) {
 						BReference<ServerBitmap> bitmap(
 							fServerApp->GetBitmap(bitmapToken), true);
 						// TODO: possible deadlock
@@ -2346,7 +2346,7 @@ fDesktop->LockSingleWindow();
 				char* buffer = new (nothrow) char[bufferSize];
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
-					&& dragMessage.Unflatten(buffer) == B_OK) {
+					&& dragMessage.Unflatten(buffer, bufferSize) == B_OK) {
 						// TODO: possible deadlock
 fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,

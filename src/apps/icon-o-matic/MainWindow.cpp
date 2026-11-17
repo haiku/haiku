@@ -280,7 +280,7 @@ MainWindow::MessageReceived(BMessage* message)
 					break;
 
 				BMessage archive;
-				archive.Unflatten(data);
+				archive.Unflatten(data, length);
 
 				if (archive.what == PathListView::kSelectionArchiveCode)
 					fPathListView->HandlePaste(&archive);

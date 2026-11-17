@@ -250,7 +250,8 @@ RepositoryReaderImpl::Init(BPositionIO* file, bool keepFile)
 
 	// unarchive repository info
 	BMessage repositoryInfoArchive;
-	error = repositoryInfoArchive.Unflatten((char*)repositoryInfoSection.data);
+	error = repositoryInfoArchive.Unflatten(repositoryInfoSection.data,
+		repositoryInfoSection.uncompressedLength);
 	if (error != B_OK) {
 		ErrorOutput()->PrintError(
 			"Error: Unable to unflatten repository info archive!\n");
