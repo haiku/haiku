@@ -3245,12 +3245,11 @@ dump_mount(int argc, char** argv)
 		return 0;
 	}
 
-	ulong val = parse_expression(argv[1]);
-	uint32 id = val;
+	uint64 val = parse_expression(argv[1]);
 
-	struct fs_mount* mount = sMountsTable->Lookup(id);
+	struct fs_mount* mount = sMountsTable->Lookup(val);
 	if (mount == NULL) {
-		if (IS_USER_ADDRESS(id)) {
+		if (IS_USER_ADDRESS(val)) {
 			kprintf("fs_mount not found\n");
 			return 0;
 		}
