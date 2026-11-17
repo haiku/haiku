@@ -304,6 +304,9 @@ net_error_to_icmp(net_error error, uint8& type, uint8& code)
 			type = ICMP_TYPE_SOURCE_QUENCH;
 			code = 0;
 			break;
+
+		default:
+			break;
 	}
 }
 

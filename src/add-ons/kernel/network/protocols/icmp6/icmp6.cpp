@@ -14,8 +14,10 @@
 #include <KernelExport.h>
 #include <util/list.h>
 
+#include <algorithm>
 #include <netinet/icmp6.h>
-#include <netinet/in.h>
+#include <netinet/ip6.h>
+#include <netinet6/in6.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -25,9 +27,9 @@
 
 //#define TRACE_ICMP6
 #ifdef TRACE_ICMP6
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -39,21 +41,143 @@ static net_stack_module_info *sStackModule;
 static net_ndp_module_info *sIPv6NDPModule;
 
 
+#ifdef TRACE_ICMP6
+
+
+static const char*
+net_error_to_string(net_error error)
+{
+#define CODE(x) case x: return #x;
+	switch (error) {
+		CODE(B_NET_ERROR_REDIRECT_HOST)
+		CODE(B_NET_ERROR_UNREACH_NET)
+		CODE(B_NET_ERROR_UNREACH_HOST)
+		CODE(B_NET_ERROR_UNREACH_PROTOCOL)
+		CODE(B_NET_ERROR_UNREACH_PORT)
+		CODE(B_NET_ERROR_UNREACH_SOURCE_FAIL)
+		CODE(B_NET_ERROR_UNREACH_NET_UNKNOWN)
+		CODE(B_NET_ERROR_UNREACH_HOST_UNKNOWN)
+		CODE(B_NET_ERROR_UNREACH_ISOLATED)
+		CODE(B_NET_ERROR_UNREACH_NET_PROHIBITED)
+		CODE(B_NET_ERROR_UNREACH_HOST_PROHIBITED)
+		CODE(B_NET_ERROR_UNREACH_NET_TOS)
+		CODE(B_NET_ERROR_UNREACH_HOST_TOS)
+		CODE(B_NET_ERROR_UNREACH_FILTER_PROHIBITED)
+		CODE(B_NET_ERROR_UNREACH_HOST_PRECEDENCE)
+		CODE(B_NET_ERROR_UNREACH_PRECEDENCE_CUTOFF)
+		CODE(B_NET_ERROR_MESSAGE_SIZE)
+		CODE(B_NET_ERROR_TRANSIT_TIME_EXCEEDED)
+		CODE(B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED)
+		CODE(B_NET_ERROR_PARAMETER_PROBLEM)
+		CODE(B_NET_ERROR_QUENCH)
+		CODE(B_NET_ERROR_UNREACH_BEYONDSCOPE)
+		default:
+			return "unknown";
+	}
+#undef CODE
+}
+
+
+#endif	// TRACE_ICMP6
+
+
+static void
+fill_sockaddr_in6(sockaddr_in6* target, in6_addr address)
+{
+	target->sin6_family = AF_INET6;
+	target->sin6_len = sizeof(sockaddr_in6);
+	target->sin6_port = 0;
+	target->sin6_addr = address;
+}
+
+
 static net_error
 icmp6_to_net_error(uint8 type, uint8 code)
 {
 	switch (type) {
+		case ICMP6_DST_UNREACH:
+			switch (code) {
+				case ICMP6_DST_UNREACH_NOROUTE:
+					return B_NET_ERROR_UNREACH_NET;
+				case ICMP6_DST_UNREACH_ADMIN:
+					return B_NET_ERROR_UNREACH_NET_PROHIBITED;
+				case ICMP6_DST_UNREACH_BEYONDSCOPE:
+					return B_NET_ERROR_UNREACH_BEYONDSCOPE;
+				case ICMP6_DST_UNREACH_ADDR:
+					return B_NET_ERROR_UNREACH_HOST;
+				case ICMP6_DST_UNREACH_NOPORT:
+					return B_NET_ERROR_UNREACH_PORT;
+				default:
+					break;
+			}
 		case ICMP6_PARAM_PROB:
 			return B_NET_ERROR_PARAMETER_PROBLEM;
 
 		case ICMP6_PACKET_TOO_BIG:
 			return B_NET_ERROR_MESSAGE_SIZE;
 
+		case ICMP6_TIME_EXCEEDED:
+			switch (code) {
+				case ICMP6_TIME_EXCEED_TRANSIT:
+					return B_NET_ERROR_TRANSIT_TIME_EXCEEDED;
+				case ICMP6_TIME_EXCEED_REASSEMBLY:
+					return B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED;
+				default:
+					break;
+			}
 		default:
 			break;
 	}
 
 	return (net_error)0;
+}
+
+
+static void
+net_error_to_icmp(net_error error, uint8& type, uint8& code)
+{
+	switch (error) {
+		// unreach
+		case B_NET_ERROR_UNREACH_NET:
+			type = ICMP6_DST_UNREACH;
+			code = ICMP6_DST_UNREACH_NOROUTE;
+			break;
+		case B_NET_ERROR_UNREACH_HOST:
+			type = ICMP6_DST_UNREACH;
+			code = ICMP6_DST_UNREACH_ADDR;
+			break;
+		case B_NET_ERROR_UNREACH_PORT:
+			type = ICMP6_DST_UNREACH;
+			code = ICMP6_DST_UNREACH_NOPORT;
+			break;
+		case B_NET_ERROR_UNREACH_NET_PROHIBITED:
+			type = ICMP6_DST_UNREACH;
+			code = ICMP6_DST_UNREACH_ADMIN;
+			break;
+		case B_NET_ERROR_UNREACH_BEYONDSCOPE:
+			type = ICMP6_DST_UNREACH;
+			code = ICMP6_DST_UNREACH_BEYONDSCOPE;
+			break;
+
+		// time exceeded
+		case B_NET_ERROR_TRANSIT_TIME_EXCEEDED:
+			type = ICMP6_TIME_EXCEEDED;
+			code = ICMP6_TIME_EXCEED_TRANSIT;
+			break;
+		case B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED:
+			type = ICMP6_TIME_EXCEEDED;
+			code = ICMP6_TIME_EXCEED_REASSEMBLY;
+			break;
+
+		// other
+		case B_NET_ERROR_PARAMETER_PROBLEM:
+			type = ICMP6_PARAM_PROB;
+			code = 0;
+			break;
+
+		default:
+			break;
+	}
 }
 
 
@@ -236,8 +360,8 @@ get_domain(struct net_buffer* buffer)
 status_t
 icmp6_receive_data(net_buffer *buffer)
 {
-	TRACE(("ICMPv6 received some data, buffer length %" B_PRIu32 "\n",
-		buffer->size));
+	TRACE("ICMPv6 received some data, buffer length %" B_PRIu32 "\n",
+		buffer->size);
 
 	net_domain* domain = get_domain(buffer);
 	if (domain == NULL)
@@ -249,8 +373,8 @@ icmp6_receive_data(net_buffer *buffer)
 
 	icmp6_hdr &header = bufferHeader.Data();
 
-	TRACE(("  got type %u, code %u, checksum 0x%x\n", header.icmp6_type,
-			header.icmp6_code, header.icmp6_cksum));
+	TRACE("  got type %u, code %u, checksum 0x%x\n", header.icmp6_type,
+			header.icmp6_code, header.icmp6_cksum);
 
 	net_address_module_info* addressModule = domain->address_module;
 
@@ -343,15 +467,118 @@ icmp6_receive_data(net_buffer *buffer)
 status_t
 icmp6_error_received(net_error code, net_error_data* errorData, net_buffer* data)
 {
- 	return B_ERROR;
+	return B_ERROR;
 }
 
 
+/*!	Sends an ICMPv6 error message to the source of the \a buffer causing the
+	error.
+*/
 status_t
 icmp6_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 	net_error_data* errorData)
 {
-	return B_ERROR;
+	TRACE("icmp6_error_reply(code %s)\n", net_error_to_string(error));
+
+	uint8 icmpType = 0;
+	uint8 icmpCode = 0;
+	net_error_to_icmp(error, icmpType, icmpCode);
+
+	TRACE("  icmp type %u, code %u\n", icmpType, icmpCode);
+
+	struct ip6_hdr header;
+	if (gBufferModule->restore_header(buffer, 0, &header, sizeof(header)) != B_OK)
+		return B_BAD_VALUE;
+
+	// Check if we actually have an IPv6 header now
+	if ((header.ip6_vfc & IPV6_VERSION_MASK) != IPV6_VERSION) {
+		TRACE("  no IPv6 header found\n");
+		return B_BAD_VALUE;
+	}
+
+	// RFC 4443 2.4 (e.1) (e.2):
+	// ICMP error message should not be sent on reception of
+	// an ICMP error message, or a redirect
+	if (header.ip6_nxt == IPPROTO_ICMPV6) {
+		uint8 type = 0;
+		if (gBufferModule->restore_header(buffer, sizeof(header), &type,
+				1) != B_OK || (type & ICMP6_INFOMSG_MASK) == 0 || type == ND_REDIRECT) {
+			return B_ERROR;
+		}
+	}
+
+	// RFC 4443 2.4 (e.3) (e.4):
+	// a datagram to an IP multicast or broadcast address,
+	// except for ICMP6_PACKET_TOO_BIG ICMP6_PARAM_PROB ICMP6_PARAMPROB_OPTION
+	if ((buffer->msg_flags & (MSG_BCAST | MSG_MCAST)) != 0
+		&& icmpType != ICMP6_PACKET_TOO_BIG && icmpType != ICMP6_PARAM_PROB
+		&& icmpType != ICMP6_PARAMPROB_OPTION) {
+		return B_ERROR;
+	}
+
+	net_buffer* reply = gBufferModule->create(256);
+	if (reply == NULL)
+		return B_NO_MEMORY;
+
+	if (buffer->destination->sa_family == AF_INET6) {
+		memcpy(reply->source, buffer->destination, buffer->destination->sa_len);
+		memcpy(reply->destination, buffer->source, buffer->source->sa_len);
+	} else {
+		fill_sockaddr_in6((sockaddr_in6*)reply->source, header.ip6_dst);
+		fill_sockaddr_in6((sockaddr_in6*)reply->destination, header.ip6_src);
+	}
+
+	// Now prepare the ICMP header
+
+	NetBufferPrepend<icmp6_hdr> icmpHeader(reply);
+	status_t status = icmpHeader.Status();
+	if (status != B_OK) {
+		gBufferModule->free(reply);
+		return status;
+	}
+	icmpHeader->icmp6_type = icmpType;
+	icmpHeader->icmp6_code = icmpCode;
+	icmpHeader->icmp6_cksum = 0;
+	icmpHeader->icmp6_data32[0] = 0;
+
+	if (errorData != NULL) {
+		switch (error) {
+			case B_NET_ERROR_PARAMETER_PROBLEM:
+				icmpHeader->icmp6_pptr = errorData->error_offset;
+				break;
+			case B_NET_ERROR_MESSAGE_SIZE:
+				icmpHeader->icmp6_mtu = htons(errorData->mtu);
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	icmpHeader.Sync();
+
+	// Append IP header + 8 byte of the original datagram
+	status = gBufferModule->append_restored_header(reply, buffer, 0,
+		std::min(sizeof(ip6_hdr) + 8, sizeof(ip6_hdr) + header.ip6_plen));
+	if (status == B_OK) {
+		net_domain* domain = get_domain(buffer);
+
+		if (domain == NULL)
+			status = B_ERROR;
+		else {
+			reply->protocol = IPPROTO_ICMPV6;
+			*ICMP6ChecksumField(reply) = gBufferModule->checksum(reply, 0, reply->size, true);
+
+			TRACE("  send ICMPv6 message %p to %s\n", reply,
+				AddressString(domain->address_module, reply->destination, true).Data());
+
+			status = domain->module->send_data(NULL, reply);
+		}
+	}
+	if (status != B_OK)
+		gBufferModule->free(reply);
+
+	return status;
 }
 
 

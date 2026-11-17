@@ -1405,6 +1405,7 @@ udp_error_received(net_error error, net_error_data* errorData, net_buffer* buffe
 			notifyError = EMSGSIZE;
 			break;
 		case B_NET_ERROR_PARAMETER_PROBLEM:
+		case B_NET_ERROR_UNREACH_BEYONDSCOPE:
 			notifyError = ENOPROTOOPT;
 			break;
 

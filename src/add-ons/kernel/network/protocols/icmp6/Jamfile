@@ -9,6 +9,3 @@ KernelAddon icmp6 :
 	icmp6.cpp
 ;
 
-# Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/protocols
-	: icmp6 ;

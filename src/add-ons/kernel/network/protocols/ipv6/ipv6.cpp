@@ -1639,7 +1639,12 @@ status_t
 ipv6_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
 	net_error_data* errorData)
 {
-	return B_ERROR;
+	// Directly obtain the ICMPV6 protocol module
+	net_protocol_module_info* icmpv6 = receiving_protocol(IPPROTO_ICMPV6);
+	if (icmpv6 == NULL)
+		return B_ERROR;
+
+	return icmpv6->error_reply(protocol, cause, error, errorData);
 }
 
 
