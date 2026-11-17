@@ -127,7 +127,7 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 	fVolume = volume;
 	fBlockGroup = blockGroup;
 	fNumBits = numBits;
-	fStart = blockGroup * numBits + fVolume->FirstDataBlock();
+	fStart = blockGroup * fVolume->BlocksPerGroup() + fVolume->FirstDataBlock();
 
 	status_t status = fVolume->GetBlockGroup(blockGroup, &fGroupDescriptor);
 	if (status != B_OK)
