@@ -1337,12 +1337,16 @@ ui_color(color_which which)
 
 
 rgb_color
-BPrivate::GetSystemColor(color_which colorConstant, bool darkVariant) {
-	if (darkVariant) {
-		return _kDefaultColorsDark[color_which_to_index(colorConstant)];
-	} else {
-		return _kDefaultColors[color_which_to_index(colorConstant)];
-	}
+BPrivate::GetSystemColor(color_which colorConstant, bool darkVariant)
+{
+	int32 index = color_which_to_index(colorConstant);
+	if (index < 0)
+		return B_TRANSPARENT_COLOR;
+
+	if (darkVariant)
+		return _kDefaultColorsDark[index];
+	else
+		return _kDefaultColors[index];
 }
 
 
