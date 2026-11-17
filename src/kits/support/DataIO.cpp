@@ -64,6 +64,8 @@ BDataIO::ReadExactly(void* buffer, size_t size, size_t* _bytesRead)
 	while (bytesRemaining > 0) {
 		ssize_t bytesRead = Read(out, bytesRemaining);
 		if (bytesRead < 0) {
+			if (bytesRead == B_INTERRUPTED)
+				continue;
 			error = bytesRead;
 			break;
 		}
@@ -94,6 +96,8 @@ BDataIO::WriteExactly(const void* buffer, size_t size, size_t* _bytesWritten)
 	while (bytesRemaining > 0) {
 		ssize_t bytesWritten = Write(in, bytesRemaining);
 		if (bytesWritten < 0) {
+			if (bytesWritten == B_INTERRUPTED)
+				continue;
 			error = bytesWritten;
 			break;
 		}
