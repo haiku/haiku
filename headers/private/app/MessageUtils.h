@@ -53,29 +53,27 @@ public:
 	template<class T>
 	inline void operator()(T &data)
 	{
-		fError = fStream->Read((void *)&data, sizeof(T));
-		if (fError > B_OK) {
+		fError = fStream->ReadExactly((void *)&data, sizeof(T));
+		if (fError == B_OK) {
 			if (IsSwapping())
 				byte_swap(data);
 			return;
 		}
 
-		if (fError == 0)
-			fError = B_ERROR;
 		throw fError;
 	}
 
 	template<class T>
 	inline void operator()(T data, size_t len)
 	{
-		fError = fStream->Read((void *)data, len);
-		if (fError >= B_OK)
+		fError = fStream->ReadExactly((void *)data, len);
+		if (fError == B_OK)
 			return;
 
 		throw fError;
 	}
 
-	status_t			Status() const { return fError >= B_OK ? B_OK : fError; }
+	status_t			Status() const { return fError; }
 
 	void				SetSwap(bool yesNo) { fSwap = yesNo; }
 	bool				IsSwapping() const { return fSwap; }

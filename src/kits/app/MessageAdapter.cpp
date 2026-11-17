@@ -140,20 +140,20 @@ MessageAdapter::Flatten(uint32 format, const BMessage *from, BDataIO *stream,
 			if (!buffer)
 				return B_NO_MEMORY;
 
-			status_t result = _FlattenR5Message(format, from, buffer,
+			status_t status = _FlattenR5Message(format, from, buffer,
 				&flattenedSize);
-			if (result < B_OK) {
+			if (status < B_OK) {
 				free(buffer);
-				return result;
+				return status;
 			}
 
-			ssize_t written = stream->Write(buffer, flattenedSize);
-			if (written != flattenedSize) {
+			status = stream->WriteExactly(buffer, flattenedSize);
+			if (status != B_OK) {
 				free(buffer);
-				return (written >= 0 ? B_ERROR : written);
+				return status;
 			}
 
-			if (size)
+			if (size != NULL)
 				*size = flattenedSize;
 
 			free(buffer);
