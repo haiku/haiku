@@ -133,8 +133,10 @@ Attribute::Read(attr_cookie* cookie, off_t pos, uint8* buffer, size_t* _length)
 		length = entry->DataLength() - pos;
 	else
 		length = *_length - pos;
-	memcpy(buffer, (uint8*)entry + entry->NameLength()
+	status = user_memcpy(buffer, (uint8*)entry + entry->NameLength()
 		+ sizeof(btrfs_dir_entry) + (uint32)pos, length);
+	if (status != B_OK)
+		return B_BAD_ADDRESS;
 	*_length = length;
 
 	free(entries);
