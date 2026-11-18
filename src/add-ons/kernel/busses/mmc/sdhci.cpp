@@ -331,7 +331,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	if (fCommandResult & SDHCI_INT_ERROR) {
 		// TODO is it a good idea to clear interrupts here from outside the interrupt handler?
-		fRegisters->interrupt_status |= fCommandResult;
+		fRegisters->interrupt_status = fCommandResult;
 		if (fCommandResult & SDHCI_INT_COMMAND_TIMEOUT) {
 			ERROR("Command execution timed out\n");
 			// At this point, the "command inhibit" bit is not set yet, it will be set only after
@@ -679,8 +679,8 @@ SdhciBus::RecoverError()
 	if (fRegisters->interrupt_status & 7)
 		fRegisters->software_reset.ResetCommandLine();
 
-	int16_t error_status = fRegisters->interrupt_status;
-	fRegisters->interrupt_status &= ~(error_status);
+	uint32_t error_status = fRegisters->interrupt_status;
+	fRegisters->interrupt_status = error_status & SDHCI_INT_ERROR_MASK;
 }
 
 
@@ -717,7 +717,7 @@ SdhciBus::HandleInterrupt()
 		else
 			TRACE("Card removed interrupt, but card is inserted\n");
 
-		fRegisters->interrupt_status |= SDHCI_INT_CARD_REM;
+		fRegisters->interrupt_status = SDHCI_INT_CARD_REM;
 		TRACE("Card removal interrupt handled\n");
 	}
 
@@ -731,7 +731,7 @@ SdhciBus::HandleInterrupt()
 		} else
 			TRACE("Card insertion interrupt, but card is removed\n");
 
-		fRegisters->interrupt_status |= SDHCI_INT_CARD_INS;
+		fRegisters->interrupt_status = SDHCI_INT_CARD_INS;
 		TRACE("Card presence interrupt handled\n");
 	}
 
@@ -740,7 +740,7 @@ SdhciBus::HandleInterrupt()
 		fCommandResult |= intmask;
 			// Save the status before clearing so the thread can handle it
 
-		fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
+		fRegisters->interrupt_status = (intmask & SDHCI_INT_CMD_MASK);
 
 		// Notify the thread
 		fInterruptNotifier.NotifyAll();
@@ -749,14 +749,14 @@ SdhciBus::HandleInterrupt()
 
 	if (intmask & SDHCI_INT_TRANSFER_MASK) {
 		fCommandResult |= intmask;
-		fRegisters->interrupt_status |= (intmask & SDHCI_INT_TRANSFER_MASK);
+		fRegisters->interrupt_status = (intmask & SDHCI_INT_TRANSFER_MASK);
 		fInterruptNotifier.NotifyAll();
 		TRACE("Transfer complete interrupt handled\n");
 	}
 
 	// handling bus power interrupt
 	if (intmask & SDHCI_INT_BUS_POWER) {
-		fRegisters->interrupt_status |= SDHCI_INT_BUS_POWER;
+		fRegisters->interrupt_status = SDHCI_INT_BUS_POWER;
 		TRACE("card is consuming too much power\n");
 	}
 
@@ -778,12 +778,12 @@ SdhciBus::_WorkerThread(void* cookie) {
 		uint32_t intmask = bus->fRegisters->interrupt_status;
 		if (intmask & SDHCI_INT_CMD_CMP) {
 			bus->fCommandResult = intmask;
-			bus->fRegisters->interrupt_status |= (intmask & SDHCI_INT_CMD_MASK);
+			bus->fRegisters->interrupt_status = (intmask & SDHCI_INT_CMD_MASK);
 			bus->fInterruptNotifier.NotifyAll();
 		}
 		if (intmask & SDHCI_INT_TRANS_CMP) {
 			bus->fCommandResult = intmask;
-			bus->fRegisters->interrupt_status |= SDHCI_INT_TRANS_CMP;
+			bus->fRegisters->interrupt_status = SDHCI_INT_TRANS_CMP;
 			bus->fInterruptNotifier.NotifyAll();
 		}
 		snooze(100);
