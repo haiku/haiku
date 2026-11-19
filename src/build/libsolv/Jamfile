@@ -34,7 +34,8 @@ switch $(HOST_PLATFORM) {
 			"($(HOST_PLATFORM))!" ;
 }
 
-SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
+SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes
+	-Wno-error=incompatible-pointer-types ;
 
 SubDirCcFlags $(HOST_PIC_CCFLAGS) ;
 SubDirC++Flags $(HOST_PIC_C++FLAGS) -std=gnu++11 ;
