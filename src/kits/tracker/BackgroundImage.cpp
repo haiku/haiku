@@ -38,6 +38,7 @@ All rights reserved.
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Node.h>
+#include <StackOrHeapArray.h>
 #include <TranslationKit.h>
 #include <View.h>
 #include <Window.h>
@@ -74,14 +75,14 @@ BackgroundImage::GetBackgroundImage(const BNode* node, bool isDesktop)
 		return NULL;
 
 	BMessage container;
-	char* buffer = new char[info.size];
+	BStackOrHeapArray<char, 512> buffer(info.size);
+	if (!buffer.IsValid())
+		return NULL;
 
 	status_t error = node->ReadAttr(kBackgroundImageInfo, info.type, 0,
 		buffer, (size_t)info.size);
 	if (error == info.size)
 		error = container.Unflatten(buffer, info.size);
-
-	delete[] buffer;
 
 	if (error != B_OK)
 		return NULL;

@@ -55,6 +55,7 @@ All rights reserved.
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
+#include <StackOrHeapArray.h>
 #include <StopWatch.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -1482,16 +1483,13 @@ TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
 		return;
 	}
 
-	char* buffer = (char*)malloc((size_t)attrInfo.size);
+	BStackOrHeapArray<char, 512> buffer(attrInfo.size);
 	BMessage message;
-	if (deskDir.ReadAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
+	if (!buffer.IsValid() || deskDir.ReadAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
 			(size_t)attrInfo.size) != attrInfo.size
 		|| message.Unflatten(buffer, attrInfo.size) != B_OK) {
-		free(buffer);
 		return;
 	}
-
-	free(buffer);
 
 	node_ref nodeRef;
 	deskDir.GetNodeRef(&nodeRef);

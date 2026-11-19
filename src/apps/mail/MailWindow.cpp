@@ -66,6 +66,7 @@ of their respective holders. All rights reserved.
 #include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <StringList.h>
 #include <StringView.h>
@@ -3315,8 +3316,8 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 			if (count > 1)
 				queryString << "(";
 
-			char* buffer = new char[info.size];
-			if (node.ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+			BStackOrHeapArray<char, 512> buffer(info.size);
+			if (buffer.IsValid() && node.ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
 					buffer, (size_t)info.size) == info.size) {
 				BMessage message;
 				if (message.Unflatten(buffer, info.size) == B_OK) {
@@ -3355,7 +3356,6 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 			if (count > 1)
 				queryString << ")";
 
-			delete [] buffer;
 			break;
 		}
 

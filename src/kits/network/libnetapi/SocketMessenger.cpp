@@ -13,6 +13,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <HashMap.h>
+#include <StackOrHeapArray.h>
 
 
 static const char* kReplySenderIDField = "socket_messenger:sender_reply_id";
@@ -306,22 +307,17 @@ BSocketMessenger::_SendMessage(const BMessage& message)
 	ssize_t flatSize = message.FlattenedSize();
 	ssize_t totalSize = flatSize + sizeof(ssize_t);
 
-	char* buffer = new(std::nothrow) char[totalSize];
-	if (buffer == NULL)
+	BStackOrHeapArray<char, 512> buffer(totalSize);
+	if (!buffer.IsValid())
 		return B_NO_MEMORY;
 
-	ArrayDeleter<char> bufferDeleter(buffer);
-	*(ssize_t*)buffer = flatSize;
+	*(ssize_t*)&*buffer = flatSize;
 	char* messageBuffer = buffer + sizeof(ssize_t);
 	status_t error = message.Flatten(messageBuffer, flatSize);
 	if (error != B_OK)
 		return error;
 
-	ssize_t size = fSocket.Write(buffer, totalSize);
-	if (size < 0)
-		return size;
-
-	return B_OK;
+	return fSocket.WriteExactly(buffer, totalSize);
 }
 
 
@@ -333,26 +329,16 @@ BSocketMessenger::_ReadMessage(BMessage& _message)
 		return error;
 
 	ssize_t size = 0;
-	ssize_t readSize = fSocket.Read(&size, sizeof(ssize_t));
-	if (readSize < 0)
-		return readSize;
-
-	if (readSize != sizeof(ssize_t))
+	status_t status = fSocket.ReadExactly(&size, sizeof(ssize_t));
+	if (status != B_OK)
 		return B_BAD_VALUE;
 
-	if (size <= 0)
-		return B_MISMATCHED_VALUES;
-
-	char* buffer = new(std::nothrow) char[size];
-	if (buffer == NULL)
+	BStackOrHeapArray<char, 512> buffer(size);
+	if (!buffer.IsValid())
 		return B_NO_MEMORY;
 
-	ArrayDeleter<char> bufferDeleter(buffer);
-	readSize = fSocket.Read(buffer, size);
-	if (readSize < 0)
-		return readSize;
-
-	if (readSize != size)
+	status = fSocket.ReadExactly(buffer, size);
+	if (status != B_OK)
 		return B_MISMATCHED_VALUES;
 
 	return _message.Unflatten(buffer, size);

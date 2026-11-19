@@ -42,6 +42,7 @@ All rights reserved.
 #include <Locale.h>
 #include <NodeMonitor.h>
 #include <Query.h>
+#include <StackOrHeapArray.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 #include <Window.h>
@@ -534,10 +535,9 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 
 	// get volumes to perform query on
 	if (modelNode->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
-		char* buffer = NULL;
+		BStackOrHeapArray<char, 512> buffer(info.size);
 
-		if ((buffer = (char*)malloc((size_t)info.size)) != NULL
-			&& modelNode->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
+		if (buffer.IsValid() && modelNode->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0,
 				buffer, (size_t)info.size) == info.size) {
 			BMessage message;
 			if (message.Unflatten(buffer, info.size) == B_OK) {
@@ -564,8 +564,6 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 				}
 			}
 		}
-
-		free(buffer);
 	}
 
 	if (searchAllVolumes) {
@@ -585,8 +583,8 @@ QueryEntryListCollection::QueryEntryListCollection(Model* model,
 
 	if (modelNode->GetAttrInfo("_trk/directories", &info) == B_OK) {
 		BString bufferString;
-		char* buffer = bufferString.LockBuffer(info.size);
-		if (modelNode->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0,
+		BStackOrHeapArray<char, 512> buffer(info.size);
+		if (!buffer.IsValid() || modelNode->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0,
 				buffer, info.size) != info.size) {
 			fStatus = B_ERROR;
 			return;

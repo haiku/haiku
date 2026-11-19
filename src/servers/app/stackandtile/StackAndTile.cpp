@@ -11,6 +11,7 @@
 #include "StackAndTile.h"
 
 #include <Debug.h>
+#include <StackOrHeapArray.h>
 
 #include "StackAndTilePrivate.h"
 
@@ -677,9 +678,9 @@ StackAndTile::_HandleMessage(BPrivate::LinkReceiver& link,
 		{
 			int32 size;
 			if (link.Read<int32>(&size) == B_OK) {
-				char buffer[size];
+				BStackOrHeapArray<char, 512> buffer(size);
 				BMessage group;
-				if (link.Read(buffer, size) == B_OK
+				if (buffer.IsValid() && link.Read(buffer, size) == B_OK
 					&& group.Unflatten(buffer, size) == B_OK) {
 					status_t status = SATGroup::RestoreGroup(group, this);
 					reply.StartMessage(status);

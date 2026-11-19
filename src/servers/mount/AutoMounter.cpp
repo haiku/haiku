@@ -35,6 +35,7 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PropertyInfo.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <VolumeRoster.h>
 
@@ -859,16 +860,15 @@ AutoMounter::_ReadSettings()
 		return;
 
 	ASSERT(settingsSize != 0);
-	char *buffer = new(std::nothrow) char[settingsSize];
-	if (buffer == NULL) {
+	BStackOrHeapArray<char, 512> buffer(settingsSize);
+	if (!buffer.IsValid()) {
 		PRINT(("error writing automounter settings, out of memory\n"));
 		return;
 	}
 
 	fPrefsFile.Seek(0, 0);
-	if (fPrefsFile.Read(buffer, (size_t)settingsSize) != settingsSize) {
+	if (fPrefsFile.ReadExactly(buffer, (size_t)settingsSize) != B_OK) {
 		PRINT(("error reading automounter settings\n"));
-		delete [] buffer;
 		return;
 	}
 
@@ -877,11 +877,8 @@ AutoMounter::_ReadSettings()
 	if (result != B_OK) {
 		PRINT(("error %s unflattening automounter settings, size %" B_PRIdSSIZE "\n",
 			strerror(result), settingsSize));
-		delete [] buffer;
 		return;
 	}
-
-	delete [] buffer;
 
 	// update flags and modes from the message
 	_UpdateSettingsFromMessage(&message);

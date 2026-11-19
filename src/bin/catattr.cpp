@@ -18,6 +18,7 @@
 
 #include <fs_attr.h>
 #include <Mime.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <TypeConstants.h>
 
@@ -155,8 +156,8 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 		cut = true;
 	}
 
-	char* buffer = (char*)malloc(size);
-	if (!buffer) {
+	BStackOrHeapArray<char, 512> buffer(size);
+	if (!buffer.IsValid()) {
 		fprintf(stderr, "Could not allocate read buffer!\n");
 		close(fd);
 		return B_NO_MEMORY;
@@ -164,7 +165,6 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
 	if (bytesRead < 0) {
-		free(buffer);
 		close(fd);
 		return errno;
 	}
@@ -172,7 +172,6 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 	if (bytesRead != size) {
 		fprintf(stderr, "Could only read %ld bytes from attribute!\n",
 			bytesRead);
-		free(buffer);
 		close(fd);
 		return B_ERROR;
 	}
@@ -224,44 +223,44 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 
 	switch (info.type) {
 		case B_INT8_TYPE:
-			printf("%" B_PRId8 "\n", *((int8*)buffer));
+			printf("%" B_PRId8 "\n", *((int8*)&*buffer));
 			break;
 		case B_UINT8_TYPE:
-			printf("%" B_PRIu8 "\n", *((uint8*)buffer));
+			printf("%" B_PRIu8 "\n", *((uint8*)&*buffer));
 			break;
 		case B_INT16_TYPE:
-			printf("%" B_PRId16 "\n", *((int16*)buffer));
+			printf("%" B_PRId16 "\n", *((int16*)&*buffer));
 			break;
 		case B_UINT16_TYPE:
-			printf("%" B_PRIu16 "\n", *((uint16*)buffer));
+			printf("%" B_PRIu16 "\n", *((uint16*)&*buffer));
 			break;
 		case B_INT32_TYPE:
-			printf("%" B_PRId32 "\n", *((int32*)buffer));
+			printf("%" B_PRId32 "\n", *((int32*)&*buffer));
 			break;
 		case B_UINT32_TYPE:
-			printf("%" B_PRIu32 "\n", *((uint32*)buffer));
+			printf("%" B_PRIu32 "\n", *((uint32*)&*buffer));
 			break;
 		case B_INT64_TYPE:
-			printf("%" B_PRId64 "\n", *((int64*)buffer));
+			printf("%" B_PRId64 "\n", *((int64*)&*buffer));
 			break;
 		case B_UINT64_TYPE:
-			printf("%" B_PRIu64 "\n", *((uint64*)buffer));
+			printf("%" B_PRIu64 "\n", *((uint64*)&*buffer));
 			break;
 		case B_FLOAT_TYPE:
-			printf("%f\n", *((float*)buffer));
+			printf("%f\n", *((float*)&*buffer));
 			break;
 		case B_DOUBLE_TYPE:
-			printf("%f\n", *((double*)buffer));
+			printf("%f\n", *((double*)&*buffer));
 			break;
 		case B_BOOL_TYPE:
-			printf("%d\n", *((unsigned char*)buffer));
+			printf("%d\n", *((unsigned char*)&*buffer));
 			break;
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
 		case 'MSIG':
 		case 'MSDC':
 		case 'MPTH':
-			printf("%s\n", buffer);
+			printf("%s\n", &*buffer);
 			break;
 
 		case B_MESSAGE_TYPE:
@@ -280,7 +279,6 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 			break;
 	}
 
-	free(buffer);
 	close(fd);
 	return B_OK;
 }

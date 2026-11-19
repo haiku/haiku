@@ -54,6 +54,7 @@ All rights reserved.
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <StackOrHeapArray.h>
 #include <UnicodeChar.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -3880,10 +3881,9 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	// restore window decor settings
 	int32 size = node->Contains(kAttrWindowDecor, B_RAW_TYPE);
 	if (size > 0) {
-		char buffer[size];
-		if (((fOpenFlags & kRestoreDecor) != 0)
-			&& node->Read(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer)
-				== size) {
+		BStackOrHeapArray<char, 512> buffer(size);
+		if (buffer.IsValid() && ((fOpenFlags & kRestoreDecor) != 0)
+			&& node->Read(kAttrWindowDecor, 0, B_RAW_TYPE, size, buffer) == size) {
 			BMessage decorSettings;
 			if (decorSettings.Unflatten(buffer, size) == B_OK)
 				SetDecoratorSettings(decorSettings);

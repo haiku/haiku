@@ -9,6 +9,7 @@
 
 #include <ByteOrder.h>
 #include <Message.h>
+#include <StackOrHeapArray.h>
 #include <TypeConstants.h>
 
 #include "DynamicBuffer.h"
@@ -367,15 +368,13 @@ BNetBuffer::RemoveMessage(BMessage& data)
 	bufferPtr += sizeof(int32);
 	int32 dataSize = *(int32*)bufferPtr;
 
-	char* flattenedData = new (std::nothrow) char[dataSize];
-	if (flattenedData == NULL)
+	BStackOrHeapArray<char, 512> flattenedData(dataSize);
+	if (!flattenedData.IsValid())
 		return B_NO_MEMORY;
 
 	status_t result = RemoveData(flattenedData, dataSize);
 	if (result == B_OK)
 		result = data.Unflatten(flattenedData, dataSize);
-
-	delete[] flattenedData;
 
 	return result;
 }

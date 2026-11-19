@@ -16,6 +16,7 @@
 #include <MediaDefs.h>
 #include <OS.h>
 #include <Path.h>
+#include <StackOrHeapArray.h>
 
 #include "MixerCore.h"
 #include "MixerDebug.h"
@@ -420,9 +421,8 @@ MixerSettings::Load()
 		return;
 	}
 
-	char * buffer = new char[size];
-	if (size != file.Read(buffer, size)) {
-		delete [] buffer;
+	BStackOrHeapArray<char, 512> buffer(size);
+	if (!buffer.IsValid() || file.ReadExactly(buffer, size) != B_OK) {
 		fLocker->Unlock();
 		TRACE("MixerSettings: can't read settings file\n");
 		return;
@@ -430,13 +430,10 @@ MixerSettings::Load()
 
 	BMessage msg;
 	if (B_OK != msg.Unflatten(buffer, size)) {
-		delete [] buffer;
 		fLocker->Unlock();
 		TRACE("MixerSettings: can't unflatten settings\n");
 		return;
 	}
-
-	delete [] buffer;
 
 	if (msg.FindInt32("version") != SETTINGS_VERSION) {
 		fLocker->Unlock();

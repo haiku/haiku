@@ -71,6 +71,7 @@ All rights reserved.
 #include <SeparatorView.h>
 #include <Size.h>
 #include <SpaceLayoutItem.h>
+#include <StackOrHeapArray.h>
 #include <StringFormat.h>
 #include <TextControl.h>
 #include <TextView.h>
@@ -1187,9 +1188,9 @@ FindPanel::LoadDirectoryFiltersFromFile(const BNode* node)
 		return;
 
 	BString bufferString;
-	char* buffer = bufferString.LockBuffer(info.size);
-	if (node->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0, buffer, (size_t)info.size)
-		!= info.size) {
+	BStackOrHeapArray<char, 512> buffer(info.size);
+	if (!buffer.IsValid() || node->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0, buffer,
+		(size_t)info.size) != info.size) {
 		return;
 	}
 
@@ -3009,8 +3010,8 @@ FindPanel::RestoreWindowState(const BNode* node)
 
 	attr_info info;
 	if (node->GetAttrInfo(kAttrQueryVolume, &info) == B_OK) {
-		char* buffer = new char[info.size];
-		if (node->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
+		BStackOrHeapArray<char, 512> buffer(info.size);
+		if (buffer.IsValid() && node->ReadAttr(kAttrQueryVolume, B_MESSAGE_TYPE, 0, buffer,
 				(size_t)info.size) == info.size) {
 			BMessage message;
 			if (message.Unflatten(buffer, info.size) == B_OK) {
@@ -3034,7 +3035,6 @@ FindPanel::RestoreWindowState(const BNode* node)
 				}
 			}
 		}
-		delete[] buffer;
 	}
 
 	LoadDirectoryFiltersFromFile(node);
@@ -3054,8 +3054,8 @@ FindPanel::RestoreWindowState(const BNode* node)
 			attr_info info;
 			if (node->GetAttrInfo(kAttrQueryInitialAttrs, &info) != B_OK)
 				break;
-			char* buffer = new char[info.size];
-			if (node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+			BStackOrHeapArray<char, 512> buffer(info.size);
+			if (buffer.IsValid() && node->ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
 					buffer, (size_t)info.size) == info.size) {
 				BMessage message;
 				if (message.Unflatten(buffer, info.size) == B_OK) {
@@ -3063,7 +3063,6 @@ FindPanel::RestoreWindowState(const BNode* node)
 						RestoreAttrState(message, index);
 				}
 			}
-			delete[] buffer;
 			break;
 		}
 

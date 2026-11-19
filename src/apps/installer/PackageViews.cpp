@@ -20,6 +20,7 @@
 #include <package/PackageInfo.h>
 #include <Path.h>
 #include <ScrollBar.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <View.h>
 #include <Window.h>
@@ -98,9 +99,9 @@ Package::PackageFromEntry(BEntry &entry)
 
 	attr_info attributes;
 	if (node.GetAttrInfo(ICON_ATTRIBUTE, &attributes) == B_OK) {
-		char buffer[attributes.size];
+		BStackOrHeapArray<char, 512> buffer(attributes.size);
 		BMessage msg;
-		if ((node.ReadAttr(ICON_ATTRIBUTE, attributes.type, 0, buffer,
+		if (buffer.IsValid() && (node.ReadAttr(ICON_ATTRIBUTE, attributes.type, 0, buffer,
 				attributes.size) == attributes.size)
 			&& (msg.Unflatten(buffer, attributes.size) == B_OK)) {
 			package->SetIcon(new BBitmap(&msg));

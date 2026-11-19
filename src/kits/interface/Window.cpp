@@ -44,6 +44,7 @@
 #include <RosterPrivate.h>
 #include <Screen.h>
 #include <ServerProtocol.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <TextView.h>
 #include <TokenSpace.h>
@@ -1558,10 +1559,13 @@ BWindow::GetDecoratorSettings(BMessage* settings) const
 		int32 size;
 		status = fLink->Read<int32>(&size);
 		if (status == B_OK) {
-			char buffer[size];
-			status = fLink->Read(buffer, size);
-			if (status == B_OK)
-				status = settings->Unflatten(buffer, size);
+			BStackOrHeapArray<char, 512> buffer(size);
+			if (buffer.IsValid()) {
+				status = fLink->Read(buffer, size);
+				if (status == B_OK)
+					status = settings->Unflatten(buffer, size);
+			} else
+				status = B_NO_MEMORY;
 		}
 	}
 
