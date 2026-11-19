@@ -30,12 +30,15 @@
 #endif
 
 
+hpet_regs* gHPET = NULL;
+
+
 void
-hpet_init(void)
+hpet_init()
 {
 	// Try to find the HPET ACPI table.
 	TRACE("hpet_init: Looking for HPET...\n");
-	acpi_hpet *hpet = (acpi_hpet *)acpi_find_table(ACPI_HPET_SIGNATURE);
+	acpi_hpet *hpet = (acpi_hpet*)acpi_find_table(ACPI_HPET_SIGNATURE);
 
 	// Clear hpet kernel args to known invalid state;
 	gKernelArgs.arch_args.hpet_phys = 0;
@@ -52,6 +55,21 @@ hpet_init(void)
 	TRACE("hpet_init: found HPET at 0x%" B_PRIx64 ".\n",
 		hpet->hpet_address.address);
 	gKernelArgs.arch_args.hpet_phys = hpet->hpet_address.address;
-	gKernelArgs.arch_args.hpet = (void *)mmu_map_physical_memory(
+	gKernelArgs.arch_args.hpet = gHPET = (hpet_regs*)mmu_map_physical_memory(
 		gKernelArgs.arch_args.hpet_phys, B_PAGE_SIZE, kDefaultPageFlags);
+}
+
+
+void
+hpet_spin(bigtime_t microseconds)
+{
+	uint64 originalConfig = gHPET->config;
+	gHPET->config |= HPET_CONF_MASK_ENABLED;
+
+	uint64 end = gHPET->u0.counter64
+		+ ((microseconds * 1000000000ULL) / HPET_GET_PERIOD(gHPET));
+	while (gHPET->u0.counter64 < end)
+		asm volatile("pause");
+
+	gHPET->config = originalConfig;
 }

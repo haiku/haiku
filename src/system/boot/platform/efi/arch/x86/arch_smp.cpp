@@ -23,7 +23,7 @@
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_system_info.h>
-#include <arch/x86/arch_hpet.h>
+#include <boot/arch/x86/arch_hpet.h>
 
 #include "mmu.h"
 #include "acpi.h"
@@ -48,27 +48,8 @@ uint32 get_sentinel(uint64 trampolineStack);
 static bool sX2APIC = false;
 
 
-static void
-hpet_spin(bigtime_t microseconds)
-{
-	// Other CPUs are booted after ExitBootServices, so we can't use spin().
-	// Use the HPET (which we conveniently don't need to calibrate) instead.
-	static hpet_regs* hpet = NULL;
-	if (hpet == NULL) {
-		platform_kernel_address_to_bootloader_address(gKernelArgs.arch_args.hpet.Get(),
-			(void**)&hpet);
-	}
-
-	uint64 originalConfig = hpet->config;
-	hpet->config |= HPET_CONF_MASK_ENABLED;
-
-	uint64 end = hpet->u0.counter64
-		+ ((microseconds * 1000000000ULL) / HPET_GET_PERIOD(hpet));
-	while (hpet->u0.counter64 < end)
-		asm volatile("pause");
-
-	hpet->config = originalConfig;
-}
+// Other CPUs are booted after ExitBootServices, so we can't use the loader's spin().
+// Use the HPET (which we conveniently don't need to calibrate) instead.
 #define spin hpet_spin
 
 

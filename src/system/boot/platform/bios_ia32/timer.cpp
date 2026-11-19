@@ -6,6 +6,8 @@
 #include <KernelExport.h>
 #include <kernel.h>
 
+#include <boot/arch/x86/arch_hpet.h>
+
 #include "bios.h"
 
 
@@ -37,6 +39,12 @@ system_time()
 extern "C" void
 spin(bigtime_t microseconds)
 {
+	// Prefer the HPET over BIOS calls, if it's available.
+	if (gHPET != NULL) {
+		hpet_spin(microseconds);
+		return;
+	}
+
 	struct bios_regs regs;
 	regs.eax = 0x8600;
 	regs.edx = microseconds & 0xFFFF;
