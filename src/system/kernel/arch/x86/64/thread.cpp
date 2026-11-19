@@ -398,10 +398,19 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 
 	// Get the stack to use and copy the frame data to it.
 	uint8* userStack = get_signal_stack(thread, frame, action,
-		sizeof(*signalFrameData) + sizeof(frame->ip));
+		sizeof(*signalFrameData) + sizeof(frame->ip) + 63);
 
 	signal_frame_data* userSignalFrameData
 		= (signal_frame_data*)(userStack + sizeof(frame->ip));
+
+	// XRSTOR needs the FPU data to be 64-byte-aligned, so make sure it is.
+	// (This is what the extra space we requested from get_signal_stack is for.)
+	addr_t misalignment = ((addr_t)&userSignalFrameData->context.uc_mcontext.fpu) % 64;
+	if (misalignment != 0) {
+		userSignalFrameData = (signal_frame_data*)
+			((uint8*)userSignalFrameData + (64 - misalignment));
+		userStack = ((uint8*)userSignalFrameData) - sizeof(frame->ip);
+	}
 
 	if (user_memcpy(userSignalFrameData, signalFrameData,
 			sizeof(*signalFrameData)) != B_OK) {
@@ -435,43 +444,9 @@ int64
 arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
 	iframe* frame = x86_get_current_iframe();
-
 	frame->orig_rax = signalFrameData->syscall_restart_return_value;
-	frame->ax = signalFrameData->context.uc_mcontext.rax;
-	frame->bx = signalFrameData->context.uc_mcontext.rbx;
-	frame->cx = signalFrameData->context.uc_mcontext.rcx;
-	frame->dx = signalFrameData->context.uc_mcontext.rdx;
-	frame->di = signalFrameData->context.uc_mcontext.rdi;
-	frame->si = signalFrameData->context.uc_mcontext.rsi;
-	frame->bp = signalFrameData->context.uc_mcontext.rbp;
-	frame->r8 = signalFrameData->context.uc_mcontext.r8;
-	frame->r9 = signalFrameData->context.uc_mcontext.r9;
-	frame->r10 = signalFrameData->context.uc_mcontext.r10;
-	frame->r11 = signalFrameData->context.uc_mcontext.r11;
-	frame->r12 = signalFrameData->context.uc_mcontext.r12;
-	frame->r13 = signalFrameData->context.uc_mcontext.r13;
-	frame->r14 = signalFrameData->context.uc_mcontext.r14;
-	frame->r15 = signalFrameData->context.uc_mcontext.r15;
-	frame->user_sp = signalFrameData->context.uc_mcontext.rsp;
-	frame->ip = signalFrameData->context.uc_mcontext.rip;
-	frame->flags = (frame->flags & ~(uint64)X86_EFLAGS_USER_FLAGS)
-		| (signalFrameData->context.uc_mcontext.rflags & X86_EFLAGS_USER_FLAGS);
 
-	// Note: the error_code and vector fields are not restored. These are provided to the signal
-	// handler for information purposes only, and are not used after the signal handling is
-	// complete.
-
-	frame->cs = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.cs;
-	frame->ss = signalFrameData->context.uc_mcontext.fpu.fp_fxsave.ss;
-
-	Thread* thread = thread_get_current_thread();
-
-	memcpy(thread->arch_info.user_fpu_state,
-		(void*)&signalFrameData->context.uc_mcontext.fpu, min_c(gFPUSaveLength, sizeof(savefpu)));
-	frame->fpu = &thread->arch_info.user_fpu_state;
-
-	// The syscall return code overwrites frame->ax with the return value of
-	// the syscall, need to return it here to ensure the correct value is
-	// restored.
-	return frame->ax;
+	// We don't actually restore any registers here, as the handler
+	// in userspace will do that.
+	return 0;
 }

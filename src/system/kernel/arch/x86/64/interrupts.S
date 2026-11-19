@@ -401,7 +401,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// Check whether the syscall number is valid.
 	cmpq	$SYSCALL_COUNT, %r14
-	jae		.Lsyscall_return
+	jae		.Lsyscall_finished
 
 	// Get the system call table entry. Note I'm hardcoding the shift because
 	// sizeof(syscall_info) is 16 and scale factors of 16 aren't supported,
@@ -440,7 +440,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	// TODO: post-syscall tracing
 
-.Lsyscall_return:
+.Lsyscall_finished:
 	// Restore the original stack pointer and return.
 	movq	%rbp, %rsp
 
@@ -465,10 +465,7 @@ FUNCTION(x86_64_syscall_entry):
 
 	UPDATE_THREAD_KERNEL_TIME()
 
-	// If we've just restored a signal frame, use the IRET path.
-	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
-	je		.Lrestore_fpu
-
+.Lsyscall_return:
 	CLEAR_FPU_STATE()
 
 	// Restore the iframe and RCX/R11 for SYSRET.
@@ -534,34 +531,10 @@ FUNCTION(x86_64_syscall_entry):
 1:
 	// Install breakpoints, if defined.
 	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%r12)
-	jz		1f
+	jz		.Lsyscall_return
 	movq	%rbp, %rdi
 	call	x86_init_user_debug_at_kernel_exit
-1:
-	// On this return path it is possible that the frame has been modified,
-	// for example to execute a signal handler, so we need to return via IRET.
-
-	cmpq	$SYSCALL_RESTORE_SIGNAL_FRAME, %r14
-	je		.Lrestore_fpu
-
-	CLEAR_FPU_STATE()
-	jmp .Liret
-
-.Lrestore_fpu:
-	movq	IFRAME_fpu(%rbp), %rdi
-
-	movl	(gXsaveMask), %eax
-	movl	(gXsaveMask+4), %edx
-	CODEPATCH_START
-	fxrstorq	(%rdi)
-	CODEPATCH_END(ALTCODEPATCH_TAG_XRSTOR)
-.Liret:
-	// Restore the saved registers.
-	RESTORE_IFRAME()
-
-	// Restore the previous GS base and return.
-	swapgs
-	iretq
+	jmp		.Lsyscall_return
 
 .Lpost_syscall_handle_signals:
 	call	thread_at_kernel_exit
@@ -603,7 +576,7 @@ FUNCTION(x86_64_syscall_entry):
 .Lbad_syscall_args:
 	movq	$0, THREAD_fault_handler(%r12)
 	movq	%rbp, %rsp
-	jmp		.Lsyscall_return
+	jmp		.Lsyscall_finished
 FUNCTION_END(x86_64_syscall_entry)
 
 
