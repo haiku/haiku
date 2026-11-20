@@ -32,16 +32,19 @@ public:
 	{
 		fArea.ptr = new int[1];
 		fArea.id = area_for(fArea.ptr);
+		CPPUNIT_ASSERT(fArea.id > 0);
 		area_info info;
 		get_area_info(fArea.id, &info);
 		fArea.addr = reinterpret_cast<char*>(info.address);
 
+		fOffset = reinterpret_cast<ptrdiff_t>(fArea.ptr) - reinterpret_cast<ptrdiff_t>(fArea.addr);
+
 		fClone1.id = clone_area("clone 1", reinterpret_cast<void**>(&fClone1.addr), B_ANY_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA, fArea.id);
+		CPPUNIT_ASSERT(fClone1.id > 0);
 		fClone2.id = clone_area("clone 2", reinterpret_cast<void**>(&fClone2.addr), B_ANY_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA, fArea.id);
-
-		fOffset = reinterpret_cast<ptrdiff_t>(fArea.ptr) - reinterpret_cast<ptrdiff_t>(fArea.addr);
+		CPPUNIT_ASSERT(fClone2.id > 0);
 
 		fClone1.ptr = reinterpret_cast<int*>(fClone1.addr + fOffset);
 		fClone2.ptr = reinterpret_cast<int*>(fClone2.addr + fOffset);
