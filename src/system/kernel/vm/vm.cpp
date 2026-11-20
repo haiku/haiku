@@ -6075,19 +6075,32 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if (!cache->consumers.IsEmpty()) {
 				// We need to make the area copy-on-write.
 				// Unlock, then reacquire locks using MultiLocker.
-				area_id areaId = area->id;
-				addr_t areaBase = area->Base();
-				size_t areaSize = area->Size();
-				cacheLocker.Unlock();
+				const area_id areaId = area->id;
+				const addr_t areaBase = area->Base();
+				const size_t areaSize = area->Size();
+
+				// We need to keep the cache reference to prevent it from being deleted.
+				cacheLocker.Detach();
+				cache->Unlock();
 				locker.Unlock();
 
 				MultiAddressSpaceLocker multiLocker;
-				status = multiLocker.AddAreaCacheAndLock(areaId, false, false, area, &cache);
+				VMCache* refetchedCache = NULL;
+				status = multiLocker.AddAreaCacheAndLock(areaId, false, false,
+					area, &refetchedCache);
+
+				// Release the kept cache reference.
+				if (cache != refetchedCache)
+					cache->ReleaseRef();
+				else
+					cache->ReleaseRefLocked();
+
 				if (status != B_OK)
 					return status;
-				cacheLocker.SetTo(cache, true);
+				cacheLocker.SetTo(refetchedCache, true);
 
-				if (area->Base() != areaBase || area->Size() != areaSize) {
+				if (area->Base() != areaBase || area->Size() != areaSize
+						|| refetchedCache != cache) {
 					restart = true;
 					break;
 				}
