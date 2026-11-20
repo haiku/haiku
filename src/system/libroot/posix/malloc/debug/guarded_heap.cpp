@@ -576,6 +576,9 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment)
 		alignment = 1;
 
 	size_t pagesNeeded = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE + 1;
+	if ((pagesNeeded * B_PAGE_SIZE) < size)
+		return NULL;
+
 	if (alignment > B_PAGE_SIZE
 		|| pagesNeeded * B_PAGE_SIZE >= GUARDED_HEAP_AREA_USE_THRESHOLD) {
 		// Don't bother, use an area directly. Since it will also fault once
