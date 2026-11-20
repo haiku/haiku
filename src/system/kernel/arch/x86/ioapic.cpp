@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <cpu.h>
 #include <util/AutoLock.h>
+#include <util/FixedSizeBitmap.h>
 
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_int.h>
@@ -84,8 +85,12 @@
 #define IO_APIC_INTERRUPT_VECTOR_SHIFT		0
 #define IO_APIC_INTERRUPT_VECTOR_MASK		0xff
 
-#define MAX_SUPPORTED_REDIRECTION_ENTRIES	64
+// maximum entries BIOS may advertise (according to Intel docs)
+#define MAX_SUPPORTED_REDIRECTION_ENTRIES	120
 #define ISA_INTERRUPT_COUNT					16
+
+
+typedef FixedSizeBitmap<MAX_SUPPORTED_REDIRECTION_ENTRIES> APICMask;
 
 
 struct ioapic_registers {
@@ -102,8 +107,8 @@ struct ioapic {
 	uint8				max_redirection_entry;
 	uint8				global_interrupt_base;
 	uint8				global_interrupt_last;
-	uint64				level_triggered_mask;
-	uint64				nmi_mask;
+	APICMask			level_triggered_mask;
+	APICMask			nmi_mask;
 
 	spinlock			registers_lock;
 	area_id				register_area;
@@ -205,10 +210,10 @@ ioapic_configure_pin(struct ioapic& ioapic, uint8 pin, uint8 vector,
 
 	if (triggerMode == B_LEVEL_TRIGGERED) {
 		entry |= IO_APIC_TRIGGER_MODE_LEVEL;
-		ioapic.level_triggered_mask |= ((uint64)1 << pin);
+		ioapic.level_triggered_mask.SetBit(pin);
 	} else {
 		entry |= IO_APIC_TRIGGER_MODE_EDGE;
-		ioapic.level_triggered_mask &= ~((uint64)1 << pin);
+		ioapic.level_triggered_mask.ClearBit(pin);
 	}
 
 	if (triggerPolarity == B_LOW_ACTIVE_POLARITY)
@@ -238,7 +243,7 @@ ioapic_get_interrupt_trigger(int32 gsi)
 		return B_EDGE_TRIGGERED;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	if ((ioapic->level_triggered_mask & ((uint64)1 << pin)) != 0)
+	if (ioapic->level_triggered_mask.GetBit(pin))
 		return B_LEVEL_TRIGGERED;
 	else
 		return B_EDGE_TRIGGERED;
@@ -370,15 +375,15 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
 	if (ioapic.max_redirection_entry >= MAX_SUPPORTED_REDIRECTION_ENTRIES) {
 		dprintf("io-apic %u entry count %d exceeds max supported, only using the "
-			"first %u entries\n", ioapic.number, ioapic.max_redirection_entry,
-			(uint8)MAX_SUPPORTED_REDIRECTION_ENTRIES);
+			"first %u entries\n", ioapic.number, ioapic.max_redirection_entry + 1,
+			MAX_SUPPORTED_REDIRECTION_ENTRIES);
 		ioapic.max_redirection_entry = MAX_SUPPORTED_REDIRECTION_ENTRIES - 1;
 	}
 
 	ioapic.global_interrupt_last
 		= ioapic.global_interrupt_base + ioapic.max_redirection_entry;
 
-	ioapic.nmi_mask = 0;
+	ioapic.nmi_mask.ClearAll();
 
 	return B_OK;
 }
@@ -389,9 +394,8 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 {
 	// program the APIC ID
 	ioapic_write_32(ioapic, IO_APIC_ID, ioapic.apic_id << IO_APIC_ID_SHIFT);
-
 	// program the interrupt vectors of the io-apic
-	ioapic.level_triggered_mask = 0;
+	ioapic.level_triggered_mask.ClearAll();
 	uint8 gsi = ioapic.global_interrupt_base;
 	for (uint8 i = 0; i <= ioapic.max_redirection_entry; i++, gsi++) {
 		// initialize everything to deliver to the boot CPU in physical mode
@@ -415,7 +419,7 @@ ioapic_initialize_ioapic(struct ioapic& ioapic, uint8 targetAPIC)
 			entry |= IO_APIC_TRIGGER_MODE_LEVEL
 				| IO_APIC_PIN_POLARITY_LOW_ACTIVE
 				| IO_APIC_DELIVERY_MODE_FIXED;
-			ioapic.level_triggered_mask |= ((uint64)1 << i);
+			ioapic.level_triggered_mask.SetBit(i);
 		}
 
 		ioapic_write_64(ioapic, IO_APIC_REDIRECTION_TABLE + 2 * i, entry, true);
@@ -502,7 +506,7 @@ acpi_enumerate_ioapics(acpi_table_madt* madt)
 				}
 
 				uint8 pin = info->GlobalIrq - ioapic->global_interrupt_base;
-				ioapic->nmi_mask |= (uint64)1 << pin;
+				ioapic->nmi_mask.SetBit(pin);
 				break;
 			}
 		}
@@ -686,7 +690,7 @@ ioapic_is_interrupt_available(int32 gsi)
 		return false;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	return (ioapic->nmi_mask & ((uint64)1 << pin)) == 0;
+	return !ioapic->nmi_mask.GetBit(pin);
 }
 
 
