@@ -79,6 +79,7 @@ SimpleTest sigint_bug113_test : sigint_bug113_test.cpp ;
 
 SimpleTest sigsuspend_test : sigsuspend_test.cpp ;
 SimpleTest sig_fault_blocked_test : sig_fault_blocked_test.cpp ;
+SimpleTest sig_corrupt_frame_test : sig_corrupt_frame_test.cpp ;
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 SubInclude HAIKU_TOP src tests system kernel fs ;
