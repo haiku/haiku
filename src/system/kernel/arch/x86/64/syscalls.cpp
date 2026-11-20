@@ -44,7 +44,15 @@ extern unsigned int x86_user_syscall_syscall_end;
 extern "C" void x86_sysenter32_userspace_thread_exit(void);
 extern unsigned int x86_sysenter32_userspace_thread_exit_end;
 
-#endif // _COMPAT_MODE
+#else
+
+extern "C" void __attribute__((naked))
+x86_64_syscall32_entry()
+{
+	asm volatile("sysret");
+}
+
+#endif
 
 
 static void
@@ -63,10 +71,10 @@ init_syscall_registers(void* dummy, int cpuNum)
 	// Entry point address.
 	x86_write_msr(IA32_MSR_LSTAR, (addr_t)x86_64_syscall_entry);
 
-#ifdef _COMPAT_MODE
 	// Syscall compat entry point address.
+	// (We initialize this no matter what, so that 32-bit code segments
+	// can't cause kernel faults by executing SYSCALL instructions.)
 	x86_write_msr(IA32_MSR_CSTAR, (addr_t)x86_64_syscall32_entry);
-#endif
 
 	// Segments that will be set upon entry and return. This is very strange
 	// and requires a specific ordering of segments in the GDT. Upon entry:
