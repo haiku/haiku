@@ -1623,7 +1623,7 @@ send_signal_to_thread_forced(Thread* thread, const Signal& signal)
 	if (error != B_OK)
 		return error;
 
-	InterruptsReadSpinLocker teamLocker(thread->team_lock);
+	InterruptsWriteSpinLocker teamLocker(thread->team_lock);
 	struct sigaction& teamHandler = thread->team->SignalActionFor(signal.Number());
 	sigset_t mask = SIGNAL_TO_MASK(signal.Number());
 	if (teamHandler.sa_handler == SIG_IGN || (thread->sig_block_mask & mask) != 0) {
