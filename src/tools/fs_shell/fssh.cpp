@@ -1567,15 +1567,15 @@ command_listattr(int argc, const char* const* argv)
 			if (error != FSSH_B_OK) {
 				fprintf(stderr, "Error: Failed to stat() attribute \"%s\": %s\n", entry->d_name,
 					fssh_strerror(error));
-				continue;
+			} else {
+				printf("%*s", kTypeWidth, fssh_get_attr_type(st.fssh_st_type));
+				printf("% *" FSSH_B_PRId64 "  ", kSizeWidth, st.fssh_st_size);
+				printf("\"%s\"\n", entry->d_name);
+				// Print attribute values if option is enabled
+				if (printContents)
+					show_attr_contents(attrFd, &st);
+				total += st.fssh_st_size;
 			}
-			printf("%*s", kTypeWidth, fssh_get_attr_type(st.fssh_st_type));
-			printf("% *" FSSH_B_PRId64 "  ", kSizeWidth, st.fssh_st_size);
-			printf("\"%s\"\n", entry->d_name);
-			// Print attribute values if option is enabled
-			if (printContents)
-				show_attr_contents(attrFd, &st);
-			total += st.fssh_st_size;
 			// close attr
 			error = _kern_close(attrFd);
 			if (error != FSSH_B_OK) {
