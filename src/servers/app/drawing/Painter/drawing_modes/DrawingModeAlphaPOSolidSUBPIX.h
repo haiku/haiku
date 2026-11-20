@@ -20,18 +20,17 @@ blend_solid_hspan_alpha_po_solid_subpix(int x, int y, unsigned len,
 	const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint16 alphaRed;
-	uint16 alphaGreen;
-	uint16 alphaBlue;
+	uint16 alphaL;
+	uint16 alphaM;
+	uint16 alphaR;
 	const int subpixelL = gSubpixelOrderingRGB ? 2 : 0;
 	const int subpixelM = 1;
 	const int subpixelR = gSubpixelOrderingRGB ? 0 : 2;
 	do {
-		alphaRed = c.a * covers[subpixelL];
-		alphaGreen = c.a * covers[subpixelM];
-		alphaBlue = c.a * covers[subpixelR];
-		BLEND_ALPHA_PO_SUBPIX(p, c.r, c.g, c.b,
-			alphaBlue, alphaGreen, alphaRed);
+		alphaL = c.a * covers[subpixelL];
+		alphaM = c.a * covers[subpixelM];
+		alphaR = c.a * covers[subpixelR];
+		BLEND_ALPHA_PO_SUBPIX(p, c.r, c.g, c.b, alphaL, alphaM, alphaR);
 		covers += 3;
 		p += 4;
 		x++;

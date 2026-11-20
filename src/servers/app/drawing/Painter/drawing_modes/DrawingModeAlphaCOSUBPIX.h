@@ -28,19 +28,18 @@ blend_solid_hspan_alpha_co_subpix(int x, int y, unsigned len,
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
 	uint8 hAlpha = pattern->HighColor().alpha;
-	uint16 alphaRed;
-	uint16 alphaGreen;
-	uint16 alphaBlue;
+	uint16 alphaL;
+	uint16 alphaM;
+	uint16 alphaR;
 	const int subpixelL = gSubpixelOrderingRGB ? 2 : 0;
 	const int subpixelM = 1;
 	const int subpixelR = gSubpixelOrderingRGB ? 0 : 2;
 	do {
-		alphaRed = hAlpha * covers[subpixelL];
-		alphaGreen = hAlpha * covers[subpixelM];
-		alphaBlue = hAlpha * covers[subpixelR];
+		alphaL = hAlpha * covers[subpixelL];
+		alphaM = hAlpha * covers[subpixelM];
+		alphaR = hAlpha * covers[subpixelR];
 		rgb_color color = pattern->ColorAt(x, y);
-		BLEND_ALPHA_CO_SUBPIX(p, color.red, color.green, color.blue,
-			alphaBlue, alphaGreen, alphaRed);
+		BLEND_ALPHA_CO_SUBPIX(p, color.red, color.green, color.blue, alphaL, alphaM, alphaR);
 		covers += 3;
 		p += 4;
 		x++;
