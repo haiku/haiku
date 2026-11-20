@@ -134,7 +134,8 @@ set_iframe_registers(iframe* frame, const debug_cpu_state* cpuState)
 	frame->cx = cpuState->rcx;
 	frame->bx = cpuState->rbx;
 	frame->ax = cpuState->rax;
-	frame->ip = cpuState->rip;
+	if (IS_USER_ADDRESS(cpuState->rip))
+		frame->ip = cpuState->rip;
 	frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
 		| (cpuState->rflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
 	frame->sp = cpuState->rsp;
@@ -186,7 +187,8 @@ set_iframe_registers(iframe* frame, const debug_cpu_state* cpuState)
 	frame->ax = cpuState->eax;
 //	frame->vector = cpuState->vector;
 //	frame->error_code = cpuState->error_code;
-	frame->ip = cpuState->eip;
+	if (IS_USER_ADDRESS(cpuState->eip))
+		frame->ip = cpuState->eip;
 //	frame->cs = cpuState->cs;
 	frame->flags = (frame->flags & ~X86_EFLAGS_USER_SETTABLE_FLAGS)
 		| (cpuState->eflags & X86_EFLAGS_USER_SETTABLE_FLAGS);
