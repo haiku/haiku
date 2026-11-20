@@ -10,6 +10,7 @@
 
 
 string format_timespec(Context &context, timespec time);
+string format_signed(int32 value);
 string format_unsigned(uint32 value);
 string format_unsigned64(uint64 value);
 

@@ -26,6 +26,15 @@ format_timespec(Context &context, timespec time)
 
 
 string
+format_signed(int32 value)
+{
+	char tmp[12];
+	snprintf(tmp, sizeof(tmp), "%" B_PRId32, value);
+	return tmp;
+}
+
+
+string
 format_unsigned(uint32 value)
 {
 	char tmp[12];

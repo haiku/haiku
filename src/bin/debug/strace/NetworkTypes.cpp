@@ -14,6 +14,7 @@
 #include "Context.h"
 #include "MemoryReader.h"
 #include "TypeHandler.h"
+#include "util.h"
 
 
 template<typename Type>
@@ -318,14 +319,43 @@ format_pointer(Context &context, msghdr *h)
 {
 	string r;
 
-	r  =   "name = " + format_pointer_value<sockaddr>(context, h->msg_name);
-	r += ", name_len = " + context.FormatUnsigned(h->msg_namelen);
-	r += ", iov = " + format_iovecs(context, h->msg_iov, h->msg_iovlen);
+	r  =   "msg_name = " + format_pointer_value<sockaddr>(context, h->msg_name);
+	r += ", msg_name_len = " + context.FormatUnsigned(h->msg_namelen);
+	r += ", msg_iov = " + format_iovecs(context, h->msg_iov, h->msg_iovlen);
 	if (h->msg_control != NULL || h->msg_controllen != 0) {
-		r += ", control = " + context.FormatPointer(h->msg_control);
-		r += ", control_len = " + context.FormatUnsigned(h->msg_controllen);
+		r += ", msg_control = ";
+		struct cmsghdr data;
+		int32 bytesRead;
+		status_t err = context.Reader().Read(h->msg_control, &data, sizeof(data), bytesRead);
+		if (err != B_OK)
+			r += context.FormatPointer(h->msg_control);
+		else {
+			r += "[{cmsg_len=" + format_unsigned(data.cmsg_len);
+			if (data.cmsg_level == SOL_SOCKET && data.cmsg_type == SCM_RIGHTS) {
+				r += ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS";
+				uint32 dataSize = data.cmsg_len - CMSG_LEN(0);
+				char buffer[dataSize];
+				err = context.Reader().Read((void*)(CMSG_DATA(h->msg_control)),
+					&buffer, dataSize, bytesRead);
+				if (err == B_OK && bytesRead == (int32)dataSize) {
+					r += ", cmsg_data=[";
+					int* fds = (int*)buffer;
+					for (uint i = 0; i < dataSize / sizeof(int); i++) {
+						if (i > 0)
+							r += ", ";
+						r += format_signed(fds[i]);
+					}
+					r += "]";
+				}
+			} else {
+				r += ", cmsg_level=" + format_signed(data.cmsg_level);
+				r += ", cmsg_type=" + format_signed(data.cmsg_type);
+			}
+			r += "}]";
+		}
+		r += ", msg_control_len = " + format_unsigned(h->msg_controllen);
 	}
-	r += ", flags = " + context.FormatFlags(h->msg_flags);
+	r += ", msg_flags = " + context.FormatUnsigned(h->msg_flags);
 
 	return r;
 }

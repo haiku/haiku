@@ -251,6 +251,7 @@ patch_network()
 	Syscall *recvfrom = get_syscall("_kern_recvfrom");
 	recvfrom->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kRecvFlags));
 	Syscall *recvmsg = get_syscall("_kern_recvmsg");
+	recvmsg->GetParameter("message")->SetOut(true);
 	recvmsg->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kRecvFlags));
 	Syscall *send = get_syscall("_kern_send");
 	send->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kRecvFlags));
