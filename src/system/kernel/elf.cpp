@@ -1680,6 +1680,8 @@ private:
 			uint32 bucket;
 			if (!_Read(&info.gnuhash.buckets[i], bucket))
 				return B_BAD_ADDRESS;
+			if (bucket == 0)
+				continue;
 
 			const uint32* chain0 = info.gnuhash.chain0;
 			const uint32* hashValue = &chain0[bucket];
