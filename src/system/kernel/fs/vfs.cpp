@@ -9770,13 +9770,10 @@ _user_create_pipe(int* userFDs, int flags)
 	}
 
 	// Everything looks good so far. Open two FDs for reading respectively
-	// writing, O_NONBLOCK to avoid blocking on open with O_RDONLY
+	// writing, O_NONBLOCK to avoid blocking on open
 	int fds[2];
 	fds[0] = open_vnode(vnode, O_RDONLY | O_NONBLOCK | flags, false);
-	fds[1] = open_vnode(vnode, O_WRONLY | flags, false);
-	// Reset O_NONBLOCK if requested
-	if ((flags & O_NONBLOCK) == 0)
-		common_fcntl(fds[0], F_SETFL, flags & O_NONBLOCK, false);
+	fds[1] = open_vnode(vnode, O_WRONLY | O_NONBLOCK | flags, false);
 
 	FDCloser closer0(fds[0], false);
 	FDCloser closer1(fds[1], false);
@@ -9785,6 +9782,12 @@ _user_create_pipe(int* userFDs, int flags)
 
 	// copy FDs to userland
 	if (status == B_OK) {
+		// Reset O_NONBLOCK if requested
+		if ((flags & O_NONBLOCK) == 0) {
+			common_fcntl(fds[0], F_SETFL, flags & O_NONBLOCK, false);
+			common_fcntl(fds[1], F_SETFL, flags & O_NONBLOCK, false);
+		}
+
 		if (!IS_USER_ADDRESS(userFDs)
 			|| user_memcpy(userFDs, fds, sizeof(fds)) != B_OK) {
 			status = B_BAD_ADDRESS;
@@ -9795,6 +9798,12 @@ _user_create_pipe(int* userFDs, int flags)
 	if (status == B_OK) {
 		closer0.Detach();
 		closer1.Detach();
+	} else {
+		// release node references which aren't bound to a fd
+		if (fds[0] < 0)
+			put_vnode(vnode);
+		if (fds[1] < 0)
+			put_vnode(vnode);
 	}
 
 	return status;
