@@ -1138,12 +1138,12 @@ discard_area_range(VMArea* area, addr_t address, addr_t size)
 	// If someone else uses the area's cache or it's not an anonymous cache, we
 	// can't discard.
 	VMCache* cache = vm_area_get_locked_cache(area);
+	VMCacheChainLocker cacheChainLocker(cache);
 	if (cache->areas.First() != area || VMArea::CacheList::GetNext(area) != NULL
 		|| !cache->consumers.IsEmpty() || cache->type != CACHE_TYPE_RAM) {
 		return B_OK;
 	}
 
-	VMCacheChainLocker cacheChainLocker(cache);
 	cacheChainLocker.LockAllSourceCaches();
 
 	unmap_pages(area, address, size);
