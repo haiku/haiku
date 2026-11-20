@@ -25,7 +25,7 @@ rule HaikuImageGetSystemLibs
 {
 	return
 		# libs with special grist
-		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+		[ MultiArchDefaultGristFiles libroot.so libroot_debug.so : revisioned ]
 		[ Libstdc++ForImage ]
 		# libs with standard grist
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
