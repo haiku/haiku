@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	3011636080
+1	english	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		關閉其他選項卡
 Insert path	Terminal TermView		插入路徑
 Text encoding	Terminal TermWindow		文字編碼
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		背景
 Window title:	Terminal AppearancePrefView		視窗標題
 New tab	Terminal TermWindow		新標籤頁
 magenta	Terminal ThemeView		品紅
-Allow bold text	Terminal AppearancePrefView		允許粗體文本
 Window title…	Terminal TermWindow		視窗標題…
 ANSI blue color	Terminal ThemeView		ANSI 藍色
 blue	Terminal ThemeView		藍色
-Open path	Terminal TermView		開啓路徑
 Cannot execute \"%command\":\n\t%error	Terminal Shell		無法執行 \"%command\":\n\t%error
+Open path	Terminal TermView		開啓路徑
 Terminal	System name		終端機
 Custom	Terminal colors scheme		客制化
 Really close?	Terminal TermWindow		真的關閉？
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		減少
 Settings…	Terminal TermWindow		設定…
 Cancel	Terminal SetTitleWindow		取消
 Blinking cursor	Terminal AppearancePrefView		閃爍的遊標
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		指定視窗標題的樣式。以下佔位符\n可以使用：\n
 Use text:	Terminal FindWindow		使用文字：
 Close active tab	Terminal TermWindow		關閉活動選項卡
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		指定視窗標題的樣式。以下佔位符\n可以使用：\n
 Selected background	Terminal ThemeView		選定的背景
 Save as default	Terminal TermWindow		另存為預設值
 Nothing is selected.	Terminal TermWindow		沒有選擇任何內容。

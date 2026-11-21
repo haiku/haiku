@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	1164274475
+1	turkish	x-vnd.Haiku-Terminal	1279879631
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Text encoding	Terminal TermWindow		Metin kodlaması
@@ -42,12 +42,11 @@ Background	Terminal ThemeView		Arka plan
 Window title:	Terminal AppearancePrefView		Pencere başlığı:
 New tab	Terminal TermWindow		Yeni sekme
 magenta	Terminal ThemeView		mor
-Allow bold text	Terminal AppearancePrefView		Kalın metne izin ver
 Window title…	Terminal TermWindow		Pencere başlığı…
 ANSI blue color	Terminal ThemeView		ANSI mavi
 blue	Terminal ThemeView		mavi
-Open path	Terminal TermView		Yol aç
 Cannot execute \"%command\":\n\t%error	Terminal Shell		“%command” yürütülemiyor:\n\t%error
+Open path	Terminal TermView		Yol aç
 Terminal	System name		Uçbirim
 Custom	Terminal colors scheme		Özel
 Really close?	Terminal TermWindow		Gerçekten kapatılsın mı?
@@ -89,9 +88,9 @@ Settings…	Terminal TermWindow		Ayarlar…
 The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		“%1” süreci hâlâ çalışıyor.\n%appname% uygulamasını kapatırsanız süreç sonlandırılacaktır.
 Cancel	Terminal SetTitleWindow		Vazgeç
 Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Use text:	Terminal FindWindow		Şu metni kullan:
 Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Selected background	Terminal ThemeView		Seçili arka plan
 Save as default	Terminal TermWindow		Saptanmış olarak kaydet
 Nothing is selected.	Terminal TermWindow		Hiçbir şey seçilmedi.

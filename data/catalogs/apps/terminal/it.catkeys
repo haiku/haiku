@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Terminal	1164274475
+1	italian	x-vnd.Haiku-Terminal	1279879631
 Close other tabs	Terminal TermWindow		Chiudi altri pannelli
 Insert path	Terminal TermView		Inserisci percorso
 Text encoding	Terminal TermWindow		Codifica del testo
@@ -42,12 +42,11 @@ Background	Terminal ThemeView		Sfondo
 Window title:	Terminal AppearancePrefView		Titolo finestra
 New tab	Terminal TermWindow		Nuovo pannello
 magenta	Terminal ThemeView		magenta
-Allow bold text	Terminal AppearancePrefView		Consenti testo in grassetto
 Window title…	Terminal TermWindow		Titolo finestra...
 ANSI blue color	Terminal ThemeView		Colore blu ANSI
 blue	Terminal ThemeView		blu
-Open path	Terminal TermView		Apri percorso
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossibile eseguire \"%command\":\n\t%error
+Open path	Terminal TermView		Apri percorso
 Terminal	System name		Terminale
 Custom	Terminal colors scheme		Personalizzato
 Really close?	Terminal TermWindow		Chiudo veramente?
@@ -89,9 +88,9 @@ Settings…	Terminal TermWindow		Impostazioni…
 The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		l processo \"%1\" è ancora in esecuzione.\nSe chiudi %appname%, il processo verrà terminato.
 Cancel	Terminal SetTitleWindow		Cancella
 Blinking cursor	Terminal AppearancePrefView		Cursore lampeggiante
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo della finestra. I seguenti segnaposto \npossono essere utilizzati:\n
 Use text:	Terminal FindWindow		Utilizza testo:
 Close active tab	Terminal TermWindow		Chiudi pannello attivo
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo della finestra. I seguenti segnaposto \npossono essere utilizzati:\n
 Selected background	Terminal ThemeView		Sfondo selezionato
 Save as default	Terminal TermWindow		Salva come predefinito
 Nothing is selected.	Terminal TermWindow		Nulla è selezionato.

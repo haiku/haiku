@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	3011636080
+1	english	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		关闭其他标签
 Insert path	Terminal TermView		插入路径  
 Text encoding	Terminal TermWindow		文字编码
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		背景
 Window title:	Terminal AppearancePrefView		窗口标题：
 New tab	Terminal TermWindow		新建标签
 magenta	Terminal ThemeView		洋红
-Allow bold text	Terminal AppearancePrefView		允许粗体字
 Window title…	Terminal TermWindow		窗口标题...
 ANSI blue color	Terminal ThemeView		ANSI 蓝
 blue	Terminal ThemeView		蓝色
-Open path	Terminal TermView		打开路径
 Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%error
+Open path	Terminal TermView		打开路径
 Terminal	System name		终端
 Custom	Terminal colors scheme		自定义
 Really close?	Terminal TermWindow		确定关闭吗？
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		缩小
 Settings…	Terminal TermWindow		设置…
 Cancel	Terminal SetTitleWindow		取消
 Blinking cursor	Terminal AppearancePrefView		闪烁游标
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
 Use text:	Terminal FindWindow		使用文本：
 Close active tab	Terminal TermWindow		关闭活动标签
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
 Selected background	Terminal ThemeView		所选背景
 Save as default	Terminal TermWindow		默认保存
 Nothing is selected.	Terminal TermWindow		未选中任何文件。

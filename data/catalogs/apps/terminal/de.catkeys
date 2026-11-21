@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1164274475
+1	german	x-vnd.Haiku-Terminal	1279879631
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
 Text encoding	Terminal TermWindow		Kodierung
@@ -42,12 +42,11 @@ Background	Terminal ThemeView		Hintergrund
 Window title:	Terminal AppearancePrefView		Fenstertitel:
 New tab	Terminal TermWindow		Neuer Reiter
 magenta	Terminal ThemeView		Magenta
-Allow bold text	Terminal AppearancePrefView		Text in Fettschrift zulassen
 Window title…	Terminal TermWindow		Fenstertitel …
 ANSI blue color	Terminal ThemeView		ANSI-Farbe Blau
 blue	Terminal ThemeView		Blau
-Open path	Terminal TermView		Pfad öffnen
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" kann nicht ausgeführt werden:\n\t%error
+Open path	Terminal TermView		Pfad öffnen
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Benutzerdefiniert
 Really close?	Terminal TermWindow		Wirklich schließen?
@@ -89,9 +88,9 @@ Settings…	Terminal TermWindow		Einstellungen …
 The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird %appname% gekillt, wird auch dieser Prozess gekillt.
 Cancel	Terminal SetTitleWindow		Abbrechen
 Blinking cursor	Terminal AppearancePrefView		Blinkender Cursor
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Use text:	Terminal FindWindow		Suchbegriff:
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
 Selected background	Terminal ThemeView		Auswahl-Hintergrund
 Save as default	Terminal TermWindow		Als Standardwerte speichern
 Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.

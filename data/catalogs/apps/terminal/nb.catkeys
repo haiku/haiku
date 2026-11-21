@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	3011636080
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		Lukk andre faner
 Insert path	Terminal TermView		Sett inn sti
 Text encoding	Terminal TermWindow		Tekstkoding
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		Bakgrunn
 Window title:	Terminal AppearancePrefView		Vindustittel:
 New tab	Terminal TermWindow		Ny fane
 magenta	Terminal ThemeView		magenta
-Allow bold text	Terminal AppearancePrefView		Tillat fet tekst
 Window title…	Terminal TermWindow		Vindustittel…
 ANSI blue color	Terminal ThemeView		ANSI blå farge
 blue	Terminal ThemeView		blå
-Open path	Terminal TermView		Åpne sti
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kunne ikke utføre "\%command\":\n\t%error
+Open path	Terminal TermView		Åpne sti
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Tilpasset
 Really close?	Terminal TermWindow		Virkelig lukke?
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		Forminsk
 Settings…	Terminal TermWindow		Innstillinger…
 Cancel	Terminal SetTitleWindow		Avbryt
 Blinking cursor	Terminal AppearancePrefView		Blinkende markør
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir vindustittelen. Følgende plassholdere\nkan brukes:\n
 Use text:	Terminal FindWindow		Bruk tekst:
 Close active tab	Terminal TermWindow		Lukk aktiv fane
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir vindustittelen. Følgende plassholdere\nkan brukes:\n
 Selected background	Terminal ThemeView		Valgt bakgrunn
 Save as default	Terminal TermWindow		Lagre som standard
 Nothing is selected.	Terminal TermWindow		Ingenting er valgt.

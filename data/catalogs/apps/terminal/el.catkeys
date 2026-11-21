@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	1164274475
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	1279879631
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
 Text encoding	Terminal TermWindow		Κωδικοποίηση κειμένου
@@ -42,12 +42,11 @@ Background	Terminal ThemeView		Χρώμα φόντου
 Window title:	Terminal AppearancePrefView		Τίτλος παραθύρου:
 New tab	Terminal TermWindow		Νέα καρτέλα
 magenta	Terminal ThemeView		ματζέντα
-Allow bold text	Terminal AppearancePrefView		Να εμφανίζονται έντονοι χαρακτήρες
 Window title…	Terminal TermWindow		Τίτλος παραθύρου…
 ANSI blue color	Terminal ThemeView		μπλε (ANSI)
 blue	Terminal ThemeView		μπλε
-Open path	Terminal TermView		Άνοιγμα διαδρομής
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
+Open path	Terminal TermView		Άνοιγμα διαδρομής
 Terminal	System name		Τερματικό
 Custom	Terminal colors scheme		Προσαρμοσμένο
 Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
@@ -89,9 +88,9 @@ Settings…	Terminal TermWindow		Ρυθμίσεις…
 The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		Η διεργασία \"%1\" εκτελείται ακόμη.\nΕάν τερματίσετε την εφαρμογή %appname%, η διεργασία αυτή θα διακοπεί. 
 Cancel	Terminal SetTitleWindow		Άκυρο
 Blinking cursor	Terminal AppearancePrefView		Αναβόσβημα δρομέα
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο παραθύρου. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
 Use text:	Terminal FindWindow		Χρήση κειμένου:
 Close active tab	Terminal TermWindow		Κλείσιμο ενεργής καρτέλας
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο παραθύρου. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
 Selected background	Terminal ThemeView		Χρώμα φόντου επιλογής
 Save as default	Terminal TermWindow		Αποθήκευση ως προεπιλογή
 Nothing is selected.	Terminal TermWindow		Τίποτα δεν επιλέχτηκε.

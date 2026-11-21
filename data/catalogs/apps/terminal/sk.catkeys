@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	439332808
+1	slovak	x-vnd.Haiku-Terminal	554937964
 Close other tabs	Terminal TermWindow		Zatvoriť ostatné karty
 Insert path	Terminal TermView		Vložiť cestu
 Text encoding	Terminal TermWindow		Kódovanie textu
@@ -30,10 +30,9 @@ Find next	Terminal TermWindow		Nájsť ďalší
 Copy link location	Terminal TermView		Kopírovať umiestnenie odkazu
 Window title:	Terminal AppearancePrefView		Titulok okna:
 New tab	Terminal TermWindow		Nová karta
-Allow bold text	Terminal AppearancePrefView		Povoliť tučný text
 Window title…	Terminal TermWindow		Titulok okna…
-Open path	Terminal TermView		Otvoriť cestu
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie je možné vykonať „%command“:\n\t%error
+Open path	Terminal TermView		Otvoriť cestu
 Terminal	System name		Terminál
 Custom	Terminal colors scheme		Vlastné
 Really close?	Terminal TermWindow		Skutočne zatvoriť?
@@ -66,9 +65,9 @@ Decrease	Terminal TermWindow		Zmenšiť
 Settings…	Terminal TermWindow		Nastavenia…
 Cancel	Terminal SetTitleWindow		Zrušiť
 Blinking cursor	Terminal AppearancePrefView		Blikajúci kurzor
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
 Use text:	Terminal FindWindow		Použiť text:
 Close active tab	Terminal TermWindow		Zatvoriť aktívnu kartu
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
 Save as default	Terminal TermWindow		Uložiť ako predvolené
 Nothing is selected.	Terminal TermWindow		Nič nie je vybrané.
 Find	Terminal FindWindow		Nájsť

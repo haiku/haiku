@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Terminal	1994404726
+1	esperanto	x-vnd.Haiku-Terminal	2110009882
 Close other tabs	Terminal TermWindow		Fermi aliajn langetojn
 Insert path	Terminal TermView		Enigi itineron
 Text encoding	Terminal TermWindow		Teksta kodprezento
@@ -30,10 +30,9 @@ Find next	Terminal TermWindow		Serĉi la venontan
 Copy link location	Terminal TermView		Kopii la lokon de la ligilo
 Window title:	Terminal AppearancePrefView		Fenestra titolo:
 New tab	Terminal TermWindow		Nova langeto
-Allow bold text	Terminal AppearancePrefView		Permesi grasan tekston
 Window title…	Terminal TermWindow		Fenestra titolo…
-Open path	Terminal TermView		Uzi itineron
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne povis ekzekucii \"%command\":\n\t%eraro
+Open path	Terminal TermView		Uzi itineron
 Terminal	System name		Terminalo
 Custom	Terminal colors scheme		Laŭmenda
 Really close?	Terminal TermWindow		Ĉu vere fermi?
@@ -66,9 +65,9 @@ Decrease	Terminal TermWindow		Malpliigi
 Settings…	Terminal TermWindow		Agordo…
 Cancel	Terminal SetTitleWindow		Nuligi
 Blinking cursor	Terminal AppearancePrefView		Palpebruma kursoro
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		La skemo specifanta la fenestran titolon. La sekvaj lokokupoj\nuzeblas:\n
 Use text:	Terminal FindWindow		Per teksto:
 Close active tab	Terminal TermWindow		Fermi aktivan langeton
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		La skemo specifanta la fenestran titolon. La sekvaj lokokupoj\nuzeblas:\n
 Save as default	Terminal TermWindow		Konservi kiel defaŭlta
 Nothing is selected.	Terminal TermWindow		Nenio estas elektita
 Use left Option as Meta key	Terminal AppearancePrefView		Uzi maldekstran opciklavon kiel metaklavo

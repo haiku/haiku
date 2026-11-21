@@ -27,8 +27,8 @@ Copy link location	Terminal TermView		Капіяваць спасылку
 Window title:	Terminal AppearancePrefView		Імя вакна:
 New tab	Terminal TermWindow		Новая ўкладка
 Window title…	Terminal TermWindow		Загаловак вакна…
-Open path	Terminal TermView		Адкрыць шлях 
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%error
+Open path	Terminal TermView		Адкрыць шлях 
 Terminal	System name		Тэрмінал
 Custom	Terminal colors scheme		Спецыяльнае
 Really close?	Terminal TermWindow		Сапраўды закрыць?
@@ -57,9 +57,9 @@ Decrease	Terminal TermWindow		Паменшыць
 Settings…	Terminal TermWindow		Наладкі…
 Cancel	Terminal SetTitleWindow		Адмена
 Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
 Use text:	Terminal FindWindow		Ужыць тэкст:
 Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
 Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
 Find	Terminal FindWindow		Шукаць
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для цякучага імя ўкладкі. Можна ўжываць наступныя\n запаўняльнікі:\n

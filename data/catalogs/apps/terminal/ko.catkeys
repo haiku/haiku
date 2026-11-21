@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Terminal	3011636080
+1	korean	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		다른 탭 닫기
 Insert path	Terminal TermView		경로 삽입
 Text encoding	Terminal TermWindow		텍스트 인코딩
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		배경
 Window title:	Terminal AppearancePrefView		창 이름:
 New tab	Terminal TermWindow		새 탭
 magenta	Terminal ThemeView		마젠타
-Allow bold text	Terminal AppearancePrefView		굵은 문자 허용
 Window title…	Terminal TermWindow		창 이름...
 ANSI blue color	Terminal ThemeView		ANSI 파란색
 blue	Terminal ThemeView		파란색
-Open path	Terminal TermView		경로 열기
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\"를 실행할 수 없습니다:\n\t%error
+Open path	Terminal TermView		경로 열기
 Terminal	System name		터미널
 Custom	Terminal colors scheme		사용자 지정
 Really close?	Terminal TermWindow		정말 닫으시겠습니까?
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		작게
 Settings…	Terminal TermWindow		환경 설정...
 Cancel	Terminal SetTitleWindow		취소
 Blinking cursor	Terminal AppearancePrefView		깜박이는 커서
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 창 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
 Use text:	Terminal FindWindow		텍스트 사용:
 Close active tab	Terminal TermWindow		활성된 탭 닫기
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 창 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
 Selected background	Terminal ThemeView		선택영역 배경
 Save as default	Terminal TermWindow		기본값으로 저장
 Nothing is selected.	Terminal TermWindow		선택된 것이 없습니다.

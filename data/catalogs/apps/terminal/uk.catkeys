@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	1164274475
+1	ukrainian	x-vnd.Haiku-Terminal	1279879631
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Вставити шлях
 Text encoding	Terminal TermWindow		Кодування тексту
@@ -42,12 +42,11 @@ Background	Terminal ThemeView		Фон
 Window title:	Terminal AppearancePrefView		Заголовок вікна:
 New tab	Terminal TermWindow		Нова вкладка
 magenta	Terminal ThemeView		пурпурний
-Allow bold text	Terminal AppearancePrefView		Дозволити жирний текст
 Window title…	Terminal TermWindow		Заголовок вікна…
 ANSI blue color	Terminal ThemeView		ANSI синій
 blue	Terminal ThemeView		синій
-Open path	Terminal TermView		Відкрити шлях
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \«%command\»:\n\t%error
+Open path	Terminal TermView		Відкрити шлях
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Вибір користувача
 Really close?	Terminal TermWindow		Дійсно закрити?
@@ -89,9 +88,9 @@ Settings…	Terminal TermWindow		Налаштування…
 The process \"%1\" is still running.\nIf you close %appname%, the process will be killed.	Terminal TermWindow		Процес \«%1\» все ще виконується.\nЯкщо закрити %appname%, процес буде завершено.
 Cancel	Terminal SetTitleWindow		Скасувати
 Blinking cursor	Terminal AppearancePrefView		Мигання курсору
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
 Use text:	Terminal FindWindow		Використати текст:
 Close active tab	Terminal TermWindow		Закрити активну вкладку
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
 Selected background	Terminal ThemeView		Фон виділення
 Save as default	Terminal TermWindow		Зберегти як типові
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.

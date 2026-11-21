@@ -27,8 +27,8 @@ Copy link location	Terminal TermView		Kopijuoti saito adresą
 Window title:	Terminal AppearancePrefView		Lango antraštė:
 New tab	Terminal TermWindow		Nauja kortelė
 Window title…	Terminal TermWindow		Lango antraštė…
-Open path	Terminal TermView		Atverti kelią
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nepavyko įvykdyti „%command“:\n\t%error
+Open path	Terminal TermView		Atverti kelią
 Terminal	System name		Terminalas
 Custom	Terminal colors scheme		Pasirinktinė
 Really close?	Terminal TermWindow		Ar tikrai užverti?
@@ -57,9 +57,9 @@ Decrease	Terminal TermWindow		Pamažinti
 Settings…	Terminal TermWindow		Nuostatos…
 Cancel	Terminal SetTitleWindow		Atsisakyti
 Blinking cursor	Terminal AppearancePrefView		Mirksintis žymeklis
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
 Use text:	Terminal FindWindow		Ieškoti teksto:
 Close active tab	Terminal TermWindow		Užverti aktyvią kortelę
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
 Nothing is selected.	Terminal TermWindow		Nėra pažymėto teksto.
 Find	Terminal FindWindow		Ieškoti
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Aktyvios kortelės antraštės šablonas. Galite naudoti šiuos vietaženklius:\n

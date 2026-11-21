@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	3011636080
+1	romanian	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		Închide alte file
 Insert path	Terminal TermView		Inserează calea
 Text encoding	Terminal TermWindow		Codare de text
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		Fundal
 Window title:	Terminal AppearancePrefView		Titlul ferestrei:
 New tab	Terminal TermWindow		Filă nouă
 magenta	Terminal ThemeView		magenta
-Allow bold text	Terminal AppearancePrefView		Permite text aldin
 Window title…	Terminal TermWindow		Titlul ferestrei…
 ANSI blue color	Terminal ThemeView		culoarea albastră ANSI
 blue	Terminal ThemeView		albastru
-Open path	Terminal TermView		Deschide calea
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nu se poate executa \„%command\”:\n\t%error
+Open path	Terminal TermView		Deschide calea
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Personalizată
 Really close?	Terminal TermWindow		Sigur închideți?
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		Micșorează
 Settings…	Terminal TermWindow		Configurări…
 Cancel	Terminal SetTitleWindow		Anulează
 Blinking cursor	Terminal AppearancePrefView		Cursor clipitor
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Modelul care specifică titlul ferestrei. Următorii substituenți\npot fi utilizați:\n
 Use text:	Terminal FindWindow		Utilizează textul:
 Close active tab	Terminal TermWindow		Închide fila activă
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Modelul care specifică titlul ferestrei. Următorii substituenți\npot fi utilizați:\n
 Selected background	Terminal ThemeView		Fundal selectat
 Save as default	Terminal TermWindow		Salvează ca implicit
 Nothing is selected.	Terminal TermWindow		Nu este selectat nimic.

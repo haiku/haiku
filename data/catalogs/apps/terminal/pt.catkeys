@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Terminal	566392757
+1	portuguese	x-vnd.Haiku-Terminal	681997913
 Close other tabs	Terminal TermWindow		Fechar os outros separadores
 Insert path	Terminal TermView		Inserir caminho
 Text encoding	Terminal TermWindow		Codificação do texto
@@ -32,10 +32,9 @@ Find next	Terminal TermWindow		Procurar seguinte
 Copy link location	Terminal TermView		Copiar localização da ligação
 Window title:	Terminal AppearancePrefView		Título da janela:
 New tab	Terminal TermWindow		Novo separador
-Allow bold text	Terminal AppearancePrefView		Permitir texto em negrito
 Window title…	Terminal TermWindow		Título da janela…
-Open path	Terminal TermView		Abrir caminho
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Não foi possível executar \"%command\":\n\t%error
+Open path	Terminal TermView		Abrir caminho
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Personalizado
 Really close?	Terminal TermWindow		Fechar mesmo?
@@ -68,9 +67,9 @@ Decrease	Terminal TermWindow		Diminuir
 Settings…	Terminal TermWindow		Definições…
 Cancel	Terminal SetTitleWindow		Cancelar
 Blinking cursor	Terminal AppearancePrefView		Cursor intermitente
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão que especifica o título da janela. Podem ser\nutilizados os seguintes elementos de substituição:\n
 Use text:	Terminal FindWindow		Usar texto:
 Close active tab	Terminal TermWindow		Fechar separador activo
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão que especifica o título da janela. Podem ser\nutilizados os seguintes elementos de substituição:\n
 Save as default	Terminal TermWindow		Guardar como predefinição
 Nothing is selected.	Terminal TermWindow		Não há nada seleccionado.
 Use left Option as Meta key	Terminal AppearancePrefView		Usar tecla Opção do lado esquerdo como tecla Meta

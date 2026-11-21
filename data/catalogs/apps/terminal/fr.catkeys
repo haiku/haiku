@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	377178725
+1	french	x-vnd.Haiku-Terminal	492783881
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Text encoding	Terminal TermWindow		Encodage texte
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		Arrière-plan
 Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
 New tab	Terminal TermWindow		Nouvel onglet
 magenta	Terminal ThemeView		magenta
-Allow bold text	Terminal AppearancePrefView		Autoriser le texte en gras
 Window title…	Terminal TermWindow		Titre de la fenêtre…
 ANSI blue color	Terminal ThemeView		Bleu ANSI
 blue	Terminal ThemeView		blue
-Open path	Terminal TermView		Ouvrir l’emplacement
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d’exécuter « %command » :\n\t%error
+Open path	Terminal TermView		Ouvrir l’emplacement
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Personnalisé
 Really close?	Terminal TermWindow		Êtes-vous sûr de vouloir fermer ?
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		Réduire
 Settings…	Terminal TermWindow		Réglages…
 Cancel	Terminal SetTitleWindow		Annuler
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 Use text:	Terminal FindWindow		Utiliser le texte :
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 Selected background	Terminal ThemeView		Arrière-plan sélectionné
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.

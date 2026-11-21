@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	3011636080
+1	finnish	x-vnd.Haiku-Terminal	3127241236
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
 Text encoding	Terminal TermWindow		Tekstikoodaus
@@ -41,12 +41,11 @@ Background	Terminal ThemeView		Tausta
 Window title:	Terminal AppearancePrefView		Ikkunaotsikko:
 New tab	Terminal TermWindow		Uusi välilehti
 magenta	Terminal ThemeView		vaaleanvioletti
-Allow bold text	Terminal AppearancePrefView		Salli lihavoitu teksti
 Window title…	Terminal TermWindow		Ikkunaotsikko...
 ANSI blue color	Terminal ThemeView		ANSI-sininen väri
 blue	Terminal ThemeView		sininen
-Open path	Terminal TermView		Avaa sijainti
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Komennon ”%command” suorittaminen epäonnistui:\n\t%error
+Open path	Terminal TermView		Avaa sijainti
 Terminal	System name		Pääteikkuna
 Custom	Terminal colors scheme		Räätälöity
 Really close?	Terminal TermWindow		Suljetaanko todella?
@@ -87,9 +86,9 @@ Decrease	Terminal TermWindow		Vähennä
 Settings…	Terminal TermWindow		Asetukset...
 Cancel	Terminal SetTitleWindow		Peru
 Blinking cursor	Terminal AppearancePrefView		Vilkkuva kohdistin
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
 Use text:	Terminal FindWindow		Käytä tekstiä:
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
 Selected background	Terminal ThemeView		Valittu tausta
 Save as default	Terminal TermWindow		Tallenna oletuksena
 Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.

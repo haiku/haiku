@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	566392757
+1	dutch; flemish	x-vnd.Haiku-Terminal	681997913
 Close other tabs	Terminal TermWindow		Andere tabs sluiten
 Insert path	Terminal TermView		Voeg pad in
 Text encoding	Terminal TermWindow		Tekstcodering
@@ -32,10 +32,9 @@ Find next	Terminal TermWindow		Volgende zoeken
 Copy link location	Terminal TermView		Tekstlinklocatie kopiëren
 Window title:	Terminal AppearancePrefView		Venstertitel:
 New tab	Terminal TermWindow		Nieuwe tab
-Allow bold text	Terminal AppearancePrefView		Vette tekst toestaan
 Window title…	Terminal TermWindow		Venstertitel...
-Open path	Terminal TermView		Pad openen
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
+Open path	Terminal TermView		Pad openen
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Aangepast
 Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
@@ -68,9 +67,9 @@ Decrease	Terminal TermWindow		Verminderen
 Settings…	Terminal TermWindow		Instellingen...
 Cancel	Terminal SetTitleWindow		Annuleren
 Blinking cursor	Terminal AppearancePrefView		Knipperende cursor
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Use text:	Terminal FindWindow		Tekst gebruiken:
 Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Save as default	Terminal TermWindow		Opslaan als standaard
 Nothing is selected.	Terminal TermWindow		Er is niets geselecteerd.
 Use left Option as Meta key	Terminal AppearancePrefView		Gebruik de linker Optietoets als Metatoets

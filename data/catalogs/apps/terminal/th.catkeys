@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Terminal	1994404726
+1	thai	x-vnd.Haiku-Terminal	2110009882
 Close other tabs	Terminal TermWindow		ปิดแท็บอื่น ๆ
 Insert path	Terminal TermView		แทรกเส้นทาง
 Text encoding	Terminal TermWindow		การเข้ารหัสข้อความ
@@ -30,10 +30,9 @@ Find next	Terminal TermWindow		ค้นหาถัดไป
 Copy link location	Terminal TermView		สำเนาที่ตั้งลิงค์
 Window title:	Terminal AppearancePrefView		ชื่อหน้าต่าง
 New tab	Terminal TermWindow		แท็ปใหม่
-Allow bold text	Terminal AppearancePrefView		ใช้งานข้อความตัวหนา
 Window title…	Terminal TermWindow		ชื่อหน้าต่าง
-Open path	Terminal TermView		เปิดพาธ
 Cannot execute \"%command\":\n\t%error	Terminal Shell		ไม่สามารถดำเนินการได้ \"%command\":\n\t%error
+Open path	Terminal TermView		เปิดพาธ
 Terminal	System name		เทอร์มินอล
 Custom	Terminal colors scheme		ปรับแต่ง
 Really close?	Terminal TermWindow		ปิดจริงๆหรือไม่?
@@ -66,9 +65,9 @@ Decrease	Terminal TermWindow		ลดลง
 Settings…	Terminal TermWindow		ตั้งค่า
 Cancel	Terminal SetTitleWindow		ยกเลิก
 Blinking cursor	Terminal AppearancePrefView		เคอร์เซอร์กะพริบ
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		รูปแบบที่ระบุชื่อหน้าต่าง ข้อความที่ต้องการให้แสดง \nสามารถใช้:\n
 Use text:	Terminal FindWindow		ใช้ข้อความ
 Close active tab	Terminal TermWindow		ปิดแท็ปที่ใช้งาน
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		รูปแบบที่ระบุชื่อหน้าต่าง ข้อความที่ต้องการให้แสดง \nสามารถใช้:\n
 Save as default	Terminal TermWindow		บันทึกเป็นค่าเริ่มต้น
 Nothing is selected.	Terminal TermWindow		ไม่มีการเลือก
 Use left Option as Meta key	Terminal AppearancePrefView		ใช้ตัวเลือกทางซ้ายเป็นการระบุคำค้นหา

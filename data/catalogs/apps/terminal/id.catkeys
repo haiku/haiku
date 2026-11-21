@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Terminal	412929673
+1	indonesian	x-vnd.Haiku-Terminal	528534829
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Text encoding	Terminal TermWindow		Pengodean Teks
@@ -31,10 +31,9 @@ Find next	Terminal TermWindow		Cari selanjutnya
 Copy link location	Terminal TermView		Salin lokasi tautan
 Window title:	Terminal AppearancePrefView		Judul jendela:
 New tab	Terminal TermWindow		Tab baru
-Allow bold text	Terminal AppearancePrefView		Izinkan teks tebal
 Window title…	Terminal TermWindow		Judul jendela…
-Open path	Terminal TermView		Buka path
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Tak bisa menjalankan \"%command\":\n\t%error
+Open path	Terminal TermView		Buka path
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Gubahan
 Really close?	Terminal TermWindow		Benar-benar hapus?
@@ -67,9 +66,9 @@ Decrease	Terminal TermWindow		Menurunkan
 Settings…	Terminal TermWindow		Pengaturan...
 Cancel	Terminal SetTitleWindow		Batalkan
 Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
 Use text:	Terminal FindWindow		Gunakan teks:
 Close active tab	Terminal TermWindow		Tutup tab aktif
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
 Save as default	Terminal TermWindow		Simpan sebagai bawaan
 Nothing is selected.	Terminal TermWindow		Tidak ada yang dipilih
 Use left Option as Meta key	Terminal AppearancePrefView		Gunakan Opsi kiri sebagai kunci Meta
