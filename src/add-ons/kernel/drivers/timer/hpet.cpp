@@ -7,7 +7,6 @@
 #include "hpet.h"
 #include "hpet_interface.h"
 #include "int.h"
-#include "msi.h"
 
 #include <Drivers.h>
 #include <KernelExport.h>
