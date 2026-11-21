@@ -96,7 +96,7 @@ public:
 	void LockBuffer_WithCapacity_ReturnsValidPointer()
 	{
 		BString locked("a string");
-		char* ptrstr = locked.LockBuffer(20);
+		char* ptrstr = locked.LockBuffer(21);
 		CPPUNIT_ASSERT_EQUAL(0, strcmp(ptrstr, "a string"));
 		strcat(ptrstr, " to be locked");
 		locked.UnlockBuffer();
