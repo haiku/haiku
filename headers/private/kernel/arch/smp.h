@@ -7,11 +7,7 @@
 
 
 #include <kernel.h>
-
-
-struct kernel_args;
-
-class CPUSet;
+#include <kernel/smp.h>
 
 
 status_t arch_smp_init(kernel_args* args);

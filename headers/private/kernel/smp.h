@@ -12,10 +12,9 @@
 #include <arch/atomic.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
+#include <util/FixedSizeBitmap.h>
 
 #include <KernelExport.h>
-
-#include <string.h>
 
 
 struct kernel_args;
@@ -40,36 +39,7 @@ enum {
 
 typedef void (*smp_call_func)(addr_t data1, int32 currentCPU, addr_t data2, addr_t data3);
 
-class CPUSet {
-public:
-	inline				CPUSet();
-
-	inline	void		ClearAll();
-	inline	void		SetAll();
-
-	inline	void		SetBit(int32 cpu);
-	inline	void		ClearBit(int32 cpu);
-
-	inline	void		SetBitAtomic(int32 cpu);
-	inline	void		ClearBitAtomic(int32 cpu);
-
-	inline	bool		GetBit(int32 cpu) const;
-	inline	bool		GetBitAtomic(int32 cpu) const;
-
-	inline	bool		Matches(const CPUSet& mask) const;
-	inline	CPUSet		And(const CPUSet& mask) const;
-	inline	bool		operator==(const CPUSet& other) const;
-
-	inline	bool		IsEmpty() const;
-
-	inline uint32		Bits(uint32 index) const { return fBitmap[index];}
-
-private:
-	static	const int	kArrayBits = 32;
-	static	const int	kArraySize = ROUNDUP(SMP_MAX_CPUS, kArrayBits) / kArrayBits;
-
-			uint32		fBitmap[kArraySize];
-};
+typedef FixedSizeBitmap<SMP_MAX_CPUS> CPUSet;
 
 
 #ifdef __cplusplus
@@ -104,125 +74,9 @@ void call_single_cpu(uint32 targetCPU, void (*func)(void*, int), void* cookie);
 void call_single_cpu_sync(uint32 targetCPU, void (*func)(void*, int),
 	void* cookie);
 
-
 #ifdef __cplusplus
 }
 #endif
-
-
-inline
-CPUSet::CPUSet()
-{
-	memset(fBitmap, 0, sizeof(fBitmap));
-}
-
-
-inline void
-CPUSet::ClearAll()
-{
-	memset(fBitmap, 0, sizeof(fBitmap));
-}
-
-
-inline void
-CPUSet::SetAll()
-{
-	memset(fBitmap, ~uint8(0), sizeof(fBitmap));
-}
-
-
-inline void
-CPUSet::SetBit(int32 cpu)
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	*element |= 1u << (cpu % kArrayBits);
-}
-
-
-inline void
-CPUSet::ClearBit(int32 cpu)
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	*element &= ~uint32(1u << (cpu % kArrayBits));
-}
-
-
-inline void
-CPUSet::SetBitAtomic(int32 cpu)
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	atomic_or(element, 1u << (cpu % kArrayBits));
-}
-
-
-inline void
-CPUSet::ClearBitAtomic(int32 cpu)
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	atomic_and(element, ~uint32(1u << (cpu % kArrayBits)));
-}
-
-
-inline bool
-CPUSet::GetBit(int32 cpu) const
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	return ((uint32)*element & (1u << (cpu % kArrayBits))) != 0;
-}
-
-
-inline bool
-CPUSet::GetBitAtomic(int32 cpu) const
-{
-	int32* element = (int32*)&fBitmap[cpu / kArrayBits];
-	return ((uint32)atomic_get(element) & (1u << (cpu % kArrayBits))) != 0;
-}
-
-
-inline CPUSet
-CPUSet::And(const CPUSet& mask) const
-{
-	CPUSet andSet;
-	for (int i = 0; i < kArraySize; i++)
-		andSet.fBitmap[i] = fBitmap[i] & mask.fBitmap[i];
-	return andSet;
-}
-
-
-inline bool
-CPUSet::Matches(const CPUSet& mask) const
-{
-	for (int i = 0; i < kArraySize; i++) {
-		if ((fBitmap[i] & mask.fBitmap[i]) != 0)
-			return true;
-	}
-
-	return false;
-}
-
-
-inline bool
-CPUSet::operator==(const CPUSet& other) const
-{
-	for (int i = 0; i < kArraySize; i++) {
-		if (fBitmap[i] != other.fBitmap[i])
-			return false;
-	}
-
-	return true;
-}
-
-
-inline bool
-CPUSet::IsEmpty() const
-{
-	for (int i = 0; i < kArraySize; i++) {
-		if (fBitmap[i] != 0)
-			return false;
-	}
-
-	return true;
-}
 
 
 // Unless spinlock debug features are enabled, try to inline
