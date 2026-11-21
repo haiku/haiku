@@ -6,7 +6,6 @@ UsePrivateHeaders app ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 # Let Jam know where to find some of our source files
-SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessage ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagerunner ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
@@ -15,19 +14,25 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) broster ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) broster testapps ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) common ] ;
 
-# TODO: bonefish: There is no MessageTestAddon.cpp. Remove, if noone uses
-# this.
-#UnitTestLib libmessagetest.so
-#	: MessageTestAddon.cpp
-#		MessageTest.cpp
-#		MessageConstructTest.cpp
-#		MessageDestructTest.cpp
-#		MessageOpAssignTest.cpp
-#		MessageEasyFindTest.cpp
-#		MessageSpeedTest.cpp
-#	: be [ TargetLibstdc++ ]
-#;
-
+local architecture = $(TARGET_PACKAGING_ARCH) ;
+local messageSourceFiles =
+	MessageTest.cpp 
+	MessageSpeedTest.cpp
+;
+if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 0 {
+	messageSourceFiles += 
+		MessageBoolItemTest.cpp
+		MessageBPointItemTest.cpp
+		MessageBRectItemTest.cpp
+		MessageFlattenableItemTest.cpp
+		MessageMessageItemTest.cpp
+		MessageMessengerItemTest.cpp
+		MessageNumberItemTest.cpp
+		MessagePointerItemTest.cpp
+		MessageRefItemTest.cpp
+		MessageStringItemTest.cpp
+	;
+}
 
 UnitTestLib libapptest.so
 	: AppKitTestAddon.cpp
@@ -61,12 +66,7 @@ UnitTestLib libapptest.so
 		LooperIsMessageWaitingTest.cpp
 
 		# BMessage
-#		MessageTest.cpp
-#		MessageConstructTest.cpp
-#		MessageDestructTest.cpp
-#		MessageOpAssignTest.cpp
-#		MessageEasyFindTest.cpp
-#		MessageSpeedTest.cpp
+		$(messageSourceFiles)
 
 		# BMessageQueue
 		MessageQueueTest.cpp
@@ -146,7 +146,6 @@ SEARCH on [ FGristFiles
 		RegistrarThreadManager.cpp
 	] = [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
-#SubInclude HAIKU_TOP src tests kits app bmessage ;
 #SubInclude HAIKU_TOP src tests kits app bmessageQueue ;
 SubInclude HAIKU_TOP src tests kits app bmessenger ;
 SubInclude HAIKU_TOP src tests kits app broster ;
