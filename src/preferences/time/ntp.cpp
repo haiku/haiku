@@ -26,6 +26,9 @@
 #define B_TRANSLATION_CONTEXT "Time"
 
 
+const uint32 kSecondsBetween1900And1970 = 2208988800UL;
+
+
 /* This structure and its data fields are described in RFC 1305
  * "Network Time Protocol (Version 3)" in appendix A.
  */
@@ -50,7 +53,7 @@ struct ufixed64 {
 	uint32	fraction;
 
 	void
-	SetTo(uint32 integer, uint32 fraction = 0)
+	SetTo(uint32 integer, uint32 fraction)
 	{
 		this->integer = htonl(integer);
 		this->fraction = htonl(fraction);
@@ -58,6 +61,19 @@ struct ufixed64 {
 
 	uint32 Integer() { return htonl(integer); }
 	uint32 Fraction() { return htonl(fraction); }
+
+	void SetTo(bigtime_t ts)
+	{
+		uint32 seconds = ts / 1000000;
+		uint32 usecs = ts % 1000000;
+		SetTo(seconds + kSecondsBetween1900And1970, usecs * 0x100000000LL / 1000000);
+	}
+	bigtime_t Usecs()
+	{
+		uint32 seconds = Integer() - kSecondsBetween1900And1970;
+		uint32 usecs = Fraction() * 1000000L / 0x100000000LL;
+		return seconds * 1000000LL + usecs;
+	}
 };
 
 struct ntp_data {
@@ -102,16 +118,6 @@ enum ntp_modes {
 };
 
 
-const uint32 kSecondsBetween1900And1970 = 2208988800UL;
-
-
-uint32
-seconds_since_1900(void)
-{
-	return kSecondsBetween1900And1970 + real_time_clock();
-}
-
-
 status_t
 ntp_update_time(const char* hostname, const char** errorString,
 	int32* errorCode)
@@ -139,14 +145,14 @@ ntp_update_time(const char* hostname, const char** errorString,
 	message.root_delay.SetTo(1);	// 1 sec
 	message.root_dispersion.SetTo(1);
 
-	message.transmit_timestamp.SetTo(seconds_since_1900());
-
 	int connection = socket(AF_INET, SOCK_DGRAM, 0);
 	if (connection < 0) {
 		*errorString = B_TRANSLATE("Could not create socket");
 		*errorCode = errno;
 		return B_ERROR;
 	}
+
+	message.transmit_timestamp.SetTo(real_time_clock_usecs());
 
 	while (resolver.GetNextAddress(&cookie, address) == B_OK) {
 		if (sendto(connection, reinterpret_cast<char*>(&message),
@@ -184,6 +190,8 @@ ntp_update_time(const char* hostname, const char** errorString,
 		return B_ERROR;
 	}
 
+	bigtime_t clientReceiveTime = real_time_clock_usecs();
+
 	message.transmit_timestamp.SetTo(0);
 
 	socklen_t addressSize = address.Length();
@@ -202,7 +210,14 @@ ntp_update_time(const char* hostname, const char** errorString,
 		return B_BAD_VALUE;
 	}
 
-	time_t now = message.transmit_timestamp.Integer() - kSecondsBetween1900And1970;
-	set_real_time_clock(now);
+	bigtime_t serverReceiveTime = message.receive_timestamp.Usecs();
+	bigtime_t serverTransmitTime = message.transmit_timestamp.Usecs();
+	bigtime_t clientTransmitTime = message.originate_timestamp.Usecs();
+
+	// offset computation from https://www.ntp.org/reflib/time/#5-on-wire-protocol-implications
+	bigtime_t offset = ((serverReceiveTime - clientTransmitTime)
+		+ (serverTransmitTime - clientReceiveTime)) / 2;
+
+	set_real_time_clock_usecs(real_time_clock_usecs() + offset);
 	return B_OK;
 }
