@@ -66,6 +66,13 @@ set_real_time_clock(unsigned long secs)
 }
 
 
+void
+set_real_time_clock_usecs(bigtime_t usecs)
+{
+	_kern_set_real_time_clock(usecs);
+}
+
+
 bigtime_t
 set_alarm(bigtime_t when, uint32 mode)
 {

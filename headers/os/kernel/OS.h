@@ -392,6 +392,7 @@ extern status_t		convert_to_pthread(thread_id thread, pthread_t *_thread);
 extern unsigned long real_time_clock(void);
 extern void			set_real_time_clock(unsigned long secsSinceJan1st1970);
 extern bigtime_t	real_time_clock_usecs(void);
+extern void			set_real_time_clock_usecs(bigtime_t usecsSinceJan1st1970);
 extern bigtime_t	system_time(void);
 						/* time since booting in microseconds */
 extern nanotime_t	system_time_nsecs(void);
