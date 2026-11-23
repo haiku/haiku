@@ -19,7 +19,7 @@ Symlink::Symlink(Inode* inode)
 
 Symlink::~Symlink()
 {
-	delete fSymlinkBuffer;
+	delete[] fSymlinkBuffer;
 }
 
 

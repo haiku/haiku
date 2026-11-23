@@ -14,13 +14,17 @@
 Extent::Extent(Inode* inode)
 	:
 	fInode(inode),
-	fOffset(0)
+	fMap(NULL),
+	fOffset(0),
+	fBlockBuffer(NULL)
 {
 }
 
 
 Extent::~Extent()
 {
+	delete fMap;
+	delete[] fBlockBuffer;
 }
 
 

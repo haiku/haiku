@@ -28,8 +28,8 @@ LeafDirectory::~LeafDirectory()
 {
 	delete fDataMap;
 	delete fLeafMap;
-	delete fDataBuffer;
-	delete fLeafBuffer;
+	delete[] fDataBuffer;
+	delete[] fLeafBuffer;
 }
 
 
