@@ -51,9 +51,6 @@ ICUCtypeData::~ICUCtypeData()
 void
 ICUCtypeData::Initialize(LocaleCtypeDataBridge* dataBridge)
 {
-	*dataBridge->addrOfClassInfoTable = &fClassInfo[128];
-	*dataBridge->addrOfToLowerTable = &fToLowerMap[128];
-	*dataBridge->addrOfToUpperTable = &fToUpperMap[128];
 	fDataBridge = dataBridge;
 }
 
@@ -143,6 +140,10 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 			fToUpperMap[i - 128] = toUpper;
 		}
 	}
+
+	*fDataBridge->addrOfClassInfoTable = &fClassInfo[128];
+	*fDataBridge->addrOfToLowerTable = &fToLowerMap[128];
+	*fDataBridge->addrOfToUpperTable = &fToUpperMap[128];
 
 	return B_OK;
 }
