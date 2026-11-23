@@ -83,6 +83,7 @@ DestroyThreadLocale(void* ptr)
 {
 	ThreadLocale* threadLocale = (ThreadLocale*)ptr;
 	delete threadLocale;
+	tls_set(TLS_LOCALE_SLOT, NULL);
 }
 
 
