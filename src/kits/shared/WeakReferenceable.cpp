@@ -67,7 +67,9 @@ WeakPointer::UseCount() const
 void
 WeakPointer::GetUnchecked()
 {
-	atomic_add(&fUseCount, 1);
+	int32 count = atomic_add(&fUseCount, 1);
+	if (count <= 0)
+		debugger("illegal usage of GetUnchecked");
 }
 
 
