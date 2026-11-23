@@ -1129,19 +1129,28 @@ vm_unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size
 
 
 static status_t
-discard_area_range(VMArea* area, addr_t address, addr_t size)
+discard_area_range(VMArea* area, addr_t address, addr_t size, bool kernel)
 {
 	addr_t offset;
 	if (!intersect_area(area, address, size, offset))
 		return B_OK;
 
-	// If someone else uses the area's cache or it's not an anonymous cache, we
-	// can't discard.
+	if (!kernel && (area->protection_max & B_WRITE_AREA) == 0)
+		return B_NOT_ALLOWED;
+
 	VMCache* cache = vm_area_get_locked_cache(area);
 	VMCacheChainLocker cacheChainLocker(cache);
+
+	// Don't discard pages from non-anonymous caches.
+	if (cache->type != CACHE_TYPE_RAM)
+		return B_NOT_ALLOWED;
+	ASSERT(cache->temporary);
+
+	// TODO: If there are other consumers of the cache, we'd need to unmap those
+	// pages too.
 	if (cache->areas.First() != area || VMArea::CacheList::GetNext(area) != NULL
-		|| !cache->consumers.IsEmpty() || cache->type != CACHE_TYPE_RAM) {
-		return B_OK;
+		|| !cache->consumers.IsEmpty()) {
+		return B_NOT_SUPPORTED;
 	}
 
 	cacheChainLocker.LockAllSourceCaches();
@@ -1149,7 +1158,7 @@ discard_area_range(VMArea* area, addr_t address, addr_t size)
 	unmap_pages(area, address, size);
 
 	ssize_t commitmentChange = 0;
-	if (cache->temporary && !cache->CanOvercommit() && area->page_protections != NULL) {
+	if (!cache->CanOvercommit() && area->page_protections != NULL) {
 		// See if the commitment can be shrunken after the pages are discarded.
 		const off_t areaCacheBase = area->Base() - area->cache_offset;
 		const off_t endAddress = address + size;
@@ -1184,7 +1193,7 @@ discard_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	for (VMAddressSpace::AreaRangeIterator it
 		= addressSpace->GetAreaRangeIterator(address, size);
 			VMArea* area = it.Next();) {
-		status_t error = discard_area_range(area, address, size);
+		status_t error = discard_area_range(area, address, size, kernel);
 		if (error != B_OK)
 			return error;
 	}
