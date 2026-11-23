@@ -25,6 +25,7 @@
 #include <AutoDeleter.h>
 
 #include <fs/devfs.h>
+#include <io_requests.h>
 #include <util/fs_trim_support.h>
 
 #include "dma_resources.h"
@@ -315,6 +316,11 @@ static status_t
 das_io(void *cookie, io_request *request)
 {
 	das_handle* handle = (das_handle*)cookie;
+
+	if (handle->info->capacity == 0 || handle->info->io_scheduler == NULL) {
+		notify_io_request(request, B_DEV_NO_MEDIA);
+		return B_DEV_NO_MEDIA;
+	}
 
 	return handle->info->io_scheduler->ScheduleRequest(request);
 }
