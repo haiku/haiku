@@ -51,10 +51,11 @@ LoadFunctions()
 static void
 LoadBackend()
 {
-	LocaleBackend::CreateBackend(gGlobalLocaleBackend);
-	if (gGlobalLocaleBackend != NULL) {
-		gGlobalLocaleBackend->Initialize(&gGlobalLocaleDataBridge);
-	}
+	LocaleBackend* backend;
+	LocaleBackend::CreateBackend(backend);
+	if (backend != NULL)
+		backend->Initialize(&gGlobalLocaleDataBridge);
+	gGlobalLocaleBackend = backend;
 }
 
 
