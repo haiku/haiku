@@ -59,11 +59,6 @@ LoadBackend()
 
 
 
-LocaleBackend::LocaleBackend()
-{
-}
-
-
 LocaleBackend::~LocaleBackend()
 {
 }
@@ -72,9 +67,8 @@ LocaleBackend::~LocaleBackend()
 status_t
 LocaleBackend::LoadBackend()
 {
-	if (gGlobalLocaleBackend == NULL) {
+	if (gGlobalLocaleBackend == NULL)
 		pthread_once(&sBackendInitOnce, &BPrivate::Libroot::LoadBackend);
-	}
 
 	return gGlobalLocaleBackend != NULL ? B_OK : B_ERROR;
 }
@@ -83,9 +77,8 @@ LocaleBackend::LoadBackend()
 status_t
 LocaleBackend::CreateBackend(LocaleBackend*& backendOut)
 {
-	if (sCreateInstanceFunc == NULL) {
+	if (sCreateInstanceFunc == NULL)
 		pthread_once(&sFunctionsInitOnce, &BPrivate::Libroot::LoadFunctions);
-	}
 
 	if (sCreateInstanceFunc != NULL) {
 		backendOut = sCreateInstanceFunc();
@@ -100,13 +93,13 @@ LocaleBackend::CreateBackend(LocaleBackend*& backendOut)
 void
 LocaleBackend::DestroyBackend(LocaleBackend* instance)
 {
-	if (sDestroyInstanceFunc != NULL) {
+	if (sDestroyInstanceFunc != NULL)
 		sDestroyInstanceFunc(instance);
-	}
 }
 
 
-LocaleBackendData* GetCurrentLocaleInfo()
+LocaleBackendData*
+GetCurrentLocaleInfo()
 {
 	return GetCurrentThreadLocale()->threadLocaleInfo;
 }
@@ -119,14 +112,16 @@ SetCurrentLocaleInfo(LocaleBackendData* newLocale)
 }
 
 
-LocaleBackend* GetCurrentLocaleBackend()
+LocaleBackend*
+GetCurrentLocaleBackend()
 {
 	LocaleBackendData* info = GetCurrentThreadLocale()->threadLocaleInfo;
-	if (info != NULL && info->backend != NULL) {
+	if (info != NULL && info->backend != NULL)
 		return info->backend;
-	}
+
 	return gGlobalLocaleBackend;
 }
+
 
 }	// namespace Libroot
 }	// namespace BPrivate

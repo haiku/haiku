@@ -112,7 +112,6 @@ struct LocaleDataBridge {
 
 class LocaleBackend {
 public:
-								LocaleBackend();
 	virtual						~LocaleBackend();
 
 	virtual	const char*			SetLocale(int category, const char* locale) = 0;
