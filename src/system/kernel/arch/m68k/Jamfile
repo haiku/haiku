@@ -84,5 +84,5 @@ KernelMergeObject kernel_arch_m68k.o :
 
 ;
 
+DEFINES on [ FGristFiles asm_offsets.h ] += $(TARGET_KERNEL_DEFINES) ;
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
-
