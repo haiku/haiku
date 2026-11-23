@@ -122,17 +122,16 @@ net_socket_private::~net_socket_private()
 	if (is_in_socket_list) {
 		MutexLocker _(sSocketLock);
 		sSocketList.Remove(this);
+		is_in_socket_list = false;
 	}
 
 	mutex_lock(&lock);
 
 	// also delete all children of this socket
-	while (net_socket_private* child = pending_children.RemoveHead()) {
+	while (net_socket_private* child = pending_children.RemoveHead())
 		child->RemoveFromParent();
-	}
-	while (net_socket_private* child = connected_children.RemoveHead()) {
+	while (net_socket_private* child = connected_children.RemoveHead())
 		child->RemoveFromParent();
-	}
 
 	mutex_unlock(&lock);
 
@@ -561,7 +560,7 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 
 	net_socket_private* socket = NULL;
 	SocketList::Iterator iterator = sSocketList.GetIterator();
-	uint32 cookie = *_cookie;
+	const uint32 cookie = *_cookie;
 	uint32 count = 0;
 
 	while (true) {
@@ -569,13 +568,21 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 		if (socket == NULL)
 			return B_ENTRY_NOT_FOUND;
 
-		// TODO: also traverse the pending connections
-		if (count == cookie)
-			break;
+		if (family != -1 && family != socket->family)
+			continue;
 
-		if (family == -1 || family == socket->family)
+		// TODO: also traverse the pending connections
+		if (count != cookie) {
 			count++;
+			continue;
+		}
+
+		// If the socket is being deleted, skip it.
+		if (socket->GetWeakPointer()->Get() == NULL)
+			continue;
+		break;
 	}
+	locker.Unlock();
 
 	*_cookie = count + 1;
 
@@ -594,6 +601,7 @@ socket_get_next_stat(uint32* _cookie, int family, struct net_stat* stat)
 	socket->first_info->control(socket->first_protocol, socket->protocol,
 		NET_STAT_SOCKET, stat, &length);
 
+	socket->ReleaseReference();
 	return B_OK;
 }
 
@@ -753,6 +761,7 @@ socket_connected(net_socket* _socket)
 	net_socket_private* socket = (net_socket_private*)_socket;
 
 	TRACE("socket_connected(%p)\n", socket);
+	ASSERT(!socket->is_connected);
 
 	if (socket->parent == NULL) {
 		socket->is_connected = true;
