@@ -60,7 +60,7 @@ public:
 
 	void Notify(uint32 eventCode, struct image* image)
 	{
-		char eventBuffer[128];
+		char eventBuffer[132];
 		KMessage event;
 		event.SetTo(eventBuffer, sizeof(eventBuffer), IMAGE_MONITOR);
 		event.AddInt32("event", eventCode);
