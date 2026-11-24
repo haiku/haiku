@@ -153,7 +153,7 @@ arch_thread_control(const char* subsystem, uint32 function, void* buffer,
 				|| user_memcpy(&base, buffer, sizeof(base)) < B_OK) {
 				return B_BAD_ADDRESS;
 			}
-			if (!IS_USER_ADDRESS(base))
+			if (base > USER_TOP)
 				return B_BAD_VALUE;
 
 			Thread* thread = thread_get_current_thread();
