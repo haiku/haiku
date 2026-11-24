@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2026, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -471,7 +471,6 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 {
 	size_t length, reserved, quotes;
 	char *buffer = *_buffer, c;
-	bool quoted;
 
 	if (string == NULL)
 		return true;
@@ -482,15 +481,20 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 		else if (is_word_break(c))
 			reserved++;
 	}
-	quoted = reserved || quotes;
+
+	bool quoted = reserved || quotes;
+	if (quoted)
+		length += 2 + quotes;
+
+	if (*_bufferSize <= length) {
+		*_bufferSize = 0;
+		return false;
+	}
 
 	// update _bufferSize in any way, so that we can chain several
 	// of these calls without having to check the return value
 	// everytime
-	*_bufferSize -= length + (quoted ? 2 + quotes : 0);
-
-	if (*_bufferSize <= 0)
-		return false;
+	*_bufferSize -= length;
 
 	if (quoted)
 		*(buffer++) = '"';
