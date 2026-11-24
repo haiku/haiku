@@ -430,6 +430,8 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// Set up the iframe to execute the signal handler wrapper on our prepared
 	// stack. First argument points to the frame data.
 	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
+	frame->cs = USER_CODE_SELECTOR;
+	frame->ss = USER_DATA_SELECTOR;
 	frame->user_sp = (addr_t)userStack;
 	arch_cpu_enable_user_access();
 	frame->ip = commPageAddress[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
