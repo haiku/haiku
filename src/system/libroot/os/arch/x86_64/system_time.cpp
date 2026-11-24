@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-#include <x86intrin.h>
+#include <x86gprintrin.h>
 
 
 static uint64_t cv_factor;

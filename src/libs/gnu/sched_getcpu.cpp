@@ -12,7 +12,7 @@
 
 #include <pthread.h>
 
-#include <x86intrin.h>
+#include <x86gprintrin.h>
 
 #define IA32_FEATURE_RDPID			(1 << 22) // RDPID Instruction
 #define IA32_FEATURE_AMD_EXT_RDTSCP		(1 << 27) // rdtscp instruction

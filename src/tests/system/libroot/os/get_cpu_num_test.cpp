@@ -10,7 +10,7 @@
 
 #include <OS.h>
 
-#include <x86intrin.h>
+#include <x86gprintrin.h>
 
 extern const char* __progname;
 
