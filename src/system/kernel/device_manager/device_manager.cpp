@@ -2204,6 +2204,9 @@ device_node::UninitUnusedDriver()
 void
 device_node::DeviceRemoved()
 {
+	if ((fFlags & NODE_FLAG_DEVICE_REMOVED) != 0)
+		return;
+
 	// notify children
 	NodeList::ConstIterator iterator = Children().GetIterator();
 	while (iterator.HasNext()) {
