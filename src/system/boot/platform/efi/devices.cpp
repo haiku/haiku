@@ -32,39 +32,41 @@
 static efi_guid BlockIoGUID = EFI_BLOCK_IO_PROTOCOL_GUID;
 
 
-class EfiDevice : public Node
+class EFIDevice : public Node
 {
-	public:
-		EfiDevice(efi_block_io_protocol *blockIo);
-		virtual ~EfiDevice();
+public:
+	EFIDevice(efi_block_io_protocol *blockIo);
+	virtual ~EFIDevice();
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
-			size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
-			size_t bufferSize) { return B_UNSUPPORTED; }
-		virtual off_t Size() const {
-			return (fBlockIo->Media->LastBlock + 1) * BlockSize(); }
+	virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
+		size_t bufferSize);
+	virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
+		size_t bufferSize) { return B_UNSUPPORTED; }
+	virtual off_t Size() const
+	{
+		return (fBlockIo->Media->LastBlock + 1) * BlockSize();
+	}
 
-		uint32 BlockSize() const { return fBlockIo->Media->BlockSize; }
-	private:
-		efi_block_io_protocol*		fBlockIo;
+	uint32 BlockSize() const { return fBlockIo->Media->BlockSize; }
+private:
+	efi_block_io_protocol*		fBlockIo;
 };
 
 
-EfiDevice::EfiDevice(efi_block_io_protocol *blockIo)
+EFIDevice::EFIDevice(efi_block_io_protocol *blockIo)
 	:
 	fBlockIo(blockIo)
 {
 }
 
 
-EfiDevice::~EfiDevice()
+EFIDevice::~EFIDevice()
 {
 }
 
 
 ssize_t
-EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+EFIDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	TRACE("%s called. pos: %" B_PRIdOFF ", %p, %" B_PRIuSIZE "\n", __func__,
 		pos, buffer, bufferSize);
@@ -81,19 +83,18 @@ EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 		__attribute__((aligned(2048)));
 
 	if (fBlockIo->ReadBlocks(fBlockIo, fBlockIo->Media->MediaId,
-		pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS) {
+			pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS) {
 		dprintf("%s: blockIo error reading from device!\n", __func__);
 		return B_ERROR;
 	}
 
 	memcpy(buffer, readBuffer + offset, bufferSize);
-
 	return bufferSize;
 }
 
 
 static bool
-device_contains_partition(EfiDevice *device, boot::Partition *partition)
+device_contains_partition(EFIDevice *device, boot::Partition *partition)
 {
 	EFI::Header *header = (EFI::Header*)partition->content_cookie;
 	if (header != NULL && header->InitCheck() == B_OK) {
@@ -156,9 +157,8 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	} else {
 		TRACE("Network is initialized! Search for remote disk...\n");
 		RemoteDisk *remoteDisk = RemoteDisk::FindAnyRemoteDisk();
-		if (remoteDisk != NULL) {
+		if (remoteDisk != NULL)
 			devicesList->Add(remoteDisk);
-		}
 	}
 
 	// Read to zero sized buffer to get memory needed for handles
@@ -202,7 +202,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		if (blockIo->Media->BlockSize > 8192)
 			continue;
 
-		EfiDevice *device = new(std::nothrow)EfiDevice(blockIo);
+		EFIDevice *device = new(std::nothrow)EFIDevice(blockIo);
 		if (device == NULL)
 			panic("Can't allocate memory for block devices!");
 		devicesList->Insert(device);
@@ -229,7 +229,7 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 	NodeIterator iterator = partitions->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition*)iterator.Next()) != NULL) {
-		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
+		if (device_contains_partition((EFIDevice*)bootDevice, partition)) {
 			bootPartitions->Insert(partition);
 		}
 	}
