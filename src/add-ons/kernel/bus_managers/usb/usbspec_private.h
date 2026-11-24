@@ -15,7 +15,6 @@
 
 
 #define USB_MAX_AREAS					8
-#define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
 #define USB_MAX_PORT_COUNT				255
 #define USB_MAX_DEPTH					5
 

@@ -965,6 +965,8 @@ XHCI::SubmitNormalRequest(Transfer* transfer)
 	}
 	if (isochronousData != NULL && transfer->IsPhysical())
 		return B_NOT_SUPPORTED;
+	if (transfer->IsPhysical() && transfer->IsFragmented())
+		return B_BAD_VALUE;
 
 	status_t status = transfer->InitKernelAccess();
 	if (status != B_OK)

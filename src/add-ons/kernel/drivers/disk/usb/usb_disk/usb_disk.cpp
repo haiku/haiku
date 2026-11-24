@@ -32,8 +32,6 @@
 #include "icons.h"
 
 
-#define MAX_IO_BLOCKS					(256)
-
 #define USB_DISK_DEVICE_MODULE_NAME		"drivers/disk/usb_disk/device_v1"
 #define USB_DISK_DRIVER_MODULE_NAME		"drivers/disk/usb_disk/driver_v1"
 #define USB_DISK_DEVICE_ID_GENERATOR	"usb_disk/device_id"
@@ -955,7 +953,7 @@ usb_disk_update_capacity(device_lun* lun)
 	if (lun->io_scheduler == NULL) {
 		dma_restrictions restrictions = {};
 		restrictions.high_address = UINT32_MAX;
-		restrictions.max_transfer_size = MAX_IO_BLOCKS * lun->block_size;
+		restrictions.max_transfer_size = USB_MAX_FRAGMENT_SIZE;
 
 		DMAResource* dmaResource = new DMAResource;
 		result = dmaResource->Init(restrictions, lun->block_size, 1, 1);

@@ -4,9 +4,9 @@
  *	Copyright 2006, Haiku Inc. All Rights Reserved.
  *	Distributed under the terms of the MIT License.
  */
-
 #ifndef _USB_V3_H_
 #define _USB_V3_H_
+
 
 #include <KernelExport.h>
 #include <bus_manager.h>
@@ -15,9 +15,11 @@
 #include <USB_spec.h>
 #include <USB_isochronous.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 typedef struct usb_module_info usb_module_info;
 
@@ -73,6 +75,9 @@ struct usb_configuration_info {
 	size_t						interface_count;/* interfaces in this config */
 	usb_interface_list			*interface;
 };
+
+// Maximum size of a USB transfer before it will be (internally) split
+#define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
 
 // Flags for queue_isochronous
 #define	USB_ISO_ASAP	0x01
