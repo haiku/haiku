@@ -484,6 +484,8 @@ TCPEndpoint::~TCPEndpoint()
 		put_endpoint_manager(fManager);
 	}
 
+	mutex_unlock(&fLock);
+
 	// we need to wait for all timers to return
 	gStackModule->wait_for_timer(&fRetransmitTimer);
 	gStackModule->wait_for_timer(&fPersistTimer);
