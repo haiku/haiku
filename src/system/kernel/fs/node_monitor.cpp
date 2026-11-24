@@ -873,7 +873,7 @@ NodeMonitorService::NotifyMount(dev_t device, dev_t parentDevice,
 		return B_OK;
 
 	// there are interested listeners: construct the message and send it
-	char messageBuffer[128];
+	char messageBuffer[160];
 	KMessage message;
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
 	message.AddInt32("opcode", B_DEVICE_MOUNTED);
