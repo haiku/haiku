@@ -228,7 +228,7 @@ public:
 
 	uint32 Available() const { return fAvailable; }
 
-	void* Allocate(uint32 size)
+	void* Allocate(uint32 size, uint32 alignment = 0)
 	{
 		if (size == 0)
 			return NULL;
@@ -238,10 +238,14 @@ public:
 			size = sizeof(FreeChunkData);
 		size = Align(size);
 
-		if (size > fAvailable)
+		if (alignment <= Alignment)
+			alignment = 0;
+
+		if ((size + alignment) > fAvailable)
 			return NULL;
 
-		FreeChunk* chunk = fFreeChunkTree.FindClosest(FreeChunkKey(size), true, true);
+		FreeChunk* chunk = fFreeChunkTree.FindClosest(FreeChunkKey(size + alignment),
+			true, true);
 		if (chunk == NULL) {
 			// could not find a free chunk as large as needed
 			return NULL;
@@ -252,9 +256,33 @@ public:
 
 		void* allocated = chunk->AllocatedAddress();
 
+		const uint32 alignedFreeChunkSize = Align(sizeof(FreeChunk));
+		uint32 offsetToAligned = 0;
+		if (alignment != 0)
+			offsetToAligned = alignment - ((addr_t)allocated % alignment);
+		if (alignment != 0 && offsetToAligned != alignment) {
+			if (offsetToAligned < alignedFreeChunkSize) {
+				// The FreeChunk structure won't fit in the intervening space.
+				// Can we add another alignment's worth of offset to compensate?
+				if (chunk->Size() < (size + alignment + offsetToAligned)) {
+					Free(allocated);
+					return NULL;
+				}
+
+				offsetToAligned += alignment;
+			}
+
+			FreeChunk* alignedChunk = chunk->Split(offsetToAligned - sizeof(Chunk));
+			fFreeChunkTree.Insert(chunk);
+			fAvailable += chunk->Size();
+
+			chunk = alignedChunk;
+			allocated = chunk->AllocatedAddress();
+		}
+
 		// If this chunk is bigger than the requested size and there's enough space
 		// left over for a new chunk, we split it.
-		if (chunk->Size() >= (size + Align(sizeof(FreeChunk)))) {
+		if (chunk->Size() >= (size + alignedFreeChunkSize)) {
 			FreeChunk* freeChunk = chunk->Split(size);
 			fFreeChunkTree.Insert(freeChunk);
 			fAvailable += freeChunk->Size();

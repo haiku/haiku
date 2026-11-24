@@ -109,18 +109,27 @@ heap_reinit_after_fork()
 void*
 malloc(size_t size)
 {
+	return memalign(kAlignment, size);
+}
+
+
+void*
+memalign(size_t alignment, size_t size)
+{
 	if (size == 0)
 		return NULL;
+	if (alignment <= kAlignment)
+		alignment = 0;
 
 	RecursiveLocker _(sLock);
 
-	void* allocated = sAllocator.Allocate(size);
+	void* allocated = sAllocator.Allocate(size, alignment);
 	if (allocated == NULL) {
 		// try to enlarge heap
-		if (grow_heap(size) != B_OK)
+		if (grow_heap(size + alignment) != B_OK)
 			return NULL;
 
-		allocated = sAllocator.Allocate(size);
+		allocated = sAllocator.Allocate(size, alignment);
 		if (allocated == NULL) {
 			TRACE(("no allocation chunk found after growing the heap\n"));
 			return NULL;
@@ -128,21 +137,6 @@ malloc(size_t size)
 	}
 
 	TRACE(("malloc(%lu) -> %p\n", size, allocatedAddress));
-	return allocated;
-}
-
-
-void*
-memalign(size_t alignment, size_t size)
-{
-	if (alignment <= kAlignment)
-		return malloc(size);
-
-	uint8* allocated = (uint8*)malloc(size + alignment - kAlignment);
-	if (allocated == NULL)
-		return NULL;
-
-	allocated += alignment - ((addr_t)allocated % alignment);
 	return allocated;
 }
 
