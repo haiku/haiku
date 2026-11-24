@@ -14,9 +14,9 @@ class TLSBlock;
 
 class TLSBlockTemplate {
 public:
-						TLSBlockTemplate() { }
+						TLSBlockTemplate() {}
 	inline				TLSBlockTemplate(void* address, size_t fileSize,
-							size_t memorySize);
+							size_t memorySize, size_t memoryAlignment);
 
 			void		SetGeneration(unsigned generation)
 							{ fGeneration = generation; }
@@ -32,6 +32,7 @@ private:
 			void*		fAddress;
 			size_t		fFileSize;
 			size_t		fMemorySize;
+			size_t		fMemoryAlignment;
 };
 
 class TLSBlockTemplates {
@@ -60,11 +61,12 @@ private:
 
 
 TLSBlockTemplate::TLSBlockTemplate(void* address, size_t fileSize,
-	size_t memorySize)
+	size_t memorySize, size_t memoryAlignment)
 	:
 	fAddress(address),
 	fFileSize(fileSize),
-	fMemorySize(memorySize)
+	fMemorySize(memorySize),
+	fMemoryAlignment(memoryAlignment)
 {
 }
 

@@ -6,6 +6,7 @@
 
 #include "runtime_loader_private.h"
 
+#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -127,6 +128,21 @@ malloc(size_t size)
 	}
 
 	TRACE(("malloc(%lu) -> %p\n", size, allocatedAddress));
+	return allocated;
+}
+
+
+void*
+memalign(size_t alignment, size_t size)
+{
+	if (alignment <= kAlignment)
+		return malloc(size);
+
+	uint8* allocated = (uint8*)malloc(size + alignment - kAlignment);
+	if (allocated == NULL)
+		return NULL;
+
+	allocated += alignment - ((addr_t)allocated % alignment);
 	return allocated;
 }
 

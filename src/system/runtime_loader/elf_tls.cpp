@@ -5,6 +5,7 @@
 
 #include "elf_tls.h"
 
+#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,7 +86,7 @@ TLSBlockTemplate::SetBaseAddress(addr_t baseAddress)
 TLSBlock
 TLSBlockTemplate::CreateBlock()
 {
-	void* pointer = malloc(fMemorySize + TLS_DTV_OFFSET);
+	void* pointer = memalign(fMemoryAlignment, fMemorySize + TLS_DTV_OFFSET);
 	if (pointer == NULL)
 		return TLSBlock();
 	memset(pointer, 0, TLS_DTV_OFFSET);

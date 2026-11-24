@@ -199,7 +199,8 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 				image->dso_tls_id
 					= TLSBlockTemplates::Get().Register(
 						TLSBlockTemplate((void*)pheader->p_vaddr,
-							pheader->p_filesz, pheader->p_memsz));
+							pheader->p_filesz, pheader->p_memsz,
+							pheader->p_align));
 				break;
 			case PT_ARM_UNWIND:
 				// will be handled in libgcc_s.so.1
