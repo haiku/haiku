@@ -26,6 +26,8 @@ int main()
 	printf("events=%08x revents=%08x\n", pfd.events, pfd.revents);
 	if (pfd.revents != POLLOUT)
 		return 2;
+	if (pfd.events != POLLOUT)
+		return 3;
 
 	return 0;
 }
