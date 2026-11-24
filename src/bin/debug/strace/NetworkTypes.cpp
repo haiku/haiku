@@ -333,19 +333,21 @@ format_pointer(Context &context, msghdr *h)
 			r += "[{cmsg_len=" + format_unsigned(data.cmsg_len);
 			if (data.cmsg_level == SOL_SOCKET && data.cmsg_type == SCM_RIGHTS) {
 				r += ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS";
-				uint32 dataSize = data.cmsg_len - CMSG_LEN(0);
-				char buffer[dataSize];
-				err = context.Reader().Read((void*)(CMSG_DATA(h->msg_control)),
-					&buffer, dataSize, bytesRead);
-				if (err == B_OK && bytesRead == (int32)dataSize) {
-					r += ", cmsg_data=[";
-					int* fds = (int*)buffer;
-					for (uint i = 0; i < dataSize / sizeof(int); i++) {
-						if (i > 0)
-							r += ", ";
-						r += format_signed(fds[i]);
+				if (data.cmsg_len >= CMSG_LEN(0)) {
+					uint32 dataSize = data.cmsg_len - CMSG_LEN(0);
+					char buffer[dataSize];
+					err = context.Reader().Read((void*)(CMSG_DATA(h->msg_control)),
+						&buffer, dataSize, bytesRead);
+					if (err == B_OK && bytesRead == (int32)dataSize) {
+						r += ", cmsg_data=[";
+						int* fds = (int*)buffer;
+						for (uint i = 0; i < dataSize / sizeof(int); i++) {
+							if (i > 0)
+								r += ", ";
+							r += format_signed(fds[i]);
+						}
+						r += "]";
 					}
-					r += "]";
 				}
 			} else {
 				r += ", cmsg_level=" + format_signed(data.cmsg_level);
