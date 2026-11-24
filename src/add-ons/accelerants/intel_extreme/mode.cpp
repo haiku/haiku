@@ -626,6 +626,16 @@ intel_set_brightness(float brightness)
 
 		write32(intel_get_backlight_register(false), duty);
 	} else if (gInfo->shared_info->pch_info >= INTEL_PCH_LPT) {
+		if (gInfo->shared_info->pch_info == INTEL_PCH_LPT) {
+			// Set the override bit, otherwise the PCH PWM takes its duty cycle from the
+			// CPU register (0x48254) and ignores BLC_PWM_PCH_CTL2.
+			uint32_t pchCtl1 = read32(BLC_PWM_PCH_CTL1);
+			if ((pchCtl1 & BLM_PCH_OVERRIDE_ENABLE) == 0) {
+				write32(BLC_PWM_PCH_CTL1, pchCtl1 | BLM_PCH_OVERRIDE_ENABLE);
+				// Post read so the write reaches the hardware before the duty cycle
+				read32(BLC_PWM_PCH_CTL1);
+			}
+		}
 		uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
 
 		uint32_t duty = (uint32_t)(period * brightness) & 0xffff;

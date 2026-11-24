@@ -1506,6 +1506,7 @@ struct intel_brightness_legacy {
 
 // Kaby Lake/Sunrisepoint
 #define BLC_PWM_PCH_CTL1				(0x8250 | REGS_SOUTH_SHARED) // Enable with bit 31
+#define BLM_PCH_OVERRIDE_ENABLE			(1 << 30)
 #define BLC_PWM_PCH_CTL2				(0x8254 | REGS_SOUTH_SHARED) // Duty Cycle and Period
 
 // Devices after Cannonlake have a new register layout, with separate registers for the period
