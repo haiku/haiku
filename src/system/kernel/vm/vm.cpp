@@ -2572,7 +2572,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 		cache->AcquireRefLocked();
 	}
 
-	if (newArea->wiring == B_FULL_LOCK) {
+	if (newArea->wiring == B_FULL_LOCK || newArea->wiring == B_CONTIGUOUS) {
 		// we need to map in everything at this point
 		if (sourceArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
