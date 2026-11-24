@@ -544,10 +544,10 @@ icmp6_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 	if (errorData != NULL) {
 		switch (error) {
 			case B_NET_ERROR_PARAMETER_PROBLEM:
-				icmpHeader->icmp6_pptr = errorData->error_offset;
+				icmpHeader->icmp6_pptr = htonl(errorData->error_offset);
 				break;
 			case B_NET_ERROR_MESSAGE_SIZE:
-				icmpHeader->icmp6_mtu = htons(errorData->mtu);
+				icmpHeader->icmp6_mtu = htonl(errorData->mtu);
 				break;
 
 			default:
@@ -559,7 +559,7 @@ icmp6_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 
 	// Append IP header + 8 byte of the original datagram
 	status = gBufferModule->append_restored_header(reply, buffer, 0,
-		std::min(sizeof(ip6_hdr) + 8, sizeof(ip6_hdr) + header.ip6_plen));
+		std::min(sizeof(ip6_hdr) + 8, sizeof(ip6_hdr) + ntohs(header.ip6_plen)));
 	if (status == B_OK) {
 		net_domain* domain = get_domain(buffer);
 
@@ -567,7 +567,8 @@ icmp6_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 			status = B_ERROR;
 		else {
 			reply->protocol = IPPROTO_ICMPV6;
-			*ICMP6ChecksumField(reply) = gBufferModule->checksum(reply, 0, reply->size, true);
+			*ICMP6ChecksumField(reply) = Checksum::PseudoHeader(domain->address_module,
+				gBufferModule, reply, IPPROTO_ICMPV6);
 
 			TRACE("  send ICMPv6 message %p to %s\n", reply,
 				AddressString(domain->address_module, reply->destination, true).Data());
