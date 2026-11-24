@@ -6,19 +6,19 @@
 
 #include <util/KMessage.h>
 
+#include <new>
 #include <stdlib.h>
 #include <string.h>
 
 #include <ByteOrder.h>
-#include <Debug.h>
 #include <KernelExport.h>
 #include <TypeConstants.h>
 
 
-#if defined(_BOOT_MODE) || defined(_LOADER_MODE)
-#	include <util/kernel_cpp.h>
+#if defined(_KERNEL_MODE)
+#	include <debug.h>
 #else
-#	include <new>
+#	include <Debug.h>
 #endif
 
 
@@ -986,11 +986,11 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 		if (newSize > fBufferCapacity) {
 			// if we don't own the buffer, we can't resize it
 			if (!(fFlags & KMESSAGE_OWNS_BUFFER)) {
-#if defined(_KERNEL_MODE) && 0
+#if defined(_KERNEL_MODE)
 				// optional debugging to find insufficiently sized KMessage
 				// buffers (e.g. for in-kernel notifications)
-				panic("KMessage: out of space: available: %" B_PRId32
-					", needed: %" B_PRId32 "\n", fBufferCapacity, newSize);
+				KDEBUG_ONLY(panic("KMessage: out of space: available: %" B_PRId32
+					", needed: %" B_PRId32 "\n", fBufferCapacity, newSize));
 #endif
 				return B_BUFFER_OVERFLOW;
 			}
