@@ -84,7 +84,7 @@ void scheduler_dump_thread_data(Thread* thread);
 
 void scheduler_new_thread_entry(Thread* thread);
 
-void scheduler_set_cpu_enabled(int32 cpu, bool enabled);
+status_t scheduler_set_cpu_enabled(int32 cpu, bool enabled);
 
 void scheduler_add_listener(struct SchedulerListener* listener);
 void scheduler_remove_listener(struct SchedulerListener* listener);

@@ -225,6 +225,8 @@ ThreadData::UnassignCore(bool running)
 	SCHEDULER_ENTER_FUNCTION();
 
 	ASSERT(fCore != NULL);
+	ASSERT(!fEnqueued);
+
 	if (running || fThread->state == B_THREAD_READY)
 		fReady = false;
 	if (!fReady)

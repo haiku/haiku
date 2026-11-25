@@ -40,7 +40,6 @@
 
 namespace Scheduler {
 
-
 class ThreadEnqueuer : public ThreadProcessing {
 public:
 	void		operator()(ThreadData* thread);
@@ -59,6 +58,7 @@ using namespace Scheduler;
 
 
 static bool sSchedulerEnabled;
+static mutex sDisableCPULock = MUTEX_INITIALIZER("scheduler disable CPU");
 
 SchedulerListenerList gSchedulerListeners;
 spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
@@ -619,49 +619,84 @@ scheduler_set_operation_mode(scheduler_mode mode)
 }
 
 
-void
+status_t
 scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 {
-#if KDEBUG
-	if (are_interrupts_enabled())
-		panic("scheduler_set_cpu_enabled: called with interrupts enabled");
-#endif
+	MutexLocker locker(sDisableCPULock);
+
+	if (gCPU[cpuID].disabled == !enabled)
+		return B_OK;
+
+	if (!enabled) {
+		// check if there are no other CPUs enabled
+		int32 i, count;
+		for (i = 0, count = 0; i < smp_get_num_cpus(); i++) {
+			if (i == cpuID)
+				continue;
+			if (!gCPU[i].disabled)
+				count++;
+		}
+
+		if (count == 0)
+			return B_NOT_ALLOWED;
+	}
 
 	dprintf("scheduler: %s CPU %" B_PRId32 "\n",
 		enabled ? "enabling" : "disabling", cpuID);
 
-	InterruptsBigSchedulerLocker _;
+	Thread* thread = thread_get_current_thread();
+	CPUSet oldMask;
+	if (!enabled) {
+		// We need to be running on the CPU we're going to disable.
+		{
+			InterruptsSpinLocker _(thread->scheduler_lock);
+			oldMask = thread->cpumask;
+		}
+
+		CPUSet temporaryMask;
+		temporaryMask.SetBit(cpuID);
+		scheduler_set_thread_affinity(thread, temporaryMask);
+	}
+
+	InterruptsLocker interruptsLocker;
+	InterruptsBigSchedulerLocker bigSchedulerLocker;
 
 	gCurrentMode->set_cpu_enabled(cpuID, enabled);
 
 	CPUEntry* cpu = &gCPUEntries[cpuID];
 	CoreEntry* core = cpu->Core();
 
-	ASSERT(core->CPUCount() >= 0);
-	if (enabled)
-		cpu->Start();
-	else {
-		cpu->UpdatePriority(B_IDLE_PRIORITY);
-
-		ThreadEnqueuer enqueuer;
-		core->RemoveCPU(cpu, enqueuer);
-	}
-
-	gCPU[cpuID].disabled = !enabled;
+	// Change gCPUEnabled first, so that rescheduling moves threads properly.
 	if (enabled)
 		gCPUEnabled.SetBitAtomic(cpuID);
 	else
 		gCPUEnabled.ClearBitAtomic(cpuID);
 
-	if (!enabled) {
-		cpu->Stop();
+	ASSERT(core->CPUCount() >= 0);
+	if (enabled) {
+		gCPU[cpuID].disabled = false;
+		cpu->Start();
+	} else {
+		cpu->UpdatePriority(B_IDLE_PRIORITY);
 
-		// don't wait until the thread quantum ends
-		if (smp_get_current_cpu() != cpuID) {
-			smp_send_ici(cpuID, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
-				SMP_MSG_FLAG_ASYNC);
-		}
+		ThreadEnqueuer enqueuer;
+		core->RemoveCPU(cpu, enqueuer);
+		cpu->Stop();
+		gCPU[cpuID].disabled = true;
+
+		bigSchedulerLocker.Unlock();
+
+		ASSERT(smp_get_current_cpu() == cpuID);
+
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		gCPU[cpuID].disabled = !enabled;
+		scheduler_reschedule(B_THREAD_READY);
+
+		ASSERT(thread_is_idle_thread(gCPU[cpuID].running_thread));
+		thread->cpumask = oldMask;
 	}
+
+	return B_OK;
 }
 
 

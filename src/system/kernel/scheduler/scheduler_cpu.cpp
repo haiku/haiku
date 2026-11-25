@@ -467,6 +467,8 @@ CoreEntry::AddCPU(CPUEntry* cpu)
 	ASSERT(fCPUCount >= 0);
 	ASSERT(fIdleCPUCount >= 0);
 
+	WriteSpinLocker coreLocker(gCoreHeapsLock);
+
 	fIdleCPUCount++;
 	if (fCPUCount++ == 0) {
 		// core has been reenabled
@@ -489,10 +491,12 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 	ASSERT(fCPUCount > 0);
 	ASSERT(fIdleCPUCount > 0);
 
+	WriteSpinLocker coreLocker(gCoreHeapsLock);
+
 	fIdleCPUCount--;
 	fCPUSet.ClearBit(cpu->ID());
 	if (--fCPUCount == 0) {
-		// unassign threads
+		// unassign non-queued threads
 		thread_map(CoreEntry::_UnassignThread, this);
 
 		// core has been disabled
@@ -509,16 +513,19 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 		fPackage->RemoveIdleCore(this);
 
 		// get rid of threads
+		coreLocker.Unlock();
 		while (fRunQueue.PeekMaximum() != NULL) {
 			ThreadData* threadData = fRunQueue.PeekMaximum();
 
 			Remove(threadData);
+			threadData->UnassignCore();
 
 			ASSERT(threadData->Core() == NULL);
 			threadPostProcessing(threadData);
 		}
+		coreLocker.Lock();
 
-		fThreadCount = 0;
+		ASSERT(fThreadCount == 0);
 	}
 
 	fCPUHeap.ModifyKey(cpu, -1);
@@ -607,7 +614,7 @@ CoreEntry::_UnassignThread(Thread* thread, void* data)
 	CoreEntry* core = static_cast<CoreEntry*>(data);
 	ThreadData* threadData = thread->scheduler_data;
 
-	if (threadData->Core() == core && thread->pinned_to_cpu == 0)
+	if (!threadData->IsEnqueued() && threadData->Core() == core && thread->pinned_to_cpu == 0)
 		threadData->UnassignCore();
 }
 

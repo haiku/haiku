@@ -36,8 +36,6 @@ static cpu_topology_node sCPUTopology;
 static cpufreq_module_info* sCPUPerformanceModule;
 static cpuidle_module_info* sCPUIdleModule;
 
-static spinlock sSetCpuLock;
-
 
 status_t
 cpu_init(kernel_args *args)
@@ -384,57 +382,10 @@ _user_cpu_enabled(int32 cpu)
 status_t
 _user_set_cpu_enabled(int32 cpu, bool enabled)
 {
-	int32 i, count;
-
 	if (geteuid() != 0)
 		return B_PERMISSION_DENIED;
 	if (cpu < 0 || cpu >= smp_get_num_cpus())
 		return B_BAD_VALUE;
 
-	// We need to lock here to make sure that no one can disable
-	// the last CPU
-
-	InterruptsSpinLocker locker(sSetCpuLock);
-
-	if (!enabled) {
-		// check if this is the last CPU to be disabled
-		for (i = 0, count = 0; i < smp_get_num_cpus(); i++) {
-			if (!gCPU[i].disabled)
-				count++;
-		}
-
-		if (count == 1)
-			return B_NOT_ALLOWED;
-	}
-
-	bool oldState = gCPU[cpu].disabled;
-
-	if (oldState != !enabled)
-		scheduler_set_cpu_enabled(cpu, enabled);
-
-	if (!enabled) {
-		if (smp_get_current_cpu() == cpu) {
-			locker.Unlock();
-			thread_yield();
-			locker.Lock();
-		}
-
-		// someone reenabled the CPU while we were rescheduling
-		if (!gCPU[cpu].disabled)
-			return B_OK;
-
-		ASSERT(smp_get_current_cpu() != cpu);
-		while (!thread_is_idle_thread(gCPU[cpu].running_thread)) {
-			locker.Unlock();
-			thread_yield();
-			locker.Lock();
-
-			if (!gCPU[cpu].disabled)
-				return B_OK;
-			ASSERT(smp_get_current_cpu() != cpu);
-		}
-	}
-
-	return B_OK;
+	return scheduler_set_cpu_enabled(cpu, enabled);
 }
-
