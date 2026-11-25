@@ -4091,17 +4091,17 @@ _user_get_thread_affinity(thread_id id, void* userMask, size_t userMaskSize)
 	{
 		if (id == 0)
 			id = thread_get_current_thread_id();
-		Thread* thread = Thread::GetAndLock(id);
+		Thread* thread = Thread::Get(id);
 		if (thread == NULL)
 			return B_BAD_THREAD_ID;
 		BReference<Thread> threadReference(thread, true);
-		ThreadLocker threadLocker(thread, true);
 
 		if (thread->team == team_get_kernel_team())
 			return B_NOT_ALLOWED;
 		if (thread->team != thread_get_current_thread()->team && geteuid() != 0)
 			return B_NOT_ALLOWED;
 
+		InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
 		mask = thread->cpumask;
 	}
 
@@ -4142,23 +4142,16 @@ _user_set_thread_affinity(thread_id id, const void* userMask, size_t size)
 	if (id == 0)
 		id = thread_get_current_thread_id();
 
-	Thread* thread = Thread::GetAndLock(id);
+	Thread* thread = Thread::Get(id);
 	if (thread == NULL)
 		return B_BAD_THREAD_ID;
 	BReference<Thread> threadReference(thread, true);
-	ThreadLocker threadLocker(thread, true);
 
 	if (thread->team == team_get_kernel_team())
 		return B_NOT_ALLOWED;
 	if (thread->team != thread_get_current_thread()->team && geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	thread->cpumask = mask;
-	threadLocker.Unlock();
-
-	// check if running on masked CPU
-	if (!mask.IsEmpty() && !mask.GetBit(thread->cpu->cpu_num))
-		thread_yield();
-
+	scheduler_set_thread_affinity(thread, mask);
 	return B_OK;
 }

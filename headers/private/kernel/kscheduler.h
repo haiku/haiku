@@ -44,6 +44,11 @@ void scheduler_reschedule(int32 next_state);
 */
 int32 scheduler_set_thread_priority(Thread* thread, int32 priority);
 
+/*!	Sets the given thread's CPU affinity.
+	The thread may be running or may be in the ready-to-run queue.
+*/
+void scheduler_set_thread_affinity(Thread* thread, const CPUSet& mask);
+
 /*!	Called when the Thread structure is first created.
 	Per-thread housekeeping resources can be allocated.
 	Interrupts must be enabled.

@@ -142,6 +142,22 @@ enqueue(Thread* thread, bool newOne)
 }
 
 
+/*!	Note: thread and scheduler locks must be held when entering this function
+*/
+static void
+requeue(Thread* thread, ThreadData* threadData)
+{
+	T(RemoveThread(thread));
+
+	// notify listeners
+	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
+		thread);
+
+	if (threadData->Dequeue())
+		enqueue(thread, true);
+}
+
+
 /*!	Enqueues the thread into the run queue.
 	Note: thread lock must be held when entering this function
 */
@@ -165,8 +181,6 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 }
 
 
-/*!	Sets the priority of a thread.
-*/
 int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
@@ -205,17 +219,51 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 
 	// The thread is in the run queue. We need to remove it and re-insert it at
 	// a new position.
-
-	T(RemoveThread(thread));
-
-	// notify listeners
-	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
-		thread);
-
-	if (threadData->Dequeue())
-		enqueue(thread, true);
+	requeue(thread, threadData);
 
 	return oldPriority;
+}
+
+
+void
+scheduler_set_thread_affinity(Thread *thread, const CPUSet& mask)
+{
+	ASSERT(are_interrupts_enabled());
+
+	InterruptsSpinLocker schedulerLock(thread->scheduler_lock);
+	SchedulerModeLocker modeLocker;
+
+	SCHEDULER_ENTER_FUNCTION();
+	TRACE("changing thread %" B_PRId32 " affinity\n", thread->id);
+
+	ThreadData* threadData = thread->scheduler_data;
+
+	thread->cpumask = mask;
+
+	// check if running or queued on masked CPU
+	bool rescheduleSelf = false;
+	if (!mask.IsEmpty() && threadData->Core() != NULL
+			&& !mask.Matches(threadData->Core()->CPUMask())) {
+		if (thread == thread_get_current_thread()) {
+			rescheduleSelf = true;
+		} else if (thread->state == B_THREAD_RUNNING) {
+			if (atomic_get_and_set(&thread->cpu->invoke_scheduler, true) != true) {
+				smp_send_ici(thread->cpu->cpu_num, SMP_MSG_RESCHEDULE, 0, 0, 0,
+					NULL, SMP_MSG_FLAG_ASYNC);
+			}
+		} else if (thread->state == B_THREAD_READY) {
+			// The thread isn't running, but is enqueued on a masked core.
+			requeue(thread, threadData);
+		} else {
+			// The thread isn't running or queued, but still has a core set.
+			threadData->UnassignCore();
+		}
+	}
+
+	if (rescheduleSelf) {
+		modeLocker.Unlock();
+		scheduler_reschedule(B_THREAD_READY);
+	}
 }
 
 
