@@ -6302,7 +6302,7 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 		if (area == NULL)
 			return B_NO_MEMORY;
 
-		uint32 offset = address - area->Base();
+		addr_t offset = address - area->Base();
 		size_t rangeSize = min_c(area->Size() - offset, size);
 		offset += area->cache_offset;
 
@@ -6314,8 +6314,8 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 
 		locker.Unlock();
 
-		uint32 firstPage = offset >> PAGE_SHIFT;
-		uint32 endPage = firstPage + (rangeSize >> PAGE_SHIFT);
+		addr_t firstPage = offset >> PAGE_SHIFT;
+		addr_t endPage = firstPage + (rangeSize >> PAGE_SHIFT);
 
 		// write the pages
 		if (cache->type == CACHE_TYPE_VNODE) {
