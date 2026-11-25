@@ -654,11 +654,17 @@ intel_set_brightness(float brightness)
 			shift = 1;
 			period = tmp >> 17;
 		}
+
+		if (period == 0)
+			return B_ERROR;
+
 		if (legacyMode)
-			period *= 0xfe;
+			period *= 0xff;
 		uint32_t duty = (uint32_t)(period * brightness);
 		if (legacyMode) {
-			uint8 lpc = duty / 0xff + 1;
+			// In legacy (combination) mode the effective duty cycle is the PWM
+			// duty cycle multiplied by the LPC value (1..255) in PCI config space.
+			uint8 lpc = (uint8)((uint64)duty * 0xfe / period + 1);
 			duty /= lpc;
 
 			// set pci config reg with lpc
@@ -718,6 +724,10 @@ intel_get_brightness(float* brightness)
 			duty >>= 1;
 		}
 	}
+
+	if (period == 0)
+		return B_ERROR;
+
 	*brightness = (float)duty / period;
 
 	return B_OK;
