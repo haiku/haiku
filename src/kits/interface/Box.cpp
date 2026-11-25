@@ -640,18 +640,16 @@ BBox::_InitObject(BMessage* archive)
 	fLabelView = NULL;
 	fLayoutData = new LayoutData;
 
-	int32 flags = 0;
-
-	BFont font(be_bold_font);
-
-	if (!archive || !archive->HasString("_fname"))
-		flags = B_FONT_FAMILY_AND_STYLE;
-
-	if (!archive || !archive->HasFloat("_fflt"))
-		flags |= B_FONT_SIZE;
-
-	if (flags != 0)
-		SetFont(&font, flags);
+	int32 fontFlags = 0;
+	if (archive == NULL || !archive->HasString("_fname"))
+		fontFlags = B_FONT_FAMILY_AND_STYLE;
+	if (archive == NULL || !archive->HasFloat("_fflt"))
+		fontFlags |= B_FONT_SIZE;
+	if (fontFlags != 0) {
+		if (fontFlags == (B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE))
+			fontFlags = B_FONT_ALL;
+		SetFont(be_bold_font, fontFlags);
+	}
 
 	if (archive != NULL) {
 		const char* string;

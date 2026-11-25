@@ -1087,18 +1087,16 @@ BTextControl::_InitData(const char* label, const BMessage* archive)
 	fDivider = 0.0f;
 	fLayoutData = new LayoutData(bounds.Width(), bounds.Height());
 
-	int32 flags = 0;
-
-	BFont font(be_plain_font);
-
-	if (!archive || !archive->HasString("_fname"))
-		flags |= B_FONT_FAMILY_AND_STYLE;
-
-	if (!archive || !archive->HasFloat("_fflt"))
-		flags |= B_FONT_SIZE;
-
-	if (flags != 0)
-		SetFont(&font, flags);
+	int32 fontFlags = 0;
+	if (archive == NULL || !archive->HasString("_fname"))
+		fontFlags = B_FONT_FAMILY_AND_STYLE;
+	if (archive == NULL || !archive->HasFloat("_fflt"))
+		fontFlags |= B_FONT_SIZE;
+	if (fontFlags != 0) {
+		if (fontFlags == (B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE))
+			fontFlags = B_FONT_ALL;
+		SetFont(be_plain_font, fontFlags);
+	}
 
 	if (label != NULL)
 		fDivider = floorf(bounds.Width() / 2.0f);
