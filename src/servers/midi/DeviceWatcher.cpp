@@ -322,9 +322,6 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 	// - product name?
 	// - serial number? (helpful to detect a device whatever USB port is connected on
 	// - port name (when device has multiple ports)
-	// - vendor name
-
-	const char* productName = NULL;
 
 	BString deviceName;
 	BString portName;
@@ -332,9 +329,8 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 	char value[B_FILE_NAME_LENGTH];
 	if (ioctl(fd, B_GET_DEVICE_NAME, value, sizeof(value)) == B_OK) {
 		// device has a custom, probably more user-friendly name
-		// use it instead of the device path
+		// use it as endpoint name, instead of the device path
 		deviceName.SetTo(value);
-		productName = deviceName.String(); // use the name returned by the driver
 	}
 
 	if (ioctl(fd, B_GET_DEVICE_SERIAL_NUMBER, value, sizeof(value)) == B_OK)
@@ -346,7 +342,9 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 		portName.SetTo(portInfo.port_name);
 	}
 
-	if (productName) {
+	if (!deviceName.IsEmpty()) {
+		msg.AddString("device:product", deviceName.String());
+
 		// build a more userfriendly endpoint name than the device path
 		BString endpointName;
 
@@ -357,7 +355,7 @@ DeviceWatcher::_SetProperties(int fd, const char* path, BMidiEndpoint* endpoint)
 			endpointName.SetTo("%product_name%");
 		}
 
-		endpointName.ReplaceAll("%product_name%", productName);
+		endpointName.ReplaceAll("%product_name%", deviceName);
 		endpointName.ReplaceAll("%port_name%", portName);
 
 		endpoint->SetName(endpointName);
