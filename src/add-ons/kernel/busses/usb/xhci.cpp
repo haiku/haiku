@@ -2011,7 +2011,11 @@ XHCI::_InsertEndpointForPipe(Pipe* pipe)
 		_WriteContext(&device->input_ctx->input.addFlags,
 			(1 << endpointNum) | (1 << 0));
 
-		ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
+		status = ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
+		if (status != B_OK) {
+			TRACE_ERROR("unable to configure endpoint: %s\n", strerror(status));
+			return status;
+		}
 
 		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n",
 			device->address, SLOT_3_SLOT_STATE_GET(_ReadContext(
