@@ -1594,23 +1594,9 @@ arch_cpu_init(kernel_args* args)
 
 #ifdef __x86_64__
 static void
-enable_smap(void* dummy, int cpu)
+add_to_cr4(void* arg, int cpu)
 {
-	x86_write_cr4(x86_read_cr4() | IA32_CR4_SMAP);
-}
-
-
-static void
-enable_smep(void* dummy, int cpu)
-{
-	x86_write_cr4(x86_read_cr4() | IA32_CR4_SMEP);
-}
-
-
-static void
-enable_osxsave(void* dummy, int cpu)
-{
-	x86_write_cr4(x86_read_cr4() | IA32_CR4_OSXSAVE);
+	x86_write_cr4(x86_read_cr4() | (intptr_t)arg);
 }
 
 
@@ -1652,7 +1638,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 	if (x86_check_feature(IA32_FEATURE_SMEP, FEATURE_7_EBX)) {
 		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_SMEP_SMAP, false)) {
 			dprintf("enable SMEP\n");
-			call_all_cpus_sync(&enable_smep, NULL);
+			call_all_cpus_sync(add_to_cr4, (void*)IA32_CR4_SMEP);
 		} else
 			dprintf("SMEP disabled per safemode setting\n");
 	}
@@ -1661,7 +1647,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 	if (x86_check_feature(IA32_FEATURE_SMAP, FEATURE_7_EBX)) {
 		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_SMEP_SMAP, false)) {
 			dprintf("enable SMAP\n");
-			call_all_cpus_sync(&enable_smap, NULL);
+			call_all_cpus_sync(add_to_cr4, (void*)IA32_CR4_SMAP);
 
 			arch_altcodepatch_replace(ALTCODEPATCH_TAG_STAC, &_stac, 3);
 			arch_altcodepatch_replace(ALTCODEPATCH_TAG_CLAC, &_clac, 3);
@@ -1675,7 +1661,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 		gHasXsavec = x86_check_feature(IA32_FEATURE_XSAVEC,
 			FEATURE_D_1_EAX);
 
-		call_all_cpus_sync(&enable_osxsave, NULL);
+		call_all_cpus_sync(add_to_cr4, (void*)IA32_CR4_OSXSAVE);
 		// also enable the cached boot cpu feature bit
 		gCPU[0].arch.feature[FEATURE_EXT] |= IA32_FEATURE_EXT_OSXSAVE;
 		gXsaveMask = IA32_XCR0_X87 | IA32_XCR0_SSE;
