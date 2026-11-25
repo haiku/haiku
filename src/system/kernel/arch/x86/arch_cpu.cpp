@@ -1592,7 +1592,6 @@ arch_cpu_init(kernel_args* args)
 }
 
 
-#ifdef __x86_64__
 static void
 add_to_cr4(void* arg, int cpu)
 {
@@ -1600,6 +1599,7 @@ add_to_cr4(void* arg, int cpu)
 }
 
 
+#ifdef __x86_64__
 static void
 enable_xsavemask(void* dummy, int cpu)
 {
