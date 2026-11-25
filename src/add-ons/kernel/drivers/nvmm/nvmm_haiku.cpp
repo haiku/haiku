@@ -15,9 +15,10 @@ extern "C" {
 #include "x86/nvmm_x86_internal.h"
 }
 
-#include <drivers/KernelExport.h>
+#include <KernelExport.h>
 #include <OS.h>
 #include <StackOrHeapArray.h>
+#include <util/AutoLock.h>
 
 #include <arch/x86/arch_system_info.h>
 #include <kernel/heap.h>
@@ -192,8 +193,8 @@ haiku_thread_unpin()
 extern "C" void
 os_preempt_disable()
 {
+	InterruptsLocker locker;
 	thread_get_current_thread()->cpu->reschedule_disabled++;
-	memory_full_barrier();
 }
 
 
@@ -202,16 +203,20 @@ os_preempt_enable()
 {
 	ASSERT(os_preempt_disabled());
 
+	InterruptsLocker locker;
 	Thread* thread = thread_get_current_thread();
 	thread->cpu->reschedule_disabled--;
-	if (thread->cpu->invoke_scheduler)
+	if (thread->cpu->invoke_scheduler) {
+		locker.Unlock();
 		scheduler_reschedule_if_necessary();
+	}
 }
 
 
 extern "C" bool
 os_preempt_disabled()
 {
+	InterruptsLocker locker;
 	return thread_get_current_thread()->cpu->reschedule_disabled;
 }
 
