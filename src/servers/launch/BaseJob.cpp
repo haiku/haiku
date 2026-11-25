@@ -243,27 +243,27 @@ BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 
 	pipes1.Delete();
 
-	BString line;
+	BString lines;
 	char buffer[4096];
 	while (true) {
-		ssize_t bytesRead = read(pipes[0], buffer, sizeof(buffer) - 1);
-		if (bytesRead <= 0)
+		ssize_t bytesRead;
+		do {
+			bytesRead = read(pipes[0], buffer, sizeof(buffer));
+		} while (bytesRead < 0 && errno == EINTR);
+		if (bytesRead <= 0) {
+			if (bytesRead == 0 && !lines.IsEmpty())
+				_ParseExportVariable(environment, lines);
 			break;
+		}
+		lines.Append(buffer, bytesRead);
 
-		// Make sure the buffer is null terminated
-		buffer[bytesRead] = 0;
-
-		const char* chunk = buffer;
 		while (true) {
-			const char* separator = strchrnul(chunk, '\n');
-			line.Append(chunk, separator - chunk);
-
-			_ParseExportVariable(environment, line);
-			line.Truncate(0);
-
-			if (*separator == '\0')
+			int32 newline = lines.FindFirst('\n');
+			if (newline < 0)
 				break;
-			chunk = separator + 1;
+			BString line(lines, newline);
+			_ParseExportVariable(environment, line);
+			lines.Remove(0, newline + 1);
 		}
 	}
 }
