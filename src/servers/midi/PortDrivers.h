@@ -33,6 +33,7 @@ public:
 	int32 			GetData(void);
 
 private:
+	void			_SprayMessage(const uint8* msg, bigtime_t timestamp);
 	static int32 	_ReaderThread(void* data);
 
 	int 			fFileDescriptor;

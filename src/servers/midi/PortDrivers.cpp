@@ -91,7 +91,7 @@ MidiPortProducer::GetData()
 
 	bool haveSysEx = false;
 	uint8* sysexBuffer = NULL;
-	size_t sysexBufferSize = B_PAGE_SIZE;
+	size_t sysexBufferSize = 0;
 	size_t sysexSize = 0;
 
 	while (fKeepRunning) {
@@ -118,8 +118,14 @@ MidiPortProducer::GetData()
 				// System Exclusive data byte
 				sysexBuffer[sysexSize++] = next;
 				if (sysexSize == sysexBufferSize) {
+					uint8* sysexBiggerBuffer = (uint8*)realloc(sysexBuffer, sysexBufferSize * 2);
+					if (sysexBiggerBuffer == NULL) {
+						// Out of Memory: drop this sysex sequence
+						haveSysEx = false;
+						continue;
+					}
 					sysexBufferSize *= 2;
-					sysexBuffer = (uint8*)realloc(sysexBuffer, sysexBufferSize);
+					sysexBuffer = sysexBiggerBuffer;
 				}
 				continue;
 			} else if ((next & 0xF8) == 0xF8) {
@@ -149,18 +155,15 @@ MidiPortProducer::GetData()
 			msgPtr = msgBuf + 1;
 			switch (next) {
 				case B_SYS_EX_START:
-					if (sysexBuffer == NULL) {
-						// first SysEx, we need to buffer SysEx data
-						sysexBuffer = (uint8*)malloc(sysexBufferSize);
-					} else if (sysexBufferSize > 4 * B_PAGE_SIZE) {
-						// Previous(es) SysEx was/were a bit large
-						// let's restart with a more reasonable buffer size
+					if (sysexBuffer == NULL || sysexBufferSize > 4 * B_PAGE_SIZE) {
+						// first SysEx, or previous(es) SysEx was/were a bit large:
+						// let's (re)start with a reasonable buffer size
 						free(sysexBuffer);
 						sysexBufferSize = B_PAGE_SIZE;
 						sysexBuffer = (uint8*)malloc(sysexBufferSize);
 					}
 					sysexSize = 0;
-					haveSysEx = true;
+					haveSysEx = (sysexBuffer != NULL);
 					break;
 
 				case B_SONG_POSITION:
@@ -205,55 +208,16 @@ MidiPortProducer::GetData()
 		} else if (needed > 0) {
 			// Data bytes to complete message
 			*msgPtr++ = next;
-			if (--needed == 0) {
-				switch (msgBuf[0] & 0xF0) {
-					case B_NOTE_OFF:
-						SprayNoteOff(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
-						break;
-
-					case B_NOTE_ON:
-						SprayNoteOn(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
-						break;
-
-					case B_KEY_PRESSURE:
-						SprayKeyPressure(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
-						break;
-
-					case B_CONTROL_CHANGE:
-						SprayControlChange(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
-						break;
-
-					case B_PROGRAM_CHANGE:
-						SprayProgramChange(msgBuf[0] & 0x0F, msgBuf[1], timestamp);
-						break;
-
-					case B_CHANNEL_PRESSURE:
-						SprayChannelPressure(msgBuf[0] & 0x0F, msgBuf[1], timestamp);
-						break;
-
-					case B_PITCH_BEND:
-						SprayPitchBend(msgBuf[0] & 0x0F, msgBuf[1], msgBuf[2], timestamp);
-						break;
-				}
-
-				switch (msgBuf[0]) {
-					case B_SONG_POSITION:
-						SpraySystemCommon(msgBuf[0], msgBuf[1], msgBuf[2], timestamp);
-						break;
-
-					case B_MIDI_TIME_CODE:
-					case B_SONG_SELECT:
-					case B_CABLE_MESSAGE:
-						SpraySystemCommon(msgBuf[0], msgBuf[1], 0, timestamp);
-						break;
-				}
-			}
+			if (--needed == 0)
+				_SprayMessage(msgBuf, timestamp);
 		} else if (runningStatus != 0) {
 			// Repeated voice command
 			msgBuf[0] = runningStatus;
 			msgBuf[1] = next;
 			msgPtr = msgBuf + 2;
 			needed = msgSize - 2;
+			if (needed == 0)
+				_SprayMessage(msgBuf, timestamp);
 		}
 
 	}	// while fKeepRunning
@@ -261,4 +225,51 @@ MidiPortProducer::GetData()
 	free(sysexBuffer);
 
 	return fKeepRunning ? errno : B_OK;
+}
+
+
+void
+MidiPortProducer::_SprayMessage(const uint8* msg, bigtime_t timestamp)
+{
+	switch (msg[0] & 0xF0) {
+		case B_NOTE_OFF:
+			SprayNoteOff(msg[0] & 0x0F, msg[1], msg[2], timestamp);
+			return;
+
+		case B_NOTE_ON:
+			SprayNoteOn(msg[0] & 0x0F, msg[1], msg[2], timestamp);
+			return;
+
+		case B_KEY_PRESSURE:
+			SprayKeyPressure(msg[0] & 0x0F, msg[1], msg[2], timestamp);
+			return;
+
+		case B_CONTROL_CHANGE:
+			SprayControlChange(msg[0] & 0x0F, msg[1], msg[2], timestamp);
+			return;
+
+		case B_PROGRAM_CHANGE:
+			SprayProgramChange(msg[0] & 0x0F, msg[1], timestamp);
+			return;
+
+		case B_CHANNEL_PRESSURE:
+			SprayChannelPressure(msg[0] & 0x0F, msg[1], timestamp);
+			return;
+
+		case B_PITCH_BEND:
+			SprayPitchBend(msg[0] & 0x0F, msg[1], msg[2], timestamp);
+			return;
+	}
+
+	switch (msg[0]) {
+		case B_SONG_POSITION:
+			SpraySystemCommon(msg[0], msg[1], msg[2], timestamp);
+			break;
+
+		case B_MIDI_TIME_CODE:
+		case B_SONG_SELECT:
+		case B_CABLE_MESSAGE:
+			SpraySystemCommon(msg[0], msg[1], 0, timestamp);
+			break;
+	}
 }
