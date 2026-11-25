@@ -27,41 +27,55 @@ x86_write_msr(uint32_t msr, uint64_t value)
 	asm volatile("wrmsr" : : "a" ((uint32_t)value) , "d" ((uint32_t)(value >> 32)), "c" (msr));
 }
 
-#define x86_read_cr0() ({ \
-	size_t _v; \
-	__asm__("mov    %%cr0,%0" : "=r" (_v)); \
-	_v; \
-})
+static inline size_t
+x86_read_cr0()
+{
+	size_t value;
+	asm volatile("mov %%cr0, %0" : "=r" (value));
+	return value;
+}
 
-#define x86_write_cr0(value) \
-	__asm__("mov    %0,%%cr0" : : "r" (value))
+static inline void
+x86_write_cr0(size_t value)
+{
+	asm volatile("mov %0, %%cr0" : : "r" (value));
+}
 
-#define x86_read_cr2() ({ \
-	size_t _v; \
-	__asm__("mov    %%cr2,%0" : "=r" (_v)); \
-	_v; \
-})
+static inline size_t
+x86_read_cr2()
+{
+	size_t value;
+	asm volatile("mov %%cr2, %0" : "=r" (value));
+	return value;
+}
 
-#define x86_read_cr3() ({ \
-	size_t _v; \
-	__asm__("mov    %%cr3,%0" : "=r" (_v)); \
-	_v; \
-})
+static inline size_t
+x86_read_cr3()
+{
+	size_t value;
+	asm volatile("mov %%cr3, %0" : "=r" (value));
+	return value;
+}
 
 static inline void
 x86_write_cr3(size_t value)
 {
-	__asm__("mov %0,%%cr3" : : "r" (value) : "memory");
+	asm volatile("mov %0, %%cr3" : : "r" (value) : "memory");
 }
 
-#define x86_read_cr4() ({ \
-	size_t _v; \
-	__asm__("mov    %%cr4,%0" : "=r" (_v)); \
-	_v; \
-})
+static inline size_t
+x86_read_cr4()
+{
+	size_t value;
+	asm volatile("mov %%cr4, %0" : "=r" (value));
+	return value;
+}
 
-#define x86_write_cr4(value) \
-	__asm__("mov    %0,%%cr4" : : "r" (value))
+static inline void
+x86_write_cr4(size_t value)
+{
+	asm volatile("mov %0, %%cr4" : : "r" (value) : "memory");
+}
 
 #define x86_read_dr3() ({ \
 	size_t _v; \
@@ -70,10 +84,10 @@ x86_write_cr3(size_t value)
 })
 
 #define x86_write_dr3(value) \
-	__asm__("mov    %0,%%dr3" : : "r" (value))
+	asm volatile("mov    %0,%%dr3" : : "r" (value))
 
 #define invalidate_TLB(va) \
-	__asm__("invlpg (%0)" : : "r" (va))
+	asm volatile("invlpg (%0)" : : "r" (va))
 
 #define wbinvd() \
 	__asm__ volatile ("wbinvd" : : : "memory")
@@ -95,13 +109,13 @@ x86_write_cr3(size_t value)
 	__asm__ volatile ("xsetbv" : : "a" (low), "d" (high), "c" (reg)); }
 
 #define out8(value,port) \
-	__asm__ ("outb %%al,%%dx" : : "a" (value), "d" (port))
+	asm volatile("outb %%al,%%dx" : : "a" (value), "d" (port))
 
 #define out16(value,port) \
-	__asm__ ("outw %%ax,%%dx" : : "a" (value), "d" (port))
+	asm volatile("outw %%ax,%%dx" : : "a" (value), "d" (port))
 
 #define out32(value,port) \
-	__asm__ ("outl %%eax,%%dx" : : "a" (value), "d" (port))
+	asm volatile("outl %%eax,%%dx" : : "a" (value), "d" (port))
 
 #define in8(port) ({ \
 	uint8 _v; \
@@ -122,7 +136,7 @@ x86_write_cr3(size_t value)
 })
 
 #define out8_p(value,port) \
-	__asm__ ("outb %%al,%%dx\n" \
+	asm volatile ("outb %%al,%%dx\n" \
 			"\tjmp 1f\n" \
 			"1:\tjmp 1f\n" \
 			"1:" : : "a" (value), "d" (port))
