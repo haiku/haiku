@@ -185,7 +185,21 @@ fork(void)
 pid_t
 vfork(void)
 {
-	thread_id thread = _kern_fork();
+	thread_id thread;
+
+	// exec*() uses malloc(), so the heap needs to continue working
+	// in vfork()ed children.
+	__heap_before_fork();
+
+	thread = _kern_fork();
+	if (thread == 0) {
+		// we are the child
+		__heap_after_fork_child();
+	} else {
+		// we are the parent
+		__heap_after_fork_parent();
+	}
+
 	if (thread < 0) {
 		// something went wrong
 		__set_errno(thread);
