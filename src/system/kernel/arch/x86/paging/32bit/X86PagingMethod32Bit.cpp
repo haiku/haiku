@@ -327,13 +327,6 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 		fPhysicalPageMapper, fKernelPhysicalPageMapper);
 		// TODO: Select the best page mapper!
 
-	// enable global page feature if available
-	if (x86_check_feature(IA32_FEATURE_PGE, FEATURE_COMMON)) {
-		// this prevents kernel pages from being flushed from TLB on
-		// context-switch
-		x86_write_cr4(x86_read_cr4() | IA32_CR4_GLOBAL_PAGES);
-	}
-
 	TRACE("X86PagingMethod32Bit::Init(): done\n");
 
 	*_physicalPageMapper = fPhysicalPageMapper;

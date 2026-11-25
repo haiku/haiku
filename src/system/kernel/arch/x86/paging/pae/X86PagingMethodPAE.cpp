@@ -175,7 +175,7 @@ private:
 	static void _EnablePAE(void* physicalPDPT, int cpu)
 	{
 		x86_write_cr3((addr_t)physicalPDPT);
-		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
+		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE);
 	}
 
 	static void _EnableExecutionDisable(void* dummy, int cpu)

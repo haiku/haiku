@@ -1633,6 +1633,13 @@ arch_cpu_init_post_vm(kernel_args* args)
 		x86_init_fpu();
 	// else fpu gets set up in smp code
 
+	// enable global page feature if available
+	if (x86_check_feature(IA32_FEATURE_PGE, FEATURE_COMMON)) {
+		// this prevents kernel pages from being flushed from TLB on
+		// context-switch
+		call_all_cpus_sync(add_to_cr4, (void*)IA32_CR4_GLOBAL_PAGES);
+	}
+
 #ifdef __x86_64__
 	// if available enable SMEP (Supervisor Memory Execution Protection)
 	if (x86_check_feature(IA32_FEATURE_SMEP, FEATURE_7_EBX)) {
