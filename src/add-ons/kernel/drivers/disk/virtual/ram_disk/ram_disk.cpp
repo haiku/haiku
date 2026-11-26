@@ -1406,8 +1406,9 @@ ram_disk_raw_device_control(void* _cookie, uint32 op, void* buffer,
 				return B_BAD_ADDRESS;
 
 			if (iconData.icon_size >= (int32)sizeof(kRamdiskIcon)) {
-				if (user_memcpy(iconData.icon_data, kRamdiskIcon,
-						sizeof(kRamdiskIcon)) != B_OK)
+				if (!IS_USER_ADDRESS(iconData.icon_data)
+						|| user_memcpy(iconData.icon_data, kRamdiskIcon,
+							sizeof(kRamdiskIcon)) != B_OK)
 					return B_BAD_ADDRESS;
 			}
 

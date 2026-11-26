@@ -301,8 +301,9 @@ FileDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
 			}
 
 			if (iconData.icon_size >= (int32)sizeof(kDeviceIcon)) {
-				if (user_memcpy(iconData.icon_data, kDeviceIcon,
-						sizeof(kDeviceIcon)) != B_OK) {
+				if (!IS_USER_ADDRESS(iconData.icon_data)
+						|| user_memcpy(iconData.icon_data, kDeviceIcon,
+							sizeof(kDeviceIcon)) != B_OK) {
 					return B_BAD_ADDRESS;
 				}
 			}
