@@ -434,7 +434,7 @@ create_file(const char* path)
 
 	// create the file
 	int fd_or_error = _kern_open(-1, path, FSSH_O_CREAT, 0);
-	if (fd_or_error <= 0) {
+	if (fd_or_error < 0) {
 		fprintf(stderr, "Error: Failed to make file \"%s\": %s\n", path,
 			fssh_strerror(fd_or_error));
 		return fd_or_error;
