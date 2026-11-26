@@ -6721,10 +6721,6 @@ common_unlink(int fd, char* path, bool kernel)
 	else
 		status = B_READ_ONLY_DEVICE;
 
-	// If nobody else is using this vnode, we don't want this removal
-	// to go through the vnode undertaker, so release it directly.
-	dec_vnode_ref_count(vnode.Detach(), true, false);
-
 	return status;
 }
 
