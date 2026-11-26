@@ -763,7 +763,10 @@ second_chance:
 								alignment);
 
 							addr_t startRange = next->Base() + next->Size();
-							startRange -= size + kMaxRandomize;
+							if (startRange > (size + kMaxRandomize))
+								startRange -= size + kMaxRandomize;
+							else
+								startRange = 0;
 							startRange = ROUNDDOWN(startRange, alignment);
 							startRange = std::max(startRange, alignedNextBase);
 
