@@ -2099,9 +2099,12 @@ static status_t
 sigaction_internal(int signal, const struct sigaction* act,
 	struct sigaction* oldAction)
 {
-	if (signal < 1 || signal > MAX_SIGNAL_NUMBER
-		|| (SIGNAL_TO_MASK(signal) & ~BLOCKABLE_SIGNALS) != 0)
+	if (signal < 1 || signal > MAX_SIGNAL_NUMBER)
 		return B_BAD_VALUE;
+	if ((SIGNAL_TO_MASK(signal) & ~BLOCKABLE_SIGNALS) != 0
+		&& act != NULL && act->sa_handler != SIG_DFL) {
+		return B_BAD_VALUE;
+	}
 
 	// get and lock the team
 	Team* team = thread_get_current_thread()->team;
