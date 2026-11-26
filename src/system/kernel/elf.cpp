@@ -2126,18 +2126,19 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 		if (programHeaders[i].p_flags & PF_WRITE) {
 			// rw/data segment
-			size_t memUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+			size_t memEnd = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				+ programHeaders[i].p_memsz;
-			size_t fileUpperBound = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
+			size_t fileEnd = (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				+ programHeaders[i].p_filesz;
 
-			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
-			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
+			// We want to map with the rounded-up memsz directly. Since we're
+			// using a PRIVATE mapping, it's allowed to be larger than the file.
+			size_t memUpperBound = ROUNDUP(memEnd, B_PAGE_SIZE);
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drw", baseName, i);
 
 			id = vm_map_file(team->id, regionName, (void **)&regionAddress,
-				addressSpec, fileUpperBound,
+				addressSpec, memUpperBound,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 				REGION_PRIVATE_MAP, false, fd,
 				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
@@ -2155,35 +2156,9 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 			// clean garbage brought by mmap (the region behind the file,
 			// at least parts of it are the bss and have to be zeroed)
-			addr_t start = (addr_t)regionAddress
-				+ (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				+ programHeaders[i].p_filesz;
-			size_t amount = fileUpperBound
-				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
-				- (programHeaders[i].p_filesz);
+			addr_t start = (addr_t)regionAddress + fileEnd;
+			size_t amount = memUpperBound - fileEnd;
 			memset((void *)start, 0, amount);
-
-			// Check if we need extra storage for the bss - we have to do this if
-			// the above region doesn't already comprise the memory size, too.
-
-			if (memUpperBound != fileUpperBound) {
-				size_t bssSize = memUpperBound - fileUpperBound;
-
-				snprintf(regionName, B_OS_NAME_LENGTH, "%s_bss%d", baseName, i);
-
-				regionAddress += fileUpperBound;
-				virtual_address_restrictions virtualRestrictions = {};
-				virtualRestrictions.address = regionAddress;
-				virtualRestrictions.address_specification = B_EXACT_ADDRESS;
-				physical_address_restrictions physicalRestrictions = {};
-				id = create_area_etc(team->id, regionName, bssSize, B_NO_LOCK,
-					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0, &virtualRestrictions,
-					&physicalRestrictions, (void**)&regionAddress);
-				if (id < B_OK) {
-					dprintf("error allocating bss area: %s!\n", strerror(id));
-					return B_NOT_AN_EXECUTABLE;
-				}
-			}
 		} else {
 			// assume ro/text segment
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_seg%drx", baseName, i);
