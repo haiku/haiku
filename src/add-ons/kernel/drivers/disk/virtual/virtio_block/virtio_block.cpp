@@ -4,12 +4,14 @@
  */
 
 
-#include <condition_variable.h>
-#include <lock.h>
 #include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
-#include <virtio.h>
 
+#include <condition_variable.h>
+#include <lock.h>
+#include <kernel.h>
+
+#include <virtio.h>
 #include "virtio_blk.h"
 
 
