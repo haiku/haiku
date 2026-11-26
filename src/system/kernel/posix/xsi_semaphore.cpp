@@ -426,8 +426,10 @@ public:
 		}
 	}
 
-	XsiSemaphore* Semaphore(int nth) const
+	XsiSemaphore* Semaphore(ushort nth) const
 	{
+		if (nth >= fNumberOfSemaphores)
+			return NULL;
 		return &fSemaphores[nth];
 	}
 
@@ -802,12 +804,6 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 			semaphoreID));
 		return EINVAL;
 	}
-	if (semaphoreNumber < 0
-		|| semaphoreNumber > semaphoreSet->NumberOfSemaphores()) {
-		TRACE(("xsi_semctl: semaphore number %d not valid for "
-			"semaphore %d\n", semaphoreNumber, semaphoreID));
-		return EINVAL;
-	}
 
 	// Lock the semaphore set itself and release both the semaphore
 	// set hash table lock and the ipc hash table lock _only_ if
@@ -824,7 +820,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 	XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 	switch (command) {
 		case GETVAL: {
-			if (!semaphoreSet->HasReadPermission()) {
+			if (semaphore == NULL) {
+				TRACE(("xsi_semctl: semaphore number %d not valid for "
+					"semaphore %d\n", semaphoreNumber, semaphoreID));
+				result = EINVAL;
+			} else if (!semaphoreSet->HasReadPermission()) {
 				TRACE(("xsi_semctl: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)semaphoreSet->IpcKey()));
@@ -835,7 +835,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		}
 
 		case SETVAL: {
-			if (!semaphoreSet->HasPermission()) {
+			if (semaphore == NULL) {
+				TRACE(("xsi_semctl: semaphore number %d not valid for "
+					"semaphore %d\n", semaphoreNumber, semaphoreID));
+				result = EINVAL;
+			} else if (!semaphoreSet->HasPermission()) {
 				TRACE(("xsi_semctl: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)semaphoreSet->IpcKey()));
@@ -853,7 +857,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		}
 
 		case GETPID: {
-			if (!semaphoreSet->HasReadPermission()) {
+			if (semaphore == NULL) {
+				TRACE(("xsi_semctl: semaphore number %d not valid for "
+					"semaphore %d\n", semaphoreNumber, semaphoreID));
+				result = EINVAL;
+			} else if (!semaphoreSet->HasReadPermission()) {
 				TRACE(("xsi_semctl: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)semaphoreSet->IpcKey()));
@@ -864,7 +872,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		}
 
 		case GETNCNT: {
-			if (!semaphoreSet->HasReadPermission()) {
+			if (semaphore == NULL) {
+				TRACE(("xsi_semctl: semaphore number %d not valid for "
+					"semaphore %d\n", semaphoreNumber, semaphoreID));
+				result = EINVAL;
+			} else if (!semaphoreSet->HasReadPermission()) {
 				TRACE(("xsi_semctl: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)semaphoreSet->IpcKey()));
@@ -875,7 +887,11 @@ _user_xsi_semctl(int semaphoreID, int semaphoreNumber, int command,
 		}
 
 		case GETZCNT: {
-			if (!semaphoreSet->HasReadPermission()) {
+			if (semaphore == NULL) {
+				TRACE(("xsi_semctl: semaphore number %d not valid for "
+					"semaphore %d\n", semaphoreNumber, semaphoreID));
+				result = EINVAL;
+			} else if (!semaphoreSet->HasReadPermission()) {
 				TRACE(("xsi_semctl: calling process has not permission "
 					"on semaphore %d, key %d\n", semaphoreSet->ID(),
 					(int)semaphoreSet->IpcKey()));
@@ -1064,19 +1080,18 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 	status_t result = 0;
 	while (notDone) {
 		XsiSemaphore *semaphore = NULL;
-		const ushort numberOfSemaphores = semaphoreSet->NumberOfSemaphores();
 		bool goToSleep = false;
 
 		uint32 i = 0;
 		for (; i < numOps; i++) {
 			ushort semaphoreNumber = operations[i].sem_num;
-			if (semaphoreNumber >= numberOfSemaphores) {
+			semaphore = semaphoreSet->Semaphore(semaphoreNumber);
+			if (semaphore == NULL) {
 				TRACE(("xsi_semop: %" B_PRIu32 " invalid semaphore number"
 					"\n", i));
 				result = EINVAL;
 				break;
 			}
-			semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 			unsigned short value = semaphore->Value();
 			short operation = operations[i].sem_op;
 			TRACE(("xsi_semop: semaphoreNumber = %d, value = %d\n",
