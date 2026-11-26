@@ -194,6 +194,12 @@ ATAPIDevice::ExecuteIO(ATARequest *request)
 		return B_BAD_INDEX;
 	}
 
+	if (ccb->cdb_length > sizeof(fPacket)) {
+		TRACE_ERROR("invalid cdb length %d\n", (int)ccb->cdb_length);
+		request->SetStatus(SCSI_REQ_INVALID);
+		return B_BAD_VALUE;
+	}
+
 	// ATAPI command packets are 12 bytes long;
 	// if the command is shorter, remaining bytes must be padded with zeros
 	memset(fPacket, 0, sizeof(fPacket));
