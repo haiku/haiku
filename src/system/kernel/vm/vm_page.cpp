@@ -3054,7 +3054,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 	// ones, the odds are that we won't find enough contiguous ones, so we skip
 	// the first iteration in this case.
 	int32 freePages = sUnreservedFreePages;
-	bool useCached = (freePages > 0) && ((page_num_t)freePages > (length * 2));
+	bool useCached = (freePages <= 0) || ((page_num_t)freePages < (length * 2));
 
 	for (;;) {
 		if (alignmentMask != 0 || boundaryMask != 0) {
