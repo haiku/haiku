@@ -15,6 +15,7 @@
  *		PawanYr <pawan.yerramilli@gmail.com>
  *		Samuel Rodríguez Pérez <samuelrp84@gmail.com>
  *		Clemens Zeidler <clemens.zeidler@googlemail.com>
+ *		Nathan Patrizi <nathan.patrizi@gmail.com>
  */
 
 #include "movement_maker.h"
@@ -686,8 +687,14 @@ TouchpadMovement::_CheckScrollingToMovement(const touchpad_movement *event,
 	}
 
 	if (!isSideScrollingV && !isSideScrollingH) {
-		if (!two_or_more_fingers(event))
+		if (!two_or_more_fingers(event)) {
+			if (fScrollingStarted) {
+				fScrollingStarted = false;
+				StartNewMovment();
+			}
+
 			return false;
+		}
 
 		if (!fMovementStarted) {
 			fMovementStarted = true;
