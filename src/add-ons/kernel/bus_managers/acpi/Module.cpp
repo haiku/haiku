@@ -13,7 +13,11 @@
 #include "ACPIPrivate.h"
 extern "C" {
 #include "acpi.h"
+#include "accommon.h"
+#include "acutils.h"
 }
+
+#include <debug.h>
 #include <dpc.h>
 #include <PCI.h>
 
@@ -77,14 +81,38 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 
 	while (get_next_entry(ACPI_TYPE_ANY, root, result,
 			sizeof(result), &counter) == B_OK) {
-		uint32 type = get_object_type(result);
+		ACPI_HANDLE deviceHandle;
+		if (AcpiGetHandle(NULL, (ACPI_STRING)result, &deviceHandle) != AE_OK)
+			continue;
+
+		ACPI_OBJECT_TYPE type = 0;
+		AcpiGetType(deviceHandle, &type);
+
 		device_node* deviceNode;
 
 		switch (type) {
 			case ACPI_TYPE_POWER:
 			case ACPI_TYPE_PROCESSOR:
 			case ACPI_TYPE_THERMAL:
-			case ACPI_TYPE_DEVICE: {
+			case ACPI_TYPE_DEVICE:
+			{
+				if (type != ACPI_TYPE_POWER) {
+					UINT32 staFlags;
+					if (AcpiUtExecute_STA((ACPI_NAMESPACE_NODE*)deviceHandle, &staFlags) != AE_OK
+							|| (staFlags & (ACPI_STA_DEVICE_PRESENT | ACPI_STA_DEVICE_FUNCTIONING))
+								== ACPI_STA_DEVICE_FUNCTIONING) {
+						// _STA execution failed, or device not present but functioning:
+						// skip the device itself, but still enumerate child devices.
+						acpi_enumerate_child_devices(node, result);
+						break;
+					}
+					if ((staFlags & ACPI_STA_DEVICE_PRESENT) == 0) {
+						// Device is neither PRESENT nor FUNCTIONING:
+						// completely skip this device and also its children.
+						break;
+					}
+				}
+
 				device_attr attrs[16] = {
 					// info about device
 					{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
@@ -151,7 +179,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 				}
 
 				status_t status = gDeviceManager->register_node(node,
-						ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode);
+					ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode);
 				free(hid);
 				free(uid);
 				free(cls);
@@ -162,6 +190,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 				acpi_enumerate_child_devices(deviceNode, result);
 				break;
 			}
+
 			default:
 				acpi_enumerate_child_devices(node, result);
 				break;
