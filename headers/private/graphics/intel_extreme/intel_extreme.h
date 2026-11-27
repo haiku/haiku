@@ -353,6 +353,9 @@ struct child_device_config {
 	uint8 hdmi_iboost_level:4;
 	uint8 dp_max_link_rate:3;
 	uint8 dp_max_link_rate_reserved:5;
+	uint8 efp_index;
+	uint32 edp_data_rate_override:12;
+	uint32 edp_data_rate_override_reserved:20;
 } __attribute__((packed));
 
 

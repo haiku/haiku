@@ -659,6 +659,11 @@ parse_vbt_from_bios(struct intel_shared_info* info)
 
 				bdb_lfp_backlight_data* backlightData
 					= (bdb_lfp_backlight_data*)(vbios.memory + start);
+				if (backlightData->entry_size != sizeof(backlightData->data[0])) {
+					TRACE((DEVICE_NAME ": backlightData entry size unsupported %u\n",
+						backlightData->entry_size));
+					break;
+				}
 
 				const struct bdb_lfp_backlight_data_entry* entry = &backlightData->data[panelType];
 
