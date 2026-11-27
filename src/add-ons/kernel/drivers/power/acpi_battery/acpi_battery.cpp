@@ -59,7 +59,7 @@ static device_manager_info *sDeviceManager;
 static ConditionVariable sBatteryCondition;
 
 
-inline uint32
+static inline uint32
 GetUint32(acpi_object_type* pointer)
 {
 	return (pointer->object_type == ACPI_TYPE_INTEGER)
@@ -67,7 +67,7 @@ GetUint32(acpi_object_type* pointer)
 }
 
 
-inline void
+static inline void
 GetString(char* buffer, size_t length, acpi_object_type* pointer)
 {
 	strlcpy(buffer, (pointer->object_type == ACPI_TYPE_STRING)
@@ -75,7 +75,7 @@ GetString(char* buffer, size_t length, acpi_object_type* pointer)
 }
 
 
-status_t
+static status_t
 ReadBatteryStatus(battery_driver_cookie* cookie,
 	acpi_battery_info* batteryStatus)
 {
@@ -127,7 +127,7 @@ exit:
 }
 
 
-status_t
+static status_t
 ReadBatteryInfo(battery_driver_cookie* cookie,
 	acpi_extended_battery_info* batteryInfo)
 {
@@ -349,10 +349,10 @@ acpi_battery_read(void* _cookie, off_t position, void *buffer, size_t* numBytes)
 
 	battery_device_cookie *device = (battery_device_cookie*)_cookie;
 
-	acpi_battery_info batteryStatus;
+	acpi_battery_info batteryStatus = {};
 	ReadBatteryStatus(device->driver_cookie, &batteryStatus);
 
-	acpi_extended_battery_info batteryInfo;
+	acpi_extended_battery_info batteryInfo = {};
 	ReadBatteryInfo(device->driver_cookie, &batteryInfo);
 
 	if (position == 0) {
@@ -438,7 +438,7 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 			if (len < sizeof(acpi_battery_info))
 				return B_BAD_VALUE;
 
-			acpi_battery_info batteryInfo;
+			acpi_battery_info batteryInfo = {};
 			err = ReadBatteryStatus(device->driver_cookie, &batteryInfo);
 			if (err != B_OK)
 				return err;
@@ -454,7 +454,7 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 			if (len < sizeof(acpi_extended_battery_info))
 				return B_BAD_VALUE;
 
-			acpi_extended_battery_info extBatteryInfo;
+			acpi_extended_battery_info extBatteryInfo = {};
 			err = ReadBatteryInfo(device->driver_cookie, &extBatteryInfo);
 			if (err != B_OK)
 				return err;
