@@ -346,6 +346,7 @@ embedded_controller_probe_ecdt()
 	acpi_ec_cookie* sc = (acpi_ec_cookie*)malloc(sizeof(acpi_ec_cookie));
 	if (sc == NULL)
 		return;
+	memset((void*)sc, 0, sizeof(acpi_ec_cookie));
 
 	sc->ec_uid = ecdt->Uid;
 	sc->ec_gpehandle = NULL;
