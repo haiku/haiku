@@ -15,7 +15,7 @@ Low priority	ProcessController		Düşük öncelik
 Urgent display priority	ProcessController		İvedi görüntüleme önceliği
 Memory usage	ProcessController		Bellek kullanımı
 Ok!	ProcessController		Tamam!
-%appname% is already installed in Deskbar.	ProcessController		%appname%, Masaüstü Çubuğu’nda halihazırda yerleşik.
+%appname% is already installed in Deskbar.	ProcessController		%appname%, Masaüstü Çubuğu’nda hâlihazırda yerleşik.
 Normal priority	ProcessController		Normal öncelik
 Restart Deskbar	ProcessController		Masaüstü Çubuğu’nu yeniden başlat
 Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
@@ -40,7 +40,7 @@ Debug this team!	ProcessController		Hata ayıkla
 ProcessController	System name		Süreç Denetimcisi
 Lowest active priority	ProcessController		En düşük etkin öncelik
 Restart Tracker	ProcessController		İzleyici’yi yeniden başlat
-System resources & caches…	ProcessController		Sistem özkaynakları ve önbellekler…
+System resources & caches…	ProcessController		Sistem özkaynakları ve ön bellekler…
 Damned!	ProcessController		Hadi be!
 New Terminal	ProcessController		Yeni uçbirim
 Power saving	ProcessController		Güç tasarrufu

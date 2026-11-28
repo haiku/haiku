@@ -67,7 +67,7 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Paket hizmeti sorunu
 No	MainWindow		Hayır
 Repository	PackageListView		Depo
-%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% uygulamasının işlevsel olması için paket ardalan sürecine gereksinimi var; ancak bu çalışıyor gibi görünmüyor.\nŞimdi başlatmak ister misiniz?
+%appname% needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		%appname% uygulamasının işlevsel olması için paket art alan sürecine gereksinimi var; ancak bu çalışıyor gibi görünmüyor.\nŞimdi başlatmak ister misiniz?
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.

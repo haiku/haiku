@@ -73,5 +73,5 @@ Convert	MediaConverter		Dönüştür
 Audio quality not supported	MediaConverter		Ses kalitesi desteklenmiyor
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Konuma yazılırken hata: %strPath%. Yerine kullanılacak konum: /boot/home
 Error read video frame %lld	MediaConverter		Video çerçevesi %lld okunurken hata
-Preview	MediaConverter		Önizleme
+Preview	MediaConverter		Ön izleme
 Start [ms]: 	MediaConverter		Başlangıç [ms]: 

@@ -1,8 +1,9 @@
-1	portuguese	x-vnd.Haiku-GLifeScreensaver	612287398
+1	portuguese	x-vnd.Haiku-GLifeScreensaver	3750244792
 by Aaron Hill	GLife ScreenSaver		por Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Atraso da vida da grelha: nenhum
 None	GLife ScreenSaver		Nenhum
 Grid width: 	GLife ScreenSaver		Largura da grelha: 
+Grid life delay: %d×	This is a factor: the × represents 'times', don't translate '%d'		Atraso de vida da grelha: %d
 Grid border: %d	GLife ScreenSaver		Borda da grelha: %d
 Grid width: %d	GLife ScreenSaver		Largura da grelha: %d
 Grid border: 	GLife ScreenSaver		Limite da grelha: 

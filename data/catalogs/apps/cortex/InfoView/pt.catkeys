@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.InfoView	590006701
+1	portuguese	application/x-vnd.Cortex.InfoView	4082335579
 Offset	InfoView		Deslocamento
 Description	DormantNodeInfoView		Descrição
 Byte order	InfoView		Ordem de bytes
@@ -23,6 +23,7 @@ Latency	LiveNodeInfoView		Latência
 Media type	InfoView		Tipo de multimédia
 Live media node	LiveNodeInfoView		Nó de média activo
 Kinds	DormantNodeInfoView		Tipos
+%title% info	InfoView		informação de %title%
 Node ID	LiveNodeInfoView		ID do nó
 Resolution	InfoView		Resolução
 Chunk size	InfoView		Tamanho do bloco

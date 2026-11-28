@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1279879631
+1	german	x-vnd.Haiku-Terminal	4032803398
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
 Text encoding	Terminal TermWindow		Kodierung
@@ -12,12 +12,14 @@ Color scheme:	Terminal ThemeView		Farbschema:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%e\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n
 Copy	Terminal TermWindow		Kopieren
 Edit tab title…	Terminal TermWindow		Reiter umbenennen …
+Bold attribute brightens ANSI colors	Terminal AppearancePrefView		Aufgehellte ANSI-Farben bei Fettschrift
 Print	Terminal TermWindow		Drucken
 Settings	Terminal TermWindow		Einstellungen
 %app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
 ANSI bright black color	Terminal ThemeView		ANSI-Farbe Hellschwarz (Dunkelgrau)
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%e\t-\tKodierung des aktuellen Reiters, außer bei UTF-8.\n\t%p\t-\tName des aktiven Prozesses.
 Use default	Terminal SetTitleWindow		Standardwerte
+Bold text:	Terminal AppearancePrefView		Fettschrift:
 Close tab	Terminal TermWindow		Reiter schließen
 Error!	Terminal getString		Fehler!
 Colors…	Terminal TermWindow		Farben…
@@ -72,8 +74,9 @@ Copy absolute path	Terminal TermView		Absoluten Pfad kopieren
 Cancel	Terminal TermWindow		Abbrechen
 ANSI cyan color	Terminal ThemeView		ANSI-Farbe Blaugrün
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Der Prozess \"%1\" läuft noch.\nWird der Reiter geschlossen, wird auch dieser Prozess abgebrochen.
+Simulate by overstriking text	Terminal AppearancePrefView		Mittels Text-doppeln simulieren
 Full screen	Terminal TermWindow		Vollbild
-Shell 	Terminal TermWindow		Konsole
+Shell 	Terminal TermWindow		Konsole 
 Revert	Terminal ThemeWindow		Anfangswerte
 ANSI green color	Terminal ThemeView		ANSI-Farbe Grün
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tDas Zeichen '%'.\n\t%<\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls die darauf folgende Variable nicht leer ist.\n\t%>\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls eine Variable zwischen diesem und eines vorangegangenen\n\t\t\t%< Abschnitts nicht leer ist.\n\t%-\t-\tKennzeichnet das Ende eines %< or %> Abschnitts.\n\nJedes nicht-numerische Zeichen zwischen '%' und dem Formattierungszeichen erzeugt nur \ndann ein Leerzeichen, wenn der Variablenwert nicht leer ist. Es wird dem %< Abschnitt \nhinzugefügt.
@@ -93,6 +96,7 @@ Use text:	Terminal FindWindow		Suchbegriff:
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
 Selected background	Terminal ThemeView		Auswahl-Hintergrund
 Save as default	Terminal TermWindow		Als Standardwerte speichern
+Use bold font	Terminal AppearancePrefView		Fette Schriftart benutzen
 Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
 ANSI bright red color	Terminal ThemeView		ANSI-Farbe Hellrot
 Use left Option as Meta key	Terminal AppearancePrefView		Linke Option-Taste als Meta-Taste verwenden
@@ -112,6 +116,7 @@ Open link	Terminal TermView		Link öffnen
 Text	Terminal ThemeView		Text
 ANSI bright yellow color	Terminal ThemeView		ANSI-Farbe Hellgelb
 Not found.	Terminal TermWindow		Nicht gefunden.
+None	Terminal AppearancePrefView		kein
 ANSI black color	Terminal ThemeView		ANSI-Farbe Schwarz
 Find…	Terminal TermWindow		Suchen …
 No search string was entered.	Terminal TermWindow		Es wurde kein Suchbegriff eingegeben.

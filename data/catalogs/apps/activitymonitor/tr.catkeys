@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-ActivityMonitor	775588635
 Teams	DataSource		Takımlar
 Temp	DataSource		Sıcaklık
-Block cache memory	DataSource		Blok önbellek dosyası
+Block cache memory	DataSource		Blok ön bellek dosyası
 Media nodes	DataSource		Ortam düğümleri
 Network send	DataSource		Ağ giden trafik
 Threads	DataSource		İş parçacıkları
@@ -11,7 +11,7 @@ CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Yenileme aralığı:
 Settings…	ActivityWindow		Ayarlar…
 Unknown thermal sensor	SystemInfoHandler		Bilinmeyen ısı algılayıcısı
-Block cache	DataSource		Blok önbelleği
+Block cache	DataSource		Blok ön belleği
 Memory	DataSource		Bellek
 No thermal sensor	SystemInfoHandler		Termal algılayıcı yok
 CPU speed	DataSource		CPU hızı
@@ -19,7 +19,7 @@ CPU usage	DataSource		CPU kullanımı
 Raw clipboard	DataSource		Ham pano
 Settings	ActivityWindow		Ayarlar
 Used memory	DataSource		Kullanılan bellek
-Cached memory	DataSource		Önbellekteki dosya
+Cached memory	DataSource		Ön bellekteki dosya
 Ports	DataSource		Kapılar
 Apps	DataSource		Uygulamalar
 Page faults	DataSource		Sayfa hatası
@@ -32,7 +32,7 @@ TX	DataSource	Shorter version for Sending	TX
 %lld ms	SettingsWindow		%lld ms
 Text clipboard	DataSource		Metin panosu
 Running applications	DataSource		Çalışan uygulamalar
-Cache	DataSource		Önbellek
+Cache	DataSource		Ön bellek
 CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
 Receiving	DataSource		Alınıyor
 Swap space	DataSource		Takas alanı

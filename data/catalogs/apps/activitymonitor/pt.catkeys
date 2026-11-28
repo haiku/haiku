@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ActivityMonitor	1901289940
+1	portuguese	x-vnd.Haiku-ActivityMonitor	1753371419
 Teams	DataSource		Equipas
 Block cache memory	DataSource		Bloco de memória reservada
 Media nodes	DataSource		Nós de multimédia
@@ -9,8 +9,10 @@ ActivityMonitor	System name		Monitor de Atividade
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervalo entre actualizações:
 Settings…	ActivityWindow		Definições…
+Unknown thermal sensor	SystemInfoHandler		Sensor térmico desconhecido
 Block cache	DataSource		Reserva em bloco
 Memory	DataSource		Memória
+No thermal sensor	SystemInfoHandler		Sem sensor termal
 CPU speed	DataSource		Velocidade da CPU
 CPU usage	DataSource		Utilização do processador
 Raw clipboard	DataSource		Área de transferência bruta

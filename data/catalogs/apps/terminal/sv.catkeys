@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	1279879631
+1	swedish	x-vnd.Haiku-Terminal	4032803398
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
 Text encoding	Terminal TermWindow		Teckenuppsättning
@@ -12,12 +12,14 @@ Color scheme:	Terminal ThemeView		Färgschema:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog i denna tab.\n\t\t\tTeller maximalt antal sökvägskomponenter\n\t\t\tkan anges som. '%2d' för som mest två komponenter.\n\t%T\t-\tTerminal programmets namn på det valda språket.\n\t%e\t-\tEnkodingen av den valda tabben . Inte visad för UTF-8.\n\t%i\t-\tIndexet för fönstret.\n\t%p\t-\tNamnet på den aktiva processen i den valda tabben.\n\t%t\t-\tTiteln på den valda tabben.
 Copy	Terminal TermWindow		Kopiera
 Edit tab title…	Terminal TermWindow		Redigera fliktitel...
+Bold attribute brightens ANSI colors	Terminal AppearancePrefView		Attributet ”fet” gör ANSI-färger ljusare
 Print	Terminal TermWindow		Skriv ut
 Settings	Terminal TermWindow		Inställningar
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
 ANSI bright black color	Terminal ThemeView		ANSI ljus svart färg
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tDen aktuella arbetskatalogen för den aktiva processen.\n\t\t\tValfritt kan det maximala antalet sökvägskomponenter vara\n\t\t\tspecificerat. T.ex. '%2d' för högst två komponenter.\n\t%i\t-\tIndex för fliken.\n\t%e\t-\tKodningen av den aktuella fliken. Visas inte för UTF-8.\n\t%p\t-\tNamnet på den aktiva processen.
 Use default	Terminal SetTitleWindow		Använd förvald
+Bold text:	Terminal AppearancePrefView		Fet text:
 Close tab	Terminal TermWindow		Stäng flik
 Error!	Terminal getString		Fel!
 Colors…	Terminal TermWindow		Färger
@@ -72,6 +74,7 @@ Copy absolute path	Terminal TermView		Kopiera absolut sökväg
 Cancel	Terminal TermWindow		Avbryt
 ANSI cyan color	Terminal ThemeView		ANSI cyan färg
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
+Simulate by overstriking text	Terminal AppearancePrefView		Simulera genom att skriva över text
 Full screen	Terminal TermWindow		Helskärm
 Shell 	Terminal TermWindow		Skal
 Revert	Terminal ThemeWindow		Återgå
@@ -93,6 +96,7 @@ Use text:	Terminal FindWindow		Använd text:
 Close active tab	Terminal TermWindow		Stäng aktiv flik
 Selected background	Terminal ThemeView		Vald bakgrund
 Save as default	Terminal TermWindow		Spara som standard
+Use bold font	Terminal AppearancePrefView		Använd fetstil
 Nothing is selected.	Terminal TermWindow		Ingenting markerat.
 ANSI bright red color	Terminal ThemeView		ANSI ljusröd färg
 Use left Option as Meta key	Terminal AppearancePrefView		Använd vänster Alternativ som Meta-tangent
@@ -112,6 +116,7 @@ Open link	Terminal TermView		Öppna länk
 Text	Terminal ThemeView		Text
 ANSI bright yellow color	Terminal ThemeView		ANSI ljusgul färg
 Not found.	Terminal TermWindow		Hittades ej.
+None	Terminal AppearancePrefView		Ingen
 ANSI black color	Terminal ThemeView		ANSI svart färg
 Find…	Terminal TermWindow		Sök...
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.

@@ -1,8 +1,9 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	1359805917
+1	portuguese	x-vnd.Haiku-HaikuDepot	1470809424
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema ao descarregar condições de utilização
 Available packages	MainWindow		Pacotes disponíveis
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
 An unexpected error has been sent from the server [%li]	ServerHelper		Foi enviado do servidor um erro inesperado [%li]
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		A obter o registo de alterações do pacote
 Create account	UserLoginWindow		Criar conta
 Agree	ToLatestUserUsageConditionsWindow		Concordar
 The response to the captcha was incorrect.	ServerHelper		A resposta ao captcha estava errada.
@@ -40,10 +41,13 @@ Click a package to view information	PackageInfoView		Clique num pacote para visu
 Cancel	UserLoginWindow		Cancelar
 Rating not possible	MainWindow		Avaliação não possível
 Package update error	MainWindow		Erro na atualização de pacotes
+Click here	FeaturedPackagesView	Appears in the sentence 'Click here to search all packages.'	Clique aqui
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# processo} other{# processos}}
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		A obter avaliações de utilizadores para o pacote
 Reboot required	PackageManager		Necessário reiniciar
 All packages	PackageListView		Todos os pacotes
 Send	RatePackageWindow		Enviar
+Creating package list…	FeaturedPackagesView		A criar lista de pacotes…
 Start package daemon	App		Iniciar serviço de pacotes
 There are problems in the supplied data:	UserLoginWindow		Há problemas nos dados introduzidos:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		O utilizador '%Nickname%' não concordou com quaisquer condições de utilização.

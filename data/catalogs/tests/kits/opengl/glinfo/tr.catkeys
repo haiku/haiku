@@ -8,7 +8,7 @@ Attributes stack size	Capabilities		Öznitelik yığın boyutu
 Maximum lights	Capabilities		En çok ışık
 Extensions	Extensions		Uzantılar
 Available extensions	Extensions		Kullanılabilir uzantılar
-Maximum recommended vertex elements	Capabilities		Önerilen en çok doruk ögeleri
+Maximum recommended vertex elements	Capabilities		Önerilen en çok tepecik ögesi
 Value	Capabilities		Değer
 Name stack size	Capabilities		Ad yığın boyutu
 Capabilities	Capabilities		Yetenekler

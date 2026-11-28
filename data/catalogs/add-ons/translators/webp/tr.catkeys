@@ -12,9 +12,9 @@ Default	ConfigView		Saptanmış
 Text	ConfigView		Metin
 Preprocessing filter	ConfigView		Ön işleme süzgeci
 Compression method:	ConfigView		Sıkıştırma yöntemi:
-Preset	ConfigView		Önayar
+Preset	ConfigView		Hazır ayar
 Drawing	ConfigView		Çizim
-Output preset:	ConfigView		Çıkış önayarı:
+Output preset:	ConfigView		Çıkış hazır ayarı:
 WebP Settings	main		WebP Ayarları
 Icon	ConfigView		Simge
 WebP image	WebPTranslator		WebP görseli

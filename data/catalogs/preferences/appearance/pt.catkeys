@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Appearance	3146871853
+1	portuguese	x-vnd.Haiku-Appearance	838951555
 Control border	Colors tab		Limite do controlo
 Control mark	Colors tab		Marca de controlo
 Off	AntialiasingSettingsView		Desligado
@@ -47,6 +47,7 @@ Automatically pick secondary colors	Colors tab		Selecionar cores secundárias au
 Window tab text	Colors tab		Texto do separador de janela
 Navigation pulse	Colors tab		Pulsação de navegação
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
+Progress bar	Colors tab		Barra de progresso
 Window tab	Colors tab		Separador de janela
 Link text	Colors tab		Texto de ligação
 Tooltip background	Colors tab		Fundo da descrição

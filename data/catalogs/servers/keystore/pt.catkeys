@@ -1,6 +1,6 @@
 1	portuguese	x-vnd.Haiku-keystore_server	2429996361
 to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		para realizar a seguinte ação:\n%accessString%\n\n
-This application doesn't yet have the required privileges.	AppAccessRequestWindow		Esta aplicação ainda não dispõe dos privilégios necessários.
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Esta aplicação ainda não tem os privilégios necessários.
 Keyring:	KeyRequestWindow		Porta-chaves:
 requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		solicita acesso ao porta-chaves:\n%keyringName%\n\n
 Application keyring access	AppAccessRequestWindow		Acesso de aplicação ao porta-chaves

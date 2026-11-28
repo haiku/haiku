@@ -1,4 +1,5 @@
-1	portuguese	x-vnd.Haiku-Network	3807978621
+1	portuguese	x-vnd.Haiku-Network	3044115400
+no link	IntefaceView		nenhuma hiperligação
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
 Link speed:	IntefaceView		Velocidade de ligação:
 WPA	WPA protected network		WPA
@@ -10,6 +11,7 @@ Other	NetworkWindow		Outro
 Sent:	IntefaceView		Dados enviados:
 Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		A máscara de sub-rede define a sua rede local
+unknown	IntefaceView		desconhecido
 Your IP address	IntefaceAddressView		O seu endereço de IP
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		Endereço IP:
@@ -27,12 +29,14 @@ Apply	IntefaceAddressView		Aplicar
 Disable	ServiceView		Desativar
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Mostrar o estado da rede na Deskbar
+no stateful configuration	IntefaceView		sem configuração com estado
 Mode:	IntefaceAddressView		Modo:
 connected	InterfaceListItem		ligado
 OK	NetworkWindow		OK
 Static	IntefaceAddressView		Estático
 launch error	NetworkWindow		erro de inicialização
 Renegotiate	IntefaceView		Renegociar
+configuring	IntefaceView		a configurar
 MAC address:	IntefaceView		Endereço MAC:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		desativado

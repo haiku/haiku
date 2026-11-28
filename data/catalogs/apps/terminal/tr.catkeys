@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	1279879631
+1	turkish	x-vnd.Haiku-Terminal	4032803398
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Text encoding	Terminal TermWindow		Metin kodlaması
@@ -12,12 +12,14 @@ Color scheme:	Terminal ThemeView		Renk şeması:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t—\tSekmede çalışan etkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için “%2d”.\n\t%T\t—\tGeçerli yerelleştirme için Uçbirim uygulaması adı\n\t%e\t—\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%i\t—\tPencere sırası\n\t%p\t—\tSekmedeki etkin işlemin adı\n\t%t\t—\tSekme başlığı
 Copy	Terminal TermWindow		Kopyala
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
+Bold attribute brightens ANSI colors	Terminal AppearancePrefView		Kalın öznitelik, ANSI renklerini daha parlak yapar
 Print	Terminal TermWindow		Yazdır
 Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% ayarları
 ANSI bright black color	Terminal ThemeView		ANSI açık siyah
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t—\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için “%2d”.\n\t%i\t—\tSekmenin indeksi.\n\t%e\t—\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t—\tEtkin sürecin adı.
 Use default	Terminal SetTitleWindow		Saptanmışları kullan
+Bold text:	Terminal AppearancePrefView		Kalın metin:
 Close tab	Terminal TermWindow		Sekmeyi kapat
 Error!	Terminal getString		Hata!
 Colors…	Terminal TermWindow		Renkler…
@@ -72,6 +74,7 @@ Copy absolute path	Terminal TermView		Tam yolu kopyala
 Cancel	Terminal TermWindow		Vazgeç
 ANSI cyan color	Terminal ThemeView		ANSI camgöbeği
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		“%1” süreci hâlâ çalışıyor.\nBu sekmeyi kapatırsanız süreç sonlandırılacaktır.
+Simulate by overstriking text	Terminal AppearancePrefView		Metnin üzerine çizgi çekerek benzeştir
 Full screen	Terminal TermWindow		Tam ekran
 Shell 	Terminal TermWindow		Kabuk 
 Revert	Terminal ThemeWindow		Eski haline döndür
@@ -93,6 +96,7 @@ Use text:	Terminal FindWindow		Şu metni kullan:
 Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
 Selected background	Terminal ThemeView		Seçili arka plan
 Save as default	Terminal TermWindow		Saptanmış olarak kaydet
+Use bold font	Terminal AppearancePrefView		Kalın font kullan
 Nothing is selected.	Terminal TermWindow		Hiçbir şey seçilmedi.
 ANSI bright red color	Terminal ThemeView		ANSI açık kırmızı
 Use left Option as Meta key	Terminal AppearancePrefView		Sol Seçenek düğmesini Meta düğmesi olarak kullan
@@ -112,6 +116,7 @@ Open link	Terminal TermView		Bağlantıyı aç
 Text	Terminal ThemeView		Metin
 ANSI bright yellow color	Terminal ThemeView		ANSI açık sarı
 Not found.	Terminal TermWindow		Bulunamadı.
+None	Terminal AppearancePrefView		Yok
 ANSI black color	Terminal ThemeView		ANSI siyah
 Find…	Terminal TermWindow		Bul…
 No search string was entered.	Terminal TermWindow		Hiçbir arama dizisi girilmedi.

@@ -124,7 +124,7 @@ The partition %s is already unmounted.	MainWindow		%s bölüntüsünün bağlant
 Target volume is read only.	MainWindow		Hedef disk bölümü saltokunur.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölüntünün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüntü artık başka işletim sistemleri tarafından tanınamayabilir!
 Cannot init source volume.	MainWindow		Kaynak disk bölümü ilklendirilemiyor.
-Boot	PartitionList		Önyükleme
+Boot	PartitionList		Ön yükleme
 %appname%: Select disk image	MainWindow		%appname%: Disk kalıbı seç
 OK	AbstractParametersPanel		Tamam
 Virtual	PartitionList		Sanal
@@ -139,7 +139,7 @@ Writing image to disk	MainWindow		Kalıp diske yazılıyor…
 The partition %s has been successfully formatted.\n	MainWindow		%s bölüntüsü başarıyla biçimlendirildi.\n
 %appname%: Register disk image	MainWindow		%appname%: Disk kalıbını kaydettir
 Write image…	MainWindow		Kalıbı yaz…
-The partition %s is already mounted.	MainWindow		%s bölüntüsü halihazırda bağlı.
+The partition %s is already mounted.	MainWindow		%s bölüntüsü hâlihazırda bağlı.
 Size	PartitionList		Boyut
 Creation of the partition has failed.	MainWindow		Bölüntü oluşturulamadı.
 Mount	MainWindow		Bağla

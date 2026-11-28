@@ -83,7 +83,7 @@ Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
  (block size: 	InfoWindow		 (blok boyutu: 
 Generate image thumbnails	SettingsView		Küçük görseller üret
-An item named '%filename%' already exists.	FSUtils		“%filename%” adlı bir öge halihazırda var.
+An item named '%filename%' already exists.	FSUtils		“%filename%” adlı bir öge hâlihazırda var.
 preferences	B_PREFERENCES_DIRECTORY		tercihler
 Name	Person Query Columns		Ad
 Skip all	FSUtils		Tümünü atla
@@ -253,7 +253,7 @@ Point	AttributesView		Nokta
 You can't move or copy items to read-only volumes.	PoseView		Saltokunur disk bölümlerine ögeleri taşıyamaz veya kopyalayamazsınız.
 home	B_USER_DIRECTORY		ana klasör
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici Şablonları
-Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
+Disk mounting during boot	AutoMounterSettings		Ön yükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
 Node ref	AttributesView		Düğüm başvurusu
 Could not find application \"%appname\"	OpenWithWindow		“%appname” uygulaması bulunamıyor
@@ -391,7 +391,7 @@ When	Email Query Columns		Ne zaman
 Object	AttributesView		Nesne
 Paste	ContainerWindow		Yapıştır
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		“%name” adındaki bir öge bu klasörde hâlihazırda var ve aynı adlı ögeler\niçeriyor olabilir. Bu ögeleri %verb ögelerle değiştirmek ister misiniz?
-Cannot unmount the boot volume \"%name\".	FSUtils		“%name” önyükleme disk bölümünün bağlantısı kesilemez.
+Cannot unmount the boot volume \"%name\".	FSUtils		“%name” ön yükleme disk bölümünün bağlantısı kesilemez.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		“%document”, “%app” uygulaması ile açılamadı (Eksik sembol: %symbol).\n
 New folder	ContainerWindow		Yeni klasör
 Name	OpenWithWindow		Ad
@@ -442,7 +442,7 @@ by formula	FindPanel		formül ile
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Yeniden adlandır”a tıklayın.
 Permissions	FilePermissionsView		İzinler
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		“%name” eski bir yürütülebilir. Lütfen güncellenmiş bir sürümünü edinin veya uygulamayı yeniden derleyin.
-Only the boot disk	AutoMounterSettings		Yalnızca önyükleme diski
+Only the boot disk	AutoMounterSettings		Yalnızca ön yükleme diski
 Message	AttributesView		İleti
 Modified	Default Query Columns		Değiştirilme
 Default application	InfoWindow		Saptanmış uygulama

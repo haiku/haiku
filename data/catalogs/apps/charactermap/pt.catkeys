@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	2719304157
+1	portuguese	x-vnd.Haiku-CharacterMap	448213617
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbolos matemáticos diversos B
 Latin extended E	UnicodeBlocks		Latim expandido E
@@ -177,6 +177,7 @@ Chorasmian	UnicodeBlocks		Corásmio
 Lisu supplement	UnicodeBlocks		Suplemento Lisu
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Controlos de formato de taquigrafia
+Inscriptional Parthian	UnicodeBlocks		Inscrição Parta
 Optical character recognition	UnicodeBlocks		Reconhecimento ótico de caracteres
 Tamil	UnicodeBlocks		Tâmil
 Lisu	UnicodeBlocks		Lisu
@@ -251,6 +252,7 @@ Hangul Jamo extended B	UnicodeBlocks		Hangul Jamo expandido B
 Tai Viet	UnicodeBlocks		Tai Viet
 Georgian supplement	UnicodeBlocks		Suplemento do Georgiano
 Tagalog	UnicodeBlocks		Tagalog
+CJK unified ideographs extension F	UnicodeBlocks		Ideogramas unificados CJK extensão F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Símbolos e pictogramas suplementares
 Devanagari	UnicodeBlocks		Devanágari
 Runic	UnicodeBlocks		Rúnico
@@ -270,6 +272,7 @@ Kangxi radicals	UnicodeBlocks		Radicais Kangxi
 Copy character	CharacterView		Copiar caráter
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Tipo de letra
+Ornamental dingbats	UnicodeBlocks		Dingbats ornamentais
 Egyptian hieroglyph format controls	UnicodeBlocks		Controlos de formato de hieróglifo egípcio
 Phaistos disc	UnicodeBlocks		Disco de Festo
 Miscellaneous technical	UnicodeBlocks		Caracteres técnicos diversos

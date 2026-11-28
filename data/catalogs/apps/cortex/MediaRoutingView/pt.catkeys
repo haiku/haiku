@@ -1,12 +1,15 @@
-1	portuguese	application/x-vnd.Cortex.MediaRoutingView	3137503987
+1	portuguese	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Bloquear grupo
 %refname% (no file)	MediaNodePanel		%refname% (nenhum ficheiro)
 Video output	MediaRoutingView		Saída de vídeo
 Icon view	MediaRoutingView		Vista de ícones
 OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Ciclo
 Advanced	MediaNodePanel		Avançado
 Audio input	MediaRoutingView		Entrada de áudio
 Run mode	MediaNodePanel		Modo de execução
 Could not load '%filename%'	MediaRoutingView		Não foi possível carregar '%filename%'
+Stop time source	MediaNodePanel		Parar fonte de tempo
 Be Audio Mixer	MediaRoutingView		Misturador de áudio Be
 Video input	MediaRoutingView		Entrada de vídeo
 Release	MediaNodePanel		Lançamento
@@ -18,6 +21,7 @@ Select all	MediaRoutingView		Selecionar todos
 (same as group)	MediaNodePanel		(mesmo que o grupo)
 Input	MediaJack		Entrada
 Get info	MediaJack		Obter informações
+Start time source	MediaNodePanel		Iniciar fonte de tempo
 Error	MediaRoutingView		Erro
 Could not release '%refname%'	MediaRoutingView		Não foi possível libertar '%refname%'
 Output	MediaJack		Saída

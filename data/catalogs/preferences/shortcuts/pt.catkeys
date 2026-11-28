@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Shortcuts	171515608
+1	portuguese	x-vnd.Haiku-Shortcuts	641209832
 *MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Aplicação
 Option	ShortcutsSpec	Name for modifier on keyboard	Opção
@@ -6,10 +6,12 @@ Save changes before closing?	ShortcutsWindow		Guardar as alterações antes de f
 Revert to saved	ShortcutsWindow		Reverter para a versão guardada
 Don't save	ShortcutsWindow		Não guardar
 *MouseDown	ShortcutsWindow		*MouseDown
+%prefname% wasn't able to save your keyset.	ShortcutsWindow		%prefname% não conseguiu guardar o seu conjunto de chaves.
 *Beep	ShortcutsWindow		*Beep
 Save	ShortcutsWindow		Guardar
 Either	ShortcutsSpec		Qualquer uma
 Oh no	ShortcutsWindow		Oh, não
+%prefname% was unable to save your KeySet file!	ShortcutsWindow		%prefname% não conseguiu guardar o seu ficheiro KeySet!
 Key	ShortcutsWindow		Tecla
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Selecionar
@@ -41,4 +43,5 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Abrir combinação de teclas…
 File	ShortcutsWindow		Ficheiro
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+%prefname% was unable to parse your KeySet file!	ShortcutsWindow		%prefname% não conseguiu analisar o seu ficheiro KeySet!
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

@@ -30,7 +30,7 @@ Time zone	Time		Zaman dilimi
 Clock	Time		Saat
 Network time	Time		Ağ zamanı
 Sending request failed	Time		Gönderme isteği başarısız
-Preview time:	Time		Zamanı önizle:
+Preview time:	Time		Zamanı ön izle:
 \nNow: 	Time		\nŞimdi: 
 Could not create socket	Time		Uç oluşturulamadı
 Pacific	Time		Pasifik
@@ -39,7 +39,7 @@ Show clock in Deskbar	Time		Saati Masaüstü Çubuğu’nda göster
 Display time with seconds	Time		Saniyeleri göster
 Time	System name		Tarih ve Zaman
 Show time zone	Time		Zaman dilimini göster
-Synchronize at boot	Time		Önyükleme sırasında eşzamanla
+Synchronize at boot	Time		Ön yükleme sırasında eşzamanla
 Indian	Time		Hint
 Revert	Time		Eski haline döndür
 Date and time	Time		Tarih ve zaman

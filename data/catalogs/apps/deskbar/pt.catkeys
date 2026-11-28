@@ -1,14 +1,16 @@
-1	portuguese	x-vnd.Be-TSKB	3780974715
+1	portuguese	x-vnd.Be-TSKB	2381744795
 Auto-hide	PreferencesWindow		Ocultar automaticamente
 Show all	WindowMenu		Mostrar todas
 Edit in Tracker…	PreferencesWindow		Editar no Tracker…
 Menu	PreferencesWindow		Menu
+Location	PreferencesWindow		Localização
 Tracker always first	PreferencesWindow		Tracker sempre primeiro
 Hide clock	TimeView		Esconder relógio
 Large	PreferencesWindow		Grandes
 <Deskbar folder is empty>	DeskbarMenu		<A pasta da Deskbar está vazia>
 Recent documents	DeskbarMenu		Documentos recentes
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicações
+%appname% preferences	PreferencesWindow		Preferências de %appname%
 Always on top	PreferencesWindow		Sempre visível
 Restart system	DeskbarMenu		Reiniciar sistema
 Recent documents:	PreferencesWindow		Documentos recentes:
@@ -28,12 +30,14 @@ Close all	WindowMenu		Fechar todas
 About this system	DeskbarMenu		Sobre este sistema
 Quit application	WindowMenu		Sair da aplicação
 Hide application names	PreferencesWindow		Esconder os nomes das aplicações
+Deskbar	System name		Deskbar
 Applications	PreferencesWindow		Aplicações
 Show application expander	PreferencesWindow		Mostrar expansor de aplicação
 Suspend	DeskbarMenu		Suspender
 Shutdown…	DeskbarMenu		Encerrar…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstrações
 Expand new applications	PreferencesWindow		Expandir novas aplicações
+%appname% preferences…	DeskbarMenu		Preferências de %appname%…
 Recent applications:	PreferencesWindow		Aplicações recentes:
 Recent folders:	PreferencesWindow		Pastas recentes:
 Recent folders	DeskbarMenu		Pastas recentes

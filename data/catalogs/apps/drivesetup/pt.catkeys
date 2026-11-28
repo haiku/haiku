@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-DriveSetup	3844018628
+1	portuguese	x-vnd.Haiku-DriveSetup	2345310783
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar todos
 Disk	MainWindow		Disco
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositivo
 Could not change the parameters of the selected partition.	MainWindow		Não foi possível alterar os parâmetros da partição selecionada.
 Initialize	MainWindow		Inicializar
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Tem a certeza que deseja gravar agora as alterações no disco?\n\nTodos os dados na partição \"%s\" serão irremediavelmente perdidos se o fizer!
 PGP encrypted	Encryption utils		Encriptado com PGP
 Delete partition	MainWindow		Eliminar partição
 Removable	PartitionList		Removível
@@ -21,6 +22,7 @@ Validation of the given parameters failed.	MainWindow		A validação dos parâme
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Tem a certeza que deseja formatar a partição \"%s\"? Apenas lhe será perguntado uma vez mais antes de as alterações serem escritas no disco.
 DriveSetup	System name		Gestor de Discos
 Mounted at	PartitionList		Montado em
+Disk system %s not found!	MainWindow		Sistema do disco %s não encontrado!
 Create…	MainWindow		Criar…
 Write changes	MainWindow		Aplicar alterações
 Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação introduzidos falhou.
@@ -40,6 +42,7 @@ Format	InitializeParametersPanel		Formatar
 Could not unmount partition	MainWindow		Não foi possível desmontar a partição
 Create	CreateParametersPanel		Criar
 File system	PartitionList		Sistema de ficheiros
+Unknown (%s)	PartitionList		Desconhecido (%s)
 The selected partition does not contain a partitioning system.	MainWindow		A partição seleccionada não contém um sistema de partições.
 End: %s	Support		Fim: %s
 Partition type	PartitionList		Tipo de partição
@@ -96,6 +99,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Boot	PartitionList		Arranque
 OK	AbstractParametersPanel		OK
 Virtual	PartitionList		Virtual
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Tem a certeza de que deseja gravar agora as alterações no disco?\n\nTodos os dados no disco \"%s\" serão irremediavelmente perdidos se o fizer!
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Tem a certeza de que pretende aplicar todas as alterações no disco agora?\n\nTodos os dados na partição seleccionada serão perdidos de forma irrecuperável se o fizer!
 Select a partition from the list below.	DiskView		Seleccione uma partição a partir da lista abaixo.

@@ -1,5 +1,7 @@
-1	portuguese	application/x-vnd.Be.LoggingConsumerApp	2235602373
+1	portuguese	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: não foi possível obter a informação do nó (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioridade
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: não foi possível encontrar o nó (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latência
 Logged input	CortexAddOnsLoggingConsumer		Introdução registada
 CPU spin percentage	CortexAddOnsLoggingConsumer		Percentagem de rotação da CPU
@@ -11,8 +13,10 @@ Latency control	CortexAddOnsLoggingConsumer		Controlo de latência
 CPU percentage	CortexAddOnsLoggingConsumer		Percentagem de CPU
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Parar
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Uma versão de complemento do nó LoggingConsumer.\nVeja a "Be Developer Newsletter III.18: 5 May, 1999\nAdaptado por Eric Moon (4 Junho, 1999)
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controlos
 controls	CortexAddOnsCommonMediaNodeControlApp		controlos
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Ligar
 percent	CortexAddOnsLoggingConsumer		percentagem
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: sem parâmetros para o nó (%ld):\n%s\n

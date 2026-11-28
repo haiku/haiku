@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Input	993392905
+1	portuguese	x-vnd.Haiku-Input	921717651
 Defaults	InputMouse		Predefinições
 Scrolling	TouchpadPrefView		Deslocação
 Long	KeyboardView		Longo
@@ -9,6 +9,7 @@ Double-click speed	SettingsView		Rapidez do duplo clique
 5-Button	SettingsView		5 Botões
 Typing test area	KeyboardView		Área de teste de digitação
 Fast	KeyboardView		Rápida
+Always	TouchpadPrefView		Sempre
 Please confirm	TouchpadPrefView		Por favor confime
 Trackpad speed	TouchpadPrefView		Velocidade do Trackpad
 Mouse speed	SettingsView		Velocidade do rato
@@ -23,6 +24,7 @@ Revert	InputMouse		Reverter
 Slow	KeyboardView		Lenta
 2-Button	SettingsView		2 Botões
 Click to focus and raise	SettingsView		Clique para adquirir foco e ativar
+Natural scrolling	TouchpadPrefView		Deslocamento natural
 Vertical	TouchpadPrefView		Vertical
 Low	TouchpadPrefView		Baixo
 Focus follows mouse	SettingsView		Foco segue o rato
@@ -31,6 +33,7 @@ Double-click test area	SettingsView		Área de testes do duplo clique
 Revert	TouchpadPrefView		Reverter
 4-Button	SettingsView		4 Botões
 Tapping sensitivity	TouchpadPrefView		Sensibilidade ao toque
+Disabled	TouchpadPrefView		Desativado
 Revert	InputKeyboard		Reverter
 Mouse type:	SettingsView		Tipo de rato:
 Off	TouchpadPrefView		Desligado
@@ -47,6 +50,7 @@ Mouse acceleration	SettingsView		Aceleração do rato
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		A nova área de deslocação é muito grande e pode impedir o funcionamento normal do rato. Tem a certeza de que pretende alterá-la?
 High	TouchpadPrefView		Alta
 Defaults	TouchpadPrefView		Predefinições
+Finger click	TouchpadPrefView		Clique do dedo
 1-Button	SettingsView		1 Botão
 Defaults	InputKeyboard		Predefinição
 Key repeat rate	KeyboardView		Taxa de repetição de tecla

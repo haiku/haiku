@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	1279879631
+1	hungarian	x-vnd.Haiku-Terminal	4032803398
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Text encoding	Terminal TermWindow		Szöveg kódolása
@@ -12,12 +12,14 @@ Color scheme:	Terminal ThemeView		Színséma:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tA jelenlegi folyamat munka mappája az aktuális fülön.\n\t\t\tOpcionálisan megadható a maximális útvonal-elemek száma.\n\t\t\tPéldául '%2d' a legutolsó kettő elem.\n\t%T\t-\tA Terminal neve az aktuális nyelven.\n\t%e\t-\tA jelenlegi fül kódolása. UTF-8 esetén nem látszik.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tAz aktív folyamat neve az aktuális fülön.\n\t%t\t-\tA jelenlegi fül címe.
 Copy	Terminal TermWindow		Másolás
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
+Bold attribute brightens ANSI colors	Terminal AppearancePrefView		Félkövér attribútum világosítja az ANSI színeket
 Print	Terminal TermWindow		Nyomtatás
 Settings	Terminal TermWindow		Beállítások
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
 ANSI bright black color	Terminal ThemeView		ANSI fényes fekete
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAz aktív folyamat jelenlegi mappája..\n\t\t\tA maximális szint megadása az útvonalhoz.\n\t\t\tPéldául '%2d' legfeljebb két szinthez.\n\t%i\t-\tA fül sorszáma.\n\t%e\t-\tAz aktuális fül kódolása. UTF-8-nál nem jelenik meg.\n\t%p\t-\tAz aktív folyamat neve.
 Use default	Terminal SetTitleWindow		Alapérték használata
+Bold text:	Terminal AppearancePrefView		Félkövér szöveg:
 Close tab	Terminal TermWindow		Lap bezárása
 Error!	Terminal getString		Hiba!
 Colors…	Terminal TermWindow		Színek…
@@ -72,6 +74,7 @@ Copy absolute path	Terminal TermView		Teljes útvonal másolása
 Cancel	Terminal TermWindow		Mégse
 ANSI cyan color	Terminal ThemeView		ANSI cián
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		A \"%1\" folyamat még fut.\nHa bezárja a lapot, a folyamat megszakad.
+Simulate by overstriking text	Terminal AppearancePrefView		Szimuláció szöveg túlhúzásával
 Full screen	Terminal TermWindow		Teljes képernyő
 Shell 	Terminal TermWindow		Shell
 Revert	Terminal ThemeWindow		Visszavon
@@ -93,6 +96,7 @@ Use text:	Terminal FindWindow		Szöveg használata:
 Close active tab	Terminal TermWindow		Aktív lap bezárása
 Selected background	Terminal ThemeView		Kijelölés háttere
 Save as default	Terminal TermWindow		Beállítás alapértelmezettként
+Use bold font	Terminal AppearancePrefView		Félkövér betűtípus használata
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
 ANSI bright red color	Terminal ThemeView		ANSI fényes piros
 Use left Option as Meta key	Terminal AppearancePrefView		Bal Opció használata Meta-billentyűnek
@@ -112,6 +116,7 @@ Open link	Terminal TermView		Hivatkozás megnyitása
 Text	Terminal ThemeView		Szöveg
 ANSI bright yellow color	Terminal ThemeView		ANSI fényes sárga
 Not found.	Terminal TermWindow		Nem található.
+None	Terminal AppearancePrefView		Nincs
 ANSI black color	Terminal ThemeView		ANSI fekete
 Find…	Terminal TermWindow		Keresés…
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg

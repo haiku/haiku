@@ -1,7 +1,8 @@
-1	portuguese	x-vnd.Haiku-Media	4055972908
+1	portuguese	x-vnd.Haiku-Media	2686142259
 Couldn't add volume control in Deskbar: %s\n	Media views		Não foi possível adicionar controlo de volume à Deskbar: %s\n
 Restart media services	Media views		Reiniciar serviços multimédia
 Quit	Media Window		Sair
+Quitting %prefname% now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Sair agora de %prefname% vai impedir o reinício dos serviços de multimédia. As funcionalidade de multimédia instáveis ou indisponíveis são o resultado provável.
 <none>	VideoInputMenu	Used when no video input is available	<nenhuma>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Não foi possível remover o controlo de volume na Deskbar: %s\n
 Video output:	Media views		Saída de vídeo:
