@@ -224,6 +224,8 @@ private:
 	static const uint32		kNumHashBuckets = 0x800;
 							// if you change this, adjust the shifting in
 							// Hash() accordingly!
+
+	static const uint16		kLastReservedPort = 1023;
 };
 
 
@@ -445,7 +447,12 @@ UdpDomainSupport::_BindEndpoint(UdpEndpoint *endpoint,
 status_t
 UdpDomainSupport::_Bind(UdpEndpoint *endpoint, const sockaddr *address)
 {
-	int socketOptions = endpoint->Socket()->options;
+	// TODO: this check follows very typical UNIX semantics
+	// and generally should be improved.
+	if (ntohs(AddressModule()->get_port(address)) <= kLastReservedPort && geteuid() != 0)
+		return B_PERMISSION_DENIED;
+
+	const int socketOptions = endpoint->Socket()->options;
 
 	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
 
